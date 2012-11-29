@@ -1,0 +1,15 @@
+﻿<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+	<!-- Init -->
+	<Script file = "IGAS_UI.lua"/>
+
+	<!-- Modules -->
+	<Include file = "SpellCooldownLine\SpellCooldownLine.xml"/>
+	<Include file = "ActionBar\ActionBar.xml"/>
+	<Include file = "InfoBar\InfoBar.xml"/>
+	<Include file = "RaidPanel\RaidPanel.xml"/>
+	<Include file = "UnitFrame\UnitFrame.xml"/>
+
+	<!-- Manager -->
+	<Script file = "Manager.Designer.lua"/>
+	<Script file = "Manager.Script.lua"/>
+</Ui>
