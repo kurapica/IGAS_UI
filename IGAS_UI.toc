@@ -4,8 +4,8 @@
 ## Version: v1
 ## Notes: UI demo for IGAS
 ## eMail: kurapica.igas@gmail.com
-## X-Embeds: IGAS
-## OptionalDeps: IGAS
+## URL: http://github.com/kurapica
+## Dependencies: IGAS
 ## DefaultState: Enabled
 ## LoadOnDemand: 0
 ## SavedVariablesPerCharacter: IGAS_UI_DB_Char
