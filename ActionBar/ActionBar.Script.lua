@@ -41,6 +41,10 @@ ITEM_QUEST = 10
 _HiddenFrame = CreateFrame("Frame")	-- No need use IGAS frame
 _HiddenFrame:Hide()
 
+GameTooltip = _G.GameTooltip
+UIParent = _G.UIParent
+ITEM_BIND_QUEST = _G.ITEM_BIND_QUEST
+
 ------------------------------------------------------
 -- Module Script Handler
 ------------------------------------------------------
@@ -158,12 +162,29 @@ function UpdateQuestBar()
 			if link and not _QuestMap[link] then
 				_, _, _, _, _, cls, subclass = GetItemInfo(link)
 
-				if cls == _ItemType[ITEM_QUEST] and GetItemSpell(link) then
-					btn:SetAction("item", link)
-					btn = btn.Brother
+				if GetItemSpell(link) then
+					if cls == _ItemType[ITEM_QUEST] then
+						-- skip
+					elseif cls == _ItemType[ITEM_CONSUMABLE] then
+						GameTooltip_SetDefaultAnchor(GameTooltip, UIParent)
+						GameTooltip:SetBagItem(bag, slot)
+						if _G["GameTooltipTextLeft2"]:GetText() ~= ITEM_BIND_QUEST then
+							link = nil
+						end
+						GameTooltip:Hide()
+					else
+						link = nil
+					end
 
-					if not btn then
-						break
+					if link then
+						_QuestMap[link] = true
+
+						btn:SetAction("item", link)
+						btn = btn.Brother
+
+						if not btn then
+							break
+						end
 					end
 				end
 			end
