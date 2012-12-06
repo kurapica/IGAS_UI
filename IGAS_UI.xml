@@ -7,7 +7,8 @@
 	<Include file = "ActionBar\ActionBar.xml"/>
 	<Include file = "InfoBar\InfoBar.xml"/>
 	<Include file = "RaidPanel\RaidPanel.xml"/>
-	<Include file = "UnitFrame\UnitFrame.xml"/>
+	<!--Include file = "UnitFrame\UnitFrame.xml"/-->
+	<Include file = "UnitFrame_Slim\UnitFrame.xml"/>
 
 	<!-- Manager -->
 	<Script file = "Manager.Designer.lua"/>
