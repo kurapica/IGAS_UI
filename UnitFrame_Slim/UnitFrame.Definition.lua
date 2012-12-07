@@ -40,7 +40,7 @@ interface "iBorder"
 	_BORDER_COLOR = ColorType(0, 0, 0)
 
 	_BACK_MULTI = 0.4
-	_BACK_ALPHA = 0.25
+	_BACK_ALPHA = 0.7
 
 	------------------------------------------------------
 	-- Method
