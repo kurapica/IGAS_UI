@@ -11,4 +11,4 @@ frmTargetTarget:SetSize(160, 36)
 
 -- Debuff Panel
 frmTargetTarget:AddElement(iDebuffPanel)
-frmTargetTarget.iDebuffPanel:SetPoint("BOTTOMRIGHT", frmTargetTarget, "TOPRIGHT")
+frmTargetTarget.iDebuffPanel:SetPoint("BOTTOMRIGHT", frmTargetTarget, "TOPRIGHT", 0, 4)

@@ -14,6 +14,9 @@ _IGASUI_UNITFRAME_GROUP = "IUnitFrame"
 RAID_CLASS_COLORS = _G.RAID_CLASS_COLORS
 DEFAULT_COLOR = ColorType(1, 1, 1)
 
+CASTBAR_COLOR = ColorType(0, 0, 0.8)
+BUFF_SIZE = 24
+
 _Buff_List = {
 	-- [spellId] = true,
 }
@@ -124,7 +127,7 @@ class "iUnitFrame"
 		frm:AddElement(iHealthBar, "rest")
 
 		-- Power
-		frm:AddElement(iPowerBar, "south", 2, "px")
+		frm:AddElement(iPowerBar, "south", 6, "px")
 
 		-- Name
 		frm:AddElement(NameLabel)
@@ -144,9 +147,9 @@ class "iUnitFrame"
 		frm.HealthTextFrequent.ShowPercent = true
 		frm.HealthTextFrequent:SetPoint("RIGHT", frm.iHealthBar, "LEFT", -4, 0)
 
-		-- Power text
-		frm:AddElement(PowerTextFrequent)
-		frm.PowerTextFrequent:SetPoint("TOPLEFT", frm, "BOTTOMLEFT")
+		frm:AddElement("HealthTextFrequent2", HealthTextFrequent)
+		frm.HealthTextFrequent2.ValueFormat = "%.1f"
+		frm.HealthTextFrequent2:SetPoint("TOPLEFT", frm, "BOTTOMLEFT", 0, -2)
 
 		arUnit:Insert(frm)
 
@@ -233,6 +236,9 @@ class "iBuffPanel"
 		obj.ColumnCount = 6
 		obj.MarginTop = 2
 
+		obj.ElementWidth = BUFF_SIZE
+		obj.ElementHeight = BUFF_SIZE
+
 		return obj
     end
 endclass "iBuffPanel"
@@ -275,6 +281,9 @@ class "iDebuffPanel"
 		obj.ColumnCount = 6
 		obj.MarginTop = 2
 
+		obj.ElementWidth = BUFF_SIZE
+		obj.ElementHeight = BUFF_SIZE
+
 		return obj
     end
 endclass "iDebuffPanel"
@@ -290,18 +299,6 @@ class "iCastBar"
 	------------------------------------------------------
 	-- Method
 	------------------------------------------------------
-	------------------------------------
-	--- Refresh the element
-	-- @name Refresh
-	-- @type function
-	------------------------------------
-	function Refresh(self)
-		if self.Unit then
-			self.__CastBar.BackdropBorderColor = RAID_CLASS_COLORS[select(2, UnitClass(self.Unit))] or DEFAULT_COLOR
-		else
-			self.__CastBar.BackdropBorderColor = DEFAULT_COLOR
-		end
-	end
 
 	------------------------------------
 	--- Custom the statusbar
@@ -313,6 +310,7 @@ class "iCastBar"
 		self.__CastBar = status
 		Super.SetUpCooldownStatus(self, status)
 		status.StatusBarTexturePath = [[Interface\Tooltips\UI-Tooltip-Background]]
+		status.StatusBarColor = CASTBAR_COLOR
 	end
 endclass "iCastBar"
 
@@ -511,7 +509,7 @@ class "iRuneBar"
 	RuneColors = {
 		[RUNETYPE_COMMON] = ColorType(1, 1, 1),
 		[RUNETYPE_BLOOD] = ColorType(1, 0, 0),
-		[RUNETYPE_UNHOLY] = ColorType(0, 0.5, 0),
+		[RUNETYPE_UNHOLY] = ColorType(0.1, 0.8, 0.1),
 		[RUNETYPE_FROST] = ColorType(0, 1, 1),
 		[RUNETYPE_DEATH] = ColorType(0.8, 0.1, 1),
 	}
@@ -555,7 +553,7 @@ class "iRuneBar"
 
 					if value then
 						self.CooldownStatus.Visible = true
-						self.CooldownStatus:SetStatusBarColor(RuneColors[value])
+						self.CooldownStatus.StatusBarColor = RuneColors[value]
 					else
 						self.CooldownStatus.Visible = false
 					end
@@ -603,7 +601,7 @@ class "iRuneBar"
     function iRuneBar(...)
 		local panel = Super(...)
 		local pct = floor(100 / MAX_RUNES)
-		local margin = (100 - pct * MAX_RUNES + 3) / 2
+		local margin = (100 - pct * MAX_RUNES + 1) / 2
 
 		panel.FrameStrata = "LOW"
 		panel.Toplevel = true
@@ -618,7 +616,7 @@ class "iRuneBar"
 
 			pos = RuneBtnMapping[i]
 
-			panel:SetWidgetLeftWidth(btnRune, margin + (pos-1)*pct, "pct", pct-3, "pct")
+			panel:SetWidgetLeftWidth(btnRune, margin + (pos-1)*pct, "pct", pct-1, "pct")
 
 			panel[i] = btnRune
 		end

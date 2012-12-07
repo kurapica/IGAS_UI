@@ -11,8 +11,8 @@ frmPet:SetSize(160, 36)
 
 -- Buff Panel
 frmPet:AddElement(iBuffPanel)
-frmPet.iBuffPanel:SetPoint("BOTTOMLEFT", frmPet, "TOPLEFT")
+frmPet.iBuffPanel:SetPoint("BOTTOMLEFT", frmPet, "TOPLEFT", 0, 4)
 
 -- Debuff Panel
 frmPet:AddElement(iDebuffPanel)
-frmPet.iDebuffPanel:SetPoint("BOTTOMRIGHT", frmPet, "TOPRIGHT")
+frmPet.iDebuffPanel:SetPoint("BOTTOMRIGHT", frmPet, "TOPRIGHT", 0, 4)

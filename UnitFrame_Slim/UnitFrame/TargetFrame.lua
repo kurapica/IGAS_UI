@@ -9,11 +9,11 @@ frmTarget.Unit = "target"
 
 -- Buff Panel
 frmTarget:AddElement(iBuffPanel)
-frmTarget.iBuffPanel:SetPoint("BOTTOMLEFT", frmTarget, "TOPLEFT")
+frmTarget.iBuffPanel:SetPoint("BOTTOMLEFT", frmTarget, "TOPLEFT", 0, 4)
 
 -- Debuff Panel
 frmTarget:AddElement(iDebuffPanel)
-frmTarget.iDebuffPanel:SetPoint("BOTTOMRIGHT", frmTarget, "TOPRIGHT")
+frmTarget.iDebuffPanel:SetPoint("BOTTOMRIGHT", frmTarget, "TOPRIGHT", 0, 4)
 
 -- QuestBoss Icon
 frmTarget:AddElement(QuestBossIcon)

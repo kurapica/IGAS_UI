@@ -11,11 +11,11 @@ frmFocus:SetSize(160, 36)
 
 -- Buff Panel
 frmFocus:AddElement(iBuffPanel)
-frmFocus.iBuffPanel:SetPoint("BOTTOMLEFT", frmFocus, "TOPLEFT")
+frmFocus.iBuffPanel:SetPoint("BOTTOMLEFT", frmFocus, "TOPLEFT", 0, 4)
 
 -- Debuff Panel
 frmFocus:AddElement(iDebuffPanel)
-frmFocus.iDebuffPanel:SetPoint("BOTTOMRIGHT", frmFocus, "TOPRIGHT")
+frmFocus.iDebuffPanel:SetPoint("BOTTOMRIGHT", frmFocus, "TOPRIGHT", 0, 4)
 
 -- NameLabel
 frmFocus.NameLabel.UseTapColor = true

@@ -8,7 +8,7 @@ frmPlayer:SetPoint("TOPLEFT")
 frmPlayer.Unit = "player"
 
 -- Hidden Mana
-frmPlayer:InsertElement(frmPlayer.iPowerBar, iHiddenManaBar, "south", 2, "px")
+frmPlayer:InsertElement(frmPlayer.iPowerBar, iHiddenManaBar, "south", 6, "px")
 
 -- Class Power & Combo
 frmPlayer:AddElement(iClassPower)
@@ -32,7 +32,7 @@ end
 
 -- Totem
 frmPlayer:AddElement(TotemBar)
-frmPlayer.TotemBar:SetPoint("BOTTOM", frmPlayer, "TOP")
+frmPlayer.TotemBar:SetPoint("BOTTOM", frmPlayer, "TOP", 0, 4)
 
 -- Combat Icon
 frmPlayer:AddElement(CombatIcon)

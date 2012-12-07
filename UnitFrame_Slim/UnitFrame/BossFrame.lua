@@ -12,9 +12,9 @@ for i = 1, 5 do
 
 	-- Buff Panel
 	frmBoss:AddElement(iBuffPanel)
-	frmBoss.iBuffPanel:SetPoint("BOTTOMLEFT", frmBoss, "TOPLEFT")
+	frmBoss.iBuffPanel:SetPoint("BOTTOMLEFT", frmBoss, "TOPLEFT", 0, 4)
 
 	-- Debuff Panel
 	frmBoss:AddElement(iDebuffPanel)
-	frmBoss.iDebuffPanel:SetPoint("BOTTOMRIGHT", frmBoss, "TOPRIGHT")
+	frmBoss.iDebuffPanel:SetPoint("BOTTOMRIGHT", frmBoss, "TOPRIGHT", 0, 4)
 end
