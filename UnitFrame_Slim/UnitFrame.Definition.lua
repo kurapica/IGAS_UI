@@ -11,18 +11,68 @@ _IGASUI_RAIDPANEL_GROUP = "IRaidPanel"	-- Same as the raidPanel, no raidpanel no
 
 _IGASUI_UNITFRAME_GROUP = "IUnitFrame"
 
-RAID_CLASS_COLORS = IGAS:CopyTable(_G.RAID_CLASS_COLORS)
+RAID_CLASS_COLORS = _G.RAID_CLASS_COLORS
 DEFAULT_COLOR = ColorType(1, 1, 1)
-PLAYER_COLOR = RAID_CLASS_COLORS[select(2, UnitClass("player"))]
 
-_THIN_BORDER = {
-    edgeFile = "Interface\\Buttons\\WHITE8x8",
-    edgeSize = 1,
+_Buff_List = {
+	-- [spellId] = true,
 }
 
-_BORDER_COLOR = ColorType(0, 0, 0)
-_BACK_MULTI = 0.4
-_BACK_ALPHA = 0.25
+_Debuff_List = {
+	-- [spellId] = true,
+}
+
+-----------------------------------------------
+--- iBorder
+-- @type interface
+-- @name iBorder
+-----------------------------------------------
+interface "iBorder"
+	_PLAYER_COLOR = RAID_CLASS_COLORS[select(2, UnitClass("player"))]
+	_THIN_BORDER = {
+	    edgeFile = "Interface\\Buttons\\WHITE8x8",
+	    edgeSize = 1,
+	}
+
+	_BORDER_COLOR = ColorType(0, 0, 0)
+
+	_BACK_MULTI = 0.4
+	_BACK_ALPHA = 0.25
+
+	------------------------------------------------------
+	-- Method
+	------------------------------------------------------
+	function SetStatusBarColor(self, r, g, b, a)
+	    if r and g and b then
+	        StatusBar.SetStatusBarColor(self, r, g, b)
+	        if self.Bg then
+	        	self.Bg:SetTexture(r * _BACK_MULTI, g * _BACK_MULTI, b * _BACK_MULTI, _BACK_ALPHA)
+	    	end
+	    end
+	end
+
+	------------------------------------------------------
+	-- Initialize
+	------------------------------------------------------
+    function iBorder(self)
+		self.StatusBarTexturePath = [[Interface\Tooltips\UI-Tooltip-Background]]
+
+		local bg = Frame("Back", self)
+		bg.FrameStrata = "BACKGROUND"
+		bg:SetPoint("TOPLEFT", -1, 1)
+		bg:SetPoint("BOTTOMRIGHT", 1, -1)
+		bg.Backdrop = _THIN_BORDER
+		bg.BackdropBorderColor = _BORDER_COLOR
+
+		local bgColor = Texture("Bg", bg, "BACKGROUND")
+		bgColor:SetAllPoints()
+
+		self.Bg = bgColor
+
+		self.SetStatusBarColor = SetStatusBarColor
+		self:SetStatusBarColor(_PLAYER_COLOR.r, _PLAYER_COLOR.g, _PLAYER_COLOR.b)
+    end
+endinterface "iBorder"
 
 -----------------------------------------------
 --- iUnitFrame
@@ -31,16 +81,11 @@ _BACK_ALPHA = 0.25
 -----------------------------------------------
 class "iUnitFrame"
 	inherit "UnitFrame"
-	-- extend "IFSpellHandler"
+	-- extend "IFSpellHandler"	-- enable this for hover spell casting
 	extend "IFMovable" "IFResizable"
 
 	_IGASUI_RAIDPANEL_GROUP = _IGASUI_RAIDPANEL_GROUP
 	_IGASUI_UNITFRAME_GROUP = _IGASUI_UNITFRAME_GROUP
-
-	_BackDrop = {
-	    edgeFile = [[Interface\ChatFrame\CHATFRAMEBACKGROUND]],
-	    edgeSize = 1,
-	}
 
 	------------------------------------------------------
 	-- Property
@@ -75,19 +120,33 @@ class "iUnitFrame"
 		frm.IFMovable = true
 		frm.IFResizable = true
 
+		-- Health
 		frm:AddElement(iHealthBar, "rest")
 
+		-- Power
 		frm:AddElement(iPowerBar, "south", 2, "px")
 
+		-- Name
 		frm:AddElement(NameLabel)
 		frm.NameLabel.UseClassColor = true
 		frm.NameLabel:SetPoint("TOPRIGHT", frm, "BOTTOMRIGHT")
 
+		-- Level
 		frm:AddElement(LevelLabel)
 		frm.LevelLabel:SetPoint("RIGHT", frm.NameLabel, "LEFT", -4, 0)
 
+		-- Cast
 		frm:AddElement(iCastBar)
 		frm.iCastBar:SetAllPoints(frm.iHealthBar)
+
+		-- Health text
+		frm:AddElement(HealthTextFrequent)
+		frm.HealthTextFrequent.ShowPercent = true
+		frm.HealthTextFrequent:SetPoint("RIGHT", frm.iHealthBar, "LEFT", -4, 0)
+
+		-- Power text
+		frm:AddElement(PowerTextFrequent)
+		frm.PowerTextFrequent:SetPoint("TOPLEFT", frm, "BOTTOMLEFT")
 
 		arUnit:Insert(frm)
 
@@ -102,16 +161,7 @@ endclass "iUnitFrame"
 -----------------------------------------------
 class "iHealthBar"
 	inherit "HealthBarFrequent"
-
-	_BACK_MULTI = _BACK_MULTI
-	_BACK_ALPHA = _BACK_ALPHA
-
-	function SetStatusBarColor(self, r, g, b, a)
-	    if r and g and b then
-	        Super.SetStatusBarColor(self, r, g, b)
-	        self.Bg:SetTexture(r * _BACK_MULTI, g * _BACK_MULTI, b * _BACK_MULTI, _BACK_ALPHA)
-	    end
-	end
+	extend "iBorder"
 
 	------------------------------------------------------
 	-- Constructor
@@ -119,20 +169,7 @@ class "iHealthBar"
 	function iHealthBar(...)
 		local bar = Super(...)
 
-		bar.StatusBarTexturePath = [[Interface\Tooltips\UI-Tooltip-Background]]
 		bar.UseClassColor = true
-
-		local bg = Frame("Back", bar)
-		bg.FrameStrata = "BACKGROUND"
-		bg:SetPoint("TOPLEFT", -1, 1)
-		bg:SetPoint("BOTTOMRIGHT", 1, -1)
-		bg.Backdrop = _THIN_BORDER
-		bg.BackdropBorderColor = _BORDER_COLOR
-
-		local bgColor = Texture("Bg", bg, "BACKGROUND")
-		bgColor:SetAllPoints()
-
-		bar.Bg = bgColor
 
 		return bar
 	end
@@ -145,39 +182,7 @@ endclass "iHealthBar"
 -----------------------------------------------
 class "iPowerBar"
 	inherit "PowerBarFrequent"
-
-	_BACK_MULTI = _BACK_MULTI
-	_BACK_ALPHA = _BACK_ALPHA
-
-	function SetStatusBarColor(self, r, g, b, a)
-	    if r and g and b then
-	        Super.SetStatusBarColor(self, r, g, b)
-	        self.Bg:SetTexture(r * _BACK_MULTI, g * _BACK_MULTI, b * _BACK_MULTI, _BACK_ALPHA)
-	    end
-	end
-
-	------------------------------------------------------
-	-- Constructor
-	------------------------------------------------------
-	function iPowerBar(...)
-		local bar = Super(...)
-
-		bar.StatusBarTexturePath = [[Interface\Tooltips\UI-Tooltip-Background]]
-
-		local bg = Frame("Back", bar)
-		bg.FrameStrata = "BACKGROUND"
-		bg:SetPoint("TOPLEFT", -1, 1)
-		bg:SetPoint("BOTTOMRIGHT", 1, -1)
-		bg.Backdrop = _THIN_BORDER
-		bg.BackdropBorderColor = _BORDER_COLOR
-
-		local bgColor = Texture("Bg", bg, "BACKGROUND")
-		bgColor:SetAllPoints()
-
-		bar.Bg = bgColor
-
-		return bar
-	end
+	extend "iBorder"
 endclass "iPowerBar"
 
 -----------------------------------------------
@@ -187,39 +192,7 @@ endclass "iPowerBar"
 -----------------------------------------------
 class "iHiddenManaBar"
 	inherit "HiddenManaBar"
-
-	_BACK_MULTI = _BACK_MULTI
-	_BACK_ALPHA = _BACK_ALPHA
-
-	function SetStatusBarColor(self, r, g, b, a)
-	    if r and g and b then
-	        Super.SetStatusBarColor(self, r, g, b)
-	        self.Bg:SetTexture(r * _BACK_MULTI, g * _BACK_MULTI, b * _BACK_MULTI, _BACK_ALPHA)
-	    end
-	end
-
-	------------------------------------------------------
-	-- Constructor
-	------------------------------------------------------
-	function iHiddenManaBar(...)
-		local bar = Super(...)
-
-		bar.StatusBarTexturePath = [[Interface\Tooltips\UI-Tooltip-Background]]
-
-		local bg = Frame("Back", bar)
-		bg.FrameStrata = "BACKGROUND"
-		bg:SetPoint("TOPLEFT", -1, 1)
-		bg:SetPoint("BOTTOMRIGHT", 1, -1)
-		bg.Backdrop = _THIN_BORDER
-		bg.BackdropBorderColor = _BORDER_COLOR
-
-		local bgColor = Texture("Bg", bg, "BACKGROUND")
-		bgColor:SetAllPoints()
-
-		bar.Bg = bgColor
-
-		return bar
-	end
+	extend "iBorder"
 endclass "iHiddenManaBar"
 
 -----------------------------------------------
@@ -241,9 +214,9 @@ class "iBuffPanel"
 	------------------------------------
 	function CustomFilter(self, unit, index, filter)
 		local isEnemy = UnitCanAttack("player", unit)
-		local name, _, _, _, _, duration, _, caster = UnitAura(unit, index, filter)
+		local name, _, _, _, _, duration, _, caster, _, _, spellID = UnitAura(unit, index, filter)
 
-		if name and duration > 0 and (isEnemy or caster == "player") then
+		if name and duration > 0 and (_Buff_List[spellID] or isEnemy or caster == "player") then
 			return true
 		end
 	end
@@ -283,9 +256,9 @@ class "iDebuffPanel"
 	------------------------------------
 	function CustomFilter(self, unit, index, filter)
 		local isFriend = not UnitCanAttack("player", unit)
-		local name, _, _, _, _, duration, _, caster = UnitAura(unit, index, filter)
+		local name, _, _, _, _, duration, _, caster, _, _, spellID = UnitAura(unit, index, filter)
 
-		if name and duration > 0 and (isFriend or caster == "player") then
+		if name and duration > 0 and (_Debuff_List[spellID] or isFriend or caster == "player") then
 			return true
 		end
 	end
@@ -313,7 +286,6 @@ endclass "iDebuffPanel"
 -----------------------------------------------
 class "iCastBar"
 	inherit "CastBar"
-	extend "IFUnitElement"
 
 	------------------------------------------------------
 	-- Method
@@ -345,59 +317,29 @@ class "iCastBar"
 endclass "iCastBar"
 
 -----------------------------------------------
+--- iClassPowerButton
+-- @type class
+-- @name iClassPowerButton
+-----------------------------------------------
+class "iClassPowerButton"
+	inherit "StatusBar"
+	extend "iBorder"
+endclass "iClassPowerButton"
+
+-----------------------------------------------
 --- iClassPower
 -- @type class
 -- @name iClassPower
 -----------------------------------------------
 class "iClassPower"
 	inherit "Frame"
-	extend "IFClassPower"
+	extend "IFClassPower" "IFComboPoint"
 
 	_MaxPower = 5
 
 	SPELL_POWER_BURNING_EMBERS = _G.SPELL_POWER_BURNING_EMBERS
 
 	MAX_POWER_PER_EMBER = _G.MAX_POWER_PER_EMBER
-
-	-----------------------------------------------
-	--- ClassPowerBar
-	-- @type class
-	-- @name ClassPowerBar
-	-----------------------------------------------
-	class "ClassPowerBar"
-		inherit "StatusBar"
-
-		_BACK_MULTI = _BACK_MULTI
-		_BACK_ALPHA = _BACK_ALPHA
-
-		------------------------------------------------------
-		-- Property
-		------------------------------------------------------
-
-		------------------------------------------------------
-		-- Constructor
-		------------------------------------------------------
-	    function ClassPowerBar(...)
-			local bar = Super(...)
-
-			bar.StatusBarTexturePath = [[Interface\Tooltips\UI-Tooltip-Background]]
-
-			local bg = Frame("Back", bar)
-			bg.FrameStrata = "BACKGROUND"
-			bg:SetPoint("TOPLEFT", -1, 1)
-			bg:SetPoint("BOTTOMRIGHT", 1, -1)
-			bg.Backdrop = _THIN_BORDER
-			bg.BackdropBorderColor = _BORDER_COLOR
-
-			local bgColor = Texture("Bg", bg, "BACKGROUND")
-			bgColor:SetAllPoints()
-
-			bar:SetStatusBarColor(PLAYER_COLOR.r, PLAYER_COLOR.g, PLAYER_COLOR.b)
-			bgColor:SetTexture(PLAYER_COLOR.r * _BACK_MULTI, PLAYER_COLOR.g * _BACK_MULTI, PLAYER_COLOR.b * _BACK_MULTI, _BACK_ALPHA)
-
-			return bar
-	    end
-	endclass "ClassPowerBar"
 
 	------------------------------------------------------
 	-- Method
@@ -532,7 +474,7 @@ class "iClassPower"
 		obj.HSpacing = 3
 
 		for i = 1, _MaxPower do
-			obj[i] = ClassPowerBar("Bar"..i, obj)
+			obj[i] = iClassPowerButton("Bar"..i, obj)
 			obj[i]:Hide()
 			obj[i]:SetPoint("TOP")
 			obj[i]:SetPoint("BOTTOM")
@@ -540,46 +482,147 @@ class "iClassPower"
 
 		obj.OnSizeChanged = obj.OnSizeChanged + OnSizeChanged
 
+		if select(2, UnitClass("player")) == "ROGUE" or select(2, UnitClass("player")) == "DRUID" then
+			obj.Refresh = IFComboPoint.Refresh
+			obj.__Min, obj.__Max = 0, _G.MAX_COMBO_POINTS
+		end
+
 		return obj
     end
 endclass "iClassPower"
 
 -----------------------------------------------
---- iTargetName
+--- iRuneBar
 -- @type class
--- @name iTargetName
+-- @name iRuneBar
 -----------------------------------------------
-class "iTargetName"
-	inherit "NameLabel"
-	extend "IFHealthFrequent"
+class "iRuneBar"
+	inherit "LayoutPanel"
+	extend "IFRune"
 
-	------------------------------------------------------
-	-- Method
-	------------------------------------------------------
-	function Refresh(self)
-		if self.Unit and UnitIsTapped(self.Unit) and not UnitIsTappedByPlayer(self.Unit) and not UnitIsTappedByAllThreatList(self.Unit) then
-			self.Text = "|cff7f7f7f" .. UnitName(self.Unit) .. "|r"
-		else
-			Super.Refresh(self)
-		end
-	end
+	MAX_RUNES = 6
 
-	------------------------------------------------------
-	-- Property
-	------------------------------------------------------
-	-- Value
-	property "Value" {
-		Set = function(self, value)
-			return self:Refresh()
-		end,
+	RUNETYPE_COMMON = 0
+	RUNETYPE_BLOOD = 1
+	RUNETYPE_UNHOLY = 2
+	RUNETYPE_FROST = 3
+	RUNETYPE_DEATH = 4
+
+	RuneColors = {
+		[RUNETYPE_COMMON] = ColorType(1, 1, 1),
+		[RUNETYPE_BLOOD] = ColorType(1, 0, 0),
+		[RUNETYPE_UNHOLY] = ColorType(0, 0.5, 0),
+		[RUNETYPE_FROST] = ColorType(0, 1, 1),
+		[RUNETYPE_DEATH] = ColorType(0.8, 0.1, 1),
 	}
+
+	RuneMapping = {
+		[1] = "BLOOD",
+		[2] = "UNHOLY",
+		[3] = "FROST",
+		[4] = "DEATH",
+	}
+
+	RuneBtnMapping = {
+		[1] = 1,
+		[2] = 2,
+		[3] = 5,
+		[4] = 6,
+		[5] = 3,
+		[6] = 4,
+	}
+
+	-----------------------------------------------
+	--- iRuneButton
+	-- @type class
+	-- @name iRuneButton
+	-----------------------------------------------
+	class "iRuneButton"
+		inherit "Button"
+		extend "IFCooldownStatus"
+
+		------------------------------------------------------
+		-- Property
+		------------------------------------------------------
+		-- RuneType
+		property "RuneType" {
+			Get = function(self)
+				return self.__RuneType
+			end,
+			Set = function(self, value)
+				if self.RuneType ~= value then
+					self.__RuneType = value
+
+					if value then
+						self.CooldownStatus.Visible = true
+						self.CooldownStatus:SetStatusBarColor(RuneColors[value])
+					else
+						self.CooldownStatus.Visible = false
+					end
+				end
+			end,
+			Type = System.Number + nil,
+		}
+		-- Ready
+		property "Ready" {
+			Get = function(self)
+				return self.__Ready
+			end,
+			Set = function(self, value)
+				if self.Ready ~= value then
+					self.__Ready = value
+
+					if value then
+						self:OnCooldownUpdate()
+					end
+				end
+			end,
+			Type = System.Boolean,
+		}
+
+		------------------------------------------------------
+		-- Constructor
+		------------------------------------------------------
+	    function iRuneButton(...)
+			local obj = Super(...)
+
+			-- Use these for cooldown
+			local bar = iClassPowerButton("CooldownStatus", obj)
+			bar:SetAllPoints()
+
+			obj.IFCooldownStatusReverse = true
+			obj.IFCooldownStatusAlwaysShow = true
+
+			return obj
+	    end
+	endclass "iRuneButton"
 
 	------------------------------------------------------
 	-- Constructor
 	------------------------------------------------------
-    function iTargetName(...)
-		local obj = Super(...)
+    function iRuneBar(...)
+		local panel = Super(...)
+		local pct = floor(100 / MAX_RUNES)
+		local margin = (100 - pct * MAX_RUNES + 3) / 2
 
-		return obj
+		panel.FrameStrata = "LOW"
+		panel.Toplevel = true
+
+		local btnRune, pos
+
+		for i = 1, MAX_RUNES do
+			btnRune = iRuneButton("Individual"..i, panel)
+			btnRune.ID = i
+
+			panel:AddWidget(btnRune)
+
+			pos = RuneBtnMapping[i]
+
+			panel:SetWidgetLeftWidth(btnRune, margin + (pos-1)*pct, "pct", pct-3, "pct")
+
+			panel[i] = btnRune
+		end
+
+		return panel
     end
-endclass "iTargetName"
+endclass "iRuneBar"

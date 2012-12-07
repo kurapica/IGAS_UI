@@ -52,8 +52,8 @@ frmTarget:AddElement(ComboBar)
 frmTarget.ComboBar:SetPoint("BOTTOM", frmTarget, "TOP")
 
 -- QuestBoss Icon
-frmPlayer:AddElement(QuestBossIcon)
-frmPlayer.QuestBossIcon:SetPoint("CENTER", frmPlayer, "LEFT")
+frmTarget:AddElement(QuestBossIcon)
+frmTarget.QuestBossIcon:SetPoint("CENTER", frmTarget, "LEFT")
 
 arUnit:Insert(frmTarget)
 
