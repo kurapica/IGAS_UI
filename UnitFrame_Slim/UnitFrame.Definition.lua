@@ -39,8 +39,8 @@ interface "iBorder"
 
 	_BORDER_COLOR = ColorType(0, 0, 0)
 
-	_BACK_MULTI = 0.4
-	_BACK_ALPHA = 0.7
+	_BACK_MULTI = 0.2
+	_BACK_ALPHA = 0.8
 
 	------------------------------------------------------
 	-- Method
@@ -73,16 +73,19 @@ interface "iBorder"
 		self.Bg = bgColor
 
 		self.SetStatusBarColor = SetStatusBarColor
-		self:SetStatusBarColor(_PLAYER_COLOR.r, _PLAYER_COLOR.g, _PLAYER_COLOR.b)
+
+		if self:IsClass(iClassPowerButton) then
+			self:SetStatusBarColor(_PLAYER_COLOR.r, _PLAYER_COLOR.g, _PLAYER_COLOR.b)
+    	end
     end
 endinterface "iBorder"
 
 -----------------------------------------------
---- iUnitFrame
+--- iSUnitFrame
 -- @type class
--- @name iUnitFrame
+-- @name iSUnitFrame
 -----------------------------------------------
-class "iUnitFrame"
+class "iSUnitFrame"
 	inherit "UnitFrame"
 	-- extend "IFSpellHandler"	-- enable this for hover spell casting
 	extend "IFMovable" "IFResizable"
@@ -112,10 +115,13 @@ class "iUnitFrame"
 		end,
 	}
 
-	function iUnitFrame(...)
+	------------------------------------------------------
+	-- Constructor
+	------------------------------------------------------
+	function iSUnitFrame(...)
 		local frm = Super(...)
 
-		frm:ConvertClass(iUnitFrame)
+		frm:ConvertClass(iSUnitFrame)
 		frm.Panel.VSpacing = 4
 
 		frm:SetSize(200, 48)
@@ -126,32 +132,55 @@ class "iUnitFrame"
 		-- Health
 		frm:AddElement(iHealthBar, "rest")
 
-		-- Power
-		frm:AddElement(iPowerBar, "south", 6, "px")
-
 		-- Name
 		frm:AddElement(NameLabel)
 		frm.NameLabel.UseClassColor = true
-		frm.NameLabel:SetPoint("TOPRIGHT", frm, "BOTTOMRIGHT")
+		frm.NameLabel:SetPoint("RIGHT", frm.iHealthBar, "RIGHT", -4, 0)
 
 		-- Level
 		frm:AddElement(LevelLabel)
 		frm.LevelLabel:SetPoint("RIGHT", frm.NameLabel, "LEFT", -4, 0)
 
+		arUnit:Insert(frm)
+
+		return frm
+	end
+endclass "iSUnitFrame"
+
+-----------------------------------------------
+--- iUnitFrame
+-- @type class
+-- @name iUnitFrame
+-----------------------------------------------
+class "iUnitFrame"
+	inherit "iSUnitFrame"
+
+	------------------------------------------------------
+	-- Constructor
+	------------------------------------------------------
+	function iUnitFrame(...)
+		local frm = Super(...)
+
+		-- Power
+		frm:AddElement(iPowerBar, "south", 6, "px")
+
+		-- Name
+		frm.NameLabel:ClearAllPoints()
+		frm.NameLabel:SetPoint("TOPRIGHT", frm, "BOTTOMRIGHT")
+
 		-- Cast
 		frm:AddElement(iCastBar)
 		frm.iCastBar:SetAllPoints(frm.iHealthBar)
 
-		-- Health text
+		-- Percent Health text
 		frm:AddElement(HealthTextFrequent)
 		frm.HealthTextFrequent.ShowPercent = true
 		frm.HealthTextFrequent:SetPoint("RIGHT", frm.iHealthBar, "LEFT", -4, 0)
 
+		-- Full Health Text
 		frm:AddElement("HealthTextFrequent2", HealthTextFrequent)
 		frm.HealthTextFrequent2.ValueFormat = "%.1f"
 		frm.HealthTextFrequent2:SetPoint("TOPLEFT", frm, "BOTTOMLEFT", 0, -2)
-
-		arUnit:Insert(frm)
 
 		return frm
 	end
@@ -322,6 +351,90 @@ endclass "iCastBar"
 class "iClassPowerButton"
 	inherit "StatusBar"
 	extend "iBorder"
+
+	------------------------------------------------------
+	-- Property
+	------------------------------------------------------
+	-- Activated
+	property "Activated" {
+		Get = function(self)
+			return self.__Activated
+		end,
+		Set = function(self, value)
+			if self.Activated ~= value then
+				self.__Activated = value
+
+				if value then
+					self.Glow.AnimOut.Playing = false
+
+					self.Glow.AnimIn.Playing = true
+				else
+					self.Glow.AnimIn.Playing = false
+
+					self.Glow.AnimOut.Playing = true
+				end
+			end
+		end,
+		Type = System.Boolean,
+	}
+
+	------------------------------------------------------
+	-- Script Handler
+	------------------------------------------------------
+	local function AnimIn_OnPlay(self)
+		self.Parent.Alpha = 0
+
+		local width, height = self.Parent.Parent:GetSize()
+		self.Parent:SetSize(width*1.05, height*2)
+	end
+
+	local function AnimIn_OnFinished(self)
+		self.Parent.Alpha = 1
+	end
+
+	local function AnimOut_OnPlay(self)
+		self.Parent.Alpha = 1
+	end
+
+	local function AnimOut_OnFinished(self)
+		self.Parent.Alpha = 0
+	end
+
+	------------------------------------------------------
+	-- Constructor
+	------------------------------------------------------
+	function iClassPowerButton(...)
+		local btn = Super(...)
+
+		local glow = Texture("Glow", btn, "ARTWORK")
+		glow.Alpha = 0
+		glow.TexturePath = [[Interface\SpellActivationOverlay\IconAlert]]
+		--glow:SetTexCoord(0.00781250, 0.50781250, 0.27734375, 0.52734375)
+		glow:SetTexCoord(0.13, 0.395, 0.27734375, 0.52734375)
+		glow:SetPoint("CENTER")
+
+		local animIn = AnimationGroup("AnimIn", glow)
+
+		local alpha = Alpha("Alpha", animIn)
+		alpha.Order = 1
+		alpha.Duration = 0.2
+		alpha.Change = 1
+
+		animIn.OnPlay = AnimIn_OnPlay
+		animIn.OnFinished = AnimIn_OnFinished
+
+		local animOut = AnimationGroup("AnimOut", glow)
+
+		alpha = Alpha("Alpha", animOut)
+		alpha.Order = 1
+		alpha.Duration = 0.2
+		alpha.Change = -1
+
+		animOut.OnPlay = AnimOut_OnPlay
+		animOut.OnFinished = AnimOut_OnFinished
+
+		return btn
+	end
 endclass "iClassPowerButton"
 
 -----------------------------------------------
@@ -335,7 +448,10 @@ class "iClassPower"
 
 	_MaxPower = 5
 
+	SPELL_POWER_SOUL_SHARDS = _G.SPELL_POWER_SOUL_SHARDS
 	SPELL_POWER_BURNING_EMBERS = _G.SPELL_POWER_BURNING_EMBERS
+	SPELL_POWER_HOLY_POWER = _G.SPELL_POWER_HOLY_POWER
+	SPELL_POWER_CHI = _G.SPELL_POWER_CHI
 
 	MAX_POWER_PER_EMBER = _G.MAX_POWER_PER_EMBER
 
@@ -371,6 +487,7 @@ class "iClassPower"
 		for i = 1, numBar do
 			self[i].Width = width
 			self[i]:SetPoint("LEFT", (width + self.HSpacing) * (i - 1), 0)
+			self[i].Activated = false
 			self[i]:Show()
 
 			if self.__ClassPowerType == SPELL_POWER_BURNING_EMBERS then
@@ -394,8 +511,10 @@ class "iClassPower"
 			for i = 1, self.__NumBar do
 				if value >= MAX_POWER_PER_EMBER then
 					self[i].Value = MAX_POWER_PER_EMBER
+					self[i].Activated = true
 				else
 					self[i].Value = value
+					self[i].Activated = false
 				end
 				value = value - MAX_POWER_PER_EMBER
 				if value < 0 then value = 0 end
@@ -403,11 +522,23 @@ class "iClassPower"
 		elseif self.__NumBar == 1 then
 			self[1].Value = value
 		else
+			local needActive = false
+
+			if self.__ClassPowerType == SPELL_POWER_HOLY_POWER then
+				if value >= 3 then
+					needActive = true
+				end
+			elseif value >= self.__Max then
+				needActive = true
+			end
+
 			for i = 1, self.__NumBar do
 				if value >= i then
 					self[i].Value = 1
+					self[i].Activated = needActive
 				else
 					self[i].Value = 0
+					self[i].Activated = false
 				end
 			end
 		end
@@ -482,6 +613,7 @@ class "iClassPower"
 
 		if select(2, UnitClass("player")) == "ROGUE" or select(2, UnitClass("player")) == "DRUID" then
 			obj.Refresh = IFComboPoint.Refresh
+			obj.__ClassPowerType = 100
 			obj.__Min, obj.__Max = 0, _G.MAX_COMBO_POINTS
 		end
 
@@ -572,6 +704,9 @@ class "iRuneBar"
 
 					if value then
 						self:OnCooldownUpdate()
+						self.CooldownStatus.Activated = true
+					else
+						self.CooldownStatus.Activated = false
 					end
 				end
 			end,

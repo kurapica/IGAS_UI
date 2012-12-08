@@ -4,10 +4,9 @@
 IGAS:NewAddon "IGAS_UI.UnitFrame"
 
 frmFocus = iUnitFrame("IGAS_UI_FocusFrame")
-frmFocus:SetPoint("TOPLEFT", 480, 0)
+frmFocus:SetPoint("TOPLEFT", 20, -40)
+frmFocus:SetSize(160, 24)
 frmFocus.Unit = "focus"
-
-frmFocus:SetSize(160, 36)
 
 -- Buff Panel
 frmFocus:AddElement(iBuffPanel)

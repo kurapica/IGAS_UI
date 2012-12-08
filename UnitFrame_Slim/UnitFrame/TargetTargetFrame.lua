@@ -3,12 +3,11 @@
 -----------------------------------------
 IGAS:NewAddon "IGAS_UI.UnitFrame"
 
-frmTargetTarget = iUnitFrame("IGAS_UI_TargetTargetFrame")
-frmTargetTarget:SetPoint("TOPLEFT", 380, -50)
+frmTargetTarget = iSUnitFrame("IGAS_UI_TargetTargetFrame")
+frmTargetTarget:SetPoint("TOPLEFT", 420, -40)
+frmTargetTarget:SetSize(160, 24)
 frmTargetTarget.Unit = "targettarget"
-
-frmTargetTarget:SetSize(160, 36)
 
 -- Debuff Panel
 frmTargetTarget:AddElement(iDebuffPanel)
-frmTargetTarget.iDebuffPanel:SetPoint("BOTTOMRIGHT", frmTargetTarget, "TOPRIGHT", 0, 4)
+frmTargetTarget.iDebuffPanel:SetPoint("TOPRIGHT", frmTargetTarget, "BOTTOMRIGHT", 0, -4)

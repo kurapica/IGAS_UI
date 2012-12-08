@@ -223,7 +223,7 @@ function BAG_CLOSED(self)
 	BAG_UPDATE(self)
 end
 
-function PLAYER_SPECIALIZATION_CHANGED(self, ...)
+function PLAYER_SPECIALIZATION_CHANGED(self)
 	local now = GetSpecialization() or 1
 	if now ~= _LoadingConfig then
 		_DBChar[_LoadingConfig] = GenerateConfig(true)

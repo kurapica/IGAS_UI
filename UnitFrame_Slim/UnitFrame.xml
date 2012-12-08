@@ -10,4 +10,5 @@
 	<Script file = "UnitFrame\TargetTargetFrame.lua"/>
 	<Script file = "UnitFrame\FocusFrame.lua"/>
 	<Script file = "UnitFrame\BossFrame.lua"/>
+	<Script file = "UnitFrame\PartyFrame.lua"/>
 </Ui>

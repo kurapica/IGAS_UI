@@ -1334,8 +1334,8 @@ class "ITail"
 					x, y = GetCursorPosition()
 					x, y = x / e, y /e
 
-					row = floor((b + h - y) / h)
-					col = floor((x - l) / w)
+					row = ceil((b + h - y) / h)
+					col = ceil((x - l) / w)
 
 					last = header:GenerateBrother(row, col)
 					if last then

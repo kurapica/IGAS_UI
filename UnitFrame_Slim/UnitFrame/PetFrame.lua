@@ -4,10 +4,9 @@
 IGAS:NewAddon "IGAS_UI.UnitFrame"
 
 frmPet = iUnitFrame("IGAS_UI_PetFrame")
-frmPet:SetPoint("TOPLEFT", 180, -50)
+frmPet:SetPoint("TOPLEFT", 180, -40)
+frmPet:SetSize(160, 24)
 frmPet.Unit = "pet"
-
-frmPet:SetSize(160, 36)
 
 -- Buff Panel
 frmPet:AddElement(iBuffPanel)

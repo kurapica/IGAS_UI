@@ -59,9 +59,30 @@ _Addon.OnSlashCmd = _Addon.OnSlashCmd + function(self, option, info)
 	end
 end
 
+_HiddenFrame = CreateFrame("Frame")
+_HiddenFrame:Hide()
+
 function HideBlzUnitFrame(self)
 	self:UnregisterAllEvents()
 	self:Hide()
+
+	self:SetParent(_HiddenFrame)
+
+	if self.healthbar then
+		self.healthbar:UnregisterAllEvents()
+	end
+
+	if self.manabar then
+		self.manabar:UnregisterAllEvents()
+	end
+
+	if self.spellbar then
+		self.spellbar:UnregisterAllEvents()
+	end
+
+	if self.powerBarAlt then
+		self.powerBarAlt:UnregisterAllEvents()
+	end
 end
 
 function OnEnable(self)

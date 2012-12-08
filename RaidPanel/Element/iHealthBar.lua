@@ -12,6 +12,21 @@ IGAS:NewAddon "IGAS_UI.RaidPanel"
 class "iHealthBar"
 	inherit "HealthBar"
 
+	_BACK_MULTI = 0.2
+	_BACK_ALPHA = 0.8
+
+	------------------------------------------------------
+	-- Method
+	------------------------------------------------------
+	function SetStatusBarColor(self, r, g, b, a)
+	    if r and g and b then
+	        StatusBar.SetStatusBarColor(self, r, g, b)
+	        if self.Bg then
+	        	self.Bg:SetTexture(r * _BACK_MULTI, g * _BACK_MULTI, b * _BACK_MULTI, _BACK_ALPHA)
+	    	end
+	    end
+	end
+
 	------------------------------------------------------
 	-- Constructor
 	------------------------------------------------------
@@ -20,6 +35,9 @@ class "iHealthBar"
 
 		bar.StatusBarTexturePath = [[Interface\Tooltips\UI-Tooltip-Background]]
 		bar.UseDebuffColor = true
+
+		local bgColor = Texture("Bg", bar, "BACKGROUND")
+		bgColor:SetAllPoints()
 
 		return bar
 	end

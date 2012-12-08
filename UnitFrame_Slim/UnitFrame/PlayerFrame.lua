@@ -4,7 +4,8 @@
 IGAS:NewAddon "IGAS_UI.UnitFrame"
 
 frmPlayer = iUnitFrame("IGAS_UI_PlayerFrame")
-frmPlayer:SetPoint("TOPLEFT")
+frmPlayer:SetPoint("TOPLEFT", 40, 0)
+frmPlayer:SetSize(200, 36)
 frmPlayer.Unit = "player"
 
 -- Hidden Mana

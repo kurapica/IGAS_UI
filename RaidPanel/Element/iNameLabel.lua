@@ -10,8 +10,8 @@ IGAS:NewAddon "IGAS_UI.RaidPanel"
 -- @name iNameLabel
 -----------------------------------------------
 class "iNameLabel"
-	inherit "FontString"
-	extend "IFUnitName" "IFThreat"
+	inherit "NameLabel"
+	extend "IFThreat"
 
 	_TARGET_TEMPLATE = FontColor.RED .. ">>" .. FontColor.CLOSE .. "%s" .. FontColor.RED .. "<<" .. FontColor.CLOSE
 
@@ -53,6 +53,13 @@ class "iNameLabel"
 	------------------------------------------------------
 	-- Constructor
 	------------------------------------------------------
+	function iNameLabel(...)
+		local label = Super(...)
+
+		label.UseClassColor = true
+
+		return label
+	end
 endclass "iNameLabel"
 
 -----------------------------------------------

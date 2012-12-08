@@ -4,7 +4,8 @@
 IGAS:NewAddon "IGAS_UI.UnitFrame"
 
 frmTarget = iUnitFrame("IGAS_UI_TargetFrame")
-frmTarget:SetPoint("TOPLEFT", 240, 0)
+frmTarget:SetPoint("TOPLEFT", 280, 0)
+frmTarget:SetSize(200, 36)
 frmTarget.Unit = "target"
 
 -- Buff Panel
