@@ -44,6 +44,7 @@ class "IActionButton"
 			NoPetCombatHeader = newtable()
 			NoVehicleHeader = newtable()
 			PetHeader = newtable()
+			AutoSwapHeader = newtable()
 
 			ShowBrother = [==[
 				local header = HeaderMap[self] or self
@@ -232,6 +233,16 @@ class "IActionButton"
 		Manager:RunFor(btn, StateCheck)
 	]]
 
+	_IActionButton_RegisterAutoSwap = [[
+		local btn = Manager:GetFrameRef("AutoSwapButton")
+		AutoSwapHeader[btn] = true
+	]]
+
+	_IActionButton_UnregisterAutoSwap = [[
+		local btn = Manager:GetFrameRef("AutoSwapButton")
+		AutoSwapHeader[btn] = nil
+	]]
+
 	_IActionButton_RegisterBrother = [[
 		local brother, header = Manager:GetFrameRef("BrotherButton"), Manager:GetFrameRef("HeaderButton")
 		HeaderMap[brother] = header
@@ -299,6 +310,32 @@ class "IActionButton"
 		local root = BranchMap[self] or self
 		if BranchHeader[root] and not RootExpansion[root] then
 			Manager:RunFor(self, HideBranch)
+		end
+		if AutoSwapHeader[root] and root ~= self then
+			local rootKind = root:GetAttribute("type")
+			if rootKind == "action" or rootKind == "pet" then return end
+			local rootTarget = rootKind and root:GetAttribute(rootKind)
+
+			local selfKind = self:GetAttribute("type")
+			if not selfKind then return end
+			local selfTarget = self:GetAttribute(selfKind)
+
+			-- Update Root
+			root:SetAttribute("type", selfKind)
+			if rootKind then
+				root:SetAttribute(rootKind, nil)
+			end
+			root:SetAttribute(selfKind, selfTarget)
+
+			root:CallMethod("IFActionHandler_UpdateAction", selfKind, selfTarget)
+
+			-- Update self
+			self:SetAttribute("type", rootKind)
+			if rootKind then
+				self:SetAttribute(rootKind, rootTarget)
+			end
+
+			self:CallMethod("IFActionHandler_UpdateAction", rootKind, rootTarget)
 		end
 	]=]
 
@@ -368,6 +405,16 @@ class "IActionButton"
 	local function UnregisterNoVehicle(self)
 		_IActionButton_ManagerFrame:SetFrameRef("StateButton", self)
 		_IActionButton_ManagerFrame:Execute(_IActionButton_UnregisterNoVehicle)
+	end
+
+	local function RegisterAutoSwap(self)
+		_IActionButton_ManagerFrame:SetFrameRef("AutoSwapButton", self)
+		_IActionButton_ManagerFrame:Execute(_IActionButton_RegisterAutoSwap)
+	end
+
+	local function UnregisterAutoSwap(self)
+		_IActionButton_ManagerFrame:SetFrameRef("AutoSwapButton", self)
+		_IActionButton_ManagerFrame:Execute(_IActionButton_UnregisterAutoSwap)
 	end
 
 	local function RegisterBrother(brother, header)
@@ -635,6 +682,7 @@ class "IActionButton"
 				value.ActionBar = self.ActionBar
 				value.MainBar = self.MainBar
 				value.LockMode = self.LockMode
+				value.AutoSwapRoot = self.AutoSwapRoot
 				value:SetSize(self:GetSize())
 
 				if self.ITail then
@@ -847,6 +895,23 @@ class "IActionButton"
 					IFNoCombatTaskHandler._RegisterNoCombatTask(RegisterNoVehicle, self)
 				else
 					IFNoCombatTaskHandler._RegisterNoCombatTask(UnregisterNoVehicle, self)
+				end
+			end
+		end,
+		Type = System.Boolean,
+	}
+	-- AutoSwapRoot
+	property "AutoSwapRoot" {
+		Get = function(self)
+			return self.__AutoSwapRoot or false
+		end,
+		Set = function(self, value)
+			if self.AutoSwapRoot ~= value then
+				self.__AutoSwapRoot = value
+				if value then
+					IFNoCombatTaskHandler._RegisterNoCombatTask(RegisterAutoSwap, self)
+				else
+					IFNoCombatTaskHandler._RegisterNoCombatTask(UnregisterAutoSwap, self)
 				end
 			end
 		end,
@@ -1399,6 +1464,7 @@ function _Recycle_IButtons:OnPush(btn)
 	btn.HideOutOfCombat = false
 	btn.HideInPetBattle = false
 	btn.HideInVehicle = false
+	btn.AutoSwapRoot = false
 	btn:Hide()
 	btn:SetSize(36, 36)
 	btn:ClearBindingKey()

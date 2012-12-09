@@ -41,6 +41,7 @@ L["Do you want reset the layout?"] = "是否确定重置当前布局?"
 L["Do you want load the layout?"] = "是否确定载入指定布局方案?"
 L["Please confirm to delete this action bar"] = "请确认是否删除这个动作条?"
 L["Please confirm to create new action bar"] = "请确认是否新建动作条?"
+L["Swap Pop-up action"] = "切换弹出条动作"
 
 L["Spell Binding"] = "技能绑定"
 L["Lock Raid Panel"] = "锁定团队面板"

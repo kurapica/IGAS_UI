@@ -271,6 +271,8 @@ function GenerateConfig(includeContent)
 		bar.HideInPetBattle = header.HideInPetBattle
 		bar.HideInVehicle = header.HideInVehicle
 
+		bar.AutoSwapRoot = header.AutoSwapRoot
+
 		bar.FreeMode = header.FreeMode
 		bar.LockMode = header.LockMode
 
@@ -342,6 +344,8 @@ function LoadConfig(config)
 			header.HideOutOfCombat = bar.HideOutOfCombat
 			header.HideInPetBattle = bar.HideInPetBattle
 			header.HideInVehicle = bar.HideInVehicle
+
+			header.AutoSwapRoot = bar.AutoSwapRoot
 
 			header.FreeMode = bar.FreeMode
 			header.LockMode = bar.LockMode
@@ -624,6 +628,9 @@ function _Menu:OnShow()
 	-- Manual mode
 	_MenuManual.Enabled = header.FreeMode
 
+	-- Auto Swap
+	_MenuSwap.Checked = header.AutoSwapRoot
+
 	-- Mouse down
 	_MenuUseDown.Checked = IFActionHandler._IsGroupUseButtonDownEnabled(_IGASUI_ACTIONBAR_GROUP)
 
@@ -770,6 +777,10 @@ function _MenuLock:OnCheckChanged()
 	else
 		IFActionHandler._EnableGroupDrag(_IGASUI_ACTIONBAR_GROUP)
 	end
+end
+
+function _MenuSwap:OnCheckChanged()
+	_Menu.Parent.AutoSwapRoot = self.Checked
 end
 
 function _ListScale:OnItemChoosed(key, item)

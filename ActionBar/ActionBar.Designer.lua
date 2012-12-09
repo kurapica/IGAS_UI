@@ -98,6 +98,9 @@ _MenuFreeMode.IsCheckButton = true
 
 _MenuManual = _Menu:AddMenuButton(L"Manual Move&Resize")
 
+_MenuSwap = _Menu:AddMenuButton(L"Swap Pop-up action")
+_MenuSwap.IsCheckButton = true
+
 _MenuSave = _Menu:AddMenuButton(L"Save Layout")
 _ListSave = List("LstSave", _MenuSave)
 _ListSave.Width = 150
