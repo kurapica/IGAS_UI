@@ -14,6 +14,9 @@ Toggle = {
 		_HeadList:Each(function(self)
 			self.LockMode = value
 			self.IHeader.Visible = not value
+			if self.HideOutOfCombat then
+				self.Visible = not value
+			end
 			if _Header4CharacterBag then
 				_Header4CharacterBag.Visible = not value
 			end
@@ -341,10 +344,6 @@ function LoadConfig(config)
 			header = NewHeader()
 			header.IHeader.Visible = false
 
-			header.HideOutOfCombat = bar.HideOutOfCombat
-			header.HideInPetBattle = bar.HideInPetBattle
-			header.HideInVehicle = bar.HideInVehicle
-
 			header.AutoSwapRoot = bar.AutoSwapRoot
 
 			header.FreeMode = bar.FreeMode
@@ -419,6 +418,10 @@ function LoadConfig(config)
 
 				btn = btn.Brother
 			end
+
+			header.HideOutOfCombat = bar.HideOutOfCombat
+			header.HideInPetBattle = bar.HideInPetBattle
+			header.HideInVehicle = bar.HideInVehicle
 		end
 
 		BAG_UPDATE()

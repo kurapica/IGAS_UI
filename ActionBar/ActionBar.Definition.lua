@@ -636,6 +636,28 @@ class "IActionButton"
 	------------------------------------------------------
 	-- Property
 	------------------------------------------------------
+	-- Visible
+	property "Visible" {
+		Get = function(self)
+			return self:IsShown() and true or false
+		end,
+		Set = function(self, value)
+			if self.Visible ~= value then
+				if value then
+					self:Show()
+				else
+					self:Hide()
+				end
+				if self.Brother then
+					self.Brother.Visible = value
+				end
+				if not value and self.Branch then
+					self.Branch.Visible = value
+				end
+			end
+		end,
+		Type = System.Boolean,
+	}
 	-- RowCount
 	property "RowCount" {
 		Get = function(self)
