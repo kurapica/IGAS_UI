@@ -9,6 +9,7 @@
 	<Include file = "RaidPanel\RaidPanel.xml"/>
 	<!--Include file = "UnitFrame\UnitFrame.xml"/-->
 	<Include file = "UnitFrame_Slim\UnitFrame.xml"/>
+	<Script file = "Minimap\Minimap.lua"/>
 
 	<!-- Manager -->
 	<Script file = "Manager.Designer.lua"/>

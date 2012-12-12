@@ -41,4 +41,4 @@ frmPlayer.CombatIcon:SetPoint("CENTER", frmPlayer, "TOPLEFT")
 
 -- Pvp Icon
 frmPlayer:AddElement(PvpIcon)
-frmPlayer.PvpIcon:SetPoint("CENTER", frmPlayer, "LEFT")
+frmPlayer.PvpIcon:SetPoint("CENTER", frmPlayer, "RIGHT", 12, 0)
