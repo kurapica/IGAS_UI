@@ -113,12 +113,22 @@ function OnLoad(self)
 	_DB = _Addon._DB.UnitFrame or {}
 	_Addon._DB.UnitFrame = _DB
 
+	-- Convert old save data
 	for i = 1, #arUnit do
-		if _DB[i] and _DB[i].Size then
-			arUnit[i].Size = _DB[i].Size
+		if _DB[i] then
+			_DB[arUnit[i].Unit] = _DB[i]
+			_DB[i] = nil
 		end
-		if _DB[i] and _DB[i].Location then
-			arUnit[i].Location = _DB[i].Location
+	end
+
+	for i = 1, #arUnit do
+		local db = _DB[arUnit[i].Unit]
+
+		if db and db.Size then
+			arUnit[i].Size = db.Size
+		end
+		if db and db.Location then
+			arUnit[i].Location = db.Location
 		end
 	end
 end
@@ -126,13 +136,13 @@ end
 --------------------
 -- Script Handler
 --------------------
-function arUnit:OnPositionChanged(index)
-	_DB[index] = _DB[index] or {}
-	_DB[index].Location = arUnit[index].Location
+function arUnit:OnPositionChanged(i)
+	_DB[arUnit[i].Unit] = _DB[arUnit[i].Unit] or {}
+	_DB[arUnit[i].Unit].Location = arUnit[i].Location
 end
 
-function arUnit:OnSizeChanged(index)
-	_DB[index] = _DB[index] or {}
-	_DB[index].Size = arUnit[index].Size
+function arUnit:OnSizeChanged(i)
+	_DB[arUnit[i].Unit] = _DB[arUnit[i].Unit] or {}
+	_DB[arUnit[i].Unit].Size = arUnit[i].Size
 end
 

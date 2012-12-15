@@ -1,7 +1,7 @@
 ## Interface: 50100
 ## Title: IGAS_UI
 ## Author: kurapica.igas@gmail.com
-## Version: v7
+## Version: v8
 ## Notes: UI demo for IGAS
 ## eMail: kurapica.igas@gmail.com
 ## URL: http://github.com/kurapica
@@ -10,8 +10,6 @@
 ## LoadOnDemand: 0
 ## SavedVariablesPerCharacter: IGAS_UI_DB_Char
 ## SavedVariables: IGAS_UI_DB
-
-embeds.xml
 
 localization\localization.cn.lua
 localization\localization.tw.lua
