@@ -14,6 +14,10 @@ _IGASUI_UNITFRAME_GROUP = "IUnitFrame"
 RAID_CLASS_COLORS = _G.RAID_CLASS_COLORS
 DEFAULT_COLOR = ColorType(1, 1, 1)
 
+_BORDER_COLOR = ColorType(0, 0, 0)
+_ELITE_COLOR = ColorType(1, 0.84, 0)
+_RARE_COLOR = ColorType(0.75, 0.75, 0.75)
+
 CASTBAR_COLOR = ColorType(0, 0, 0.8)
 BUFF_SIZE = 24
 
@@ -36,8 +40,6 @@ interface "iBorder"
 	    edgeFile = "Interface\\Buttons\\WHITE8x8",
 	    edgeSize = 1,
 	}
-
-	_BORDER_COLOR = ColorType(0, 0, 0)
 
 	_BACK_MULTI = 0.2
 	_BACK_ALPHA = 0.8
@@ -194,6 +196,20 @@ endclass "iUnitFrame"
 class "iHealthBar"
 	inherit "HealthBarFrequent"
 	extend "iBorder"
+
+	function Refresh(self, ...)
+		if self.Unit == "target" then
+			local classification = UnitClassification("target")
+			if classification == "worldboss" or classification == "elite" then
+				self.Back.BackdropBorderColor = _ELITE_COLOR
+			elseif classification == "rareelite" or classification == "rare" then
+				self.Back.BackdropBorderColor = _RARE_COLOR
+			else
+				self.Back.BackdropBorderColor = _BORDER_COLOR
+			end
+		end
+		return Super.Refresh(self, ...)
+	end
 
 	------------------------------------------------------
 	-- Constructor
