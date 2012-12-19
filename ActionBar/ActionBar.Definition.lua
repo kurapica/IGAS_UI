@@ -321,21 +321,10 @@ class "IActionButton"
 			local selfTarget = self:GetAttribute(selfKind)
 
 			-- Update Root
-			root:SetAttribute("type", selfKind)
-			if rootKind then
-				root:SetAttribute(rootKind, nil)
-			end
-			root:SetAttribute(selfKind, selfTarget)
-
-			root:CallMethod("IFActionHandler_UpdateAction", selfKind, selfTarget)
+			root:RunAttribute("UpdateAction", selfKind, selfTarget)
 
 			-- Update self
-			self:SetAttribute("type", rootKind)
-			if rootKind then
-				self:SetAttribute(rootKind, rootTarget)
-			end
-
-			self:CallMethod("IFActionHandler_UpdateAction", rootKind, rootTarget)
+			self:RunAttribute("UpdateAction", rootKind, rootTarget)
 		end
 	]=]
 
