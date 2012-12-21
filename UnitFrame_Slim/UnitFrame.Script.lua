@@ -56,6 +56,45 @@ _Addon.OnSlashCmd = _Addon.OnSlashCmd + function(self, option, info)
 		end
 
 		return true
+	elseif option and (option:lower() == "show" or option:lower() == "hide") then
+		if info then
+			if not info:match("%d$") then
+				info = info .. "%d*"
+			end
+			local visible = (option:lower() == "show")
+
+			IFNoCombatTaskHandler._RegisterNoCombatTask(function()
+				if visible then
+					for i = 1, #arUnit do
+						if arUnit[i].OldUnit and arUnit[i].OldUnit:match(info) then
+							_DB.HideUnit[arUnit[i].OldUnit] = nil
+
+							arUnit[i].Unit = arUnit[i].OldUnit
+							arUnit[i].OldUnit = nil
+
+							arUnit[i].IFMovable = true
+							arUnit[i].IFResizable = true
+						end
+					end
+				else
+					for i = 1, #arUnit do
+						if arUnit[i].Unit and arUnit[i].Unit:match(info) then
+							_DB.HideUnit[arUnit[i].Unit] = true
+
+							arUnit[i].OldUnit = arUnit[i].Unit
+							arUnit[i].Unit = nil
+
+							arUnit[i].IFMovable = false
+							arUnit[i].IFResizable = false
+						end
+					end
+				end
+			end)
+		else
+			Log(2, "/iu show|hide unit - show or hide unit's frame")
+		end
+
+		return true
 	end
 end
 
@@ -131,18 +170,34 @@ function OnLoad(self)
 			arUnit[i].Location = db.Location
 		end
 	end
+
+	-- Hide no need unitframe
+	_DB.HideUnit = _DB.HideUnit or {}
+	for i = 1, #arUnit do
+		if _DB.HideUnit[arUnit[i].Unit] then
+			arUnit[i].OldUnit = arUnit[i].Unit
+			arUnit[i].Unit = nil
+
+			arUnit[i].IFMovable = false
+			arUnit[i].IFResizable = false
+		end
+	end
 end
 
 --------------------
 -- Script Handler
 --------------------
 function arUnit:OnPositionChanged(i)
-	_DB[arUnit[i].Unit] = _DB[arUnit[i].Unit] or {}
-	_DB[arUnit[i].Unit].Location = arUnit[i].Location
+	if arUnit[i].Unit then
+		_DB[arUnit[i].Unit] = _DB[arUnit[i].Unit] or {}
+		_DB[arUnit[i].Unit].Location = arUnit[i].Location
+	end
 end
 
 function arUnit:OnSizeChanged(i)
-	_DB[arUnit[i].Unit] = _DB[arUnit[i].Unit] or {}
-	_DB[arUnit[i].Unit].Size = arUnit[i].Size
+	if arUnit[i].Unit then
+		_DB[arUnit[i].Unit] = _DB[arUnit[i].Unit] or {}
+		_DB[arUnit[i].Unit].Size = arUnit[i].Size
+	end
 end
 
