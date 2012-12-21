@@ -73,6 +73,28 @@ end
 function OnEnable(self)
 	self:SecureHook("SpellButton_UpdateButton")
 	LEARNED_SPELL_IN_TAB(self)
+
+	self:ThreadCall(function()
+		System.Threading.Sleep(3)
+
+		IFNoCombatTaskHandler._RegisterNoCombatTask(function()
+			_G.CompactRaidFrameContainer:UnregisterAllEvents()
+			_G.CompactRaidFrameManager:UnregisterAllEvents()
+			_G.CompactRaidFrameManager:Show()
+
+			for i=1, 8 do
+				local button = _G["CompactRaidFrameManagerDisplayFrameRaidMarkersRaidMarker"..i]
+				button:GetNormalTexture():SetDesaturated(false)
+				button:SetAlpha(1)
+				button:Enable()
+
+				button = _G["CompactRaidFrameManagerDisplayFrameRaidMarkersRaidMarkerRemove"]
+				button:GetNormalTexture():SetDesaturated(false)
+				button:SetAlpha(1)
+				button:Enable()
+			end
+		end)
+	end)
 end
 
 function PLAYER_REGEN_DISABLED(self)
