@@ -17,7 +17,7 @@ _IGASUI_SPELLHANDLER = IFSpellHandler._Group(_IGASUI_RAIDPANEL_GROUP)
 -----------------------------------------------
 class "iRaidUnitFrame"
 	inherit "UnitFrame"
-	extend "IFSpellHandler"
+	extend "IFSpellHandler""iBorder"
 
 	_IGASUI_RAIDPANEL_GROUP = _IGASUI_RAIDPANEL_GROUP
 
@@ -157,17 +157,13 @@ class "BindingButton"
 	------------------------------------------------------
 	-- Constructor
 	------------------------------------------------------
-    function BindingButton(name, parent)
-		local mask = Super(name, parent)
+    function BindingButton(self)
+		self.AsKeyBind = true
 
-		mask.AsKeyBind = true
+		self.OnEnter = self.OnEnter + OnEnter
+		self.OnLeave = self.OnLeave + OnLeave
 
-		mask.OnEnter = mask.OnEnter + OnEnter
-		mask.OnLeave = mask.OnLeave + OnLeave
-
-		mask.OnKeySet = mask.OnKeySet + OnKeySet
-		mask.OnKeyClear = mask.OnKeyClear + OnKeyClear
-
-		return mask
+		self.OnKeySet = self.OnKeySet + OnKeySet
+		self.OnKeyClear = self.OnKeyClear + OnKeyClear
     end
 endclass "BindingButton"

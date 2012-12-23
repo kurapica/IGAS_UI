@@ -40,17 +40,13 @@ class "iDebuffPanel"
 	------------------------------------------------------
 	-- Constructor
 	------------------------------------------------------
-    function iDebuffPanel(...)
-		local obj = Super(...)
-
-		obj.Filter = "HARMFUL"
-		obj.ColumnCount = 6
-		obj.RowCount = 1
-		obj.ElementWidth = 14
-		obj.ElementHeight = 14
-		obj.Orientation = Orientation.HORIZONTAL
-
-		return obj
+    function iDebuffPanel(self)
+		self.Filter = "HARMFUL"
+		self.ColumnCount = 6
+		self.RowCount = 1
+		self.ElementWidth = 14
+		self.ElementHeight = 14
+		self.Orientation = Orientation.HORIZONTAL
     end
 endclass "iDebuffPanel"
 

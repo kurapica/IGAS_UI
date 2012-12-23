@@ -38,17 +38,13 @@ class "iBuffPanel"
 	------------------------------------------------------
 	-- Constructor
 	------------------------------------------------------
-    function iBuffPanel(...)
-		local obj = Super(...)
-
-		obj.Filter = "HELPFUL|PLAYER"
-		obj.ColumnCount = 6
-		obj.RowCount = 2
-		obj.ElementWidth = 14
-		obj.ElementHeight = 14
-		obj.Orientation = Orientation.VERTICAL
-
-		return obj
+    function iBuffPanel(self)
+		self.Filter = "HELPFUL|PLAYER"
+		self.ColumnCount = 6
+		self.RowCount = 2
+		self.ElementWidth = 14
+		self.ElementHeight = 14
+		self.Orientation = Orientation.VERTICAL
     end
 endclass "iBuffPanel"
 

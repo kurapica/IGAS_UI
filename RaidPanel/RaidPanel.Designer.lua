@@ -24,6 +24,9 @@ raidPanel:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 0, -300)
 raidPanel.ElementType = iRaidUnitFrame
 raidPanel.ElementPrefix = "iRaidUnitFrame"
 raidPanel.KeepMaxPlayer = true
+raidPanel.SortByRole = true
+raidPanel.VSpacing = 3
+raidPanel.HSpacing = 3
 
 raidPanelMask = Mask("Mask", raidPanel)
 raidPanelMask.AsMove = true

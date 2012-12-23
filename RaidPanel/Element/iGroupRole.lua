@@ -16,6 +16,7 @@ interface "IFIGroupRole"
     function IFIGroupRole(self)
 		self:AddElement(RoleIcon)
 		self.RoleIcon:SetPoint("TOPRIGHT")
+		--self.RoleIcon.ShowInCombat = true
     end
 endinterface "IFIGroupRole"
 

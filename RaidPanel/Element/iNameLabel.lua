@@ -53,13 +53,6 @@ class "iNameLabel"
 	------------------------------------------------------
 	-- Constructor
 	------------------------------------------------------
-	function iNameLabel(...)
-		local label = Super(...)
-
-		label.UseClassColor = true
-
-		return label
-	end
 endclass "iNameLabel"
 
 -----------------------------------------------
@@ -73,8 +66,8 @@ interface "IFINameLabel"
 	------------------------------------------------------
     function IFINameLabel(self)
 		self:AddElement(iNameLabel)
-		self.iNameLabel:SetPoint("TOPLEFT")
-		self.iNameLabel:SetPoint("TOPRIGHT")
+		self.iNameLabel:SetPoint("TOPLEFT", 2, -2)
+		self.iNameLabel:SetPoint("TOPRIGHT", -2, -2)
 
 		self.iNameLabel.UseClassColor = true
 		self.iNameLabel.DrawLayer = "BORDER"

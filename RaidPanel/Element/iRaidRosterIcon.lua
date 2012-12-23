@@ -15,7 +15,7 @@ interface "IFIRaidRosterIcon"
 	------------------------------------------------------
     function IFIRaidRosterIcon(self)
 		self:AddElement(RaidRosterIcon)
-		self.RaidRosterIcon:SetPoint("TOPRIGHT", -16, 0)
+		self.RaidRosterIcon:SetPoint("TOPLEFT", 0, 0)
     end
 endinterface "IFIRaidRosterIcon"
 

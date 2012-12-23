@@ -87,12 +87,20 @@ function OnEnable(self)
 				button:GetNormalTexture():SetDesaturated(false)
 				button:SetAlpha(1)
 				button:Enable()
-
-				button = _G["CompactRaidFrameManagerDisplayFrameRaidMarkersRaidMarkerRemove"]
-				button:GetNormalTexture():SetDesaturated(false)
-				button:SetAlpha(1)
-				button:Enable()
 			end
+
+			button = _G["CompactRaidFrameManagerDisplayFrameRaidMarkersRaidMarkerRemove"]
+			button:GetNormalTexture():SetDesaturated(false)
+			button:SetAlpha(1)
+			button:Enable()
+
+			button = _G.CompactRaidFrameManagerDisplayFrameLeaderOptionsInitiateRolePoll
+			button:SetAlpha(1)
+			button:Enable()
+
+			button = _G.CompactRaidFrameManagerDisplayFrameLeaderOptionsInitiateReadyCheck
+			button:SetAlpha(1)
+			button:Enable()
 		end)
 	end)
 end

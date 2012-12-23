@@ -11,17 +11,7 @@ IGAS:NewAddon "IGAS_UI.RaidPanel"
 -----------------------------------------------
 class "iPowerBar"
 	inherit "PowerBar"
-
-	------------------------------------------------------
-	-- Constructor
-	------------------------------------------------------
-	function iPowerBar(...)
-		local bar = Super(...)
-
-		bar.StatusBarTexturePath = [[Interface\Tooltips\UI-Tooltip-Background]]
-
-		return bar
-	end
+	extend "iStatusBarStyle"
 endclass "iPowerBar"
 
 -----------------------------------------------

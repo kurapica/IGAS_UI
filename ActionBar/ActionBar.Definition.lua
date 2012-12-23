@@ -1178,34 +1178,34 @@ class "IActionButton"
 		end
 	end
 
+	function Constructor(self, name, parent, ...)
+		local obj = Super.Constructor(self, _Prefix.._Index, IGAS.UIParent)
+		_Index = _Index + 1
+
+		return obj
+	end
+
 	------------------------------------------------------
 	-- Constructor
 	------------------------------------------------------
-    function IActionButton()
-		local obj = Super(_Prefix.._Index, IGAS.UIParent)
-		_Index = _Index + 1
+    function IActionButton(self)
+		self.IFMovable = false
+		self.IFResizable = false
+		self.ShowGrid = true
+		self.ID = 1
 
-		obj:ConvertClass(IActionButton)
+		self.MarginX = 2
+		self.MarginY = 2
 
-		obj.IFMovable = false
-		obj.IFResizable = false
-		obj.ShowGrid = true
-		obj.ID = 1
-
-		obj.MarginX = 2
-		obj.MarginY = 2
-
-		obj.OnEnter = obj.OnEnter + OnEnter
-		obj.OnMouseDown = obj.OnMouseDown + OnMouseDown
+		self.OnEnter = self.OnEnter + OnEnter
+		self.OnMouseDown = self.OnMouseDown + OnMouseDown
 
 		-- callback from RestrictedEnvironment, maybe add some mechanism solve this later
-		IGAS:GetUI(obj).IActionHandler_UpdateExpansion = IActionHandler_UpdateExpansion
+		IGAS:GetUI(self).IActionHandler_UpdateExpansion = IActionHandler_UpdateExpansion
 
-		IFNoCombatTaskHandler._RegisterNoCombatTask(SetupActionButton, obj)
+		IFNoCombatTaskHandler._RegisterNoCombatTask(SetupActionButton, self)
 
-		obj.UseBlizzardArt = true
-
-		return obj
+		self.UseBlizzardArt = true
     end
 endclass "IActionButton"
 
@@ -1323,31 +1323,32 @@ class "IHeader"
 	------------------------------------------------------
 	-- Constructor
 	------------------------------------------------------
-    function IHeader()
-		local header = Super(_Prefix.._Index, IGAS.UIParent)
+	function Constructor(self, name, parent, ...)
+		local obj = Super.Constructor(self, _Prefix.._Index, IGAS.UIParent)
 		_Index = _Index + 1
+		return obj
+	end
 
-		header.Parent = nil
-		header.Name = "IHeader"
-		header.Visible = false
-		header.Width = 24
-		header.Height = 24
-		header.MouseEnabled = true
-		header:RegisterForClicks("AnyUp")
+    function IHeader(self)
+		self.Parent = nil
+		self.Name = "IHeader"
+		self.Visible = false
+		self.Width = 24
+		self.Height = 24
+		self.MouseEnabled = true
+		self:RegisterForClicks("AnyUp")
 
-		header:SetNormalTexture([[Interface\Buttons\UI-CheckBox-Up]])
-		header:SetPushedTexture([[Interface\Buttons\UI-CheckBox-Down]])
+		self:SetNormalTexture([[Interface\Buttons\UI-CheckBox-Up]])
+		self:SetPushedTexture([[Interface\Buttons\UI-CheckBox-Down]])
 
-		local txtCheck = Texture("CheckedTexture", header)
+		local txtCheck = Texture("CheckedTexture", self)
 		txtCheck.TexturePath = [[Interface\Buttons\UI-CheckBox-Check]]
 		txtCheck:SetAllPoints()
 		txtCheck.Visible = false
 
-		--header.OnMouseUp = header.OnMouseUp + OnMouseUp
-		header.OnMouseDown = header.OnMouseDown + OnMouseDown
-		header.OnClick = header.OnClick + OnClick
-
-		return header
+		--self.OnMouseUp = self.OnMouseUp + OnMouseUp
+		self.OnMouseDown = self.OnMouseDown + OnMouseDown
+		self.OnClick = self.OnClick + OnClick
     end
 endclass "IHeader"
 
@@ -1425,24 +1426,25 @@ class "ITail"
 	------------------------------------------------------
 	-- Constructor
 	------------------------------------------------------
-    function ITail()
-		local tail = Super(_Prefix.._Index, IGAS.UIParent)
+	function Constructor(self, name, parent, ...)
+		local obj = Super.Constructor(self, _Prefix.._Index, IGAS.UIParent)
 		_Index = _Index + 1
+		return obj
+	end
 
-		tail.Parent = nil
-		tail.Name = "ITail"
-		tail.Visible = false
-		tail.Width = 16
-		tail.Height = 16
-		tail.MouseEnabled = true
+    function ITail(self)
+		self.Parent = nil
+		self.Name = "ITail"
+		self.Visible = false
+		self.Width = 16
+		self.Height = 16
+		self.MouseEnabled = true
 
-		tail.NormalTexturePath = [[Interface\ChatFrame\UI-ChatIM-SizeGrabber-Up]]
-		tail.HighlightTexturePath = [[Interface\ChatFrame\UI-ChatIM-SizeGrabber-Highlight]]
-		tail.PushedTexturePath = [[Interface\ChatFrame\UI-ChatIM-SizeGrabber-Down]]
+		self.NormalTexturePath = [[Interface\ChatFrame\UI-ChatIM-SizeGrabber-Up]]
+		self.HighlightTexturePath = [[Interface\ChatFrame\UI-ChatIM-SizeGrabber-Highlight]]
+		self.PushedTexturePath = [[Interface\ChatFrame\UI-ChatIM-SizeGrabber-Down]]
 
-		tail.OnMouseDown = tail.OnMouseDown + OnMouseDown
-
-		return tail
+		self.OnMouseDown = self.OnMouseDown + OnMouseDown
     end
 endclass "ITail"
 

@@ -177,13 +177,16 @@ class "SpellIcon"
     ------------------------------------------------------
     -- Constructor
     ------------------------------------------------------
-    function SpellIcon(name, parent)
-        local icon = Super(name, parent, "OVERLAY")
-        icon.Width = parent.Width
-        icon.Height = parent.Height
+    function Constructor(self, name, parent, ...)
+        return Super.Constructor(self, name, parent, "OVERLAY")
+    end
+
+    function SpellIcon(self, name, parent)
+        self.Width = parent.Width
+        self.Height = parent.Height
 
         -- Inline Animation
-        local agInLine = AnimationGroup("agInLine", icon)
+        local agInLine = AnimationGroup("agInLine", self)
         agInLine.OnPlay = agInLine_OnPlay
         agInLine.OnFinished = agInLine_OnFinished
 
@@ -197,14 +200,14 @@ class "SpellIcon"
         tranInLine.Duration = 1
 
         -- Moving Animation
-        local agTrans = AnimationGroup("agTrans", icon)
+        local agTrans = AnimationGroup("agTrans", self)
         agTrans.OnFinished = agTrans_OnFinished
 
         local trans = Translation("trans", agTrans)
         trans.Order = 1
 
         -- Scale Animation
-        local agFinal = AnimationGroup("agFinal", icon)
+        local agFinal = AnimationGroup("agFinal", self)
         agFinal.OnFinished = agFinal_OnFinished
 
         local scale = Scale("scale", agFinal)
@@ -221,7 +224,5 @@ class "SpellIcon"
         alphaScale.Order = 2
         alphaScale.Duration = 0.4
         alphaScale.Change = -_Full_Alpha
-
-        return icon
     end
 endclass "SpellIcon"

@@ -11,76 +11,7 @@ _IGASUI_RAIDPANEL_GROUP = "IRaidPanel"	-- Same as the raidPanel, no raidpanel no
 
 _IGASUI_UNITFRAME_GROUP = "IUnitFrame"
 
-RAID_CLASS_COLORS = _G.RAID_CLASS_COLORS
-DEFAULT_COLOR = ColorType(1, 1, 1)
-
-_BORDER_COLOR = ColorType(0, 0, 0)
-_ELITE_COLOR = ColorType(1, 0.84, 0)
-_RARE_COLOR = ColorType(0.75, 0.75, 0.75)
-
-CASTBAR_COLOR = ColorType(0, 0, 0.8)
-BUFF_SIZE = 24
-
-_Buff_List = {
-	-- [spellId] = true,
-}
-
-_Debuff_List = {
-	-- [spellId] = true,
-}
-
------------------------------------------------
---- iBorder
--- @type interface
--- @name iBorder
------------------------------------------------
-interface "iBorder"
-	_PLAYER_COLOR = RAID_CLASS_COLORS[select(2, UnitClass("player"))]
-	_THIN_BORDER = {
-	    edgeFile = "Interface\\Buttons\\WHITE8x8",
-	    edgeSize = 1,
-	}
-
-	_BACK_MULTI = 0.2
-	_BACK_ALPHA = 0.8
-
-	------------------------------------------------------
-	-- Method
-	------------------------------------------------------
-	function SetStatusBarColor(self, r, g, b, a)
-	    if r and g and b then
-	        StatusBar.SetStatusBarColor(self, r, g, b)
-	        if self.Bg then
-	        	self.Bg:SetTexture(r * _BACK_MULTI, g * _BACK_MULTI, b * _BACK_MULTI, _BACK_ALPHA)
-	    	end
-	    end
-	end
-
-	------------------------------------------------------
-	-- Initialize
-	------------------------------------------------------
-    function iBorder(self)
-		self.StatusBarTexturePath = [[Interface\Tooltips\UI-Tooltip-Background]]
-
-		local bg = Frame("Back", self)
-		bg.FrameStrata = "BACKGROUND"
-		bg:SetPoint("TOPLEFT", -1, 1)
-		bg:SetPoint("BOTTOMRIGHT", 1, -1)
-		bg.Backdrop = _THIN_BORDER
-		bg.BackdropBorderColor = _BORDER_COLOR
-
-		local bgColor = Texture("Bg", bg, "BACKGROUND")
-		bgColor:SetAllPoints()
-
-		self.Bg = bgColor
-
-		self.SetStatusBarColor = SetStatusBarColor
-
-		if self:IsClass(iClassPowerButton) then
-			self:SetStatusBarColor(_PLAYER_COLOR.r, _PLAYER_COLOR.g, _PLAYER_COLOR.b)
-    	end
-    end
-endinterface "iBorder"
+PLAYER_COLOR = RAID_CLASS_COLORS[select(2, UnitClass("player"))]
 
 -----------------------------------------------
 --- iSUnitFrame
@@ -120,32 +51,27 @@ class "iSUnitFrame"
 	------------------------------------------------------
 	-- Constructor
 	------------------------------------------------------
-	function iSUnitFrame(...)
-		local frm = Super(...)
+	function iSUnitFrame(self)
+		self.Panel.VSpacing = 4
 
-		frm:ConvertClass(iSUnitFrame)
-		frm.Panel.VSpacing = 4
+		self:SetSize(200, 48)
 
-		frm:SetSize(200, 48)
-
-		frm.IFMovable = true
-		frm.IFResizable = true
+		self.IFMovable = true
+		self.IFResizable = true
 
 		-- Health
-		frm:AddElement(iHealthBar, "rest")
+		self:AddElement(iHealthBar, "rest")
 
 		-- Name
-		frm:AddElement(NameLabel)
-		frm.NameLabel.UseClassColor = true
-		frm.NameLabel:SetPoint("RIGHT", frm.iHealthBar, "RIGHT", -4, 0)
+		self:AddElement(NameLabel)
+		self.NameLabel.UseClassColor = true
+		self.NameLabel:SetPoint("RIGHT", self.iHealthBar, "RIGHT", -4, 0)
 
 		-- Level
-		frm:AddElement(LevelLabel)
-		frm.LevelLabel:SetPoint("RIGHT", frm.NameLabel, "LEFT", -4, 0)
+		self:AddElement(LevelLabel)
+		self.LevelLabel:SetPoint("RIGHT", self.NameLabel, "LEFT", -4, 0)
 
-		arUnit:Insert(frm)
-
-		return frm
+		arUnit:Insert(self)
 	end
 endclass "iSUnitFrame"
 
@@ -160,31 +86,27 @@ class "iUnitFrame"
 	------------------------------------------------------
 	-- Constructor
 	------------------------------------------------------
-	function iUnitFrame(...)
-		local frm = Super(...)
-
+	function iUnitFrame(self)
 		-- Power
-		frm:AddElement(iPowerBar, "south", 6, "px")
+		self:AddElement(iPowerBar, "south", 6, "px")
 
 		-- Name
-		frm.NameLabel:ClearAllPoints()
-		frm.NameLabel:SetPoint("TOPRIGHT", frm, "BOTTOMRIGHT")
+		self.NameLabel:ClearAllPoints()
+		self.NameLabel:SetPoint("TOPRIGHT", self, "BOTTOMRIGHT")
 
 		-- Cast
-		frm:AddElement(iCastBar)
-		frm.iCastBar:SetAllPoints(frm.iHealthBar)
+		self:AddElement(iCastBar)
+		self.iCastBar:SetAllPoints(self.iHealthBar)
 
 		-- Percent Health text
-		frm:AddElement(HealthTextFrequent)
-		frm.HealthTextFrequent.ShowPercent = true
-		frm.HealthTextFrequent:SetPoint("RIGHT", frm.iHealthBar, "LEFT", -4, 0)
+		self:AddElement(HealthTextFrequent)
+		self.HealthTextFrequent.ShowPercent = true
+		self.HealthTextFrequent:SetPoint("RIGHT", self.iHealthBar, "LEFT", -4, 0)
 
 		-- Full Health Text
-		frm:AddElement("HealthTextFrequent2", HealthTextFrequent)
-		frm.HealthTextFrequent2.ValueFormat = "%.1f"
-		frm.HealthTextFrequent2:SetPoint("TOPLEFT", frm, "BOTTOMLEFT", 0, -2)
-
-		return frm
+		self:AddElement("HealthTextFrequent2", HealthTextFrequent)
+		self.HealthTextFrequent2.ValueFormat = "%.1f"
+		self.HealthTextFrequent2:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 0, -2)
 	end
 endclass "iUnitFrame"
 
@@ -195,17 +117,17 @@ endclass "iUnitFrame"
 -----------------------------------------------
 class "iHealthBar"
 	inherit "HealthBarFrequent"
-	extend "iBorder"
+	extend "iBorder" "iStatusBarStyle"
 
 	function Refresh(self, ...)
 		if self.Unit == "target" then
 			local classification = UnitClassification("target")
 			if classification == "worldboss" or classification == "elite" then
-				self.Back.BackdropBorderColor = _ELITE_COLOR
+				self.Back.BackdropBorderColor = ELITE_BORDER_COLOR
 			elseif classification == "rareelite" or classification == "rare" then
-				self.Back.BackdropBorderColor = _RARE_COLOR
+				self.Back.BackdropBorderColor = RARE_BORDER_COLOR
 			else
-				self.Back.BackdropBorderColor = _BORDER_COLOR
+				self.Back.BackdropBorderColor = DEFAULT_BORDER_COLOR
 			end
 		end
 		return Super.Refresh(self, ...)
@@ -214,12 +136,8 @@ class "iHealthBar"
 	------------------------------------------------------
 	-- Constructor
 	------------------------------------------------------
-	function iHealthBar(...)
-		local bar = Super(...)
-
-		bar.UseClassColor = true
-
-		return bar
+	function iHealthBar(self)
+		self.UseClassColor = true
 	end
 endclass "iHealthBar"
 
@@ -230,7 +148,7 @@ endclass "iHealthBar"
 -----------------------------------------------
 class "iPowerBar"
 	inherit "PowerBarFrequent"
-	extend "iBorder"
+	extend "iBorder" "iStatusBarStyle"
 endclass "iPowerBar"
 
 -----------------------------------------------
@@ -240,7 +158,7 @@ endclass "iPowerBar"
 -----------------------------------------------
 class "iHiddenManaBar"
 	inherit "HiddenManaBar"
-	extend "iBorder"
+	extend "iBorder" "iStatusBarStyle"
 endclass "iHiddenManaBar"
 
 -----------------------------------------------
@@ -250,6 +168,8 @@ endclass "iHiddenManaBar"
 -----------------------------------------------
 class "iBuffPanel"
 	inherit "AuraPanel"
+
+	BUFF_SIZE = BUFF_SIZE
 
 	------------------------------------
 	--- Custom Filter method
@@ -272,19 +192,15 @@ class "iBuffPanel"
 	------------------------------------------------------
 	-- Constructor
 	------------------------------------------------------
-    function iBuffPanel(...)
-		local obj = Super(...)
+    function iBuffPanel(self)
+		self.Filter = "HELPFUL"
+		self.HighLightPlayer = true
+		self.RowCount = 6
+		self.ColumnCount = 6
+		self.MarginTop = 2
 
-		obj.Filter = "HELPFUL"
-		obj.HighLightPlayer = true
-		obj.RowCount = 6
-		obj.ColumnCount = 6
-		obj.MarginTop = 2
-
-		obj.ElementWidth = BUFF_SIZE
-		obj.ElementHeight = BUFF_SIZE
-
-		return obj
+		self.ElementWidth = BUFF_SIZE
+		self.ElementHeight = BUFF_SIZE
     end
 endclass "iBuffPanel"
 
@@ -295,6 +211,8 @@ endclass "iBuffPanel"
 -----------------------------------------------
 class "iDebuffPanel"
 	inherit "AuraPanel"
+
+	BUFF_SIZE = BUFF_SIZE
 
 	------------------------------------
 	--- Custom Filter method
@@ -317,19 +235,15 @@ class "iDebuffPanel"
 	------------------------------------------------------
 	-- Constructor
 	------------------------------------------------------
-    function iDebuffPanel(...)
-		local obj = Super(...)
+    function iDebuffPanel(self)
+		self.Filter = "HARMFUL"
+		self.HighLightPlayer = true
+		self.RowCount = 6
+		self.ColumnCount = 6
+		self.MarginTop = 2
 
-		obj.Filter = "HARMFUL"
-		obj.HighLightPlayer = true
-		obj.RowCount = 6
-		obj.ColumnCount = 6
-		obj.MarginTop = 2
-
-		obj.ElementWidth = BUFF_SIZE
-		obj.ElementHeight = BUFF_SIZE
-
-		return obj
+		self.ElementWidth = BUFF_SIZE
+		self.ElementHeight = BUFF_SIZE
     end
 endclass "iDebuffPanel"
 
@@ -340,6 +254,8 @@ endclass "iDebuffPanel"
 -----------------------------------------------
 class "iCastBar"
 	inherit "CastBar"
+
+	STATUSBAR_TEXTURE_PATH = STATUSBAR_TEXTURE_PATH
 
 	------------------------------------------------------
 	-- Method
@@ -354,7 +270,7 @@ class "iCastBar"
 	function SetUpCooldownStatus(self, status)
 		self.__CastBar = status
 		Super.SetUpCooldownStatus(self, status)
-		status.StatusBarTexturePath = [[Interface\Tooltips\UI-Tooltip-Background]]
+		status.StatusBarTexturePath = STATUSBAR_TEXTURE_PATH
 		status.StatusBarColor = CASTBAR_COLOR
 	end
 endclass "iCastBar"
@@ -366,7 +282,7 @@ endclass "iCastBar"
 -----------------------------------------------
 class "iClassPowerButton"
 	inherit "StatusBar"
-	extend "iBorder"
+	extend "iBorder" "iStatusBarStyle"
 
 	------------------------------------------------------
 	-- Property
@@ -399,6 +315,8 @@ class "iClassPowerButton"
 	------------------------------------------------------
 	local function AnimIn_OnPlay(self)
 		self.Parent.Alpha = 0
+		local width, height = self.Parent.Parent:GetSize()
+		self.Parent:SetSize(width*1.05, height*2)
 	end
 
 	local function AnimIn_OnFinished(self)
@@ -418,10 +336,8 @@ class "iClassPowerButton"
 	------------------------------------------------------
 	-- Constructor
 	------------------------------------------------------
-	function iClassPowerButton(...)
-		local btn = Super(...)
-
-		local glow = Texture("Glow", btn, "ARTWORK")
+	function iClassPowerButton(self)
+		local glow = Texture("Glow", self, "ARTWORK")
 		glow.Alpha = 0
 		glow.TexturePath = [[Interface\SpellActivationOverlay\IconAlert]]
 		--glow:SetTexCoord(0.00781250, 0.50781250, 0.27734375, 0.52734375)
@@ -447,8 +363,6 @@ class "iClassPowerButton"
 
 		animOut.OnPlay = AnimOut_OnPlay
 		animOut.OnFinished = AnimOut_OnFinished
-
-		return btn
 	end
 endclass "iClassPowerButton"
 
@@ -500,6 +414,7 @@ class "iClassPower"
 		self.__NumBar = numBar
 
 		for i = 1, numBar do
+			self[i]:SetStatusBarColor(PLAYER_COLOR.r, PLAYER_COLOR.g, PLAYER_COLOR.b)
 			self[i].Width = width
 			self[i]:SetPoint("LEFT", (width + self.HSpacing) * (i - 1), 0)
 			self[i].Activated = false
@@ -612,27 +527,23 @@ class "iClassPower"
 	------------------------------------------------------
 	-- Constructor
 	------------------------------------------------------
-    function iClassPower(...)
-		local obj = Super(...)
-
-		obj.HSpacing = 3
+    function iClassPower(self)
+		self.HSpacing = 3
 
 		for i = 1, _MaxPower do
-			obj[i] = iClassPowerButton("Bar"..i, obj)
-			obj[i]:Hide()
-			obj[i]:SetPoint("TOP")
-			obj[i]:SetPoint("BOTTOM")
+			self[i] = iClassPowerButton("Bar"..i, self)
+			self[i]:Hide()
+			self[i]:SetPoint("TOP")
+			self[i]:SetPoint("BOTTOM")
 		end
 
-		obj.OnSizeChanged = obj.OnSizeChanged + OnSizeChanged
+		self.OnSizeChanged = self.OnSizeChanged + OnSizeChanged
 
 		if select(2, UnitClass("player")) == "ROGUE" or select(2, UnitClass("player")) == "DRUID" then
-			obj.Refresh = IFComboPoint.Refresh
-			obj.__ClassPowerType = 100
-			obj.__Min, obj.__Max = 0, _G.MAX_COMBO_POINTS
+			self.Refresh = IFComboPoint.Refresh
+			self.__ClassPowerType = 100
+			self.__Min, self.__Max = 0, _G.MAX_COMBO_POINTS
 		end
-
-		return obj
     end
 endclass "iClassPower"
 
@@ -731,46 +642,41 @@ class "iRuneBar"
 		------------------------------------------------------
 		-- Constructor
 		------------------------------------------------------
-	    function iRuneButton(...)
-			local obj = Super(...)
-
+	    function iRuneButton(self)
 			-- Use these for cooldown
-			local bar = iClassPowerButton("CooldownStatus", obj)
+			local bar = iClassPowerButton("CooldownStatus", self)
 			bar:SetAllPoints()
 
-			obj.IFCooldownStatusReverse = true
-			obj.IFCooldownStatusAlwaysShow = true
+			self.IFCooldownStatusReverse = true
+			self.IFCooldownStatusAlwaysShow = true
 
-			return obj
+			return self
 	    end
 	endclass "iRuneButton"
 
 	------------------------------------------------------
 	-- Constructor
 	------------------------------------------------------
-    function iRuneBar(...)
-		local panel = Super(...)
+    function iRuneBar(self)
 		local pct = floor(100 / MAX_RUNES)
 		local margin = (100 - pct * MAX_RUNES + 1) / 2
 
-		panel.FrameStrata = "LOW"
-		panel.Toplevel = true
+		self.FrameStrata = "LOW"
+		self.Toplevel = true
 
 		local btnRune, pos
 
 		for i = 1, MAX_RUNES do
-			btnRune = iRuneButton("Individual"..i, panel)
+			btnRune = iRuneButton("Individual"..i, self)
 			btnRune.ID = i
 
-			panel:AddWidget(btnRune)
+			self:AddWidget(btnRune)
 
 			pos = RuneBtnMapping[i]
 
-			panel:SetWidgetLeftWidth(btnRune, margin + (pos-1)*pct, "pct", pct-1, "pct")
+			self:SetWidgetLeftWidth(btnRune, margin + (pos-1)*pct, "pct", pct-1, "pct")
 
-			panel[i] = btnRune
+			self[i] = btnRune
 		end
-
-		return panel
     end
 endclass "iRuneBar"
