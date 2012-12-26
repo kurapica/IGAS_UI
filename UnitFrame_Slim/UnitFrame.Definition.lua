@@ -795,30 +795,30 @@ class "iEclipseBar"
 	-- Constructor
 	------------------------------------------------------
     function iEclipseBar(self)
-    	local sunBar = iClassPowerButton("SunBar", self)
-    	local moonBar = iClassPowerButton("MoonBar", self)
+		local sunBar = iClassPowerButton("SunBar", self)
+		local moonBar = iClassPowerButton("MoonBar", self)
 
-    	sunBar:SetPoint("TOP")
-    	sunBar:SetPoint("BOTTOM")
-    	sunBar:SetPoint("RIGHT")
-    	sunBar:SetPoint("LEFT", self, "CENTER", 1, 0)
+		sunBar:SetPoint("TOP")
+		sunBar:SetPoint("BOTTOM")
+		sunBar:SetPoint("RIGHT")
+		sunBar:SetPoint("LEFT", self, "CENTER", 1, 0)
 
-    	moonBar:SetPoint("TOP")
-    	moonBar:SetPoint("BOTTOM")
-    	moonBar:SetPoint("LEFT")
-    	moonBar:SetPoint("RIGHT", self, "CENTER", -1, 0)
+		moonBar:SetPoint("TOP")
+		moonBar:SetPoint("BOTTOM")
+		moonBar:SetPoint("LEFT")
+		moonBar:SetPoint("RIGHT", self, "CENTER", -1, 0)
 
-    	sunBar:SetStatusBarColor(1, 1, 0)
-    	moonBar:SetStatusBarColor(0.0, 0.6, 1)
+		sunBar:SetStatusBarColor(1, 1, 0)
+		moonBar:SetStatusBarColor(0.0, 0.6, 1)
 
-    	sunBar.FrameLevel = self.FrameLevel
-    	moonBar.FrameLevel = self.FrameLevel
+		sunBar.FrameLevel = self.FrameLevel
+		moonBar.FrameLevel = self.FrameLevel
 
-    	sunBar:SetMinMaxValues(0, 1)
-    	moonBar:SetMinMaxValues(0, 1)
+		sunBar:SetMinMaxValues(0, 1)
+		moonBar:SetMinMaxValues(0, 1)
 
-    	sunBar.Value = 1
-    	moonBar.Value = 1
+		sunBar.Value = 1
+		moonBar.Value = 1
 
 		-- Marker
 		local marker = Texture("Marker", self, "OVERLAY")
