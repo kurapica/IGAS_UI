@@ -409,14 +409,14 @@ class "iClassPower"
 			self[i]:Hide()
 		end
 
-		local width = floor((self.Parent.Width - self.HSpacing * (numBar-1)) / numBar)
+		local width = floor((self.Parent.Width - 2 - self.HSpacing * (numBar-1)) / numBar)
 
 		self.__NumBar = numBar
 
 		for i = 1, numBar do
 			self[i]:SetStatusBarColor(PLAYER_COLOR.r, PLAYER_COLOR.g, PLAYER_COLOR.b)
 			self[i].Width = width
-			self[i]:SetPoint("LEFT", (width + self.HSpacing) * (i - 1), 0)
+			self[i]:SetPoint("LEFT", 1 + (width + self.HSpacing) * (i - 1), 0)
 			self[i].Activated = false
 			self[i]:Show()
 
