@@ -680,3 +680,157 @@ class "iRuneBar"
 		end
     end
 endclass "iRuneBar"
+
+-----------------------------------------------
+--- iPlayerPowerText
+-- @type class
+-- @name iPlayerPowerText
+-----------------------------------------------
+class "iPlayerPowerText"
+	inherit "PowerTextFrequent"
+
+	function Refresh(self)
+		local powerType = UnitPowerType(self.Unit) or 0
+
+		if powerType == 0 or powerType == "MANA" then
+			self.ShowPercent = true
+		else
+			self.ShowPercent = false
+		end
+
+		return Super.Refresh(self)
+	end
+endclass "iPlayerPowerText"
+
+-----------------------------------------------
+--- iEclipseBar
+-- @type class
+-- @name iEclipseBar
+-----------------------------------------------
+class "iEclipseBar"
+	inherit "Frame"
+	extend "IFEclipse"
+
+	ECLIPSE_MARKER_COORDS = _G.ECLIPSE_MARKER_COORDS
+	GameTooltip = _G.GameTooltip
+	BALANCE = _G.BALANCE
+	BALANCE_TOOLTIP = _G.BALANCE_TOOLTIP
+
+	------------------------------------------------------
+	-- Script
+	------------------------------------------------------
+
+	------------------------------------------------------
+	-- Method
+	------------------------------------------------------
+
+	------------------------------------------------------
+	-- Property
+	------------------------------------------------------
+	-- SunActivated
+	property "SunActivated" {
+		Get = function(self)
+			return self.SunBar.Activated
+		end,
+		Set = function(self, flag)
+			self.SunBar.Activated = flag
+		end,
+		Type = Boolean,
+	}
+	-- MoonActivated
+	property "MoonActivated" {
+		Get = function(self)
+			return self.MoonBar.Activated
+		end,
+		Set = function(self, flag)
+			self.MoonBar.Activated = flag
+		end,
+		Type = Boolean,
+	}
+	-- EclipseDirection
+	property "Direction" {
+		Get = function(self)
+			return self.__EclipseBar_Direction or IFEclipse.EclipseDirection.None
+		end,
+		Set = function(self, dir)
+			if dir and self.__EclipseBar_Direction ~= dir then
+				self.__EclipseBar_Direction = dir
+				self.Marker:SetTexCoord(unpack(ECLIPSE_MARKER_COORDS[dir]))
+			end
+		end,
+		Type = IFEclipse.EclipseDirection,
+	}
+	-- MinMaxValue
+	property "MinMaxValue" {
+		Get = function(self)
+			return MinMax(self.__Min, self.__Max)
+		end,
+		Set = function(self, value)
+			self.__Min, self.__Max = value.min, value.max
+		end,
+		Type = System.MinMax,
+	}
+	-- Value
+	property "Value" {
+		Get = function(self)
+			return self.__Value
+		end,
+		Set = function(self, value)
+			self.__Value = value
+
+			self.PowerText.Text = tostring(abs(value))
+
+			if self.__Max and self.__Max > 0 and value then
+				self.Marker:SetPoint("CENTER", (value/self.__Max) *  (self.Width/2), 0)
+			end
+		end,
+		Type = System.Number,
+	}
+
+	------------------------------------------------------
+	-- Script Handler
+	------------------------------------------------------
+
+	------------------------------------------------------
+	-- Constructor
+	------------------------------------------------------
+    function iEclipseBar(self)
+    	local sunBar = iClassPowerButton("SunBar", self)
+    	local moonBar = iClassPowerButton("MoonBar", self)
+
+    	sunBar:SetPoint("TOP")
+    	sunBar:SetPoint("BOTTOM")
+    	sunBar:SetPoint("RIGHT")
+    	sunBar:SetPoint("LEFT", self, "CENTER", 1, 0)
+
+    	moonBar:SetPoint("TOP")
+    	moonBar:SetPoint("BOTTOM")
+    	moonBar:SetPoint("LEFT")
+    	moonBar:SetPoint("RIGHT", self, "CENTER", -1, 0)
+
+    	sunBar:SetStatusBarColor(1, 1, 0)
+    	moonBar:SetStatusBarColor(0.0, 0.6, 1)
+
+    	sunBar.FrameLevel = self.FrameLevel
+    	moonBar.FrameLevel = self.FrameLevel
+
+    	sunBar:SetMinMaxValues(0, 1)
+    	moonBar:SetMinMaxValues(0, 1)
+
+    	sunBar.Value = 1
+    	moonBar.Value = 1
+
+		-- Marker
+		local marker = Texture("Marker", self, "OVERLAY")
+		marker.TexturePath = [[Interface\PlayerFrame\UI-DruidEclipse]]
+		marker.BlendMode = "ADD"
+		marker:SetSize(30, 30)
+		marker:SetPoint("CENTER", 0, 2)
+		marker:SetTexCoord(1.0, 0.914, 0.82, 1.0)
+
+		-- PowerText
+		local powerText = FontString("PowerText", self, "OVERLAY", "TextStatusBarText")
+		powerText:SetPoint("CENTER")
+		powerText.Visible = true
+    end
+endclass "iEclipseBar"

@@ -19,8 +19,10 @@ frmPlayer.iClassPower:SetPoint("BOTTOMRIGHT", frmPlayer, "TOPRIGHT", 0, 4)
 
 -- Eclipse
 if select(2, UnitClass("player")) == "DRUID" then
-	frmPlayer:AddElement(EclipseBar)
-	frmPlayer.EclipseBar:SetPoint("BOTTOM", frmPlayer, "TOP")
+	frmPlayer:AddElement(iEclipseBar)
+	frmPlayer.iEclipseBar.Height = 6
+	frmPlayer.iEclipseBar:SetPoint("BOTTOMLEFT", frmPlayer, "TOPLEFT", 0, 4)
+	frmPlayer.iEclipseBar:SetPoint("BOTTOMRIGHT", frmPlayer, "TOPRIGHT", 0, 4)
 end
 
 -- Rune Bar
@@ -42,3 +44,7 @@ frmPlayer.CombatIcon:SetPoint("CENTER", frmPlayer, "TOPLEFT")
 -- Pvp Icon
 frmPlayer:AddElement(PvpIcon)
 frmPlayer.PvpIcon:SetPoint("CENTER", frmPlayer, "RIGHT", 12, 0)
+
+-- Power Text
+frmPlayer:AddElement(iPlayerPowerText)
+frmPlayer.iPlayerPowerText:SetPoint("RIGHT", frmPlayer.iPowerBar, "LEFT", -4, 0)
