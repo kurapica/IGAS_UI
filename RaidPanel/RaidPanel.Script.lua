@@ -63,7 +63,11 @@ function OnLoad(self)
 	self:RegisterEvent"PLAYER_SPECIALIZATION_CHANGED"
 	self:RegisterEvent"PLAYER_LOGOUT"
 	self:RegisterEvent"LEARNED_SPELL_IN_TAB"
-	self:RegisterEvent"UPDATE_INSTANCE_INFO"
+	self:RegisterEvent("UPDATE_INSTANCE_INFO")
+	self:RegisterEvent("GROUP_ROSTER_UPDATE")
+	self:RegisterEvent("PARTY_LEADER_CHANGED")
+	self:RegisterEvent("VOICE_STATUS_UPDATE")
+	self:RegisterEvent("PARTY_LFG_RESTRICTED")
 
 	_LoadingConfig = GetSpecialization() or 1
 	if _DBChar[_LoadingConfig] then
@@ -79,7 +83,14 @@ function OnEnable(self)
 		System.Threading.Sleep(3)
 
 		IFNoCombatTaskHandler._RegisterNoCombatTask(function()
+			_G.RaidFrame:UnregisterEvent("READY_CHECK")
+			_G.RaidFrame:UnregisterEvent("READY_CHECK_CONFIRM")
+			_G.RaidFrame:UnregisterEvent("READY_CHECK_FINISHED")
 			_G.RaidFrame:UnregisterEvent("UPDATE_INSTANCE_INFO")
+			_G.RaidFrame:UnregisterEvent("GROUP_ROSTER_UPDATE")
+			_G.RaidFrame:UnregisterEvent("PARTY_LEADER_CHANGED")
+			_G.RaidFrame:UnregisterEvent("VOICE_STATUS_UPDATE")
+			_G.RaidFrame:UnregisterEvent("PARTY_LFG_RESTRICTED")
 
 			_G.CompactRaidFrameContainer:UnregisterAllEvents()
 			_G.CompactRaidFrameManager:UnregisterAllEvents()
@@ -112,6 +123,22 @@ end
 
 function UPDATE_INSTANCE_INFO(self)
 	IFNoCombatTaskHandler._RegisterNoCombatTask(RaidFrame_OnEvent, _G.RaidFrame, "UPDATE_INSTANCE_INFO")
+end
+
+function GROUP_ROSTER_UPDATE(self)
+	IFNoCombatTaskHandler._RegisterNoCombatTask(RaidFrame_OnEvent, _G.RaidFrame, "GROUP_ROSTER_UPDATE")
+end
+
+function PARTY_LEADER_CHANGED(self)
+	IFNoCombatTaskHandler._RegisterNoCombatTask(RaidFrame_OnEvent, _G.RaidFrame, "PARTY_LEADER_CHANGED")
+end
+
+function VOICE_STATUS_UPDATE(self)
+	IFNoCombatTaskHandler._RegisterNoCombatTask(RaidFrame_OnEvent, _G.RaidFrame, "PARTY_LEADER_CHANGED")
+end
+
+function PARTY_LFG_RESTRICTED(self)
+	IFNoCombatTaskHandler._RegisterNoCombatTask(RaidFrame_OnEvent, _G.RaidFrame, "PARTY_LEADER_CHANGED")
 end
 
 function PLAYER_REGEN_DISABLED(self)
