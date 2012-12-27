@@ -63,6 +63,7 @@ function OnLoad(self)
 	self:RegisterEvent"PLAYER_SPECIALIZATION_CHANGED"
 	self:RegisterEvent"PLAYER_LOGOUT"
 	self:RegisterEvent"LEARNED_SPELL_IN_TAB"
+	self:RegisterEvent"UPDATE_INSTANCE_INFO"
 
 	_LoadingConfig = GetSpecialization() or 1
 	if _DBChar[_LoadingConfig] then
@@ -78,12 +79,16 @@ function OnEnable(self)
 		System.Threading.Sleep(3)
 
 		IFNoCombatTaskHandler._RegisterNoCombatTask(function()
+			_G.RaidFrame:UnregisterEvent("UPDATE_INSTANCE_INFO")
+
 			_G.CompactRaidFrameContainer:UnregisterAllEvents()
 			_G.CompactRaidFrameManager:UnregisterAllEvents()
 			_G.CompactRaidFrameManager:Show()
 
+			local button
+
 			for i=1, 8 do
-				local button = _G["CompactRaidFrameManagerDisplayFrameRaidMarkersRaidMarker"..i]
+				button = _G["CompactRaidFrameManagerDisplayFrameRaidMarkersRaidMarker"..i]
 				button:GetNormalTexture():SetDesaturated(false)
 				button:SetAlpha(1)
 				button:Enable()
@@ -103,6 +108,10 @@ function OnEnable(self)
 			button:Enable()
 		end)
 	end)
+end
+
+function UPDATE_INSTANCE_INFO(self)
+	IFNoCombatTaskHandler._RegisterNoCombatTask(RaidFrame_OnEvent, _G.RaidFrame, "UPDATE_INSTANCE_INFO")
 end
 
 function PLAYER_REGEN_DISABLED(self)
