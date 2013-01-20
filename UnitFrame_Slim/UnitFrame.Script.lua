@@ -183,6 +183,11 @@ function OnLoad(self)
 			arUnit[i].IFResizable = false
 		end
 	end
+
+	-- Fix for PETBATTLES taint error
+	if _G.FRAMELOCK_STATES and _G.FRAMELOCK_STATES.PETBATTLES then
+		wipe(_G.FRAMELOCK_STATES.PETBATTLES)
+	end
 end
 
 --------------------
