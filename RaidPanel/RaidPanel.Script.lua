@@ -59,10 +59,10 @@ function OnLoad(self)
 		raidPanel.Location = _DBChar.Location
 	end
 
-	self:RegisterEvent"PLAYER_REGEN_DISABLED"
-	self:RegisterEvent"PLAYER_SPECIALIZATION_CHANGED"
-	self:RegisterEvent"PLAYER_LOGOUT"
-	self:RegisterEvent"LEARNED_SPELL_IN_TAB"
+	self:RegisterEvent("PLAYER_REGEN_DISABLED")
+	self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
+	self:RegisterEvent("PLAYER_LOGOUT")
+	self:RegisterEvent("LEARNED_SPELL_IN_TAB")
 	self:RegisterEvent("UPDATE_INSTANCE_INFO")
 	self:RegisterEvent("GROUP_ROSTER_UPDATE")
 	self:RegisterEvent("PARTY_LEADER_CHANGED")

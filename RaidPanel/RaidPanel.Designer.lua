@@ -31,6 +31,14 @@ raidPanel.HSpacing = 3
 raidPanelMask = Mask("Mask", raidPanel)
 raidPanelMask.AsMove = true
 
+raidPetPanel = PetUnitPanel("IGAS_UI_RAIDPETPANEL")
+raidPetPanel:SetPoint("TOPLEFT", raidPanel, "TOPRIGHT", 3, 0)
+raidPetPanel.ElementType = iRaidUnitFrame
+raidPetPanel.ElementPrefix = "iRaidPetUnitFrame"
+raidPetPanel.VSpacing = 3
+raidPetPanel.HSpacing = 3
+raidPetPanel.DeactivateInRaid = true
+
 -- withPanel
 withPanel = Frame("IGASUI_Withpanel", SpellBookFrame)
 withPanel.Visible = false
