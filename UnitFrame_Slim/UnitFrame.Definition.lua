@@ -13,11 +13,6 @@ _IGASUI_UNITFRAME_GROUP = "IUnitFrame"
 
 PLAYER_COLOR = RAID_CLASS_COLORS[select(2, UnitClass("player"))]
 
------------------------------------------------
---- iSUnitFrame
--- @type class
--- @name iSUnitFrame
------------------------------------------------
 class "iSUnitFrame"
 	inherit "UnitFrame"
 	-- extend "IFSpellHandler"	-- enable this for hover spell casting
@@ -75,11 +70,6 @@ class "iSUnitFrame"
 	end
 endclass "iSUnitFrame"
 
------------------------------------------------
---- iUnitFrame
--- @type class
--- @name iUnitFrame
------------------------------------------------
 class "iUnitFrame"
 	inherit "iSUnitFrame"
 
@@ -110,11 +100,6 @@ class "iUnitFrame"
 	end
 endclass "iUnitFrame"
 
------------------------------------------------
---- iHealthBar
--- @type class
--- @name iHealthBar
------------------------------------------------
 class "iHealthBar"
 	inherit "HealthBarFrequent"
 	extend "iBorder" "iStatusBarStyle"
@@ -141,31 +126,16 @@ class "iHealthBar"
 	end
 endclass "iHealthBar"
 
------------------------------------------------
---- iPowerBar
--- @type class
--- @name iPowerBar
------------------------------------------------
 class "iPowerBar"
 	inherit "PowerBarFrequent"
 	extend "iBorder" "iStatusBarStyle"
 endclass "iPowerBar"
 
------------------------------------------------
---- iHiddenManaBar
--- @type class
--- @name iHiddenManaBar
------------------------------------------------
 class "iHiddenManaBar"
 	inherit "HiddenManaBar"
 	extend "iBorder" "iStatusBarStyle"
 endclass "iHiddenManaBar"
 
------------------------------------------------
---- iBuffPanel
--- @type class
--- @name iBuffPanel
------------------------------------------------
 class "iBuffPanel"
 	inherit "AuraPanel"
 
@@ -204,11 +174,6 @@ class "iBuffPanel"
     end
 endclass "iBuffPanel"
 
------------------------------------------------
---- iDebuffPanel
--- @type class
--- @name iDebuffPanel
------------------------------------------------
 class "iDebuffPanel"
 	inherit "AuraPanel"
 
@@ -247,11 +212,6 @@ class "iDebuffPanel"
     end
 endclass "iDebuffPanel"
 
------------------------------------------------
---- iCastBar
--- @type class
--- @name iCastBar
------------------------------------------------
 class "iCastBar"
 	inherit "CastBar"
 
@@ -275,11 +235,6 @@ class "iCastBar"
 	end
 endclass "iCastBar"
 
------------------------------------------------
---- iClassPowerButton
--- @type class
--- @name iClassPowerButton
------------------------------------------------
 class "iClassPowerButton"
 	inherit "StatusBar"
 	extend "iBorder" "iStatusBarStyle"
@@ -366,11 +321,6 @@ class "iClassPowerButton"
 	end
 endclass "iClassPowerButton"
 
------------------------------------------------
---- iClassPower
--- @type class
--- @name iClassPower
------------------------------------------------
 class "iClassPower"
 	inherit "Frame"
 	extend "IFClassPower" "IFComboPoint"
@@ -547,11 +497,6 @@ class "iClassPower"
     end
 endclass "iClassPower"
 
------------------------------------------------
---- iRuneBar
--- @type class
--- @name iRuneBar
------------------------------------------------
 class "iRuneBar"
 	inherit "LayoutPanel"
 	extend "IFRune"
@@ -681,11 +626,6 @@ class "iRuneBar"
     end
 endclass "iRuneBar"
 
------------------------------------------------
---- iPlayerPowerText
--- @type class
--- @name iPlayerPowerText
------------------------------------------------
 class "iPlayerPowerText"
 	inherit "PowerTextFrequent"
 
@@ -702,11 +642,6 @@ class "iPlayerPowerText"
 	end
 endclass "iPlayerPowerText"
 
------------------------------------------------
---- iEclipseBar
--- @type class
--- @name iEclipseBar
------------------------------------------------
 class "iEclipseBar"
 	inherit "Frame"
 	extend "IFEclipse"
@@ -834,3 +769,46 @@ class "iEclipseBar"
 		powerText.Visible = true
     end
 endclass "iEclipseBar"
+
+class "iStaggerBar"
+	inherit "StatusBar"
+	extend "IFStagger"
+
+	local function OnShow(self)
+		self.Ag.Playing = true
+	end
+
+	local function OnHide(self)
+		self.Ag.Playing = false
+	end
+
+	------------------------------------------------------
+	-- Constructor
+	------------------------------------------------------
+    function iStaggerBar(self)
+		self.StatusBarTexturePath = _Addon.STATUSBAR_TEXTURE_PATH
+
+    	self.FrameLevel = self.FrameLevel + 2
+    	self:SetStatusBarColor(1, 0, 0)
+    	self.Alpha = 0
+    	self.Visible = false
+
+    	-- Flashing
+    	local ag = AnimationGroup("Ag", self)
+    	ag.Looping = "REPEAT"
+
+    	local alphaIn = Alpha("AlphaIn", ag)
+    	alphaIn.Duration = 0.5
+    	alphaIn.Order = 1
+    	alphaIn.Change = 1
+
+    	local alphaOut = Alpha("AlphaOut", ag)
+    	alphaOut.StartDelay = 1
+    	alphaOut.Duration = 0.5
+    	alphaOut.Order = 2
+    	alphaOut.Change = -1
+
+    	self.OnShow = self.OnShow + OnShow
+    	self.OnHide = self.OnHide + OnHide
+    end
+endclass "iStaggerBar"

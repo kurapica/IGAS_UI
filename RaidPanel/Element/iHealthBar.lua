@@ -4,11 +4,6 @@
 
 IGAS:NewAddon "IGAS_UI.RaidPanel"
 
------------------------------------------------
---- iHealthBar
--- @type class
--- @name iHealthBar
------------------------------------------------
 class "iHealthBar"
 	inherit "HealthBar"
 	extend "iStatusBarStyle"
@@ -21,11 +16,6 @@ class "iHealthBar"
 	end
 endclass "iHealthBar"
 
------------------------------------------------
---- iMyHealPrediction
--- @type class
--- @name iMyHealPrediction
------------------------------------------------
 class "iMyHealPrediction"
 	inherit "StatusBar"
 	extend "IFMyHealPrediction"
@@ -39,11 +29,6 @@ class "iMyHealPrediction"
     end
 endclass "iMyHealPrediction"
 
------------------------------------------------
---- iAllHealPrediction
--- @type class
--- @name iAllHealPrediction
------------------------------------------------
 class "iAllHealPrediction"
 	inherit "StatusBar"
 	extend "IFAllHealPrediction"
@@ -57,15 +42,42 @@ class "iAllHealPrediction"
     end
 endclass "iAllHealPrediction"
 
------------------------------------------------
---- IFIHealthBar
--- @type interface
--- @name IFIHealthBar
------------------------------------------------
+class "iAbsorb"
+	inherit "StatusBar"
+	extend "IFAbsorb"
+
+	------------------------------------------------------
+	-- Property
+	------------------------------------------------------
+	property "OverAbsorb" {
+		Set = function(self, value)
+			self.Parent.OverAbsorbGlow.Visible = value
+		end,
+	}
+
+	------------------------------------------------------
+	-- Constructor
+	------------------------------------------------------
+    function iAbsorb(self)
+    	local overAbsorbGlow = Texture("OverAbsorbGlow", self.Parent)
+
+    	overAbsorbGlow.BlendMode = "ADD"
+    	overAbsorbGlow.TexturePath = [[Interface\RaidFrame\Shield-Overshield]]
+    	overAbsorbGlow.Width = 16
+    	overAbsorbGlow.Visible = false
+
+		overAbsorbGlow:SetPoint("TOPLEFT", self.Parent.iHealthBar, "TOPRIGHT", -7, 0)
+		overAbsorbGlow:SetPoint("BOTTOMLEFT", self.Parent.iHealthBar, "BOTTOMRIGHT", -7, 0)
+    end
+endclass "iAbsorb"
+
 interface "IFIHealthBar"
 	local function OnSizeChanged(self)
-		self.Parent.iMyHealPrediction.Size = self.Size
-		self.Parent.iAllHealPrediction.Size = self.Size
+		local size = self.Size
+
+		self.Parent.iMyHealPrediction.Size = size
+		self.Parent.iAllHealPrediction.Size = size
+		self.Parent.iAbsorb.Size = size
 	end
 
 	------------------------------------------------------
@@ -75,12 +87,16 @@ interface "IFIHealthBar"
 		self:AddElement(iHealthBar, "rest")
 		self:AddElement(iMyHealPrediction)
 		self:AddElement(iAllHealPrediction)
+		self:AddElement(iAbsorb)
 
 		self.iMyHealPrediction:SetPoint("TOPLEFT", self.iHealthBar.StatusBarTexture, "TOPRIGHT")
 		self.iAllHealPrediction:SetPoint("TOPLEFT", self.iHealthBar.StatusBarTexture, "TOPRIGHT")
+		self.iAbsorb:SetPoint("TOPLEFT", self.iHealthBar.StatusBarTexture, "TOPRIGHT")
 
 		self.iMyHealPrediction.FrameLevel = self.iHealthBar.FrameLevel + 2
 		self.iAllHealPrediction.FrameLevel = self.iHealthBar.FrameLevel + 2
+		self.iAbsorb.FrameLevel = self.iHealthBar.FrameLevel + 2
+		self.Panel.OverAbsorbGlow.FrameLevel = self.iHealthBar.FrameLevel + 2
 
 		self.iHealthBar.OnSizeChanged = self.iHealthBar.OnSizeChanged + OnSizeChanged
     end

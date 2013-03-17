@@ -125,7 +125,7 @@ function HideBlzUnitFrame(self)
 end
 
 function OnEnable(self)
-	HideBlzUnitFrame(_G.PlayerFrame)
+	--HideBlzUnitFrame(_G.PlayerFrame)
 	HideBlzUnitFrame(_G.PetFrame)
 	HideBlzUnitFrame(_G.PartyMemberFrame1)
 	HideBlzUnitFrame(_G.PartyMemberFrame2)

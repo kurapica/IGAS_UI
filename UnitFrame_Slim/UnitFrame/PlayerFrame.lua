@@ -48,3 +48,9 @@ frmPlayer.PvpIcon:SetPoint("CENTER", frmPlayer, "RIGHT", 12, 0)
 -- Power Text
 frmPlayer:AddElement(iPlayerPowerText)
 frmPlayer.iPlayerPowerText:SetPoint("RIGHT", frmPlayer.iPowerBar, "LEFT", -4, 0)
+
+-- Stagger
+if select(2, UnitClass("player")) == "MONK" then
+	frmPlayer:AddElement(iStaggerBar)
+	frmPlayer.iStaggerBar:SetAllPoints(frmPlayer.iHealthBar)
+end
