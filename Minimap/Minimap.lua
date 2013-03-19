@@ -85,7 +85,7 @@ MinimapBorder.TexturePath = nil
 Minimap:SetMaskTexture("Interface\\Buttons\\WHITE8x8")
 
 innerBorder = Frame("InnerBorder", Minimap)
-innerBorder.FrameStrata = "BACKGROUND"
+innerBorder.FrameStrata = "LOW"
 innerBorder:SetAllPoints()
 BuildBorder(innerBorder)
 
