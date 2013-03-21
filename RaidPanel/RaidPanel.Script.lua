@@ -18,9 +18,11 @@ Toggle = {
 	Set = function (value)
 		if value then
 			raidPanelMask.Visible = false
+			_Menu.Visible = false
 		else
 			if not InCombatLockdown() then
 				raidPanelMask.Visible = true
+				_Menu.Visible = true
 			end
 		end
 	end,
@@ -57,6 +59,20 @@ function OnLoad(self)
 
 	if _DBChar.Location then
 		raidPanel.Location = _DBChar.Location
+	end
+
+	_DBChar.DisableElement = _DBChar.DisableElement or {}
+	_DisableElement = _DBChar.DisableElement
+
+	-- Choose the element types
+	local mnuBtn
+
+	for i = 1, _Menu.ItemCount do
+		mnuBtn = _Menu:GetMenuButton(i)
+
+		mnuBtn.Checked = not _DisableElement[mnuBtn.ElementName]
+
+		UpdateElementType(mnuBtn.ElementType, mnuBtn.Checked)
 	end
 
 	self:RegisterEvent("PLAYER_REGEN_DISABLED")
@@ -266,4 +282,25 @@ function chkFocus:OnValueChanged()
 		withPanel.Target.With = chkTarget.Checked and "target" or chkFocus.Checked and "focus" or nil
 		withPanel.Target:SetBindingKey(withPanel.Target.BindKey)
 	end
+end
+
+--------------------
+-- Tool function
+--------------------
+function AddElementType(type, name)
+	local elementName = System.Reflector.GetName(type)
+	local btn = _Menu:AddMenuButton(name)
+
+	btn.IsCheckButton = true
+	btn.ElementName = elementName
+	btn.ElementType = type
+
+	btn.OnCheckChanged = function(self)
+		if _Menu.Visible then
+		end
+	end
+end
+
+function UpdateElementType(type, flag)
+
 end

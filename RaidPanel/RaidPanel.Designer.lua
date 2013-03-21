@@ -62,3 +62,14 @@ chkFocus = CheckBox("ChkFocus", withPanel)
 chkFocus:SetPoint("LEFT", 2)
 chkFocus:SetPoint("TOP", chkTarget, "BOTTOM")
 chkFocus.Text = "Focus"
+
+--------------------------
+-- Raid panel's config menu
+--------------------------
+_Menu = DropDownList("Menu", raidPanel)
+_Menu.MultiSelect = true
+_Menu.ShowOnCursor = false
+_Menu.AutoHide = false
+
+_Menu:SetPoint("TOPLEFT", raidPanel, "TOPRIGHT")
+
