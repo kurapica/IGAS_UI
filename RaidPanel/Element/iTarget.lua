@@ -4,11 +4,6 @@
 
 IGAS:NewAddon "IGAS_UI.RaidPanel"
 
------------------------------------------------
---- iTarget
--- @type class
--- @name iTarget
------------------------------------------------
 class "iTarget"
 	inherit "VirtualUIObject"
 	extend "IFTarget"
@@ -42,11 +37,6 @@ class "iTarget"
 	end
 endclass "iTarget"
 
------------------------------------------------
---- IFITarget
--- @type interface
--- @name IFITarget
------------------------------------------------
 interface "IFITarget"
 	------------------------------------------------------
 	-- Initialize
@@ -59,3 +49,5 @@ endinterface "IFITarget"
 partclass "iRaidUnitFrame"
 	extend "IFITarget"
 endclass "iRaidUnitFrame"
+
+AddType4Config(iTarget, L"Target indicator")

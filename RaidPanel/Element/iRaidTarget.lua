@@ -4,11 +4,6 @@
 
 IGAS:NewAddon "IGAS_UI.RaidPanel"
 
------------------------------------------------
---- IFIRaidTarget
--- @type interface
--- @name IFIRaidTarget
------------------------------------------------
 interface "IFIRaidTarget"
 	------------------------------------------------------
 	-- Initialize
@@ -22,3 +17,5 @@ endinterface "IFIRaidTarget"
 partclass "iRaidUnitFrame"
 	extend "IFIRaidTarget"
 endclass "iRaidUnitFrame"
+
+AddType4Config(RaidTargetIcon, L"Raid/Group target indicator")

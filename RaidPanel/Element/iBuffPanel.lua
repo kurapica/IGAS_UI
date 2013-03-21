@@ -4,11 +4,6 @@
 
 IGAS:NewAddon "IGAS_UI.RaidPanel"
 
------------------------------------------------
---- iBuffPanel
--- @type class
--- @name iBuffPanel
------------------------------------------------
 class "iBuffPanel"
 	inherit "AuraPanel"
 
@@ -48,11 +43,6 @@ class "iBuffPanel"
     end
 endclass "iBuffPanel"
 
------------------------------------------------
---- IFIBuffPanel
--- @type interface
--- @name IFIBuffPanel
------------------------------------------------
 interface "IFIBuffPanel"
 	------------------------------------------------------
 	-- Initialize
@@ -67,3 +57,5 @@ endinterface "IFIBuffPanel"
 partclass "iRaidUnitFrame"
 	extend "IFIBuffPanel"
 endclass "iRaidUnitFrame"
+
+AddType4Config(iBuffPanel, L"Buff panel")

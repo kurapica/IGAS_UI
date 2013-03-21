@@ -4,11 +4,6 @@
 
 IGAS:NewAddon "IGAS_UI.RaidPanel"
 
------------------------------------------------
---- IFILeaderIcon
--- @type interface
--- @name IFILeaderIcon
------------------------------------------------
 interface "IFILeaderIcon"
 	------------------------------------------------------
 	-- Initialize
@@ -22,3 +17,5 @@ endinterface "IFILeaderIcon"
 partclass "iRaidUnitFrame"
 	extend "IFILeaderIcon"
 endclass "iRaidUnitFrame"
+
+AddType4Config(LeaderIcon, L"Leader indicator")

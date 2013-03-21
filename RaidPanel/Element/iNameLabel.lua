@@ -4,11 +4,6 @@
 
 IGAS:NewAddon "IGAS_UI.RaidPanel"
 
------------------------------------------------
---- iNameLabel
--- @type class
--- @name iNameLabel
------------------------------------------------
 class "iNameLabel"
 	inherit "NameLabel"
 	extend "IFThreat"
@@ -55,11 +50,6 @@ class "iNameLabel"
 	------------------------------------------------------
 endclass "iNameLabel"
 
------------------------------------------------
---- IFINameLabel
--- @type interface
--- @name IFINameLabel
------------------------------------------------
 interface "IFINameLabel"
 	------------------------------------------------------
 	-- Initialize
@@ -77,3 +67,5 @@ endinterface "IFINameLabel"
 partclass "iRaidUnitFrame"
 	extend "IFINameLabel"
 endclass "iRaidUnitFrame"
+
+AddType4Config(iNameLabel, L"Name indicator")

@@ -4,11 +4,6 @@
 
 IGAS:NewAddon "IGAS_UI.RaidPanel"
 
------------------------------------------------
---- iDebuffPanel
--- @type class
--- @name iDebuffPanel
------------------------------------------------
 class "iDebuffPanel"
 	inherit "AuraPanel"
 
@@ -50,11 +45,6 @@ class "iDebuffPanel"
     end
 endclass "iDebuffPanel"
 
------------------------------------------------
---- IFIDebuffPanel
--- @type interface
--- @name IFIDebuffPanel
------------------------------------------------
 interface "IFIDebuffPanel"
 	------------------------------------------------------
 	-- Initialize
@@ -69,3 +59,5 @@ endinterface "IFIDebuffPanel"
 partclass "iRaidUnitFrame"
 	extend "IFIDebuffPanel"
 endclass "iRaidUnitFrame"
+
+AddType4Config(iDebuffPanel, L"Debuff panel")

@@ -66,10 +66,11 @@ chkFocus.Text = "Focus"
 --------------------------
 -- Raid panel's config menu
 --------------------------
-_Menu = DropDownList("Menu", raidPanel)
-_Menu.MultiSelect = true
-_Menu.ShowOnCursor = false
-_Menu.AutoHide = false
+raidPanelConfig = DropDownList("Menu", raidPanel)
+raidPanelConfig.MultiSelect = true
+raidPanelConfig.ShowOnCursor = false
+raidPanelConfig.AutoHide = false
 
-_Menu:SetPoint("TOPLEFT", raidPanel, "TOPRIGHT")
+raidPanelConfig:SetPoint("TOPLEFT", raidPanel, "TOPRIGHT")
 
+raidpanelMenuArray = Array(DropDownList.DropDownMenuButton)

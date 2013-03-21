@@ -4,11 +4,6 @@
 
 IGAS:NewAddon "IGAS_UI.RaidPanel"
 
------------------------------------------------
---- IFIConnect
--- @type interface
--- @name IFIConnect
------------------------------------------------
 interface "IFIConnect"
 	------------------------------------------------------
 	-- Initialize
@@ -22,3 +17,5 @@ endinterface "IFIConnect"
 partclass "iRaidUnitFrame"
 	extend "IFIConnect"
 endclass "iRaidUnitFrame"
+
+AddType4Config(DisconnectIcon, L"Disconnect indicator")

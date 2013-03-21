@@ -4,11 +4,6 @@
 
 IGAS:NewAddon "IGAS_UI.RaidPanel"
 
------------------------------------------------
---- iRange
--- @type class
--- @name iRange
------------------------------------------------
 class "iRange"
 	inherit "VirtualUIObject"
 	extend "IFRange"

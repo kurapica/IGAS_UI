@@ -105,3 +105,7 @@ endinterface "IFIHealthBar"
 partclass "iRaidUnitFrame"
 	extend "IFIHealthBar"
 endclass "iRaidUnitFrame"
+
+AddType4Config(iMyHealPrediction, L"My heal prediction")
+AddType4Config(iAllHealPrediction, L"All heal prediction")
+AddType4Config(iAbsorb, L"Total Absorb")

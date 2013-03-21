@@ -1,4 +1,4 @@
-﻿local L = IGAS:NewLocale("IGAS_UI", "zhTW")
+﻿local L = IGAS:NewLocale("IGAS_UI" , "zhTW")
 if not L then return end
 
 L["Close Menu"] = "關閉菜單"
@@ -53,3 +53,19 @@ L["%s is added to item cooldown line."] = "%s 被加入物品冷卻監視列表�
 L["%s is removed from item cooldown line."] = "%s 被移出物品冷卻監視列表。"
 
 L["Lock Unit Frame"] = "鎖定人物面板"
+
+L["Buff panel"] = "增益面板"
+L["Disconnect indicator"] = "斷線指示"
+L["Debuff panel"] = "減益面板"
+L["Group Role indicator"] = "小隊角色指示"
+L["My heal prediction"] = "玩家的提前治療量"
+L["All heal prediction"] = "全部的提前治療量"
+L["Total Absorb"] = "總吸收量"
+L["Leader indicator"] = "隊長指示"
+L["Target indicator"] = "玩家目標指示"
+L["Resurrect indicator"] = "復活指示"
+L["ReadyCheck indicator"] = "團隊檢查指示"
+L["Raid/Group target indicator"] = "團隊/小隊目標指示"
+L["Raid roster indicator"] = "團隊角色指示"
+L["Power bar"] = "能力資源條"
+L["Name indicator"] = "姓名指示"

@@ -4,11 +4,6 @@
 
 IGAS:NewAddon "IGAS_UI.RaidPanel"
 
------------------------------------------------
---- IFIResurrect
--- @type interface
--- @name IFIResurrect
------------------------------------------------
 interface "IFIResurrect"
 	------------------------------------------------------
 	-- Initialize
@@ -22,3 +17,5 @@ endinterface "IFIResurrect"
 partclass "iRaidUnitFrame"
 	extend "IFIResurrect"
 endclass "iRaidUnitFrame"
+
+AddType4Config(ResurrectIcon, L"Resurrect indicator")

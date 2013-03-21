@@ -4,11 +4,6 @@
 
 IGAS:NewAddon "IGAS_UI.RaidPanel"
 
------------------------------------------------
---- IFIRaidRosterIcon
--- @type interface
--- @name IFIRaidRosterIcon
------------------------------------------------
 interface "IFIRaidRosterIcon"
 	------------------------------------------------------
 	-- Initialize
@@ -22,3 +17,5 @@ endinterface "IFIRaidRosterIcon"
 partclass "iRaidUnitFrame"
 	extend "IFIRaidRosterIcon"
 endclass "iRaidUnitFrame"
+
+AddType4Config(RaidRosterIcon, L"Raid roster indicator")

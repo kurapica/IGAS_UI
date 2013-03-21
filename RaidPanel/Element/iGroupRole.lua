@@ -4,11 +4,6 @@
 
 IGAS:NewAddon "IGAS_UI.RaidPanel"
 
------------------------------------------------
---- IFIGroupRole
--- @type interface
--- @name IFIGroupRole
------------------------------------------------
 interface "IFIGroupRole"
 	------------------------------------------------------
 	-- Initialize
@@ -23,3 +18,5 @@ endinterface "IFIGroupRole"
 partclass "iRaidUnitFrame"
 	extend "IFIGroupRole"
 endclass "iRaidUnitFrame"
+
+AddType4Config(RoleIcon, L"Group Role indicator")

@@ -4,11 +4,6 @@
 
 IGAS:NewAddon "IGAS_UI.RaidPanel"
 
------------------------------------------------
---- IFIReadyCheck
--- @type interface
--- @name IFIReadyCheck
------------------------------------------------
 interface "IFIReadyCheck"
 	------------------------------------------------------
 	-- Initialize
@@ -22,3 +17,5 @@ endinterface "IFIReadyCheck"
 partclass "iRaidUnitFrame"
 	extend "IFIReadyCheck"
 endclass "iRaidUnitFrame"
+
+AddType4Config(ReadyCheckIcon, L"ReadyCheck indicator")

@@ -18,11 +18,11 @@ Toggle = {
 	Set = function (value)
 		if value then
 			raidPanelMask.Visible = false
-			_Menu.Visible = false
+			raidPanelConfig.Visible = false
 		else
 			if not InCombatLockdown() then
 				raidPanelMask.Visible = true
-				_Menu.Visible = true
+				raidPanelConfig.Visible = true
 			end
 		end
 	end,
@@ -63,17 +63,12 @@ function OnLoad(self)
 
 	_DBChar.DisableElement = _DBChar.DisableElement or {}
 	_DisableElement = _DBChar.DisableElement
-
-	-- Choose the element types
-	local mnuBtn
-
-	for i = 1, _Menu.ItemCount do
-		mnuBtn = _Menu:GetMenuButton(i)
-
+	raidpanelMenuArray:Each(function(mnuBtn)
 		mnuBtn.Checked = not _DisableElement[mnuBtn.ElementName]
 
-		UpdateElementType(mnuBtn.ElementType, mnuBtn.Checked)
-	end
+		raidPanel:Each(UpdateConfig4UnitFrame, mnuBtn)
+		raidPetPanel:Each(UpdateConfig4UnitFrame, mnuBtn)
+	end)
 
 	self:RegisterEvent("PLAYER_REGEN_DISABLED")
 	self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
@@ -284,23 +279,41 @@ function chkFocus:OnValueChanged()
 	end
 end
 
---------------------
--- Tool function
---------------------
-function AddElementType(type, name)
-	local elementName = System.Reflector.GetName(type)
-	local btn = _Menu:AddMenuButton(name)
+function raidPanel:OnElementAdd(unitframe)
+	raidpanelMenuArray:Each(UpdateConfig4MenuBtn, unitframe)
+end
 
-	btn.IsCheckButton = true
-	btn.ElementName = elementName
-	btn.ElementType = type
+function raidPetPanel:OnElementAdd(unitframe)
+	raidpanelMenuArray:Each(UpdateConfig4MenuBtn, unitframe)
+end
 
-	btn.OnCheckChanged = function(self)
-		if _Menu.Visible then
-		end
+function raidpanelMenuArray:OnCheckChanged(index)
+	if raidPanelConfig.Visible then
+		_DisableElement[raidpanelMenuArray[index].ElementName] = not raidpanelMenuArray[index].Checked
+
+		raidPanel:Each(UpdateConfig4UnitFrame, raidpanelMenuArray[index])
+		raidPetPanel:Each(UpdateConfig4UnitFrame, raidpanelMenuArray[index])
 	end
 end
 
-function UpdateElementType(type, flag)
+--------------------
+-- Tool function
+--------------------
+function AddType4Config(type, text)
+	local name = System.Reflector.GetName(type)
+	local btn = raidPanelConfig:AddMenuButton(text)
 
+	btn.IsCheckButton = true
+	btn.ElementName = name
+	btn.ElementType = type
+
+	raidpanelMenuArray:Insert(btn)
+end
+
+function UpdateConfig4UnitFrame(unitframe, mnuBtn)
+	unitframe:GetElement(mnuBtn.ElementType).Activated = mnuBtn.Checked
+end
+
+function UpdateConfig4MenuBtn(mnuBtn, unitframe)
+	return UpdateConfig4UnitFrame(unitframe, mnuBtn)
 end

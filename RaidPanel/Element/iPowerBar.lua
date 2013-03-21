@@ -4,21 +4,11 @@
 
 IGAS:NewAddon "IGAS_UI.RaidPanel"
 
------------------------------------------------
---- iPowerBar
--- @type class
--- @name iPowerBar
------------------------------------------------
 class "iPowerBar"
 	inherit "PowerBar"
 	extend "iStatusBarStyle"
 endclass "iPowerBar"
 
------------------------------------------------
---- IFIPowerBar
--- @type interface
--- @name IFIPowerBar
------------------------------------------------
 interface "IFIPowerBar"
 	------------------------------------------------------
 	-- Initialize
@@ -31,3 +21,5 @@ endinterface "IFIPowerBar"
 partclass "iRaidUnitFrame"
 	extend "IFIPowerBar"
 endclass "iRaidUnitFrame"
+
+AddType4Config(iPowerBar, L"Power bar")
