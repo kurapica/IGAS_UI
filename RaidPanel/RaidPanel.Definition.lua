@@ -10,11 +10,6 @@ import "System.Widget.Unit"
 _IGASUI_RAIDPANEL_GROUP = "IRaidPanel"
 _IGASUI_SPELLHANDLER = IFSpellHandler._Group(_IGASUI_RAIDPANEL_GROUP)
 
------------------------------------------------
---- iRaidUnitFrame
--- @type class
--- @name iRaidUnitFrame
------------------------------------------------
 class "iRaidUnitFrame"
 	inherit "UnitFrame"
 	extend "IFSpellHandler""iBorder"
@@ -31,11 +26,6 @@ class "iRaidUnitFrame"
 	}
 endclass "iRaidUnitFrame"
 
------------------------------------------------
---- BindingButton
--- @type class
--- @name BindingButton
------------------------------------------------
 class "BindingButton"
 	inherit "Mask"
 

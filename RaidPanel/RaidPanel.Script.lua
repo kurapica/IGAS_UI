@@ -155,6 +155,7 @@ end
 function PLAYER_REGEN_DISABLED(self)
 	if raidPanelMask.Visible then
 		raidPanelMask.Visible = false
+		raidPanelConfig.Visible = false
 		raidPanel:StopMovingOrSizing()
 		raidPanel.Movable = false
 	end
