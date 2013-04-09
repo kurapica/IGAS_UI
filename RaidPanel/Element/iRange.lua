@@ -4,33 +4,6 @@
 
 IGAS:NewAddon "IGAS_UI.RaidPanel"
 
-class "iRange"
-	inherit "VirtualUIObject"
-	extend "IFRange"
-
-	------------------------------------------------------
-	-- Method
-	------------------------------------------------------
-
-	------------------------------------------------------
-	-- Property
-	------------------------------------------------------
-	-- Alpha
-	property "Alpha" {
-		Get = function(self)
-			return self.Parent.Alpha
-		end,
-		Set = function(self, value)
-			self.Parent.Alpha = value
-		end,
-		Type = System.Number,
-	}
-
-	------------------------------------------------------
-	-- Constructor
-	------------------------------------------------------
-endclass "iRange"
-
 -----------------------------------------------
 --- IFIRange
 -- @type interface
@@ -41,7 +14,7 @@ interface "IFIRange"
 	-- Initialize
 	------------------------------------------------------
     function IFIRange(self)
-		self:AddElement(iRange)
+		self:AddElement(RangeChecker)
     end
 endinterface "IFIRange"
 
