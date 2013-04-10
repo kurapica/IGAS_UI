@@ -1,4 +1,4 @@
-﻿local L = IGAS:NewLocale("IGAS_UI" , "zhTW")
+﻿local L = IGAS:NewLocale("IGAS_UI", "zhTW")
 if not L then return end
 
 L["Close Menu"] = "關閉菜單"
@@ -69,3 +69,4 @@ L["Raid/Group target indicator"] = "團隊/小隊目標指示"
 L["Raid roster indicator"] = "團隊角色指示"
 L["Power bar"] = "能力資源條"
 L["Name indicator"] = "姓名指示"
+L["Range indicator"] = "距離指示"

@@ -15,9 +15,13 @@ interface "IFIRange"
 	------------------------------------------------------
     function IFIRange(self)
 		self:AddElement(RangeChecker)
+		self.RangeChecker.UseIndicator = true
+		self.RangeChecker:SetPoint("CENTER", self, "LEFT", 16, 0)
     end
 endinterface "IFIRange"
 
 partclass "iRaidUnitFrame"
 	extend "IFIRange"
 endclass "iRaidUnitFrame"
+
+AddType4Config(RangeChecker, L"Range indicator")

@@ -630,7 +630,7 @@ class "iPlayerPowerText"
 	inherit "PowerTextFrequent"
 
 	function Refresh(self)
-		local powerType = UnitPowerType(self.Unit) or 0
+		local powerType = self.Unit and UnitPowerType(self.Unit) or 0
 
 		if powerType == 0 or powerType == "MANA" then
 			self.ShowPercent = true
