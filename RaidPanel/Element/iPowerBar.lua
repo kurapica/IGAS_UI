@@ -6,7 +6,7 @@ IGAS:NewAddon "IGAS_UI.RaidPanel"
 
 class "iPowerBar"
 	inherit "PowerBar"
-	extend "iStatusBarStyle"
+	extend "iStatusBarStyle""iBorder"
 endclass "iPowerBar"
 
 interface "IFIPowerBar"
@@ -14,7 +14,7 @@ interface "IFIPowerBar"
 	-- Initialize
 	------------------------------------------------------
     function IFIPowerBar(self)
-		self:AddElement(iPowerBar, "south", 4, "px")
+		self:AddElement(iPowerBar, "south", 3, "px")
     end
 endinterface "IFIPowerBar"
 

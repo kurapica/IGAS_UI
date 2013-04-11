@@ -12,7 +12,7 @@ _IGASUI_SPELLHANDLER = IFSpellHandler._Group(_IGASUI_RAIDPANEL_GROUP)
 
 class "iRaidUnitFrame"
 	inherit "UnitFrame"
-	extend "IFSpellHandler""iBorder"
+	extend "IFSpellHandler"
 
 	_IGASUI_RAIDPANEL_GROUP = _IGASUI_RAIDPANEL_GROUP
 
@@ -24,6 +24,10 @@ class "iRaidUnitFrame"
 			return _IGASUI_RAIDPANEL_GROUP
 		end,
 	}
+
+	function iRaidUnitFrame(self)
+		self.Panel.VSpacing = 1
+	end
 endclass "iRaidUnitFrame"
 
 class "BindingButton"

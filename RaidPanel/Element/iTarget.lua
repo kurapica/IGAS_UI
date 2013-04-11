@@ -20,9 +20,9 @@ class "iTarget"
 			if self.IsTarget ~= value then
 				self.__IsTarget = value
 				if value then
-					self.UpdateFrame.Back.BackdropBorderColor = TARGET_BORDER_COLOR
+					self.UpdateFrame.iHealthBar.Back.BackdropBorderColor = TARGET_BORDER_COLOR
 				else
-					self.UpdateFrame.Back.BackdropBorderColor = DEFAULT_BORDER_COLOR
+					self.UpdateFrame.iHealthBar.Back.BackdropBorderColor = DEFAULT_BORDER_COLOR
 				end
 			end
 		end,

@@ -6,13 +6,14 @@ IGAS:NewAddon "IGAS_UI.RaidPanel"
 
 class "iHealthBar"
 	inherit "HealthBar"
-	extend "iStatusBarStyle"
+	extend "iStatusBarStyle""iBorder"
 
 	------------------------------------------------------
 	-- Constructor
 	------------------------------------------------------
 	function iHealthBar(self)
 		self.UseDebuffColor = true
+		self.FrameLevel = self.FrameLevel + 1
 	end
 endclass "iHealthBar"
 
