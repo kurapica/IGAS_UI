@@ -9,6 +9,7 @@
 	<Include file = "InfoBar\InfoBar.xml"/>
 	<Include file = "RaidPanel\RaidPanel.xml"/>
 	<Include file = "UnitFrame_Slim\UnitFrame.xml"/>
+	<Include file = "NamePlate\NamePlate.xml"/>
 	<Script file = "Minimap\Minimap.lua"/>
 
 	<!-- Manager -->

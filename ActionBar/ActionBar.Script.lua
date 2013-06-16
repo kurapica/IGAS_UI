@@ -19,6 +19,10 @@ Toggle = {
 			end
 			if _Header4CharacterBag then
 				_Header4CharacterBag.Visible = not value
+				CharacterBag0Slot.Visible = not value
+				CharacterBag1Slot.Visible = not value
+				CharacterBag2Slot.Visible = not value
+				CharacterBag3Slot.Visible = not value
 			end
 		end)
 		Toggle.Update()
@@ -499,6 +503,11 @@ function UpdateBlzMainMenuBar()
 			CharacterBag2Slot:SetParent(UIParent)
 			CharacterBag3Slot:SetParent(UIParent)
 
+			CharacterBag0Slot.Visible = not _DBChar.LockBar
+			CharacterBag1Slot.Visible = not _DBChar.LockBar
+			CharacterBag2Slot.Visible = not _DBChar.LockBar
+			CharacterBag3Slot.Visible = not _DBChar.LockBar
+
 			if _Header4CharacterBagLocation then
 				MainMenuBarBackpackButton.Location = _Header4CharacterBagLocation
 			end
@@ -584,11 +593,11 @@ end
 --------------------
 -- Script Handler
 --------------------
-function MainMenuBarBackpackButton:OnEnter()
+--[[function MainMenuBarBackpackButton:OnEnter()
 	if not InCombatLockdown() and _Header4CharacterBag then
 		_Header4CharacterBag.Visible = true
 	end
-end
+end--]]
 
 function _Menu:OnShow()
 	local header = self.Parent

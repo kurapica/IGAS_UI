@@ -89,15 +89,19 @@ interface "iBorder"
 	    edgeSize = 1,
 	}
 
-	------------------------------------------------------
-	-- Initialize
-	------------------------------------------------------
-    function iBorder(self)
+	function _BuildBorder(self)
 		local bg = Frame("Back", self)
 		bg.FrameStrata = "BACKGROUND"
 		bg:SetPoint("TOPLEFT", -1, 1)
 		bg:SetPoint("BOTTOMRIGHT", 1, -1)
 		bg.Backdrop = THIN_BORDER
 		bg.BackdropBorderColor = DEFAULT_BORDER_COLOR
+	end
+
+	------------------------------------------------------
+	-- Initialize
+	------------------------------------------------------
+    function iBorder(self)
+		_BuildBorder(self)
     end
 endinterface "iBorder"
