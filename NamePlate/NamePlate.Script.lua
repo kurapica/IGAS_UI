@@ -60,7 +60,7 @@ end
 
 function CheckG()
 	-- Keep it simple
-	if rawget(_G, "NamePlate" .. (_MaxNamePlate + 1)) then
+	while rawget(_G, "NamePlate" .. (_MaxNamePlate + 1)) do
 		_MaxNamePlate = _MaxNamePlate + 1
 
 		BuildNamePlate(_G["NamePlate" .. _MaxNamePlate])
