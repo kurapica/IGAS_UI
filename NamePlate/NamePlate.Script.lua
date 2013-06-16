@@ -10,7 +10,7 @@ _MaxNamePlate = 0
 -- Module Script Handler
 ------------------------------------------------------
 function OnLoad(self)
-	
+
 end
 
 function OnEnable(self)
