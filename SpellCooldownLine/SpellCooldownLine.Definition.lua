@@ -18,9 +18,9 @@ class "SpellIcon"
     local random = math.random
 
     ------------------------------------------------------
-    -- Script
+    -- Event
     ------------------------------------------------------
-    script "OnFinished"
+    event "OnFinished"
 
     ------------------------------------------------------
     -- Method
@@ -171,7 +171,7 @@ class "SpellIcon"
 
     local function agFinal_OnFinished(self)
         self.Parent.Visible = false
-        return self.Parent:Fire("OnFinished")
+        return self.Parent:Raise("OnFinished")
     end
 
     ------------------------------------------------------

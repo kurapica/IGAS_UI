@@ -1231,9 +1231,9 @@ class "IHeader"
 
 
 	------------------------------------------------------
-	-- Script
+	-- Event
 	------------------------------------------------------
-	script "OnPositionChanged"
+	event "OnPositionChanged"
 
 	------------------------------------------------------
 	-- Method
@@ -1296,7 +1296,7 @@ class "IHeader"
 					Threading.Sleep(0.1)
 				end
 
-				return self:Fire("OnPositionChanged")
+				return self:Raise("OnPositionChanged")
 			end)
 		end
 	end
@@ -1304,7 +1304,7 @@ class "IHeader"
 	local function OnMouseUp(self, button)
 		if button == "LeftButton" then
 			self.Parent:StopMovingOrSizing()
-			self:Fire("OnPositionChanged")
+			self:Raise("OnPositionChanged")
 		end
 	end
 
