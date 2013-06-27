@@ -1296,7 +1296,7 @@ class "IHeader"
 					Threading.Sleep(0.1)
 				end
 
-				return self:Raise("OnPositionChanged")
+				return self:Fire("OnPositionChanged")
 			end)
 		end
 	end
@@ -1304,7 +1304,7 @@ class "IHeader"
 	local function OnMouseUp(self, button)
 		if button == "LeftButton" then
 			self.Parent:StopMovingOrSizing()
-			self:Raise("OnPositionChanged")
+			self:Fire("OnPositionChanged")
 		end
 	end
 

@@ -171,7 +171,7 @@ class "SpellIcon"
 
     local function agFinal_OnFinished(self)
         self.Parent.Visible = false
-        return self.Parent:Raise("OnFinished")
+        return self.Parent:Fire("OnFinished")
     end
 
     ------------------------------------------------------

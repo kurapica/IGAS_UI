@@ -101,6 +101,20 @@ _MenuManual = _Menu:AddMenuButton(L"Manual Move&Resize")
 _MenuSwap = _Menu:AddMenuButton(L"Swap Pop-up action")
 _MenuSwap.IsCheckButton = true
 
+_MenuSaveSet = _Menu:AddMenuButton(L"Save Settings")
+_ListSaveSet = List("LstSaveSet", _MenuSaveSet)
+_ListSaveSet.Width = 150
+_ListSaveSet.Height = 250
+_ListSaveSet.Visible = false
+_MenuSaveSet.DropDownList = _ListSaveSet
+
+_MenuLoadSet = _Menu:AddMenuButton(L"Load Settings")
+_ListLoadSet = List("LstLoadSet", _MenuLoadSet)
+_ListLoadSet.Width = 150
+_ListLoadSet.Height = 250
+_ListLoadSet.Visible = false
+_MenuLoadSet.DropDownList = _ListLoadSet
+
 _MenuSave = _Menu:AddMenuButton(L"Save Layout")
 _ListSave = List("LstSave", _MenuSave)
 _ListSave.Width = 150

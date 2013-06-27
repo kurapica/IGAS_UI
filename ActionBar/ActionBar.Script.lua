@@ -61,10 +61,10 @@ function OnLoad(self)
 	_Addon._DB.ActionBar = _DB
 	_Addon._DBChar.ActionBar = _DBChar
 
-	_LayoutSave = {}
-	_LayoutLoad = {}
-	tinsert(_LayoutSave, L"New Layout")
-	tinsert(_LayoutLoad, L"Reset")
+	-- Load layout
+	_LayoutSave = {L"New Layout"}
+	_LayoutLoad = {L"Reset"}
+
 	for name in pairs(_DB) do
 		tinsert(_LayoutSave, name)
 		tinsert(_LayoutLoad, name)
@@ -75,8 +75,26 @@ function OnLoad(self)
 	_ListLoad.Keys = _LayoutLoad
 	_ListLoad.Items = _LayoutLoad
 
-	self:RegisterEvent"PLAYER_SPECIALIZATION_CHANGED"
-	self:RegisterEvent"PLAYER_LOGOUT"
+	-- Load settings
+	_DBCharSet = _DBChar.ActionSet or {}
+	_DBChar.ActionSet = _DBCharSet
+
+	_ActionSetSave = {L"New Set"}
+	_ActionSetLoad = {}
+
+	for name in pairs(_DBCharSet) do
+		tinsert(_ActionSetSave, name)
+		tinsert(_ActionSetLoad, name)
+	end
+
+	_ListSaveSet.Keys = _ActionSetSave
+	_ListSaveSet.Items = _ActionSetSave
+	_ListLoadSet.Keys = _ActionSetLoad
+	_ListLoadSet.Items = _ActionSetLoad
+
+	-- Register system events
+	self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
+	self:RegisterEvent("PLAYER_LOGOUT")
 
 	self:RegisterEvent("MERCHANT_SHOW")
 	self:RegisterEvent("MERCHANT_CLOSED")
@@ -646,10 +664,16 @@ function _Menu:OnShow()
 	-- Mouse down
 	_MenuUseDown.Checked = IFActionHandler._IsGroupUseButtonDownEnabled(_IGASUI_ACTIONBAR_GROUP)
 
-	-- Save
+	-- Save Set
+	_ListSaveSet.SelectedIndex = nil
+
+	-- Load Set
+	_ListLoadSet.SelectedIndex = nil
+
+	-- Save Layout
 	_ListSave.SelectedIndex = nil
 
-	-- Load
+	-- Load Layout
 	_ListLoad.SelectedIndex = nil
 
 	-- Hide Blz bar
@@ -846,6 +870,40 @@ end
 function _MenuManual:OnClick()
 	IFMovable._Toggle(_IGASUI_ACTIONBAR_GROUP)
 	IFResizable._Toggle(_IGASUI_ACTIONBAR_GROUP)
+end
+
+function _ListSaveSet:OnItemChoosed(key, item)
+	_Menu:Hide()
+	if key == L"New Set" then
+		self:ThreadCall(function (self)
+			local name = ""
+			while strtrim(name) == "" or name == L"New Set" or _DBCharSet[name] do
+				name = IGAS:MsgBox(L"Please input the new set name", "ic")
+				if not name then
+					return
+				end
+			end
+			_DBCharSet[name] = GenerateConfig(true)
+			tinsert(_ActionSetSave, name)
+			tinsert(_ActionSetLoad, name)
+		end)
+	else
+		self:ThreadCall(function (self)
+			if IGAS:MsgBox(L"Do you want overwrite the existed set?", "n") then
+				_DBCharSet[key] = GenerateConfig(true)
+			end
+		end)
+	end
+end
+
+function _ListLoadSet:OnItemChoosed(key, item)
+	_Menu:Hide()
+
+	self:ThreadCall(function (self)
+		if IGAS:MsgBox(L"Do you want load the set?", "n") then
+			LoadConfig(_DBCharSet[key])
+		end
+	end)
 end
 
 function _ListSave:OnItemChoosed(key, item)

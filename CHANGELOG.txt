@@ -1,0 +1,3 @@
+2013/06/27:
+    1. Update for IGAS v39.
+    2. Load/Save settings command added for the action bar.
