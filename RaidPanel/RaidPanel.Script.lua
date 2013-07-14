@@ -57,19 +57,84 @@ function OnLoad(self)
 	_Addon._DB.RaidPanel = _DB
 	_Addon._DBChar.RaidPanel = _DBChar
 
+	-- Load location
 	if _DBChar.Location then
 		raidPanel.Location = _DBChar.Location
 	end
 
+	-- Load disable settings
 	_DBChar.DisableElement = _DBChar.DisableElement or {}
 	_DisableElement = _DBChar.DisableElement
-	raidpanelMenuArray:Each(function(mnuBtn)
-		mnuBtn.Checked = not _DisableElement[mnuBtn.ElementName]
+	raidpanelMenuArray:Each(function(self)
+		self.Checked = not _DisableElement[self.ElementName]
 
-		raidPanel:Each(UpdateConfig4UnitFrame, mnuBtn)
-		raidPetPanel:Each(UpdateConfig4UnitFrame, mnuBtn)
+		raidPanel:Each(UpdateConfig4UnitFrame, self)
+		raidPetPanel:Each(UpdateConfig4UnitFrame, self)
 	end)
 
+	-- Load raid panel settings
+	_DBChar.RaidPanelSet = _DBChar.RaidPanelSet or {}
+	_RaidPanelSet = _DBChar.RaidPanelSet
+
+	-- Default settings
+	if not next(_RaidPanelSet) then
+		_RaidPanelSet.ShowRaid = true
+		_RaidPanelSet.ShowParty = true
+		_RaidPanelSet.ShowPlayer = true
+		_RaidPanelSet.ShowSolo = true
+		_RaidPanelSet.GroupBy = "GROUP"
+		_RaidPanelSet.SortBy = "INDEX"
+	end
+
+	for k, v in pairs(_RaidPanelSet) do
+		raidPanel[k] = v
+	end
+	raidpanelPropArray:Each(function(self)
+		if self.ConfigValue then
+			self.Checked = (raidPanel[self.ConfigName] == self.ConfigValue)
+		else
+			self.Checked = raidPanel[self.ConfigName]
+		end
+	end)
+
+	--[[ Filter Settings
+	_DBChar.GroupFilter = _DBChar.GroupFilter or {}
+	_DBChar.ClassFilter = _DBChar.ClassFilter or {}
+	_DBChar.RoleFilter = _DBChar.RoleFilter or {}
+	_GroupFilter = _DBChar.GroupFilter
+	_ClassFilter = _DBChar.ClassFilter
+	_RoleFilter = _DBChar.RoleFilter
+
+	raidPanel.GroupFilter = _GroupFilter
+	raidPanel.ClassFilter = _ClassFilter
+	raidPanel.RoleFilter = _RoleFilter
+
+	groupFilterArray:Each(function(self)
+		for _, v in ipairs(_GroupFilter) do
+			if v == self.FilterValue then
+				self.Checked = true
+				break
+			end
+		end
+	end)
+	classFilterArray:Each(function(self)
+		for _, v in ipairs(_ClassFilter) do
+			if v == self.FilterValue then
+				self.Checked = true
+				break
+			end
+		end
+	end)
+	roleFilterArray:Each(function(self)
+		for _, v in ipairs(_RoleFilter) do
+			if v == self.FilterValue then
+				self.Checked = true
+				break
+			end
+		end
+	end)--]]
+
+	-- Used for RaidFrame updating
 	self:RegisterEvent("PLAYER_REGEN_DISABLED")
 	self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
 	self:RegisterEvent("PLAYER_LOGOUT")
@@ -84,6 +149,8 @@ function OnLoad(self)
 	if _DBChar[_LoadingConfig] then
 		_IGASUI_SPELLHANDLER:Import(_DBChar[_LoadingConfig])
 	end
+
+	raidPanel:InitWithCount(25)
 end
 
 function OnEnable(self)
@@ -290,12 +357,72 @@ end
 
 function raidpanelMenuArray:OnCheckChanged(index)
 	if raidPanelConfig.Visible then
-		_DisableElement[raidpanelMenuArray[index].ElementName] = not raidpanelMenuArray[index].Checked
+		_DisableElement[self[index].ElementName] = not self[index].Checked
 
-		raidPanel:Each(UpdateConfig4UnitFrame, raidpanelMenuArray[index])
-		raidPetPanel:Each(UpdateConfig4UnitFrame, raidpanelMenuArray[index])
+		raidPanel:Each(UpdateConfig4UnitFrame, self[index])
+		raidPetPanel:Each(UpdateConfig4UnitFrame, self[index])
 	end
 end
+
+function raidpanelPropArray:OnCheckChanged(index)
+	if raidPanelConfig.Visible and (self[index].Checked or not self[index].ConfigValue) then
+		raidPanel[self[index].ConfigName] = self[index].ConfigValue or self[index].Checked
+
+		-- keep set
+		_RaidPanelSet[self[index].ConfigName] = raidPanel[self[index].ConfigName]
+
+		raidPanel:Refresh()
+	end
+end
+
+--[[function groupFilterArray:OnCheckChanged(index)
+	if raidPanelConfig.Visible then
+		wipe(_GroupFilter)
+
+		for _, filter in ipairs(self) do
+			if filter.Checked then
+				tinsert(_GroupFilter, filter.FilterValue)
+			end
+		end
+
+		raidPanel.GroupFilter = _GroupFilter
+
+		raidPanel:Refresh()
+	end
+end
+
+function classFilterArray:OnCheckChanged(index)
+	if raidPanelConfig.Visible then
+		wipe(_ClassFilter)
+
+		for _, filter in ipairs(self) do
+			if filter.Checked then
+				tinsert(_ClassFilter, filter.FilterValue)
+			end
+		end
+
+		raidPanel.ClassFilter = _ClassFilter
+
+		raidPanel:Refresh()
+	end
+end
+
+function roleFilterArray:OnCheckChanged(index)
+	if raidPanelConfig.Visible then
+		wipe(_RoleFilter)
+
+		for _, filter in ipairs(self) do
+			if filter.Checked then
+				tinsert(_RoleFilter, filter.FilterValue)
+			end
+		end
+
+		raidPanel.RoleFilter = _RoleFilter
+
+		raidPanel:Refresh()
+	end
+end--]]
+
 
 --------------------
 -- Tool function

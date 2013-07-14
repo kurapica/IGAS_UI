@@ -13,6 +13,7 @@ manager:SetPoint("LEFT")
 
 manager.Caption = L"IGAS UI"
 manager.DockMode = true
+manager.HideForCombat = true
 manager.Visible = false
 manager.Resizable = false
 

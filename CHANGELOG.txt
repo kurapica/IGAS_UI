@@ -1,3 +1,7 @@
+2013/07/14: v22
+	1. Update for IGAS v41.
+	2. More settings for the RaidPanel, you can see the detail on the menu of the RaidPanel.
+
 2013/06/27: v21
     1. Update for IGAS v39.
     2. Load/Save settings command added for the action bar.
