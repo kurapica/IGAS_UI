@@ -86,6 +86,15 @@ function OnLoad(self)
 		_RaidPanelSet.SortBy = "INDEX"
 	end
 
+	if _DBChar.RaidPanelActivated == nil then
+		_DBChar.RaidPanelActivated = true
+	end
+
+	if _DBChar.RaidPetPanelActivated == nil then
+		_DBChar.RaidPetPanelActivated = true
+	end
+
+	-- Load Config
 	for k, v in pairs(_RaidPanelSet) do
 		raidPanel[k] = v
 	end
@@ -151,6 +160,8 @@ function OnLoad(self)
 	end
 
 	raidPanel:InitWithCount(25)
+	raidPanel.Activated = _DBChar.RaidPanelActivated
+	raidPetPanel.Activated = _DBChar.RaidPetPanelActivated
 end
 
 function OnEnable(self)
