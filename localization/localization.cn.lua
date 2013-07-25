@@ -77,6 +77,12 @@ L["Power bar"] = "能力资源条"
 L["Name indicator"] = "姓名指示"
 L["Range indicator"] = "距离指示"
 
+L["Raid panel"] = "团队面板"
+L["Pet panel"] = "宠物面板"
+
+L["Activated"] = "启用"
+L["Deactivate in raid"] = "团队中禁用"
+
 L["Show"] = "显示面板"
 L["Show in a raid"] = "在团队中"
 L["Show in a party"] = "在小队中"
