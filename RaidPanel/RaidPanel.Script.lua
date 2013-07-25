@@ -76,6 +76,9 @@ function OnLoad(self)
 	_DBChar.RaidPanelSet = _DBChar.RaidPanelSet or {}
 	_RaidPanelSet = _DBChar.RaidPanelSet
 
+	_DBChar.RaidPetPanelSet = _DBChar.RaidPetPanelSet or {}
+	_RaidPetPanelSet = _DBChar.RaidPetPanelSet
+
 	-- Default settings
 	if not next(_RaidPanelSet) then
 		_RaidPanelSet.ShowRaid = true
@@ -86,6 +89,15 @@ function OnLoad(self)
 		_RaidPanelSet.SortBy = "INDEX"
 	end
 
+	if not next(_RaidPetPanelSet) then
+		_RaidPetPanelSet.ShowRaid = true
+		_RaidPetPanelSet.ShowParty = true
+		_RaidPetPanelSet.ShowPlayer = true
+		_RaidPetPanelSet.ShowSolo = true
+		_RaidPetPanelSet.GroupBy = "GROUP"
+		_RaidPetPanelSet.SortBy = "INDEX"
+	end
+
 	if _DBChar.RaidPanelActivated == nil then
 		_DBChar.RaidPanelActivated = true
 	end
@@ -94,17 +106,27 @@ function OnLoad(self)
 		_DBChar.RaidPetPanelActivated = true
 	end
 
+	if _DBChar.RaidPetPanelDeactivateInRaid == nil then
+		_DBChar.RaidPetPanelDeactivateInRaid = true
+	end
+
 	-- Load Config
 	for k, v in pairs(_RaidPanelSet) do
 		raidPanel[k] = v
 	end
+	for k, v in pairs(_RaidPetPanelSet) do
+		raidPetPanel[k] = v
+	end
 	raidpanelPropArray:Each(function(self)
 		if self.ConfigValue then
-			self.Checked = (raidPanel[self.ConfigName] == self.ConfigValue)
+			self.Checked = (self.UnitPanel[self.ConfigName] == self.ConfigValue)
 		else
-			self.Checked = raidPanel[self.ConfigName]
+			self.Checked = self.UnitPanel[self.ConfigName]
 		end
 	end)
+	mnuRaidPetPanelDeactivateInRaid.Checked = _DBChar.RaidPetPanelDeactivateInRaid
+	mnuRaidPanelActivated.Checked = _DBChar.RaidPanelActivated
+	mnuRaidPetPanelActivated.Checked = _DBChar.RaidPetPanelActivated
 
 	--[[ Filter Settings
 	_DBChar.GroupFilter = _DBChar.GroupFilter or {}
@@ -161,6 +183,9 @@ function OnLoad(self)
 
 	raidPanel:InitWithCount(25)
 	raidPanel.Activated = _DBChar.RaidPanelActivated
+
+	raidPetPanel:InitWithCount(10)
+	raidPetPanel.DeactivateInRaid = _DBChar.RaidPetPanelDeactivateInRaid
 	raidPetPanel.Activated = _DBChar.RaidPetPanelActivated
 end
 
@@ -377,12 +402,38 @@ end
 
 function raidpanelPropArray:OnCheckChanged(index)
 	if raidPanelConfig.Visible and (self[index].Checked or not self[index].ConfigValue) then
-		raidPanel[self[index].ConfigName] = self[index].ConfigValue or self[index].Checked
+		self[index].UnitPanel[self[index].ConfigName] = self[index].ConfigValue or self[index].Checked
 
 		-- keep set
-		_RaidPanelSet[self[index].ConfigName] = raidPanel[self[index].ConfigName]
+		if self[index].UnitPanel == raidPanel then
+			_RaidPanelSet[self[index].ConfigName] = raidPanel[self[index].ConfigName]
+		else
+			_RaidPetPanelSet[self[index].ConfigName] = raidPetPanel[self[index].ConfigName]
+		end
+	end
+end
 
-		raidPanel:Refresh()
+function mnuRaidPanelActivated:OnCheckChanged()
+	if raidPanelConfig.Visible then
+		_DBChar.RaidPanelActivated = self.Checked
+
+		raidPanel.Activated = _DBChar.RaidPanelActivated
+	end
+end
+
+function mnuRaidPetPanelActivated:OnCheckChanged()
+	if raidPanelConfig.Visible then
+		_DBChar.RaidPetPanelActivated = self.Checked
+
+		raidPetPanel.Activated = _DBChar.RaidPetPanelActivated
+	end
+end
+
+function mnuRaidPetPanelDeactivateInRaid:OnCheckChanged()
+	if raidPanelConfig.Visible then
+		_DBChar.RaidPetPanelDeactivateInRaid = self.Checked
+
+		raidPetPanel.DeactivateInRaid = _DBChar.RaidPetPanelDeactivateInRaid
 	end
 end
 

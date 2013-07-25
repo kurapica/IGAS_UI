@@ -29,7 +29,7 @@ raidPanelMask = Mask("Mask", raidPanel)
 raidPanelMask.AsMove = true
 
 raidPetPanel = PetUnitPanel("IGAS_UI_RAIDPETPANEL")
-raidPetPanel:SetPoint("TOPLEFT", raidPanel, "TOPRIGHT", 3, 0)
+raidPetPanel:SetPoint("TOPLEFT", raidPanel, "BOTTOMLEFT", 0, 6)
 raidPetPanel.ElementType = iRaidUnitFrame
 raidPetPanel.ElementPrefix = "iRaidPetUnitFrame"
 raidPetPanel.VSpacing = 3
@@ -76,50 +76,82 @@ raidpanelMenuArray = Array(DropDownList.DropDownMenuButton)
 --------------------------
 raidpanelPropArray = Array(DropDownList.DropDownMenuButton)
 
+-- Activated
+mnuRaidPanelActivated = raidPanelConfig:AddMenuButton(L"Raid panel", L"Activated")
+mnuRaidPanelActivated.IsCheckButton = true
+
+mnuRaidPetPanelActivated = raidPanelConfig:AddMenuButton(L"Pet panel", L"Activated")
+mnuRaidPetPanelActivated.IsCheckButton = true
+
+mnuRaidPetPanelDeactivateInRaid = raidPanelConfig:AddMenuButton(L"Pet panel", L"Deactivate in raid")
+mnuRaidPetPanelDeactivateInRaid.IsCheckButton = true
+
 -- Show ->
-showRaid = raidPanelConfig:AddMenuButton(L"Show", L"Show in a raid")
-showRaid.IsCheckButton = true
-showRaid.ConfigName = "ShowRaid"
-raidpanelPropArray:Insert(showRaid)
+ShowProperty = {"ShowRaid", "ShowParty", "ShowPlayer", "ShowSolo"}
+ShowLocale = {L"Show in a raid", L"Show in a party", L"Show the player in party", L"Show when solo",}
 
-showParty = raidPanelConfig:AddMenuButton(L"Show", L"Show in a party")
-showParty.IsCheckButton = true
-showParty.ConfigName = "ShowParty"
-raidpanelPropArray:Insert(showParty)
+for i, v in ipairs(ShowProperty) do
+	local show = raidPanelConfig:AddMenuButton(L"Raid panel", L"Show", ShowLocale[i])
+	show.UnitPanel = raidPanel
+	show.IsCheckButton = true
+	show.ConfigName = v
+	raidpanelPropArray:Insert(show)
 
-showPlayer = raidPanelConfig:AddMenuButton(L"Show", L"Show the player in party")
-showPlayer.IsCheckButton = true
-showPlayer.ConfigName = "ShowPlayer"
-raidpanelPropArray:Insert(showPlayer)
+	show = raidPanelConfig:AddMenuButton(L"Pet panel", L"Show", ShowLocale[i])
+	show.UnitPanel = raidPetPanel
+	show.IsCheckButton = true
+	show.ConfigName = v
+	raidpanelPropArray:Insert(show)
+end
 
-showSolo = raidPanelConfig:AddMenuButton(L"Show", L"Show when solo")
-showSolo.IsCheckButton = true
-showSolo.ConfigName = "ShowSolo"
-raidpanelPropArray:Insert(showSolo)
+raidPanelConfig:GetMenuButton(L"Raid panel").DropDownList.MultiSelect = true
+raidPanelConfig:GetMenuButton(L"Pet panel").DropDownList.MultiSelect = true
 
-raidPanelConfig:GetMenuButton(L"Show").DropDownList.MultiSelect = true
+raidPanelConfig:GetMenuButton(L"Raid panel", L"Show").DropDownList.MultiSelect = true
+raidPanelConfig:GetMenuButton(L"Pet panel", L"Show").DropDownList.MultiSelect = true
+
+ShowProperty = nil
+ShowLocale = nil
 
 -- Group ->
 for _, v in ipairs(System.Reflector.GetEnums(IFGroup.GroupType)) do
-	local groupBy = raidPanelConfig:AddMenuButton(L"Group By", L[v])
+	local groupBy = raidPanelConfig:AddMenuButton(L"Raid panel", L"Group By", L[v])
+	groupBy.UnitPanel = raidPanel
+	groupBy.IsCheckButton = true
+	groupBy.ConfigName = "GroupBy"
+	groupBy.ConfigValue = v
+	raidpanelPropArray:Insert(groupBy)
+
+	groupBy = raidPanelConfig:AddMenuButton(L"Pet panel", L"Group By", L[v])
+	groupBy.UnitPanel = raidPetPanel
 	groupBy.IsCheckButton = true
 	groupBy.ConfigName = "GroupBy"
 	groupBy.ConfigValue = v
 	raidpanelPropArray:Insert(groupBy)
 end
 
-raidPanelConfig:GetMenuButton(L"Group By").DropDownList.MultiSelect = false
+raidPanelConfig:GetMenuButton(L"Raid panel", L"Group By").DropDownList.MultiSelect = false
+raidPanelConfig:GetMenuButton(L"Pet panel", L"Group By").DropDownList.MultiSelect = false
 
 -- Sort ->
 for _, v in ipairs(System.Reflector.GetEnums(IFGroup.SortType)) do
-	local sortBy = raidPanelConfig:AddMenuButton(L"Sort By", L[v])
+	local sortBy = raidPanelConfig:AddMenuButton(L"Raid panel", L"Sort By", L[v])
+	sortBy.UnitPanel = raidPanel
+	sortBy.IsCheckButton = true
+	sortBy.ConfigName = "SortBy"
+	sortBy.ConfigValue = v
+	raidpanelPropArray:Insert(sortBy)
+
+	sortBy = raidPanelConfig:AddMenuButton(L"Pet panel", L"Sort By", L[v])
+	sortBy.UnitPanel = raidPetPanel
 	sortBy.IsCheckButton = true
 	sortBy.ConfigName = "SortBy"
 	sortBy.ConfigValue = v
 	raidpanelPropArray:Insert(sortBy)
 end
 
-raidPanelConfig:GetMenuButton(L"Sort By").DropDownList.MultiSelect = false
+raidPanelConfig:GetMenuButton(L"Raid panel", L"Sort By").DropDownList.MultiSelect = false
+raidPanelConfig:GetMenuButton(L"Pet panel", L"Sort By").DropDownList.MultiSelect = false
 
 --[[ Filter -> Group
 groupFilterArray = Array(DropDownList.DropDownMenuButton)
