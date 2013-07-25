@@ -24,16 +24,24 @@ raidPanel.ElementPrefix = "iRaidUnitFrame"
 raidPanel.KeepMaxPlayer = true
 raidPanel.VSpacing = 3
 raidPanel.HSpacing = 3
+raidPanel.MarginTop = 3
+raidPanel.MarginBottom = 3
+raidPanel.MarginLeft = 3
+raidPanel.MarginRight = 3
 
 raidPanelMask = Mask("Mask", raidPanel)
 raidPanelMask.AsMove = true
 
 raidPetPanel = PetUnitPanel("IGAS_UI_RAIDPETPANEL")
-raidPetPanel:SetPoint("TOPLEFT", raidPanel, "BOTTOMLEFT", 0, 6)
+raidPetPanel:SetPoint("TOPLEFT", raidPanel, "BOTTOMLEFT")
 raidPetPanel.ElementType = iRaidUnitFrame
 raidPetPanel.ElementPrefix = "iRaidPetUnitFrame"
 raidPetPanel.VSpacing = 3
 raidPetPanel.HSpacing = 3
+raidPetPanel.MarginTop = 3
+raidPetPanel.MarginBottom = 3
+raidPetPanel.MarginLeft = 3
+raidPetPanel.MarginRight = 3
 
 -- withPanel
 withPanel = Frame("IGASUI_Withpanel", SpellBookFrame)
@@ -152,6 +160,26 @@ end
 
 raidPanelConfig:GetMenuButton(L"Raid panel", L"Sort By").DropDownList.MultiSelect = false
 raidPanelConfig:GetMenuButton(L"Pet panel", L"Sort By").DropDownList.MultiSelect = false
+
+-- Orientation
+for _, v in ipairs(System.Reflector.GetEnums(Orientation)) do
+	local orientation = raidPanelConfig:AddMenuButton(L"Raid panel", L"Orientation", L[v])
+	orientation.UnitPanel = raidPanel
+	orientation.IsCheckButton = true
+	orientation.ConfigName = "Orientation"
+	orientation.ConfigValue = v
+	raidpanelPropArray:Insert(orientation)
+
+	orientation = raidPanelConfig:AddMenuButton(L"Pet panel", L"Orientation", L[v])
+	orientation.UnitPanel = raidPetPanel
+	orientation.IsCheckButton = true
+	orientation.ConfigName = "Orientation"
+	orientation.ConfigValue = v
+	raidpanelPropArray:Insert(orientation)
+end
+
+raidPanelConfig:GetMenuButton(L"Raid panel", L"Orientation").DropDownList.MultiSelect = false
+raidPanelConfig:GetMenuButton(L"Pet panel", L"Orientation").DropDownList.MultiSelect = false
 
 --[[ Filter -> Group
 groupFilterArray = Array(DropDownList.DropDownMenuButton)

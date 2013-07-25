@@ -94,7 +94,12 @@ L["NONE"] = "無"
 L["GROUP"] = "小組"
 L["CLASS"] = "職業"
 L["ROLE"] = "職責"
+L["ASSIGNEDROLE"] = "分配職責"
 
 L["Sort By"] = "排序"
 L["INDEX"] = "順序"
 L["NAME"] = "名字"
+
+L["Orientation"] = "取向"
+L["HORIZONTAL"] = "水平"
+L["VERTICAL"] = "豎直"

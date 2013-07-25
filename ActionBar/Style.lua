@@ -10,7 +10,7 @@ IGAS:NewAddon "IGAS_UI.ActionBar"
 -- @name IFStyle
 -----------------------------------------------
 interface "IFStyle"
-	_PLAYER_CLASS_COLOR = IGAS:CopyTable(_G.RAID_CLASS_COLORS[select(2, UnitClass("player"))])
+	_PLAYER_CLASS_COLOR = _G.RAID_CLASS_COLORS[select(2, UnitClass("player"))]
 	_PLAYER_CLASS_COLOR.a = 0.8
 
 	_BackDrop = {

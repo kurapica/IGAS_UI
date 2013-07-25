@@ -8,6 +8,9 @@ SpellBookFrame = _G.SpellBookFrame
 MAX_SKILLLINE_TABS = _G.MAX_SKILLLINE_TABS
 BOOKTYPE_SPELL = _G.BOOKTYPE_SPELL
 
+NUM_RAID_GROUPS = _G.NUM_RAID_GROUPS
+MEMBERS_PER_RAID_GROUP = _G.MEMBERS_PER_RAID_GROUP
+
 _IGASUI_HELPFUL_SPELL = {}
 
 Toggle = {
@@ -87,6 +90,7 @@ function OnLoad(self)
 		_RaidPanelSet.ShowSolo = true
 		_RaidPanelSet.GroupBy = "GROUP"
 		_RaidPanelSet.SortBy = "INDEX"
+		_RaidPanelSet.Orientation = "HORIZONTAL"
 	end
 
 	if not next(_RaidPetPanelSet) then
@@ -96,6 +100,7 @@ function OnLoad(self)
 		_RaidPetPanelSet.ShowSolo = true
 		_RaidPetPanelSet.GroupBy = "GROUP"
 		_RaidPetPanelSet.SortBy = "INDEX"
+		_RaidPetPanelSet.Orientation = "HORIZONTAL"
 	end
 
 	if _DBChar.RaidPanelActivated == nil then
@@ -112,10 +117,18 @@ function OnLoad(self)
 
 	-- Load Config
 	for k, v in pairs(_RaidPanelSet) do
-		raidPanel[k] = v
+		if k == "Orientation" then
+			SetOrientation(raidPanel, v)
+		else
+			raidPanel[k] = v
+		end
 	end
 	for k, v in pairs(_RaidPetPanelSet) do
-		raidPetPanel[k] = v
+		if k == "Orientation" then
+			SetOrientation(raidPetPanel, v)
+		else
+			raidPetPanel[k] = v
+		end
 	end
 	raidpanelPropArray:Each(function(self)
 		if self.ConfigValue then
@@ -165,16 +178,11 @@ function OnLoad(self)
 		end
 	end)--]]
 
-	-- Used for RaidFrame updating
+	-- System Events
 	self:RegisterEvent("PLAYER_REGEN_DISABLED")
 	self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
 	self:RegisterEvent("PLAYER_LOGOUT")
 	self:RegisterEvent("LEARNED_SPELL_IN_TAB")
-	self:RegisterEvent("UPDATE_INSTANCE_INFO")
-	self:RegisterEvent("GROUP_ROSTER_UPDATE")
-	self:RegisterEvent("PARTY_LEADER_CHANGED")
-	self:RegisterEvent("VOICE_STATUS_UPDATE")
-	self:RegisterEvent("PARTY_LFG_RESTRICTED")
 
 	_LoadingConfig = GetSpecialization() or 1
 	if _DBChar[_LoadingConfig] then
@@ -197,15 +205,6 @@ function OnEnable(self)
 		System.Threading.Sleep(3)
 
 		IFNoCombatTaskHandler._RegisterNoCombatTask(function()
-			_G.RaidFrame:UnregisterEvent("READY_CHECK")
-			_G.RaidFrame:UnregisterEvent("READY_CHECK_CONFIRM")
-			_G.RaidFrame:UnregisterEvent("READY_CHECK_FINISHED")
-			_G.RaidFrame:UnregisterEvent("UPDATE_INSTANCE_INFO")
-			_G.RaidFrame:UnregisterEvent("GROUP_ROSTER_UPDATE")
-			_G.RaidFrame:UnregisterEvent("PARTY_LEADER_CHANGED")
-			_G.RaidFrame:UnregisterEvent("VOICE_STATUS_UPDATE")
-			_G.RaidFrame:UnregisterEvent("PARTY_LFG_RESTRICTED")
-
 			_G.CompactRaidFrameContainer:UnregisterAllEvents()
 			_G.CompactRaidFrameManager:UnregisterAllEvents()
 			_G.CompactRaidFrameManager:Show()
@@ -233,26 +232,6 @@ function OnEnable(self)
 			button:Enable()
 		end)
 	end)
-end
-
-function UPDATE_INSTANCE_INFO(self)
-	IFNoCombatTaskHandler._RegisterNoCombatTask(RaidFrame_OnEvent, _G.RaidFrame, "UPDATE_INSTANCE_INFO")
-end
-
-function GROUP_ROSTER_UPDATE(self)
-	IFNoCombatTaskHandler._RegisterNoCombatTask(RaidFrame_OnEvent, _G.RaidFrame, "GROUP_ROSTER_UPDATE")
-end
-
-function PARTY_LEADER_CHANGED(self)
-	IFNoCombatTaskHandler._RegisterNoCombatTask(RaidFrame_OnEvent, _G.RaidFrame, "PARTY_LEADER_CHANGED")
-end
-
-function VOICE_STATUS_UPDATE(self)
-	IFNoCombatTaskHandler._RegisterNoCombatTask(RaidFrame_OnEvent, _G.RaidFrame, "PARTY_LEADER_CHANGED")
-end
-
-function PARTY_LFG_RESTRICTED(self)
-	IFNoCombatTaskHandler._RegisterNoCombatTask(RaidFrame_OnEvent, _G.RaidFrame, "PARTY_LEADER_CHANGED")
 end
 
 function PLAYER_REGEN_DISABLED(self)
@@ -402,7 +381,11 @@ end
 
 function raidpanelPropArray:OnCheckChanged(index)
 	if raidPanelConfig.Visible and (self[index].Checked or not self[index].ConfigValue) then
-		self[index].UnitPanel[self[index].ConfigName] = self[index].ConfigValue or self[index].Checked
+		if self[index].ConfigName == "Orientation" then
+			SetOrientation(self[index].UnitPanel, self[index].ConfigValue)
+		else
+			self[index].UnitPanel[self[index].ConfigName] = self[index].ConfigValue or self[index].Checked
+		end
 
 		-- keep set
 		if self[index].UnitPanel == raidPanel then
@@ -437,7 +420,8 @@ function mnuRaidPetPanelDeactivateInRaid:OnCheckChanged()
 	end
 end
 
---[[function groupFilterArray:OnCheckChanged(index)
+--[[
+function groupFilterArray:OnCheckChanged(index)
 	if raidPanelConfig.Visible then
 		wipe(_GroupFilter)
 
@@ -485,7 +469,6 @@ function roleFilterArray:OnCheckChanged(index)
 	end
 end--]]
 
-
 --------------------
 -- Tool function
 --------------------
@@ -506,4 +489,16 @@ end
 
 function UpdateConfig4MenuBtn(mnuBtn, unitframe)
 	return UpdateConfig4UnitFrame(unitframe, mnuBtn)
+end
+
+function SetOrientation(self, value)
+	self.Orientation = value
+
+	if self.Orientation == "HORIZONTAL" then
+		self.RowCount = NUM_RAID_GROUPS
+		self.ColumnCount = MEMBERS_PER_RAID_GROUP
+	else
+		self.ColumnCount = NUM_RAID_GROUPS
+		self.RowCount = MEMBERS_PER_RAID_GROUP
+	end
 end
