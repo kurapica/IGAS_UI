@@ -90,7 +90,7 @@ function OnLoad(self)
 		_RaidPanelSet.ShowSolo = true
 		_RaidPanelSet.GroupBy = "GROUP"
 		_RaidPanelSet.SortBy = "INDEX"
-		_RaidPanelSet.Orientation = "HORIZONTAL"
+		_RaidPanelSet.Orientation = "VERTICAL"
 	end
 
 	if not next(_RaidPetPanelSet) then
@@ -100,7 +100,7 @@ function OnLoad(self)
 		_RaidPetPanelSet.ShowSolo = true
 		_RaidPetPanelSet.GroupBy = "GROUP"
 		_RaidPetPanelSet.SortBy = "INDEX"
-		_RaidPetPanelSet.Orientation = "HORIZONTAL"
+		_RaidPetPanelSet.Orientation = "VERTICAL"
 	end
 
 	if _DBChar.RaidPanelActivated == nil then
@@ -116,11 +116,16 @@ function OnLoad(self)
 	end
 
 	if _DBChar.PetPanelLocation == nil then
-		_DBChar.PetPanelLocation = "BOTTOM"
+		_DBChar.PetPanelLocation = "RIGHT"
 	end
 
 	-- Load Config
 	SetLocation(_DBChar.PetPanelLocation)
+	if _DBChar.PetPanelLocation == "BOTTOM" then
+		mnuRaidPetPanelLocationBottom.Checked = true
+	else
+		mnuRaidPetPanelLocationRight.Checked = true
+	end
 
 	for k, v in pairs(_RaidPanelSet) do
 		if k == "Orientation" then
