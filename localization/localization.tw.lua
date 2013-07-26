@@ -83,6 +83,10 @@ L["Pet panel"] = "寵物面板"
 L["Activated"] = "啟用"
 L["Deactivate in raid"] = "團隊中禁用"
 
+L["Location"] = "位置"
+L["Right"] = "右側"
+L["Bottom"] = "下側"
+
 L["Show"] = "顯示面板"
 L["Show in a raid"] = "在團隊中"
 L["Show in a party"] = "在小隊中"

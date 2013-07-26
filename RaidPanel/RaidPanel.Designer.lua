@@ -94,6 +94,15 @@ mnuRaidPetPanelActivated.IsCheckButton = true
 mnuRaidPetPanelDeactivateInRaid = raidPanelConfig:AddMenuButton(L"Pet panel", L"Deactivate in raid")
 mnuRaidPetPanelDeactivateInRaid.IsCheckButton = true
 
+-- Location
+mnuRaidPetPanelLocationRight = raidPanelConfig:AddMenuButton(L"Pet panel", L"Location", L"Right")
+mnuRaidPetPanelLocationRight.IsCheckButton = true
+
+mnuRaidPetPanelLocationBottom = raidPanelConfig:AddMenuButton(L"Pet panel", L"Location", L"Bottom")
+mnuRaidPetPanelLocationBottom.IsCheckButton = true
+
+raidPanelConfig:GetMenuButton(L"Pet panel", L"Location").DropDownList.MultiSelect = false
+
 -- Show ->
 ShowProperty = {"ShowRaid", "ShowParty", "ShowPlayer", "ShowSolo"}
 ShowLocale = {L"Show in a raid", L"Show in a party", L"Show the player in party", L"Show when solo",}

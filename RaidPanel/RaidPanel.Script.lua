@@ -115,7 +115,13 @@ function OnLoad(self)
 		_DBChar.RaidPetPanelDeactivateInRaid = true
 	end
 
+	if _DBChar.PetPanelLocation == nil then
+		_DBChar.PetPanelLocation = "BOTTOM"
+	end
+
 	-- Load Config
+	SetLocation(_DBChar.PetPanelLocation)
+
 	for k, v in pairs(_RaidPanelSet) do
 		if k == "Orientation" then
 			SetOrientation(raidPanel, v)
@@ -420,6 +426,18 @@ function mnuRaidPetPanelDeactivateInRaid:OnCheckChanged()
 	end
 end
 
+function mnuRaidPetPanelLocationRight:OnCheckChanged()
+	if raidPanelConfig.Visible and self.Checked then
+		SetLocation("RIGHT")
+	end
+end
+
+function mnuRaidPetPanelLocationBottom:OnCheckChanged()
+	if raidPanelConfig.Visible and self.Checked then
+		SetLocation("BOTTOM")
+	end
+end
+
 --[[
 function groupFilterArray:OnCheckChanged(index)
 	if raidPanelConfig.Visible then
@@ -501,4 +519,18 @@ function SetOrientation(self, value)
 		self.ColumnCount = NUM_RAID_GROUPS
 		self.RowCount = MEMBERS_PER_RAID_GROUP
 	end
+end
+
+function SetLocation(value)
+	_DBChar.PetPanelLocation = value
+
+	IFNoCombatTaskHandler._RegisterNoCombatTask(function()
+		if value == "RIGHT" then
+			raidPetPanel:ClearAllPoints()
+			raidPetPanel:SetPoint("TOPLEFT", raidPanel, "TOPRIGHT")
+		elseif value == "BOTTOM" then
+			raidPetPanel:ClearAllPoints()
+			raidPetPanel:SetPoint("TOPLEFT", raidPanel, "BOTTOMLEFT")
+		end
+	end)
 end

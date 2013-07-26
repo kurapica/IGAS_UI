@@ -1,3 +1,6 @@
+2013/07/26: v23-2
+	1. Pet panel's location can be changed by the menu.
+
 2013/07/25: v23
 	1. Update for IGAS v42. With the new group system provided by IGAS, the raid panel and pet panel's grouping and sorting should work well during combat.
 	2. Pet panel is moved to the bottom of the raid panel, all can be activated or deactived, more settings for pet panel is added.
