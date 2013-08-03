@@ -1,3 +1,6 @@
+2013/08/03: v24
+	1. A debuff panel should be shown on the target's nameplates, to reduce cost, only for target now. The size and alpha settings can be found in IGAS_UI.Definition.lua, TARGET_DEBUFF_SIZE is used to set the icon's size, and TARGET_DEBUFF_MAX_ALPHA_LIMIT is used to set the time limit when the icon's alpha should be max (the value 1).
+
 2013/07/26: v23-2
 	1. Pet panel's location can be changed by the menu.
 

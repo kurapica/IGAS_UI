@@ -9,12 +9,45 @@ _MaxNamePlate = 0
 ------------------------------------------------------
 -- Module Script Handler
 ------------------------------------------------------
-function OnLoad(self)
+_InChecking_Mode = false
 
+function OnLoad(self)
+	self:RegisterEvent("PLAYER_TARGET_CHANGED")
+	self:ActiveThread("OnEvent")
 end
 
 function OnEnable(self)
 	_Scan.Visible = true
+end
+
+function PLAYER_TARGET_CHANGED(self)
+	if _InChecking_Mode then return end
+
+	_InChecking_Mode = true
+
+	while UnitExists('target') do
+		Threading.Sleep(0.1)
+
+		local plate
+
+		for i = 1, #NamePlateArray do
+			plate = NamePlateArray[i].Parent
+
+			if plate.Visible and plate.Alpha > 0.9 then
+				TargetDebuffPanel.Parent = plate
+				TargetDebuffPanel:SetPoint("BOTTOM", plate, "TOP")
+				TargetDebuffPanel.Visible = true
+				TargetDebuffPanel:Refresh()
+
+				_InChecking_Mode = false
+
+				return
+			end
+		end
+	end
+
+	TargetDebuffPanel.Visible = false
+	_InChecking_Mode = false
 end
 
 ------------------------------------------------------

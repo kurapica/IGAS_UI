@@ -27,6 +27,10 @@ CASTBAR_COLOR = ColorType(0, 0, 0.8)
 ------------------------------------
 -- Buff & Debuff
 ------------------------------------
+-- Debuff size for target name plate
+TARGET_DEBUFF_SIZE = 42
+-- Max alpha for debuff length than, if set to 5, the icon should be max alpha if the debuff length than 5s
+TARGET_DEBUFF_MAX_ALPHA_LIMIT = 5
 -- Buff size for Unit Frame
 BUFF_SIZE = 24
 -- Need show buff list
