@@ -69,6 +69,12 @@ function _Scan:OnUpdate(elapsed)
 	end
 end
 
+function TargetDebuffPanel:OnHide()
+	if UnitExists('target') then
+		_M:ThreadCall(PLAYER_TARGET_CHANGED)
+	end
+end
+
 ------------------------------------------------------
 -- Helper Function
 ------------------------------------------------------

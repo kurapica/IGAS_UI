@@ -67,6 +67,8 @@ class "iDebuffPanel"
 		extend "IFCooldownLabel"
 
 		TARGET_DEBUFF_MAX_ALPHA_LIMIT = TARGET_DEBUFF_MAX_ALPHA_LIMIT
+		NORMAL_COLOR = ColorType(1, 1, 1)
+		LAST_COLOR = ColorType(1, 0.12, 0.12)
 
 		--[======[
 			@name AuraIcon
@@ -83,6 +85,13 @@ class "iDebuffPanel"
 				self.Parent.Alpha = 1
 			else
 				self.Parent.Alpha = text / TARGET_DEBUFF_MAX_ALPHA_LIMIT
+			end
+
+			--Mark the minimal icon
+			if text <= 5 then
+				self.TextColor = LAST_COLOR
+			else
+				self.TextColor = NORMAL_COLOR
 			end
 		end
 
@@ -195,7 +204,7 @@ class "iDebuffPanel"
 	function CustomFilter(self, unit, index, filter)
 		local name, _, _, _, _, duration, _, caster, _, _, spellID = UnitAura(unit, index, filter)
 
-		if name and duration > 0 and caster == "player" then
+		if name and duration > 0 and caster == "player" and name ~= UnitChannelInfo("player") then
 			return true
 		end
 	end
