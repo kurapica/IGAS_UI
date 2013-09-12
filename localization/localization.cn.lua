@@ -76,6 +76,7 @@ L["Raid roster indicator"] = "团队角色指示"
 L["Power bar"] = "能力资源条"
 L["Name indicator"] = "姓名指示"
 L["Range indicator"] = "距离指示"
+L["Heal Absorb"] = "治疗吸收"
 
 L["Raid panel"] = "团队面板"
 L["Pet panel"] = "宠物面板"
