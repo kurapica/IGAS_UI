@@ -84,6 +84,14 @@ raidpanelMenuArray = Array(DropDownList.DropDownMenuButton)
 --------------------------
 raidpanelPropArray = Array(DropDownList.DropDownMenuButton)
 
+-- Element Size
+mnuRaidPanelSizeWidth = raidPanelConfig:AddMenuButton(L"Element Size", "Width")
+mnuRaidPanelSizeHeight = raidPanelConfig:AddMenuButton(L"Element Size", "Height")
+mnuRaidPanelSizePowerHeight = raidPanelConfig:AddMenuButton(L"Element Size", "PowerHeight")
+mnuRaidPanelSizeWidth:ActiveThread("OnClick")
+mnuRaidPanelSizeHeight:ActiveThread("OnClick")
+mnuRaidPanelSizePowerHeight:ActiveThread("OnClick")
+
 -- Activated
 mnuRaidPanelActivated = raidPanelConfig:AddMenuButton(L"Raid panel", L"Activated")
 mnuRaidPanelActivated.IsCheckButton = true

@@ -119,6 +119,23 @@ function OnLoad(self)
 		_DBChar.PetPanelLocation = "RIGHT"
 	end
 
+	if _DBChar.ElementWidth then
+		raidPanel.ElementWidth = _DBChar.ElementWidth
+		raidPetPanel.ElementWidth = _DBChar.ElementWidth
+	end
+
+	mnuRaidPanelSizeWidth.Text = L"Width : " .. tostring(raidPanel.ElementWidth)
+
+	if _DBChar.ElementHeight then
+		raidPanel.ElementHeight = _DBChar.ElementHeight
+		raidPetPanel.ElementHeight = _DBChar.ElementHeight
+	end
+
+	mnuRaidPanelSizeHeight.Text = L"Height : " .. tostring(raidPanel.ElementHeight)
+
+	_DBChar.PowerHeight = _DBChar.PowerHeight or 3
+	mnuRaidPanelSizePowerHeight.Text = L"Power Height : " .. tostring(_DBChar.PowerHeight)
+
 	-- Load Config
 	SetLocation(_DBChar.PetPanelLocation)
 	if _DBChar.PetPanelLocation == "BOTTOM" then
@@ -375,10 +392,61 @@ end
 
 function raidPanel:OnElementAdd(unitframe)
 	raidpanelMenuArray:Each(UpdateConfig4MenuBtn, unitframe)
+	if iPowerBar then
+		unitframe:AddElement(iPowerBar, "south", _DBChar.PowerHeight, "px")
+	end
 end
 
 function raidPetPanel:OnElementAdd(unitframe)
 	raidpanelMenuArray:Each(UpdateConfig4MenuBtn, unitframe)
+end
+
+function mnuRaidPanelSizeWidth:OnClick()
+	local value = tonumber(IGAS:MsgBox(L"Please input the element's width(px)", "ic") or nil)
+
+	if value and value > 10 then
+		_DBChar.ElementWidth = value
+		raidPanel.ElementWidth = value
+		raidPetPanel.ElementWidth = value
+
+		self.Text = L"Width : " .. tostring(value)
+
+		if raidPanelMask.Visible then
+			raidPanelMask:SetSize(raidPanel:GetSize())
+		end
+	end
+end
+
+function mnuRaidPanelSizeHeight:OnClick()
+	local value = tonumber(IGAS:MsgBox(L"Please input the element's height(px)", "ic") or nil)
+
+	if value and value > _DBChar.PowerHeight then
+		_DBChar.ElementHeight = value
+		raidPanel.ElementHeight = value
+		raidPetPanel.ElementHeight = value
+
+		self.Text = L"Height : " .. tostring(value)
+
+		if raidPanelMask.Visible then
+			raidPanelMask:SetSize(raidPanel:GetSize())
+		end
+	end
+end
+
+function mnuRaidPanelSizePowerHeight:OnClick()
+	local value = tonumber(IGAS:MsgBox(L"Please input the power bar's height(px)", "ic") or nil)
+
+	if value and value > 0 and value < raidPanel.ElementHeight then
+		_DBChar.PowerHeight = value
+
+		if iPowerBar then
+			raidPanel:Each(function (self)
+				self:AddElement(iPowerBar, "south", _DBChar.PowerHeight, "px")
+			end)
+		end
+
+		self.Text = L"Power Height : " .. tostring(_DBChar.PowerHeight)
+	end
 end
 
 function raidpanelMenuArray:OnCheckChanged(index)

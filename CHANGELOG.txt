@@ -1,3 +1,7 @@
+2013/09/16：v26
+	1. New heal abosrb indicator for the raid panel(need v49 IGAS lib) .
+	2. New size settings for the raid panel, you can find them in the menu of the raid panel.
+
 2013/08/03: v25
 	1. Improve the display for the debuff panel on the target's nameplate.
 
