@@ -1,3 +1,6 @@
+2013/10/14: v27
+	1. Using SetVertexColor instead of SetTexture for shadow background, greatly reduce the memory increment.
+
 2013/09/16：v26
 	1. New heal abosrb indicator for the raid panel(need v49 IGAS lib) .
 	2. New size settings for the raid panel, you can find them in the menu of the raid panel.

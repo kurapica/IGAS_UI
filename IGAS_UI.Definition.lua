@@ -60,12 +60,13 @@ interface "iStatusBarStyle"
 	------------------------------------------------------
 	-- Method
 	------------------------------------------------------
+	local oldSetStatusBarColor = StatusBar.SetStatusBarColor
+
 	function SetStatusBarColor(self, r, g, b, a)
-	    if r and g and b then
-	        StatusBar.SetStatusBarColor(self, r, g, b)
-	        if self.Bg then
-	        	self.Bg:SetTexture(r * _BACK_MULTI, g * _BACK_MULTI, b * _BACK_MULTI, _BACK_ALPHA)
-	    	end
+	    if r then
+	        oldSetStatusBarColor(self, r, g, b)
+
+	        self.Bg:SetVertexColor(r * _BACK_MULTI, g * _BACK_MULTI, b * _BACK_MULTI, _BACK_ALPHA)
 	    end
 	end
 
@@ -76,7 +77,9 @@ interface "iStatusBarStyle"
 		self.StatusBarTexturePath = STATUSBAR_TEXTURE_PATH
 
 		local bgColor = Texture("Bg", self, "BACKGROUND")
+		bgColor:SetTexture(1, 1, 1, 1)
 		bgColor:SetAllPoints()
+		self.Bg = bgColor	-- For quick access
 
 		self.SetStatusBarColor = SetStatusBarColor
     end
