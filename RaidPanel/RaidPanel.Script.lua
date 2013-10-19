@@ -124,17 +124,17 @@ function OnLoad(self)
 		raidPetPanel.ElementWidth = _DBChar.ElementWidth
 	end
 
-	mnuRaidPanelSizeWidth.Text = L"Width : " .. tostring(raidPanel.ElementWidth)
+	mnuRaidPanelSetWidth.Text = L"Width : " .. tostring(raidPanel.ElementWidth)
 
 	if _DBChar.ElementHeight then
 		raidPanel.ElementHeight = _DBChar.ElementHeight
 		raidPetPanel.ElementHeight = _DBChar.ElementHeight
 	end
 
-	mnuRaidPanelSizeHeight.Text = L"Height : " .. tostring(raidPanel.ElementHeight)
+	mnuRaidPanelSetHeight.Text = L"Height : " .. tostring(raidPanel.ElementHeight)
 
 	_DBChar.PowerHeight = _DBChar.PowerHeight or 3
-	mnuRaidPanelSizePowerHeight.Text = L"Power Height : " .. tostring(_DBChar.PowerHeight)
+	mnuRaidPanelSetPowerHeight.Text = L"Power Height : " .. tostring(_DBChar.PowerHeight)
 
 	-- Load Config
 	SetLocation(_DBChar.PetPanelLocation)
@@ -169,7 +169,7 @@ function OnLoad(self)
 	mnuRaidPanelActivated.Checked = _DBChar.RaidPanelActivated
 	mnuRaidPetPanelActivated.Checked = _DBChar.RaidPetPanelActivated
 
-	--[[ Filter Settings
+	---[[ Filter Settings
 	_DBChar.GroupFilter = _DBChar.GroupFilter or {}
 	_DBChar.ClassFilter = _DBChar.ClassFilter or {}
 	_DBChar.RoleFilter = _DBChar.RoleFilter or {}
@@ -216,6 +216,9 @@ function OnLoad(self)
 	if _DBChar[_LoadingConfig] then
 		_IGASUI_SPELLHANDLER:Import(_DBChar[_LoadingConfig])
 	end
+
+	mnuRaidPanelSetUseClassColor.Checked = _DBChar.ElementUseClassColor
+	UpdateHealthBar4UseClassColor()
 
 	raidPanel:InitWithCount(25)
 	raidPanel.Activated = _DBChar.RaidPanelActivated
@@ -401,7 +404,7 @@ function raidPetPanel:OnElementAdd(unitframe)
 	raidpanelMenuArray:Each(UpdateConfig4MenuBtn, unitframe)
 end
 
-function mnuRaidPanelSizeWidth:OnClick()
+function mnuRaidPanelSetWidth:OnClick()
 	local value = tonumber(IGAS:MsgBox(L"Please input the element's width(px)", "ic") or nil)
 
 	if value and value > 10 then
@@ -417,7 +420,7 @@ function mnuRaidPanelSizeWidth:OnClick()
 	end
 end
 
-function mnuRaidPanelSizeHeight:OnClick()
+function mnuRaidPanelSetHeight:OnClick()
 	local value = tonumber(IGAS:MsgBox(L"Please input the element's height(px)", "ic") or nil)
 
 	if value and value > _DBChar.PowerHeight then
@@ -433,7 +436,7 @@ function mnuRaidPanelSizeHeight:OnClick()
 	end
 end
 
-function mnuRaidPanelSizePowerHeight:OnClick()
+function mnuRaidPanelSetPowerHeight:OnClick()
 	local value = tonumber(IGAS:MsgBox(L"Please input the power bar's height(px)", "ic") or nil)
 
 	if value and value > 0 and value < raidPanel.ElementHeight then
@@ -446,6 +449,14 @@ function mnuRaidPanelSizePowerHeight:OnClick()
 		end
 
 		self.Text = L"Power Height : " .. tostring(_DBChar.PowerHeight)
+	end
+end
+
+function mnuRaidPanelSetUseClassColor:OnCheckChanged()
+	if raidPanelConfig.Visible then
+		_DBChar.ElementUseClassColor = self.Checked
+
+		UpdateHealthBar4UseClassColor()
 	end
 end
 
@@ -511,7 +522,7 @@ function mnuRaidPetPanelLocationBottom:OnCheckChanged()
 	end
 end
 
---[[
+---[[
 function groupFilterArray:OnCheckChanged(index)
 	if raidPanelConfig.Visible then
 		wipe(_GroupFilter)
@@ -605,5 +616,15 @@ function SetLocation(value)
 			raidPetPanel:ClearAllPoints()
 			raidPetPanel:SetPoint("TOPLEFT", raidPanel, "BOTTOMLEFT")
 		end
+	end)
+end
+
+function UpdateHealthBar4UseClassColor()
+	local flag = _DBChar.ElementUseClassColor
+	raidPanel:Each(function(self)
+		self:GetElement(iHealthBar).UseClassColor = flag
+	end)
+	raidPetPanel:Each(function(self)
+		self:GetElement(iHealthBar).UseClassColor = flag
 	end)
 end

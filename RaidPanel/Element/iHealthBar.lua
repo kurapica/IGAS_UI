@@ -13,6 +13,9 @@ class "iHealthBar"
 	------------------------------------------------------
 	function iHealthBar(self)
 		self.UseDebuffColor = true
+		if _DBChar.ElementUseClassColor then
+			self.UseClassColor = true
+		end
 		self.FrameLevel = self.FrameLevel + 1
 	end
 endclass "iHealthBar"

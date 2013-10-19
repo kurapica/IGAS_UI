@@ -85,12 +85,14 @@ raidpanelMenuArray = Array(DropDownList.DropDownMenuButton)
 raidpanelPropArray = Array(DropDownList.DropDownMenuButton)
 
 -- Element Size
-mnuRaidPanelSizeWidth = raidPanelConfig:AddMenuButton(L"Element Size", "Width")
-mnuRaidPanelSizeHeight = raidPanelConfig:AddMenuButton(L"Element Size", "Height")
-mnuRaidPanelSizePowerHeight = raidPanelConfig:AddMenuButton(L"Element Size", "PowerHeight")
-mnuRaidPanelSizeWidth:ActiveThread("OnClick")
-mnuRaidPanelSizeHeight:ActiveThread("OnClick")
-mnuRaidPanelSizePowerHeight:ActiveThread("OnClick")
+mnuRaidPanelSetWidth = raidPanelConfig:AddMenuButton(L"Element Settings", "Width")
+mnuRaidPanelSetHeight = raidPanelConfig:AddMenuButton(L"Element Settings", "Height")
+mnuRaidPanelSetPowerHeight = raidPanelConfig:AddMenuButton(L"Element Settings", "PowerHeight")
+mnuRaidPanelSetUseClassColor = raidPanelConfig:AddMenuButton(L"Element Settings", L"Use Class Color")
+mnuRaidPanelSetWidth:ActiveThread("OnClick")
+mnuRaidPanelSetHeight:ActiveThread("OnClick")
+mnuRaidPanelSetPowerHeight:ActiveThread("OnClick")
+mnuRaidPanelSetUseClassColor.IsCheckButton = true
 
 -- Activated
 mnuRaidPanelActivated = raidPanelConfig:AddMenuButton(L"Raid panel", L"Activated")
@@ -198,17 +200,17 @@ end
 raidPanelConfig:GetMenuButton(L"Raid panel", L"Orientation").DropDownList.MultiSelect = false
 raidPanelConfig:GetMenuButton(L"Pet panel", L"Orientation").DropDownList.MultiSelect = false
 
---[[ Filter -> Group
+-- Filter -> Group
 groupFilterArray = Array(DropDownList.DropDownMenuButton)
 
 for i = 1, _G.NUM_RAID_GROUPS do
-	local groupFilter = raidPanelConfig:AddMenuButton(L"Filter", L"Group", tostring(i))
+	local groupFilter = raidPanelConfig:AddMenuButton(L"Raid panel", L"Filter", L"GROUP", tostring(i))
 	groupFilter.IsCheckButton = true
 	groupFilter.FilterValue = i
 	groupFilterArray:Insert(groupFilter)
 end
 
-raidPanelConfig:GetMenuButton(L"Filter", L"Group").DropDownList.MultiSelect = true
+raidPanelConfig:GetMenuButton(L"Raid panel", L"Filter", L"GROUP").DropDownList.MultiSelect = true
 
 -- Filter -> Class
 classFilterArray = Array(DropDownList.DropDownMenuButton)
@@ -226,13 +228,13 @@ for _, v in ipairs({
 		"MONK",
 		"DRUID",
 	}) do
-	local classFilter = raidPanelConfig:AddMenuButton(L"Filter", L"Class", L[v])
+	local classFilter = raidPanelConfig:AddMenuButton(L"Raid panel", L"Filter", L"CLASS", L[v])
 	classFilter.IsCheckButton = true
 	classFilter.FilterValue = v
 	classFilterArray:Insert(classFilter)
 end
 
-raidPanelConfig:GetMenuButton(L"Filter", L"Class").DropDownList.MultiSelect = true
+raidPanelConfig:GetMenuButton(L"Raid panel", L"Filter", L"CLASS").DropDownList.MultiSelect = true
 
 -- Filter -> Role
 roleFilterArray = Array(DropDownList.DropDownMenuButton)
@@ -245,11 +247,11 @@ for _, v in ipairs({
 		"DAMAGER",
 		"NONE"
 	}) do
-	local roleFilter = raidPanelConfig:AddMenuButton(L"Filter", L"Role", L[v])
+	local roleFilter = raidPanelConfig:AddMenuButton(L"Raid panel", L"Filter", L"ROLE", L[v])
 	roleFilter.IsCheckButton = true
 	roleFilter.FilterValue = v
 	roleFilterArray:Insert(roleFilter)
 end
 
-raidPanelConfig:GetMenuButton(L"Filter", L"Role").DropDownList.MultiSelect = true
+raidPanelConfig:GetMenuButton(L"Raid panel", L"Filter", L"ROLE").DropDownList.MultiSelect = true
 --]]

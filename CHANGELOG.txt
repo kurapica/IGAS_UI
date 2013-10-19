@@ -1,3 +1,7 @@
+2013/10/19: v28
+	1. You can choose using class color or not for the raid panel.
+	2. You can choose filter for the raid panel on the menu.
+
 2013/10/14: v27
 	1. Using SetVertexColor instead of SetTexture for shadow background, greatly reduce the memory increment.
 
