@@ -82,6 +82,9 @@ function OnLoad(self)
 	_DBChar.RaidPetPanelSet = _DBChar.RaidPetPanelSet or {}
 	_RaidPetPanelSet = _DBChar.RaidPetPanelSet
 
+	_DBChar.RaidDeadPanelSet = _DBChar.RaidDeadPanelSet or {}
+	_RaidDeadPanelSet = _DBChar.RaidDeadPanelSet
+
 	-- Default settings
 	if not next(_RaidPanelSet) then
 		_RaidPanelSet.ShowRaid = true
@@ -100,7 +103,17 @@ function OnLoad(self)
 		_RaidPetPanelSet.ShowSolo = true
 		_RaidPetPanelSet.GroupBy = "GROUP"
 		_RaidPetPanelSet.SortBy = "INDEX"
-		_RaidPetPanelSet.Orientation = "VERTICAL"
+		_RaidPetPanelSet.Orientation = "HORIZONTAL"
+	end
+
+	if not next(_RaidDeadPanelSet) then
+		_RaidDeadPanelSet.ShowRaid = true
+		_RaidDeadPanelSet.ShowParty = false
+		_RaidDeadPanelSet.ShowPlayer = false
+		_RaidDeadPanelSet.ShowSolo = false
+		_RaidDeadPanelSet.GroupBy = "GROUP"
+		_RaidDeadPanelSet.SortBy = "INDEX"
+		_RaidDeadPanelSet.Orientation = "HORIZONTAL"
 	end
 
 	if _DBChar.RaidPanelActivated == nil then
@@ -115,6 +128,10 @@ function OnLoad(self)
 		_DBChar.RaidPetPanelDeactivateInRaid = true
 	end
 
+	if _DBChar.RaidDeadPanelActivated == nil then
+		_DBChar.RaidDeadPanelActivated = false
+	end
+
 	if _DBChar.PetPanelLocation == nil then
 		_DBChar.PetPanelLocation = "RIGHT"
 	end
@@ -122,6 +139,7 @@ function OnLoad(self)
 	if _DBChar.ElementWidth then
 		raidPanel.ElementWidth = _DBChar.ElementWidth
 		raidPetPanel.ElementWidth = _DBChar.ElementWidth
+		raidDeadPanel.ElementWidth = _DBChar.ElementWidth
 	end
 
 	mnuRaidPanelSetWidth.Text = L"Width : " .. tostring(raidPanel.ElementWidth)
@@ -129,6 +147,7 @@ function OnLoad(self)
 	if _DBChar.ElementHeight then
 		raidPanel.ElementHeight = _DBChar.ElementHeight
 		raidPetPanel.ElementHeight = _DBChar.ElementHeight
+		raidDeadPanel.ElementHeight = _DBChar.ElementHeight
 	end
 
 	mnuRaidPanelSetHeight.Text = L"Height : " .. tostring(raidPanel.ElementHeight)
@@ -158,6 +177,13 @@ function OnLoad(self)
 			raidPetPanel[k] = v
 		end
 	end
+	for k, v in pairs(_RaidDeadPanelSet) do
+		if k == "Orientation" then
+			SetOrientation(raidDeadPanel, v)
+		else
+			raidDeadPanel[k] = v
+		end
+	end
 	raidpanelPropArray:Each(function(self)
 		if self.ConfigValue then
 			self.Checked = (self.UnitPanel[self.ConfigName] == self.ConfigValue)
@@ -168,8 +194,9 @@ function OnLoad(self)
 	mnuRaidPetPanelDeactivateInRaid.Checked = _DBChar.RaidPetPanelDeactivateInRaid
 	mnuRaidPanelActivated.Checked = _DBChar.RaidPanelActivated
 	mnuRaidPetPanelActivated.Checked = _DBChar.RaidPetPanelActivated
+	mnuRaidDeadPanelActivated.Checked = _DBChar.RaidDeadPanelActivated
 
-	---[[ Filter Settings
+	-- Filter Settings
 	_DBChar.GroupFilter = _DBChar.GroupFilter or {}
 	_DBChar.ClassFilter = _DBChar.ClassFilter or {}
 	_DBChar.RoleFilter = _DBChar.RoleFilter or {}
@@ -204,7 +231,44 @@ function OnLoad(self)
 				break
 			end
 		end
-	end)--]]
+	end)
+
+	-- Filter for dead
+	_DBChar.DeadGroupFilter = _DBChar.DeadGroupFilter or {}
+	_DBChar.DeadClassFilter = _DBChar.DeadClassFilter or {}
+	_DBChar.DeadRoleFilter = _DBChar.DeadRoleFilter or {}
+	_DeadGroupFilter = _DBChar.DeadGroupFilter
+	_DeadClassFilter = _DBChar.DeadClassFilter
+	_DeadRoleFilter = _DBChar.DeadRoleFilter
+
+	raidDeadPanel.GroupFilter = _DeadGroupFilter
+	raidDeadPanel.ClassFilter = _DeadClassFilter
+	raidDeadPanel.RoleFilter = _DeadRoleFilter
+
+	groupDeadFilterArray:Each(function(self)
+		for _, v in ipairs(_DeadGroupFilter) do
+			if v == self.FilterValue then
+				self.Checked = true
+				break
+			end
+		end
+	end)
+	classDeadFilterArray:Each(function(self)
+		for _, v in ipairs(_DeadClassFilter) do
+			if v == self.FilterValue then
+				self.Checked = true
+				break
+			end
+		end
+	end)
+	roleDeadFilterArray:Each(function(self)
+		for _, v in ipairs(_DeadRoleFilter) do
+			if v == self.FilterValue then
+				self.Checked = true
+				break
+			end
+		end
+	end)
 
 	-- System Events
 	self:RegisterEvent("PLAYER_REGEN_DISABLED")
@@ -226,6 +290,9 @@ function OnLoad(self)
 	raidPetPanel:InitWithCount(10)
 	raidPetPanel.DeactivateInRaid = _DBChar.RaidPetPanelDeactivateInRaid
 	raidPetPanel.Activated = _DBChar.RaidPetPanelActivated
+
+	raidDeadPanel:InitWithCount(10)
+	raidDeadPanel.Activated = _DBChar.RaidDeadPanelActivated
 end
 
 function OnEnable(self)
@@ -411,6 +478,7 @@ function mnuRaidPanelSetWidth:OnClick()
 		_DBChar.ElementWidth = value
 		raidPanel.ElementWidth = value
 		raidPetPanel.ElementWidth = value
+		raidDeadPanel.ElementWidth = value
 
 		self.Text = L"Width : " .. tostring(value)
 
@@ -427,6 +495,7 @@ function mnuRaidPanelSetHeight:OnClick()
 		_DBChar.ElementHeight = value
 		raidPanel.ElementHeight = value
 		raidPetPanel.ElementHeight = value
+		raidDeadPanel.ElementHeight = value
 
 		self.Text = L"Height : " .. tostring(value)
 
@@ -480,8 +549,10 @@ function raidpanelPropArray:OnCheckChanged(index)
 		-- keep set
 		if self[index].UnitPanel == raidPanel then
 			_RaidPanelSet[self[index].ConfigName] = raidPanel[self[index].ConfigName]
-		else
+		elseif self[index].UnitPanel == raidPetPanel then
 			_RaidPetPanelSet[self[index].ConfigName] = raidPetPanel[self[index].ConfigName]
+		elseif self[index].UnitPanel == raidDeadPanel then
+			_RaidDeadPanelSet[self[index].ConfigName] = raidDeadPanel[self[index].ConfigName]
 		end
 	end
 end
@@ -510,6 +581,14 @@ function mnuRaidPetPanelDeactivateInRaid:OnCheckChanged()
 	end
 end
 
+function mnuRaidDeadPanelActivated:OnCheckChanged()
+	if raidPanelConfig.Visible then
+		_DBChar.RaidDeadPanelActivated = self.Checked
+
+		raidDeadPanel.Activated = _DBChar.RaidDeadPanelActivated
+	end
+end
+
 function mnuRaidPetPanelLocationRight:OnCheckChanged()
 	if raidPanelConfig.Visible and self.Checked then
 		SetLocation("RIGHT")
@@ -522,7 +601,6 @@ function mnuRaidPetPanelLocationBottom:OnCheckChanged()
 	end
 end
 
----[[
 function groupFilterArray:OnCheckChanged(index)
 	if raidPanelConfig.Visible then
 		wipe(_GroupFilter)
@@ -569,7 +647,55 @@ function roleFilterArray:OnCheckChanged(index)
 
 		raidPanel:Refresh()
 	end
-end--]]
+end
+
+function groupDeadFilterArray:OnCheckChanged(index)
+	if raidPanelConfig.Visible then
+		wipe(_DeadGroupFilter)
+
+		for _, filter in ipairs(self) do
+			if filter.Checked then
+				tinsert(_DeadGroupFilter, filter.FilterValue)
+			end
+		end
+
+		raidDeadPanel.GroupFilter = _DeadGroupFilter
+
+		raidDeadPanel:Refresh()
+	end
+end
+
+function classDeadFilterArray:OnCheckChanged(index)
+	if raidPanelConfig.Visible then
+		wipe(_DeadClassFilter)
+
+		for _, filter in ipairs(self) do
+			if filter.Checked then
+				tinsert(_DeadClassFilter, filter.FilterValue)
+			end
+		end
+
+		raidDeadPanel.ClassFilter = _DeadClassFilter
+
+		raidDeadPanel:Refresh()
+	end
+end
+
+function roleDeadFilterArray:OnCheckChanged(index)
+	if raidPanelConfig.Visible then
+		wipe(_DeadRoleFilter)
+
+		for _, filter in ipairs(self) do
+			if filter.Checked then
+				tinsert(_DeadRoleFilter, filter.FilterValue)
+			end
+		end
+
+		raidDeadPanel.RoleFilter = _DeadRoleFilter
+
+		raidDeadPanel:Refresh()
+	end
+end
 
 --------------------
 -- Tool function
@@ -612,9 +738,15 @@ function SetLocation(value)
 		if value == "RIGHT" then
 			raidPetPanel:ClearAllPoints()
 			raidPetPanel:SetPoint("TOPLEFT", raidPanel, "TOPRIGHT")
+
+			raidDeadPanel:ClearAllPoints()
+			raidDeadPanel:SetPoint("TOPLEFT", raidPanel, "BOTTOMLEFT")
 		elseif value == "BOTTOM" then
 			raidPetPanel:ClearAllPoints()
 			raidPetPanel:SetPoint("TOPLEFT", raidPanel, "BOTTOMLEFT")
+
+			raidDeadPanel:ClearAllPoints()
+			raidDeadPanel:SetPoint("TOPLEFT", raidPetPanel, "BOTTOMLEFT")
 		end
 	end)
 end
@@ -625,6 +757,9 @@ function UpdateHealthBar4UseClassColor()
 		self:GetElement(iHealthBar).UseClassColor = flag
 	end)
 	raidPetPanel:Each(function(self)
+		self:GetElement(iHealthBar).UseClassColor = flag
+	end)
+	raidDeadPanel:Each(function(self)
 		self:GetElement(iHealthBar).UseClassColor = flag
 	end)
 end

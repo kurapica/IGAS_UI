@@ -68,4 +68,22 @@ partclass "iRaidUnitFrame"
 	extend "IFINameLabel"
 endclass "iRaidUnitFrame"
 
+interface "IFDeadNameLabel"
+	------------------------------------------------------
+	-- Initialize
+	------------------------------------------------------
+    function IFDeadNameLabel(self)
+		self:AddElement(NameLabel)
+		self.NameLabel:SetPoint("TOPLEFT", 2, -2)
+		self.NameLabel:SetPoint("TOPRIGHT", -2, -2)
+
+		self.NameLabel.UseClassColor = true
+		self.NameLabel.DrawLayer = "BORDER"
+    end
+endinterface "IFDeadNameLabel"
+
+partclass "iDeadUnitFrame"
+	extend "IFDeadNameLabel"
+endclass "iDeadUnitFrame"
+
 AddType4Config(iNameLabel, L"Name indicator")

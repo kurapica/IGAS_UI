@@ -137,3 +137,5 @@ L["MAINASSIST"] = "副坦克"
 L["TANK"] = "坦克"
 L["HEALER"] = "治疗"
 L["DAMAGER"] = "伤害"
+
+L["Dead panel"] = "死者面板"

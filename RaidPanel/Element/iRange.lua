@@ -24,4 +24,8 @@ partclass "iRaidUnitFrame"
 	extend "IFIRange"
 endclass "iRaidUnitFrame"
 
+partclass "iDeadUnitFrame"
+	extend "IFIRange"
+endclass "iDeadUnitFrame"
+
 AddType4Config(RangeChecker, L"Range indicator")

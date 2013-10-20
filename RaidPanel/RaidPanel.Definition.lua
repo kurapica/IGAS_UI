@@ -14,8 +14,6 @@ class "iRaidUnitFrame"
 	inherit "UnitFrame"
 	extend "IFSpellHandler"
 
-	_IGASUI_RAIDPANEL_GROUP = _IGASUI_RAIDPANEL_GROUP
-
 	------------------------------------------------------
 	-- Property
 	------------------------------------------------------
@@ -29,6 +27,24 @@ class "iRaidUnitFrame"
 		self.Panel.VSpacing = 1
 	end
 endclass "iRaidUnitFrame"
+
+class "iDeadUnitFrame"
+	inherit "UnitFrame"
+	extend "IFSpellHandler"
+
+	------------------------------------------------------
+	-- Property
+	------------------------------------------------------
+	property "IFSpellHandlerGroup" {
+		Get = function(self)
+			return _IGASUI_RAIDPANEL_GROUP
+		end,
+	}
+
+	function iDeadUnitFrame(self)
+		self.Panel.VSpacing = 1
+	end
+endclass "iDeadUnitFrame"
 
 class "BindingButton"
 	inherit "Mask"

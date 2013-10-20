@@ -21,7 +21,6 @@ raidPanel = UnitPanel("IGAS_UI_RAIDPANEL")
 raidPanel:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 0, -300)
 raidPanel.ElementType = iRaidUnitFrame
 raidPanel.ElementPrefix = "iRaidUnitFrame"
-raidPanel.KeepMaxPlayer = true
 raidPanel.VSpacing = 3
 raidPanel.HSpacing = 3
 raidPanel.MarginTop = 3
@@ -42,6 +41,18 @@ raidPetPanel.MarginTop = 3
 raidPetPanel.MarginBottom = 3
 raidPetPanel.MarginLeft = 3
 raidPetPanel.MarginRight = 3
+
+raidDeadPanel = UnitPanel("IGAS_UI_DEADPANEL")
+raidDeadPanel:SetPoint("TOPLEFT", raidPetPanel, "BOTTOMLEFT")
+raidDeadPanel.ElementType = iDeadUnitFrame
+raidDeadPanel.ElementPrefix = "iRaidDeadUnitFrame"
+raidDeadPanel.ShowDeadOnly = true
+raidDeadPanel.VSpacing = 3
+raidDeadPanel.HSpacing = 3
+raidDeadPanel.MarginTop = 3
+raidDeadPanel.MarginBottom = 3
+raidDeadPanel.MarginLeft = 3
+raidDeadPanel.MarginRight = 3
 
 -- withPanel
 withPanel = Frame("IGASUI_Withpanel", SpellBookFrame)
@@ -104,6 +115,9 @@ mnuRaidPetPanelActivated.IsCheckButton = true
 mnuRaidPetPanelDeactivateInRaid = raidPanelConfig:AddMenuButton(L"Pet panel", L"Deactivate in raid")
 mnuRaidPetPanelDeactivateInRaid.IsCheckButton = true
 
+mnuRaidDeadPanelActivated = raidPanelConfig:AddMenuButton(L"Dead panel", L"Activated")
+mnuRaidDeadPanelActivated.IsCheckButton = true
+
 -- Location
 mnuRaidPetPanelLocationRight = raidPanelConfig:AddMenuButton(L"Pet panel", L"Location", L"Right")
 mnuRaidPetPanelLocationRight.IsCheckButton = true
@@ -129,13 +143,21 @@ for i, v in ipairs(ShowProperty) do
 	show.IsCheckButton = true
 	show.ConfigName = v
 	raidpanelPropArray:Insert(show)
+
+	show = raidPanelConfig:AddMenuButton(L"Dead panel", L"Show", ShowLocale[i])
+	show.UnitPanel = raidDeadPanel
+	show.IsCheckButton = true
+	show.ConfigName = v
+	raidpanelPropArray:Insert(show)
 end
 
 raidPanelConfig:GetMenuButton(L"Raid panel").DropDownList.MultiSelect = true
 raidPanelConfig:GetMenuButton(L"Pet panel").DropDownList.MultiSelect = true
+raidPanelConfig:GetMenuButton(L"Dead panel").DropDownList.MultiSelect = true
 
 raidPanelConfig:GetMenuButton(L"Raid panel", L"Show").DropDownList.MultiSelect = true
 raidPanelConfig:GetMenuButton(L"Pet panel", L"Show").DropDownList.MultiSelect = true
+raidPanelConfig:GetMenuButton(L"Dead panel", L"Show").DropDownList.MultiSelect = true
 
 ShowProperty = nil
 ShowLocale = nil
@@ -155,10 +177,18 @@ for _, v in ipairs(System.Reflector.GetEnums(IFGroup.GroupType)) do
 	groupBy.ConfigName = "GroupBy"
 	groupBy.ConfigValue = v
 	raidpanelPropArray:Insert(groupBy)
+
+	groupBy = raidPanelConfig:AddMenuButton(L"Dead panel", L"Group By", L[v])
+	groupBy.UnitPanel = raidDeadPanel
+	groupBy.IsCheckButton = true
+	groupBy.ConfigName = "GroupBy"
+	groupBy.ConfigValue = v
+	raidpanelPropArray:Insert(groupBy)
 end
 
 raidPanelConfig:GetMenuButton(L"Raid panel", L"Group By").DropDownList.MultiSelect = false
 raidPanelConfig:GetMenuButton(L"Pet panel", L"Group By").DropDownList.MultiSelect = false
+raidPanelConfig:GetMenuButton(L"Dead panel", L"Group By").DropDownList.MultiSelect = false
 
 -- Sort ->
 for _, v in ipairs(System.Reflector.GetEnums(IFGroup.SortType)) do
@@ -175,10 +205,18 @@ for _, v in ipairs(System.Reflector.GetEnums(IFGroup.SortType)) do
 	sortBy.ConfigName = "SortBy"
 	sortBy.ConfigValue = v
 	raidpanelPropArray:Insert(sortBy)
+
+	sortBy = raidPanelConfig:AddMenuButton(L"Dead panel", L"Sort By", L[v])
+	sortBy.UnitPanel = raidDeadPanel
+	sortBy.IsCheckButton = true
+	sortBy.ConfigName = "SortBy"
+	sortBy.ConfigValue = v
+	raidpanelPropArray:Insert(sortBy)
 end
 
 raidPanelConfig:GetMenuButton(L"Raid panel", L"Sort By").DropDownList.MultiSelect = false
 raidPanelConfig:GetMenuButton(L"Pet panel", L"Sort By").DropDownList.MultiSelect = false
+raidPanelConfig:GetMenuButton(L"Dead panel", L"Sort By").DropDownList.MultiSelect = false
 
 -- Orientation
 for _, v in ipairs(System.Reflector.GetEnums(Orientation)) do
@@ -195,12 +233,20 @@ for _, v in ipairs(System.Reflector.GetEnums(Orientation)) do
 	orientation.ConfigName = "Orientation"
 	orientation.ConfigValue = v
 	raidpanelPropArray:Insert(orientation)
+
+	orientation = raidPanelConfig:AddMenuButton(L"Dead panel", L"Orientation", L[v])
+	orientation.UnitPanel = raidDeadPanel
+	orientation.IsCheckButton = true
+	orientation.ConfigName = "Orientation"
+	orientation.ConfigValue = v
+	raidpanelPropArray:Insert(orientation)
 end
 
 raidPanelConfig:GetMenuButton(L"Raid panel", L"Orientation").DropDownList.MultiSelect = false
 raidPanelConfig:GetMenuButton(L"Pet panel", L"Orientation").DropDownList.MultiSelect = false
+raidPanelConfig:GetMenuButton(L"Dead panel", L"Orientation").DropDownList.MultiSelect = false
 
--- Filter -> Group
+-- Raid -> Filter -> Group
 groupFilterArray = Array(DropDownList.DropDownMenuButton)
 
 for i = 1, _G.NUM_RAID_GROUPS do
@@ -212,7 +258,7 @@ end
 
 raidPanelConfig:GetMenuButton(L"Raid panel", L"Filter", L"GROUP").DropDownList.MultiSelect = true
 
--- Filter -> Class
+-- Raid -> Filter -> Class
 classFilterArray = Array(DropDownList.DropDownMenuButton)
 
 for _, v in ipairs({
@@ -236,7 +282,7 @@ end
 
 raidPanelConfig:GetMenuButton(L"Raid panel", L"Filter", L"CLASS").DropDownList.MultiSelect = true
 
--- Filter -> Role
+-- Raid -> Filter -> Role
 roleFilterArray = Array(DropDownList.DropDownMenuButton)
 
 for _, v in ipairs({
@@ -254,4 +300,58 @@ for _, v in ipairs({
 end
 
 raidPanelConfig:GetMenuButton(L"Raid panel", L"Filter", L"ROLE").DropDownList.MultiSelect = true
---]]
+
+-- Dead -> Filter -> Group
+groupDeadFilterArray = Array(DropDownList.DropDownMenuButton)
+
+for i = 1, _G.NUM_RAID_GROUPS do
+	local groupFilter = raidPanelConfig:AddMenuButton(L"Dead panel", L"Filter", L"GROUP", tostring(i))
+	groupFilter.IsCheckButton = true
+	groupFilter.FilterValue = i
+	groupDeadFilterArray:Insert(groupFilter)
+end
+
+raidPanelConfig:GetMenuButton(L"Dead panel", L"Filter", L"GROUP").DropDownList.MultiSelect = true
+
+-- Dead -> Filter -> Class
+classDeadFilterArray = Array(DropDownList.DropDownMenuButton)
+
+for _, v in ipairs({
+		"WARRIOR",
+		"PALADIN",
+		"HUNTER",
+		"ROGUE",
+		"PRIEST",
+		"DEATHKNIGHT",
+		"SHAMAN",
+		"MAGE",
+		"WARLOCK",
+		"MONK",
+		"DRUID",
+	}) do
+	local classFilter = raidPanelConfig:AddMenuButton(L"Dead panel", L"Filter", L"CLASS", L[v])
+	classFilter.IsCheckButton = true
+	classFilter.FilterValue = v
+	classDeadFilterArray:Insert(classFilter)
+end
+
+raidPanelConfig:GetMenuButton(L"Dead panel", L"Filter", L"CLASS").DropDownList.MultiSelect = true
+
+-- Dead -> Filter -> Role
+roleDeadFilterArray = Array(DropDownList.DropDownMenuButton)
+
+for _, v in ipairs({
+		"MAINTANK",
+		"MAINASSIST",
+		"TANK",
+		"HEALER",
+		"DAMAGER",
+		"NONE"
+	}) do
+	local roleFilter = raidPanelConfig:AddMenuButton(L"Dead panel", L"Filter", L"ROLE", L[v])
+	roleFilter.IsCheckButton = true
+	roleFilter.FilterValue = v
+	roleDeadFilterArray:Insert(roleFilter)
+end
+
+raidPanelConfig:GetMenuButton(L"Dead panel", L"Filter", L"ROLE").DropDownList.MultiSelect = true

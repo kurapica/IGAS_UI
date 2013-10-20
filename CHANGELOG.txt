@@ -1,3 +1,6 @@
+2013/10/20: v29
+	1. New Dead panel added to the RaidPanel, only show the dead players in the raid(party), default deactivated. Also a menu added to support it.
+
 2013/10/19: v28
 	1. You can choose using class color or not for the raid panel.
 	2. You can choose filter for the raid panel on the menu.

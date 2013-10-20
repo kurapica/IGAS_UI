@@ -18,4 +18,8 @@ partclass "iRaidUnitFrame"
 	extend "IFIResurrect"
 endclass "iRaidUnitFrame"
 
+partclass "iDeadUnitFrame"
+	extend "IFIResurrect"
+endclass "iDeadUnitFrame"
+
 AddType4Config(ResurrectIcon, L"Resurrect indicator")

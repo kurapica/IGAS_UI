@@ -18,4 +18,8 @@ partclass "iRaidUnitFrame"
 	extend "IFIConnect"
 endclass "iRaidUnitFrame"
 
+partclass "iDeadUnitFrame"
+	extend "IFIConnect"
+endclass "iDeadUnitFrame"
+
 AddType4Config(DisconnectIcon, L"Disconnect indicator")

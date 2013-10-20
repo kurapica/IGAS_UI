@@ -42,6 +42,19 @@ partclass "iRaidUnitFrame"
 	extend "IFIHealthBar"
 endclass "iRaidUnitFrame"
 
+interface "IFDeadHealthBar"
+	------------------------------------------------------
+	-- Initialize
+	------------------------------------------------------
+    function IFDeadHealthBar(self)
+		self:AddElement(iHealthBar, "rest")
+    end
+endinterface "IFDeadHealthBar"
+
+partclass "iDeadUnitFrame"
+	extend "IFDeadHealthBar"
+endclass "iDeadUnitFrame"
+
 AddType4Config(MyHealPredictionBar, L"My heal prediction")
 AddType4Config(AllHealPredictionBar, L"All heal prediction")
 AddType4Config(TotalAbsorbBar, L"Total Absorb")
