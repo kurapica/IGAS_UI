@@ -56,7 +56,7 @@ interface "IFIDebuffPanel"
     end
 endinterface "IFIDebuffPanel"
 
-partclass "iRaidUnitFrame"
+class "iRaidUnitFrame"
 	extend "IFIDebuffPanel"
 endclass "iRaidUnitFrame"
 

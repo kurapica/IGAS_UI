@@ -28,6 +28,6 @@ interface "IFStyle"
     end
 endinterface "IFStyle"
 
-partclass "IActionButton"
+class "IActionButton"
 	extend "IFStyle"
 endclass "IActionButton"

@@ -14,7 +14,7 @@ interface "IFIRaidRosterIcon"
     end
 endinterface "IFIRaidRosterIcon"
 
-partclass "iRaidUnitFrame"
+class "iRaidUnitFrame"
 	extend "IFIRaidRosterIcon"
 endclass "iRaidUnitFrame"
 

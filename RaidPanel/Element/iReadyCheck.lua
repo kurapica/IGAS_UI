@@ -14,7 +14,7 @@ interface "IFIReadyCheck"
     end
 endinterface "IFIReadyCheck"
 
-partclass "iRaidUnitFrame"
+class "iRaidUnitFrame"
 	extend "IFIReadyCheck"
 endclass "iRaidUnitFrame"
 

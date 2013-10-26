@@ -54,7 +54,7 @@ interface "IFIBuffPanel"
     end
 endinterface "IFIBuffPanel"
 
-partclass "iRaidUnitFrame"
+class "iRaidUnitFrame"
 	extend "IFIBuffPanel"
 endclass "iRaidUnitFrame"
 

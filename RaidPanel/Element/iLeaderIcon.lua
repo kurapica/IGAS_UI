@@ -14,7 +14,7 @@ interface "IFILeaderIcon"
     end
 endinterface "IFILeaderIcon"
 
-partclass "iRaidUnitFrame"
+class "iRaidUnitFrame"
 	extend "IFILeaderIcon"
 endclass "iRaidUnitFrame"
 

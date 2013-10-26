@@ -14,11 +14,11 @@ interface "IFIConnect"
     end
 endinterface "IFIConnect"
 
-partclass "iRaidUnitFrame"
+class "iRaidUnitFrame"
 	extend "IFIConnect"
 endclass "iRaidUnitFrame"
 
-partclass "iDeadUnitFrame"
+class "iDeadUnitFrame"
 	extend "IFIConnect"
 endclass "iDeadUnitFrame"
 

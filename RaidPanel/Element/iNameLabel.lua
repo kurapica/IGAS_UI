@@ -64,7 +64,7 @@ interface "IFINameLabel"
     end
 endinterface "IFINameLabel"
 
-partclass "iRaidUnitFrame"
+class "iRaidUnitFrame"
 	extend "IFINameLabel"
 endclass "iRaidUnitFrame"
 
@@ -82,7 +82,7 @@ interface "IFDeadNameLabel"
     end
 endinterface "IFDeadNameLabel"
 
-partclass "iDeadUnitFrame"
+class "iDeadUnitFrame"
 	extend "IFDeadNameLabel"
 endclass "iDeadUnitFrame"
 

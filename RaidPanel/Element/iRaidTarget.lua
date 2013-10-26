@@ -14,7 +14,7 @@ interface "IFIRaidTarget"
     end
 endinterface "IFIRaidTarget"
 
-partclass "iRaidUnitFrame"
+class "iRaidUnitFrame"
 	extend "IFIRaidTarget"
 endclass "iRaidUnitFrame"
 

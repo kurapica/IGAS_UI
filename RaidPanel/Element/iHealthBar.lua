@@ -38,7 +38,7 @@ interface "IFIHealthBar"
     end
 endinterface "IFIHealthBar"
 
-partclass "iRaidUnitFrame"
+class "iRaidUnitFrame"
 	extend "IFIHealthBar"
 endclass "iRaidUnitFrame"
 
@@ -51,7 +51,7 @@ interface "IFDeadHealthBar"
     end
 endinterface "IFDeadHealthBar"
 
-partclass "iDeadUnitFrame"
+class "iDeadUnitFrame"
 	extend "IFDeadHealthBar"
 endclass "iDeadUnitFrame"
 

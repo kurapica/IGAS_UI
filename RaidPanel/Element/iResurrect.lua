@@ -14,11 +14,11 @@ interface "IFIResurrect"
     end
 endinterface "IFIResurrect"
 
-partclass "iRaidUnitFrame"
+class "iRaidUnitFrame"
 	extend "IFIResurrect"
 endclass "iRaidUnitFrame"
 
-partclass "iDeadUnitFrame"
+class "iDeadUnitFrame"
 	extend "IFIResurrect"
 endclass "iDeadUnitFrame"
 

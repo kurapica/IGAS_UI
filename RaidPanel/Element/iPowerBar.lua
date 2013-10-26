@@ -18,7 +18,7 @@ interface "IFIPowerBar"
     end
 endinterface "IFIPowerBar"
 
-partclass "iRaidUnitFrame"
+class "iRaidUnitFrame"
 	extend "IFIPowerBar"
 endclass "iRaidUnitFrame"
 

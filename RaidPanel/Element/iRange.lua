@@ -20,11 +20,11 @@ interface "IFIRange"
     end
 endinterface "IFIRange"
 
-partclass "iRaidUnitFrame"
+class "iRaidUnitFrame"
 	extend "IFIRange"
 endclass "iRaidUnitFrame"
 
-partclass "iDeadUnitFrame"
+class "iDeadUnitFrame"
 	extend "IFIRange"
 endclass "iDeadUnitFrame"
 

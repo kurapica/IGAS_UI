@@ -15,7 +15,7 @@ interface "IFIGroupRole"
     end
 endinterface "IFIGroupRole"
 
-partclass "iRaidUnitFrame"
+class "iRaidUnitFrame"
 	extend "IFIGroupRole"
 endclass "iRaidUnitFrame"
 
@@ -30,7 +30,7 @@ interface "IFDeadGroupRole"
     end
 endinterface "IFDeadGroupRole"
 
-partclass "iDeadUnitFrame"
+class "iDeadUnitFrame"
 	extend "IFDeadGroupRole"
 endclass "iDeadUnitFrame"
 
