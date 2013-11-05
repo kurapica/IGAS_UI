@@ -1,3 +1,6 @@
+2013/11/05: v30
+	1. Raidpanel show boss debuff now.
+
 2013/10/20: v29
 	1. New Dead panel added to the RaidPanel, only show the dead players in the raid(party), default deactivated. Also a menu added to support it.
 

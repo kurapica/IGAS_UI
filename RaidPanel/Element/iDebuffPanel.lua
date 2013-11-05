@@ -27,7 +27,7 @@ class "iDebuffPanel"
 	function CustomFilter(self, unit, index, filter)
 		local name, rank, texture, count, dtype, duration, expires, caster, isStealable, shouldConsolidate, spellID, canApplyAura, isBossDebuff = UnitAura(unit, index, filter)
 
-		if name and _DebuffSpellList[spellID] then
+		if name and ( isBossDebuff or _DebuffSpellList[spellID] ) then
 			return true
 		end
 	end
