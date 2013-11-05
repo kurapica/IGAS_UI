@@ -35,10 +35,10 @@ class "iBuffPanel"
 	------------------------------------------------------
     function iBuffPanel(self)
 		self.Filter = "HELPFUL|PLAYER"
-		self.ColumnCount = 6
+		self.ColumnCount = 3
 		self.RowCount = 2
-		self.ElementWidth = 14
-		self.ElementHeight = 14
+		self.ElementWidth = 16
+		self.ElementHeight = 16
 		self.Orientation = Orientation.VERTICAL
     end
 endclass "iBuffPanel"

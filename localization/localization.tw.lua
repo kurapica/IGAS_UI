@@ -1,6 +1,30 @@
 ﻿local L = IGAS:NewLocale("IGAS_UI", "zhTW")
 if not L then return end
 
+L["Change Log"] = "更新日誌"
+
+L["ChangeLog"] = [[
+<html>
+<body>
+<p>
+<lime>2013/11/6 v30 : </lime>
+</p><br/>
+<p>
+    1. 團隊面板的大量配置信息可以在配置菜單中找到，比如按職業色顯示，元素大小，隊伍過濾等。
+</p><br/><p>
+    1. 團隊面板會顯示你和你的團隊遭遇過的所有減益，可以在配置菜單中設置黑名單：單元配置 --> 減益過濾。
+</p>
+<br/><br/>
+<p>
+<lime>2013/10/20: v29 </lime>
+</p><br/>
+<p>
+    1. 死者面板追加，僅顯示死亡的玩家，默認不使用，單獨的配置菜單提供。
+</p>
+</body>
+</html>
+]]
+
 L["Close Menu"] = "關閉菜單"
 L["Action Map"] = "動作條映射"
 L["None"] = "(無)"
@@ -139,3 +163,7 @@ L["HEALER"] = "治療"
 L["DAMAGER"] = "傷害"
 
 L["Dead panel"] = "死者面板"
+
+L["Debuff filter"] = "減益過濾"
+L["Debuff list --> Black list"] = "減益列表 --> 黑名單"
+L["Double click item to add/remove to the black list"] = "雙擊項目向黑名單添加或移除"

@@ -11,6 +11,7 @@
 ## SavedVariablesPerCharacter: IGAS_UI_DB_Char
 ## SavedVariables: IGAS_UI_DB
 
+localization\localization.lua
 localization\localization.cn.lua
 localization\localization.tw.lua
 

@@ -49,6 +49,42 @@ function OnLoad(self)
 
 	-- Slash command
 	self:AddSlashCmd("/igasui", "/iu")
+
+	OnLoad = nil
+end
+
+function OnEnable(self)
+	IFNoCombatTaskHandler._RegisterNoCombatTask(function()
+		local version = tonumber(GetAddOnMetadata(_Name, "Version"):match("%d+"))
+
+		if not _DB.VERSION or _DB.VERSION < version then
+			_DB.VERSION = version
+
+			local frm = Form("IGAS_UI_ChangeLog")
+			frm.Caption = "IGAS_UI - " .. L"Change Log"
+			frm.Resizable = false
+			frm.Visible = false
+
+			local html = HTMLViewer("HTMLViewer", frm)
+			html:SetPoint("TOPLEFT", 4, -26)
+			html:SetPoint("BOTTOMRIGHT", -4, 56)
+			html:SetBackdrop(nil)
+
+			local btn = NormalButton("OkayOnly", frm)
+			btn.Style = "Classic"
+			btn:SetSize(100, 26)
+			btn:SetPoint("BOTTOMRIGHT", -4, 6)
+			btn.Text = L"Okay"
+
+			btn.OnClick = function() return frm:Hide() end
+			frm.OnHide = function() return frm:Dispose() end
+			frm.OnShow = function() html.Text = L"ChangeLog" end
+
+			return frm:Show()
+		end
+	end)
+
+	OnEnable = nil
 end
 
 function OnSlashCmd(self, option, info)
