@@ -1,3 +1,8 @@
+2013/11/08: v31
+	1. A new feature added for the raid panel, used to send debuff to black list when right-click on it, default disabled, can be enabled in the "Element Settings" -> "Right mouse-click send debuff to black list".
+
+	2. Debuffs in raid panel will be started from bottom-right to top-left, supported by the IGAS lib v55 which would be released in the future week.
+
 2013/11/05: v30
 	1. Raidpanel show all rebuff now, you can send no need debuff to black list in the config menu, only debuffs that you and your team faced will be added to the list.
 

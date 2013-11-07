@@ -6,18 +6,27 @@ L["Change Log"] = "更新日志"
 L["ChangeLog"] = [[
 <html>
 <body>
-<h1>
+<p>
+<lime>2013/11/8 v31 : </lime>
+</p><br/>
+<p>
+    1. 新的团队面板机能，右键点击减益(Debuff)可以直接送入黑名单，该功能默认关闭，可在配置菜单开启："单元配置" -> "右键点击减益送至黑名单"
+</p><br/><p>
+    2. 团队面板的减益(Debuff)的刷新位置将从右下角开始，而不是现在的左上角，显示更加符合习惯，该功能需要IGAS v55版本，该版本预计下周发布。
+</p>
+<br/><br/>
+<p>
 <lime>2013/11/6 v30 : </lime>
-</h1><br/>
+</p><br/>
 <p>
     1. 团队面板的大量配置信息可以在配置菜单中找到，比如按职业颜色显示，元素大小，队伍过滤等。
 </p><br/><p>
     2. 团队面板会显示你和你的团队遭遇过的所有减益，可以在配置菜单中设置黑名单 : "单元配置" -> "减益过滤".
 </p>
 <br/><br/>
-<h1>
+<p>
 <lime>2013/10/20: v29 </lime>
-</h1><br/>
+</p><br/>
 <p>
 	1. 死者面板增加，仅显示死亡的角色，默认不启用，单独的配置菜单提供。
 </p>
@@ -165,5 +174,7 @@ L["DAMAGER"] = "伤害"
 L["Dead panel"] = "死者面板"
 
 L["Debuff filter"] = "减益过滤"
-L["Debuff list --> Black list"] = "减益列表 --> 黑名单"
-L["Double click item to add/remove to the black list"] = "双击项目向黑名单添加或移除"
+L["Black list"] = "黑名单"
+L["Double click to remove"] = "双击项目移除"
+
+L["Right mouse-click send debuff to black list"] = "右键点击减益送至黑名单"

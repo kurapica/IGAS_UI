@@ -7,6 +7,15 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2013/11/8 v31 : </lime>
+</p><br/>
+<p>
+    1. 新的團隊面板機能，右鍵點擊減益(Debuff)可以直接送入黑名單，該功能默認關閉，可以至配置菜單設置：單元配置 --> 右鍵點擊減益送至黑名單。
+</p><br/><p>
+    2. 團隊面板的減益(Debuff)將從右下角開始顯示，而不是現在的左上角，顯示更加符合習慣，該功能需要IGAS v55版本，預計下禮拜發佈。
+</p>
+<br/><br/>
+<p>
 <lime>2013/11/6 v30 : </lime>
 </p><br/>
 <p>
@@ -165,5 +174,7 @@ L["DAMAGER"] = "傷害"
 L["Dead panel"] = "死者面板"
 
 L["Debuff filter"] = "減益過濾"
-L["Debuff list --> Black list"] = "減益列表 --> 黑名單"
-L["Double click item to add/remove to the black list"] = "雙擊項目向黑名單添加或移除"
+L["Black list"] = "黑名單"
+L["Double click to remove"] = "雙擊項目移除"
+
+L["Right mouse-click send debuff to black list"] = "右鍵點擊減益送至黑名單"

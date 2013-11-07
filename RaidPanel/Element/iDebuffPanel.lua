@@ -6,42 +6,28 @@ IGAS:NewAddon "IGAS_UI.RaidPanel"
 
 OnLoad = OnLoad + function(self)
 	_DB = _Addon._DB.RaidPanel or {}
-	_DB.DebuffSpellList =  _DB.DebuffSpellList or {}
+	_DB.DebuffSpellList = nil
 	_DB.DebuffBlackList = _DB.DebuffBlackList or {}
 
-	_DebuffSpellList = _DB.DebuffSpellList
 	_DebuffBlackList = _DB.DebuffBlackList
+
+	mnuRaidPanelDebuffRightMouseRemove.Checked = _DB.DebuffRightMouseRemove
 end
 
 iDebuffFilter = Form("IGAS_UI_IDebuffFilter")
-iDebuffFilter.Caption = L"Debuff list --> Black list"
-iDebuffFilter.Message = L"Double click item to add/remove to the black list"
+iDebuffFilter.Caption = L"Black list"
+iDebuffFilter.Message = L"Double click to remove"
 iDebuffFilter.Resizable = false
-iDebuffFilter.Layout = DockLayoutPanel
+iDebuffFilter:SetSize(300, 400)
 iDebuffFilter.Visible = false
 
-iDebuffScanList = List("ScanList", iDebuffFilter)
-iDebuffFilter:AddWidget(iDebuffScanList, "west", 49, "pct")
-iDebuffScanList.ShowTootip = true
-
 iDebuffBlackList = List("BlackList", iDebuffFilter)
-iDebuffFilter:AddWidget(iDebuffBlackList, "east", 49, "pct")
+iDebuffBlackList:SetPoint("TOPLEFT", 4, -26)
+iDebuffBlackList:SetPoint("BOTTOMRIGHT", -4, 26)
 iDebuffBlackList.ShowTootip = true
 
 function iDebuffFilter:OnShow()
-	iDebuffScanList:SuspendLayout()
-
-    iDebuffScanList:Clear()
-
-    for spellID in pairs(_DebuffSpellList) do
-        local name, _, icon = GetSpellInfo(spellID)
-
-        iDebuffScanList:AddItem(spellID, name, icon)
-    end
-
-    iDebuffScanList:ResumeLayout()
-
-    iDebuffBlackList:SuspendLayout()
+	iDebuffBlackList:SuspendLayout()
 
     iDebuffBlackList:Clear()
 
@@ -54,22 +40,9 @@ function iDebuffFilter:OnShow()
     iDebuffBlackList:ResumeLayout()
 end
 
-function iDebuffScanList:OnItemDoubleClick(spellID, name, icon)
-    self:RemoveItem(spellID)
-    iDebuffBlackList:SetItem(spellID, name, icon)
-    _DebuffSpellList[spellID] = nil
-    _DebuffBlackList[spellID] = true
-end
-
 function iDebuffBlackList:OnItemDoubleClick(spellID, name, icon)
     self:RemoveItem(spellID)
-    iDebuffScanList:SetItem(spellID, name, icon)
-    _DebuffSpellList[spellID] = true
     _DebuffBlackList[spellID] = nil
-end
-
-function iDebuffScanList:OnGameTooltipShow(GameTooltip, spellID)
-    GameTooltip:SetSpellByID(spellID)
 end
 
 function iDebuffBlackList:OnGameTooltipShow(GameTooltip, spellID)
@@ -81,6 +54,15 @@ mnuRaidPanelDebuffFilter = raidPanelConfig:AddMenuButton(L"Element Settings", L"
 
 function mnuRaidPanelDebuffFilter:OnClick()
 	iDebuffFilter.Visible = true
+end
+
+mnuRaidPanelDebuffRightMouseRemove = raidPanelConfig:AddMenuButton(L"Element Settings", L"Right mouse-click send debuff to black list")
+mnuRaidPanelDebuffRightMouseRemove.IsCheckButton = true
+
+function mnuRaidPanelDebuffRightMouseRemove:OnCheckChanged()
+	if raidPanelConfig.Visible then
+		_DB.DebuffRightMouseRemove = self.Checked
+	end
 end
 
 class "iDebuffPanel"
@@ -103,11 +85,26 @@ class "iDebuffPanel"
 
 		if _DebuffBlackList[spellID] then return false end
 
-		if not _DebuffSpellList[spellID] then
-			_DebuffSpellList[spellID] = true
-		end
-
 		return true
+	end
+
+	------------------------------------------------------
+	-- Event Handler
+	------------------------------------------------------
+	local function OnMouseUp(self, button)
+		if button == "RightButton" and _DB.DebuffRightMouseRemove then
+			local name, _, _, _, _, _, _, _, _, _, spellID = UnitAura(self.Parent.Unit, self.Index, self.Parent.Filter)
+
+			if name then
+				_DebuffBlackList[spellID] = true
+
+				return self.Parent:Refresh()
+			end
+		end
+	end
+
+	local function OnElementAdd(self, element)
+		element.OnMouseUp = element.OnMouseUp + OnMouseUp
 	end
 
 	------------------------------------------------------
@@ -120,6 +117,10 @@ class "iDebuffPanel"
 		self.ElementWidth = 16
 		self.ElementHeight = 16
 		self.Orientation = Orientation.HORIZONTAL
+		self.TopToBottom = false
+		self.LeftToRight = false
+
+		self.OnElementAdd = self.OnElementAdd + OnElementAdd
     end
 endclass "iDebuffPanel"
 
