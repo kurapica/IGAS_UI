@@ -11,6 +11,11 @@ OnLoad = OnLoad + function(self)
 
 	_DebuffBlackList = _DB.DebuffBlackList
 
+	-- Default true
+	if _DB.DebuffRightMouseRemove == nil then
+		_DB.DebuffRightMouseRemove = true
+	end
+
 	mnuRaidPanelDebuffRightMouseRemove.Checked = _DB.DebuffRightMouseRemove
 end
 
@@ -62,6 +67,10 @@ mnuRaidPanelDebuffRightMouseRemove.IsCheckButton = true
 function mnuRaidPanelDebuffRightMouseRemove:OnCheckChanged()
 	if raidPanelConfig.Visible then
 		_DB.DebuffRightMouseRemove = self.Checked
+
+		raidPanel:Each(function (self)
+			self:GetElement(iDebuffPanel):Each("MouseEnabled", _DB.DebuffRightMouseRemove)
+		end)
 	end
 end
 
@@ -92,7 +101,7 @@ class "iDebuffPanel"
 	-- Event Handler
 	------------------------------------------------------
 	local function OnMouseUp(self, button)
-		if button == "RightButton" and _DB.DebuffRightMouseRemove then
+		if button == "RightButton" then
 			local name, _, _, _, _, _, _, _, _, _, spellID = UnitAura(self.Parent.Unit, self.Index, self.Parent.Filter)
 
 			if name then
@@ -104,6 +113,7 @@ class "iDebuffPanel"
 	end
 
 	local function OnElementAdd(self, element)
+		element.MouseEnabled = _DB.DebuffRightMouseRemove
 		element.OnMouseUp = element.OnMouseUp + OnMouseUp
 	end
 
