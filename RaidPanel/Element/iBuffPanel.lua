@@ -33,7 +33,9 @@ class "iBuffPanel"
 	------------------------------------------------------
 	-- Constructor
 	------------------------------------------------------
-    function iBuffPanel(self)
+    function iBuffPanel(self, name, parent, ...)
+		Super(self, name, parent, ...)
+
 		self.Filter = "HELPFUL|PLAYER"
 		self.ColumnCount = 3
 		self.RowCount = 2

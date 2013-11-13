@@ -1188,7 +1188,9 @@ class "IActionButton"
 	------------------------------------------------------
 	-- Constructor
 	------------------------------------------------------
-    function IActionButton(self)
+    function IActionButton(self, name, parent, ...)
+		Super(self, name, parent, ...)
+
 		self.IFMovable = false
 		self.IFResizable = false
 		self.ShowGrid = true
@@ -1329,7 +1331,9 @@ class "IHeader"
 		return obj
 	end
 
-    function IHeader(self)
+    function IHeader(self, name, parent, ...)
+		Super(self, name, parent, ...)
+
 		self.Parent = nil
 		self.Name = "IHeader"
 		self.Visible = false
@@ -1432,7 +1436,9 @@ class "ITail"
 		return obj
 	end
 
-    function ITail(self)
+    function ITail(self, name, parent, ...)
+		Super(self, name, parent, ...)
+
 		self.Parent = nil
 		self.Name = "ITail"
 		self.Visible = false

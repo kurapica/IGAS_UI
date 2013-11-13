@@ -1,3 +1,6 @@
+2013/11/13: v31-2
+	1. Update for IGAS v55.
+
 2013/11/08: v31
 	1. A new feature added for the raid panel, used to send debuff to black list when right-click on it, default disabled, can be enabled in the "Element Settings" -> "Right mouse-click send debuff to black list".
 

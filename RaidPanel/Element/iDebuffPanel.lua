@@ -120,7 +120,9 @@ class "iDebuffPanel"
 	------------------------------------------------------
 	-- Constructor
 	------------------------------------------------------
-    function iDebuffPanel(self)
+    function iDebuffPanel(self, name, parent, ...)
+		Super(self, name, parent, ...)
+
 		self.Filter = "HARMFUL"
 		self.ColumnCount = 3
 		self.RowCount = 2

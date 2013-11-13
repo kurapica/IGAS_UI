@@ -32,7 +32,9 @@ class "iTarget"
 	------------------------------------------------------
 	-- Constructor
 	------------------------------------------------------
-	function iTarget(self)
+	function iTarget(self, name, parent, ...)
+		Super(self, name, parent, ...)
+
 		self.UpdateFrame = self.Parent.Parent
 	end
 endclass "iTarget"

@@ -11,7 +11,9 @@ class "iHealthBar"
 	------------------------------------------------------
 	-- Constructor
 	------------------------------------------------------
-	function iHealthBar(self)
+	function iHealthBar(self, name, parent, ...)
+		Super(self, name, parent, ...)
+
 		self.UseDebuffColor = true
 		if _DBChar.ElementUseClassColor then
 			self.UseClassColor = true

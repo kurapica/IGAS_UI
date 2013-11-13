@@ -32,7 +32,9 @@ class "NamePlateMask"
 	------------------------------------------------------
 	-- Constructor
 	------------------------------------------------------
-    function NamePlateMask(self, name, parent)
+    function NamePlateMask(self, name, parent, ...)
+		Super(self, name, parent, ...)
+
     	-- HealthBar
 		self.HealthBar = ({({parent:GetChildren()})[1]:GetChildren()})[1]
 
@@ -177,7 +179,9 @@ class "iDebuffPanel"
 		------------------------------------------------------
 		-- Constructor
 		------------------------------------------------------
-		function AuraIcon(self, name, parent)
+		function AuraIcon(self, name, parent, ...)
+			Super(self, name, parent, ...)
+
 			local icon = Texture("Icon", self, "BORDER")
 			icon:SetPoint("TOPLEFT", 1, -1)
 			icon:SetPoint("BOTTOMRIGHT", -1, 1)
@@ -212,7 +216,9 @@ class "iDebuffPanel"
 	------------------------------------------------------
 	-- Constructor
 	------------------------------------------------------
-    function iDebuffPanel(self)
+    function iDebuffPanel(self, name, parent, ...)
+		Super(self, name, parent, ...)
+
 		self.Filter = "HARMFUL"
 		self.RowCount = 6
 		self.ColumnCount = 6

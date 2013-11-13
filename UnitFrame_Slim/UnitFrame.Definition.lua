@@ -46,7 +46,9 @@ class "iSUnitFrame"
 	------------------------------------------------------
 	-- Constructor
 	------------------------------------------------------
-	function iSUnitFrame(self)
+	function iSUnitFrame(self, name, parent, ...)
+		Super(self, name, parent, ...)
+
 		self.Panel.VSpacing = 4
 
 		self:SetSize(200, 48)
@@ -76,7 +78,9 @@ class "iUnitFrame"
 	------------------------------------------------------
 	-- Constructor
 	------------------------------------------------------
-	function iUnitFrame(self)
+	function iUnitFrame(self, name, parent, ...)
+		Super(self, name, parent, ...)
+
 		-- Power
 		self:AddElement(iPowerBar, "south", 6, "px")
 
@@ -121,7 +125,9 @@ class "iHealthBar"
 	------------------------------------------------------
 	-- Constructor
 	------------------------------------------------------
-	function iHealthBar(self)
+	function iHealthBar(self, name, parent, ...)
+		Super(self, name, parent, ...)
+
 		self.UseClassColor = true
 	end
 endclass "iHealthBar"
@@ -162,7 +168,9 @@ class "iBuffPanel"
 	------------------------------------------------------
 	-- Constructor
 	------------------------------------------------------
-    function iBuffPanel(self)
+    function iBuffPanel(self, name, parent, ...)
+		Super(self, name, parent, ...)
+
 		self.Filter = "HELPFUL"
 		self.HighLightPlayer = true
 		self.RowCount = 6
@@ -200,7 +208,9 @@ class "iDebuffPanel"
 	------------------------------------------------------
 	-- Constructor
 	------------------------------------------------------
-    function iDebuffPanel(self)
+    function iDebuffPanel(self, name, parent, ...)
+		Super(self, name, parent, ...)
+
 		self.Filter = "HARMFUL"
 		self.HighLightPlayer = true
 		self.RowCount = 6
@@ -291,7 +301,9 @@ class "iClassPowerButton"
 	------------------------------------------------------
 	-- Constructor
 	------------------------------------------------------
-	function iClassPowerButton(self)
+	function iClassPowerButton(self, name, parent, ...)
+		Super(self, name, parent, ...)
+
 		local glow = Texture("Glow", self, "ARTWORK")
 		glow.Alpha = 0
 		glow.TexturePath = [[Interface\SpellActivationOverlay\IconAlert]]
@@ -477,7 +489,9 @@ class "iClassPower"
 	------------------------------------------------------
 	-- Constructor
 	------------------------------------------------------
-    function iClassPower(self)
+    function iClassPower(self, name, parent, ...)
+		Super(self, name, parent, ...)
+
 		self.HSpacing = 3
 
 		for i = 1, _MaxPower do
@@ -587,7 +601,9 @@ class "iRuneBar"
 		------------------------------------------------------
 		-- Constructor
 		------------------------------------------------------
-	    function iRuneButton(self)
+	    function iRuneButton(self, name, parent, ...)
+			Super(self, name, parent, ...)
+
 			-- Use these for cooldown
 			local bar = iClassPowerButton("CooldownStatus", self)
 			bar:SetAllPoints()
@@ -602,7 +618,9 @@ class "iRuneBar"
 	------------------------------------------------------
 	-- Constructor
 	------------------------------------------------------
-    function iRuneBar(self)
+    function iRuneBar(self, name, parent, ...)
+		Super(self, name, parent, ...)
+
 		local pct = floor(100 / MAX_RUNES)
 		local margin = (100 - pct * MAX_RUNES + 1) / 2
 
@@ -729,7 +747,9 @@ class "iEclipseBar"
 	------------------------------------------------------
 	-- Constructor
 	------------------------------------------------------
-    function iEclipseBar(self)
+    function iEclipseBar(self, name, parent, ...)
+		Super(self, name, parent, ...)
+
 		local sunBar = iClassPowerButton("SunBar", self)
 		local moonBar = iClassPowerButton("MoonBar", self)
 
@@ -785,7 +805,9 @@ class "iStaggerBar"
 	------------------------------------------------------
 	-- Constructor
 	------------------------------------------------------
-    function iStaggerBar(self)
+    function iStaggerBar(self, name, parent, ...)
+		Super(self, name, parent, ...)
+
 		self.StatusBarTexturePath = _Addon.STATUSBAR_TEXTURE_PATH
 
     	self.FrameLevel = self.FrameLevel + 2

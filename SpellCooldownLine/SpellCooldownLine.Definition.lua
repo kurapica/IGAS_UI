@@ -181,7 +181,9 @@ class "SpellIcon"
         return Super.Constructor(self, name, parent, "OVERLAY")
     end
 
-    function SpellIcon(self, name, parent)
+    function SpellIcon(self, name, parent, ...)
+        Super(self, name, parent, ...)
+
         self.Width = parent.Width
         self.Height = parent.Height
 

@@ -23,7 +23,9 @@ class "iRaidUnitFrame"
 		end,
 	}
 
-	function iRaidUnitFrame(self)
+	function iRaidUnitFrame(self, name, parent, ...)
+		Super(self, name, parent, ...)
+
 		self.Panel.VSpacing = 1
 	end
 endclass "iRaidUnitFrame"
@@ -41,7 +43,9 @@ class "iDeadUnitFrame"
 		end,
 	}
 
-	function iDeadUnitFrame(self)
+	function iDeadUnitFrame(self, name, parent, ...)
+		Super(self, name, parent, ...)
+
 		self.Panel.VSpacing = 1
 	end
 endclass "iDeadUnitFrame"
@@ -167,7 +171,9 @@ class "BindingButton"
 	------------------------------------------------------
 	-- Constructor
 	------------------------------------------------------
-    function BindingButton(self)
+    function BindingButton(self, name, parent, ...)
+		Super(self, name, parent, ...)
+
 		self.AsKeyBind = true
 
 		self.OnEnter = self.OnEnter + OnEnter
