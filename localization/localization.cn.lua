@@ -13,6 +13,8 @@ L["ChangeLog"] = [[
     1. 新的团队面板机能，右键点击减益(Debuff)可以直接送入黑名单，可在配置菜单关闭："单元配置" -> "右键点击减益送至黑名单"
 </p><br/><p>
     2. 团队面板的减益(Debuff)的刷新位置将从右下角开始，而不是现在的左上角，显示更加符合习惯，该功能需要IGAS v55版本，该版本预计下周发布。
+</p><br/><p>
+    3. 显示增益/减益的提示会阻挡鼠标操作，可在配置菜单关闭： "单元配置" -> "显示增益/减益的提示".
 </p>
 <br/><br/>
 <p>
@@ -178,3 +180,4 @@ L["Black list"] = "黑名单"
 L["Double click to remove"] = "双击项目移除"
 
 L["Right mouse-click send debuff to black list"] = "右键点击减益送至黑名单"
+L["Show buff/debuff tootip"] = "显示增益/减益的提示"

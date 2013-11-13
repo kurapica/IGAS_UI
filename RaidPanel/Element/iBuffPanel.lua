@@ -31,6 +31,13 @@ class "iBuffPanel"
 	end
 
 	------------------------------------------------------
+	-- Event Handler
+	------------------------------------------------------
+	local function OnElementAdd(self, element)
+		element.ShowTooltip = _DB.ShowDebuffTooltip
+	end
+
+	------------------------------------------------------
 	-- Constructor
 	------------------------------------------------------
     function iBuffPanel(self, name, parent, ...)
@@ -42,6 +49,8 @@ class "iBuffPanel"
 		self.ElementWidth = 16
 		self.ElementHeight = 16
 		self.Orientation = Orientation.VERTICAL
+
+		self.OnElementAdd = self.OnElementAdd + OnElementAdd
     end
 endclass "iBuffPanel"
 

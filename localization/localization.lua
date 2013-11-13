@@ -10,6 +10,8 @@ L["ChangeLog"] = [[
     1. A new feature added for the raid panel, used to send debuff to black list when right-click on it, can be disabled in the "Element Settings" -> "Right mouse-click send debuff to black list".
 </p><br/><p>
     2. Debuffs in raid panel will be started from bottom-right to top-left, supported by the IGAS lib v55 which would be released in the future week.
+</p><br/><p>
+    3. Enable the tooltip for buff/debuff will block the mouse action, so you can disabled it in "Element Settings" -> "Show buff/debuff tootip".
 </p>
 <br/><br/>
 <p>

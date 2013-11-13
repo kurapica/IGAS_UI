@@ -16,7 +16,12 @@ OnLoad = OnLoad + function(self)
 		_DB.DebuffRightMouseRemove = true
 	end
 
+	if _DB.ShowDebuffTooltip == nil then
+		_DB.ShowDebuffTooltip = true
+	end
+
 	mnuRaidPanelDebuffRightMouseRemove.Checked = _DB.DebuffRightMouseRemove
+	mnuRaidPanelDebuffShowTooltip.Checked = _DB.ShowDebuffTooltip
 end
 
 iDebuffFilter = Form("IGAS_UI_IDebuffFilter")
@@ -64,12 +69,30 @@ end
 mnuRaidPanelDebuffRightMouseRemove = raidPanelConfig:AddMenuButton(L"Element Settings", L"Right mouse-click send debuff to black list")
 mnuRaidPanelDebuffRightMouseRemove.IsCheckButton = true
 
+mnuRaidPanelDebuffShowTooltip = raidPanelConfig:AddMenuButton(L"Element Settings", L"Show buff/debuff tootip")
+mnuRaidPanelDebuffShowTooltip.IsCheckButton = true
+
 function mnuRaidPanelDebuffRightMouseRemove:OnCheckChanged()
 	if raidPanelConfig.Visible then
 		_DB.DebuffRightMouseRemove = self.Checked
 
 		raidPanel:Each(function (self)
-			self:GetElement(iDebuffPanel):Each("MouseEnabled", _DB.DebuffRightMouseRemove)
+			self:GetElement(iDebuffPanel):Each("MouseEnabled", _DB.ShowDebuffTooltip or _DB.DebuffRightMouseRemove)
+		end)
+	end
+end
+
+function mnuRaidPanelDebuffShowTooltip:OnCheckChanged()
+	if raidPanelConfig.Visible then
+		_DB.ShowDebuffTooltip = self.Checked
+
+		raidPanel:Each(function (self)
+			self:GetElement(iDebuffPanel):Each("ShowTooltip", _DB.ShowDebuffTooltip)
+			self:GetElement(iDebuffPanel):Each("MouseEnabled", _DB.ShowDebuffTooltip or _DB.DebuffRightMouseRemove)
+
+			if self:GetElement(iBuffPanel) then
+				self:GetElement(iBuffPanel):Each("ShowTooltip", _DB.ShowDebuffTooltip)
+			end
 		end)
 	end
 end
@@ -101,7 +124,7 @@ class "iDebuffPanel"
 	-- Event Handler
 	------------------------------------------------------
 	local function OnMouseUp(self, button)
-		if button == "RightButton" then
+		if _DB.DebuffRightMouseRemove and button == "RightButton" then
 			local name, _, _, _, _, _, _, _, _, _, spellID = UnitAura(self.Parent.Unit, self.Index, self.Parent.Filter)
 
 			if name then
@@ -113,7 +136,8 @@ class "iDebuffPanel"
 	end
 
 	local function OnElementAdd(self, element)
-		element.MouseEnabled = _DB.DebuffRightMouseRemove
+		element.ShowTooltip = _DB.ShowDebuffTooltip
+		element.MouseEnabled = _DB.ShowDebuffTooltip or _DB.DebuffRightMouseRemove
 		element.OnMouseUp = element.OnMouseUp + OnMouseUp
 	end
 
