@@ -9,11 +9,9 @@ import "System.Widget.Action"
 
 _IGASUI_ACTIONBAR_GROUP = "IActionButton"
 
------------------------------------------------
---- IActionButton
--- @type class
--- @name IActionButton
------------------------------------------------
+------------------------------------------------------
+-- Class
+------------------------------------------------------
 class "IActionButton"
 	inherit "ActionButton"
 	extend "IFMovable" "IFResizable"
@@ -26,7 +24,7 @@ class "IActionButton"
 	_IGASUI_ACTIONBAR_GROUP = _IGASUI_ACTIONBAR_GROUP
 
 	-- Manager Frame
-	_IActionButton_ManagerFrame = _IActionButton_ManagerFrame or SecureFrame("IGASUI_IActionButton_Manager", IGAS.UIParent, "SecureHandlerStateTemplate")
+	_IActionButton_ManagerFrame = SecureFrame("IGASUI_IActionButton_Manager", IGAS.UIParent, "SecureHandlerStateTemplate")
 	_IActionButton_ManagerFrame.Visible = false
 
 	-- Init manger frame's enviroment
@@ -312,19 +310,7 @@ class "IActionButton"
 			Manager:RunFor(self, HideBranch)
 		end
 		if AutoSwapHeader[root] and root ~= self then
-			local rootKind = root:GetAttribute("type")
-			if rootKind == "action" or rootKind == "pet" then return end
-			local rootTarget = rootKind and root:GetAttribute(rootKind)
-
-			local selfKind = self:GetAttribute("type")
-			if not selfKind then return end
-			local selfTarget = self:GetAttribute(selfKind)
-
-			-- Update Root
-			root:RunAttribute("UpdateAction", selfKind, selfTarget)
-
-			-- Update self
-			self:RunAttribute("UpdateAction", rootKind, rootTarget)
+			return self:RunAttribute("SwapAction", root)
 		end
 	]=]
 
@@ -444,7 +430,7 @@ class "IActionButton"
 	end
 
 	------------------------------------------------------
-	-- Script
+	-- Event
 	------------------------------------------------------
 
 	------------------------------------------------------
@@ -458,15 +444,15 @@ class "IActionButton"
 	-- @return brother last brother
 	------------------------------------
 	function GenerateBrother(self, row, col, force)
-		row = row or self.__Row or 1
-		col = col or self.__Col or 1
+		row = row or self.RowCount
+		col = col or self.ColCount
 
 		if row <= 1 then row = 1 end
 		if col <= 1 then col = 1 end
 		if row > ceil(_MaxBrother / col) then row = ceil(_MaxBrother / col) end
 
 		if self.Header == self and not self.FreeMode then
-			if force or self.__Row ~= row or self.__Col ~= col then
+			if force or self.RowCount ~= row or self.ColCount ~= col then
 				local w, h, marginX, marginY, index, brother, last = self.Width, self.Height, self.MarginX, self.MarginY, 1, self
 				local tail
 
@@ -518,7 +504,7 @@ class "IActionButton"
 
 				wipe(_TempActionBrother)
 
-				self.__Row, self.__Col = row, col
+				self.RowCount, self.ColCount = row, col
 
 				return brother
 			end
@@ -533,10 +519,10 @@ class "IActionButton"
 	-- @return nil
 	------------------------------------
 	function GenerateBranch(self, num, force)
-		num = num or self.__BranchNum or 0
+		num = num or self.BranchCount
 
 		if self.Root == self and not InCombatLockdown() then
-			if force or self.__BranchNum ~= num then
+			if force or self.BranchCount ~= num then
 				local w, h, marginX, marginY, branch, last = self.Width, self.Height, self.MarginX, self.MarginY, self
 				local dir = self.FlyoutDirection
 
@@ -573,7 +559,7 @@ class "IActionButton"
 
 				wipe(_TempActionBranch)
 
-				self.__BranchNum = num
+				self.BranchCount = num
 				self.ShowFlyOut = num > 0 and (not self.LockMode or not self.FreeMode)
 			end
 		end
@@ -583,10 +569,9 @@ class "IActionButton"
 	--- Update the action
 	-- @name UpdateAction
 	-- @type function
-	-- @param kind, target, texture, tooltip
 	------------------------------------
-	function UpdateAction(self, kind, target, texture, tooltip)
-		if kind == "flyout" then
+	function UpdateAction(self)
+		if self.ActionType == "flyout" then
 			if self.Root ~= self then
 				return IFNoCombatTaskHandler._RegisterNoCombatTask(function ()
 					self:SetAction(nil)
@@ -596,7 +581,7 @@ class "IActionButton"
 			end
 		end
 		if self.UseBlizzardArt then
-			return Super.UpdateAction(self, kind, target, texture, tooltip)
+			return Super.UpdateAction(self)
 		end
 	end
 
@@ -625,6 +610,15 @@ class "IActionButton"
 	------------------------------------------------------
 	-- Property
 	------------------------------------------------------
+	-- RowCount
+	property "RowCount" { Type = System.Number, Default = 1 }
+
+	-- ColCount
+	property "ColCount" { Type = System.Number, Default = 1 }
+
+	-- BranchCount
+	property "BranchCount" { Type = System.Number }
+
 	-- Visible
 	property "Visible" {
 		Get = function(self)
@@ -647,29 +641,10 @@ class "IActionButton"
 		end,
 		Type = System.Boolean,
 	}
-	-- RowCount
-	property "RowCount" {
-		Get = function(self)
-			return self.__Row or 1
-		end,
-	}
-	-- ColCount
-	property "ColCount" {
-		Get = function(self)
-			return self.__Col or 1
-		end,
-	}
-	-- BranchCount
-	property "BranchCount" {
-		Get = function(self)
-			return self.__BranchNum or 0
-		end,
-	}
+
 	-- Expansion
 	property "Expansion" {
-		Get = function(self)
-			return self.__Expansion or false
-		end,
+		Field = "__Expansion",
 		Set = function(self, value)
 			if self.__Expansion ~= value then
 				self.__Expansion = value
@@ -678,11 +653,10 @@ class "IActionButton"
 		end,
 		Type = System.Boolean,
 	}
+
 	-- Brother
 	property "Brother" {
-		Get = function(self)
-			return self.__Brother
-		end,
+		Field = "__Brother",
 		Set = function(self, value)
 			self.__Brother = value
 			if value then
@@ -703,11 +677,10 @@ class "IActionButton"
 		end,
 		Type = IActionButton + nil,
 	}
+
 	-- Branch
 	property "Branch" {
-		Get = function(self)
-			return self.__Branch
-		end,
+		Field = "__Branch",
 		Set = function(self, value)
 			self.__Branch = value
 			if value then
@@ -721,6 +694,7 @@ class "IActionButton"
 		end,
 		Type = IActionButton + nil,
 	}
+
 	-- Header
 	property "Header" {
 		Get = function(self)
@@ -740,6 +714,7 @@ class "IActionButton"
 		end,
 		Type = IActionButton + nil,
 	}
+
 	-- Root
 	property "Root" {
 		Get = function(self)
@@ -759,6 +734,7 @@ class "IActionButton"
 		end,
 		Type = IActionButton + nil,
 	}
+
 	-- ActionBar
 	property "ActionBar" {
 		Get = function(self)
@@ -774,6 +750,7 @@ class "IActionButton"
 		end,
 		Type = System.Number + nil,
 	}
+
 	-- MainBar
 	property "MainBar" {
 		Get = function(self)
@@ -789,11 +766,10 @@ class "IActionButton"
 		end,
 		Type = System.Boolean,
 	}
+
 	-- PetBar
 	property "PetBar" {
-		Get = function(self)
-			return self.__PetBar or false
-		end,
+		Field = "__PetBar",
 		Set = function(self, value)
 			if self.PetBar ~= value then
 				if value and self.ReplaceBlzMainAction then return end
@@ -820,11 +796,10 @@ class "IActionButton"
 		end,
 		Type = System.Boolean,
 	}
+
 	-- StanceBar
 	property "StanceBar" {
-		Get = function(self)
-			return self.__StanceBar or false
-		end,
+		Field = "__StanceBar",
 		Set = function(self, value)
 			if self.StanceBar ~= value then
 				if value and self.ReplaceBlzMainAction then return end
@@ -845,23 +820,13 @@ class "IActionButton"
 		end,
 		Type = System.Boolean,
 	}
+
 	-- QuestBar
-	property "QuestBar" {
-		Get = function(self)
-			return self.__QuestBar or false
-		end,
-		Set = function(self, value)
-			if self.QuestBar ~= value then
-				self.__QuestBar = value
-			end
-		end,
-		Type = System.Boolean,
-	}
+	property "QuestBar" { Type = System.Boolean }
+
 	-- HideOutOfCombat
 	property "HideOutOfCombat" {
-		Get = function(self)
-			return self.__HideOutOfCombat or false
-		end,
+		Field = "__HideOutOfCombat",
 		Set = function(self, value)
 			if self.HideOutOfCombat ~= value then
 				if value and self.ReplaceBlzMainAction then return end
@@ -875,11 +840,10 @@ class "IActionButton"
 		end,
 		Type = System.Boolean,
 	}
+
 	-- HideInPetBattle
 	property "HideInPetBattle" {
-		Get = function(self)
-			return self.__HideInPetBattle or false
-		end,
+		Field = "__HideInPetBattle",
 		Set = function(self, value)
 			if self.HideInPetBattle ~= value then
 				if value and self.ReplaceBlzMainAction then return end
@@ -893,11 +857,10 @@ class "IActionButton"
 		end,
 		Type = System.Boolean,
 	}
+
 	-- HideInVehicle
 	property "HideInVehicle" {
-		Get = function(self)
-			return self.__HideInVehicle or false
-		end,
+		Field = "__HideInVehicle",
 		Set = function(self, value)
 			if self.HideInVehicle ~= value then
 				if value and self.ReplaceBlzMainAction then return end
@@ -911,11 +874,10 @@ class "IActionButton"
 		end,
 		Type = System.Boolean,
 	}
+
 	-- AutoSwapRoot
 	property "AutoSwapRoot" {
-		Get = function(self)
-			return self.__AutoSwapRoot or false
-		end,
+		Field = "__AutoSwapRoot",
 		Set = function(self, value)
 			if self.AutoSwapRoot ~= value then
 				self.__AutoSwapRoot = value
@@ -928,6 +890,7 @@ class "IActionButton"
 		end,
 		Type = System.Boolean,
 	}
+
 	--- Parent
 	property "Parent" {
 		Get = function(self)
@@ -944,6 +907,7 @@ class "IActionButton"
 		end,
 		Type = UIObject + nil,
 	}
+
 	-- FrameLevel
 	property "FrameLevel" {
 		Get = function(self)
@@ -960,6 +924,7 @@ class "IActionButton"
 		end,
 		Type = Number,
 	}
+
 	-- FreeMode
 	property "FreeMode" {
 		Get = function(self)
@@ -993,6 +958,7 @@ class "IActionButton"
 		end,
 		Type = System.Boolean,
 	}
+
 	-- LockMode
 	property "LockMode" {
 		Get = function(self)
@@ -1020,6 +986,7 @@ class "IActionButton"
 		end,
 		Type = System.Boolean,
 	}
+
 	-- MarginX
 	property "MarginX" {
 		Get = function(self)
@@ -1041,6 +1008,7 @@ class "IActionButton"
 		end,
 		Type = System.Number,
 	}
+
 	-- MarginY
 	property "MarginY" {
 		Get = function(self)
@@ -1062,6 +1030,7 @@ class "IActionButton"
 		end,
 		Type = System.Number,
 	}
+
 	-- Scale
 	property "Scale" {
 		Get = function(self)
@@ -1078,6 +1047,7 @@ class "IActionButton"
 		end,
 		Type = Number,
 	}
+
 	-- ReplaceBlzMainAction
 	property "ReplaceBlzMainAction" {
 		Get = function(self)
@@ -1211,11 +1181,6 @@ class "IActionButton"
     end
 endclass "IActionButton"
 
------------------------------------------------
---- IHeader
--- @type class
--- @name IHeader
------------------------------------------------
 class "IHeader"
 	inherit "Button"
 
@@ -1356,11 +1321,6 @@ class "IHeader"
     end
 endclass "IHeader"
 
------------------------------------------------
---- ITail
--- @type class
--- @name ITail
------------------------------------------------
 class "ITail"
 	inherit "Button"
 

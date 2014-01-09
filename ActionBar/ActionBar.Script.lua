@@ -17,14 +17,14 @@ Toggle = {
 			if self.HideOutOfCombat then
 				self.Visible = not value
 			end
-			if _Header4CharacterBag then
-				_Header4CharacterBag.Visible = not value
-				CharacterBag0Slot.Visible = not value
-				CharacterBag1Slot.Visible = not value
-				CharacterBag2Slot.Visible = not value
-				CharacterBag3Slot.Visible = not value
-			end
 		end)
+		if _Header4CharacterBag then
+			_Header4CharacterBag.Visible = not value
+			CharacterBag0Slot.Visible = not value
+			CharacterBag1Slot.Visible = not value
+			CharacterBag2Slot.Visible = not value
+			CharacterBag3Slot.Visible = not value
+		end
 		Toggle.Update()
 	end,
 	Update = function() end,
@@ -320,7 +320,7 @@ function GenerateConfig(includeContent)
 			set.FlyoutDirection = btn.FlyoutDirection
 			set.HotKey = btn:GetBindingKey()
 			if includeContent then
-				set.ActionKind, set.ActionTarget = btn:GetAction()
+				set.ActionKind, set.ActionTarget, set.ActionDetail = btn:GetAction()
 			end
 
 			-- branch
@@ -335,7 +335,7 @@ function GenerateConfig(includeContent)
 				end
 				bset.HotKey = branch:GetBindingKey()
 				if includeContent then
-					bset.ActionKind, bset.ActionTarget = branch:GetAction()
+					bset.ActionKind, bset.ActionTarget, bset.ActionDetail = branch:GetAction()
 				end
 
 				tinsert(set, bset)
@@ -408,7 +408,7 @@ function LoadConfig(config)
 				btn.FlyoutDirection = set.FlyoutDirection
 				btn:SetBindingKey(set.HotKey)
 				if set.ActionKind and set.ActionTarget then
-					btn:SetAction(set.ActionKind, set.ActionTarget)
+					btn:SetAction(set.ActionKind, set.ActionTarget, set.ActionDetail)
 				end
 
 				if btn.FreeMode then
@@ -423,7 +423,7 @@ function LoadConfig(config)
 				for _, bset in ipairs(set) do
 					branch:SetBindingKey(bset.HotKey)
 					if bset.ActionKind and bset.ActionTarget then
-						branch:SetAction(bset.ActionKind, bset.ActionTarget)
+						branch:SetAction(bset.ActionKind, bset.ActionTarget, bset.ActionDetail)
 					end
 
 					if branch.FreeMode then
