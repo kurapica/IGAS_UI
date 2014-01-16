@@ -310,7 +310,8 @@ class "IActionButton"
 			Manager:RunFor(self, HideBranch)
 		end
 		if AutoSwapHeader[root] and root ~= self then
-			return self:RunAttribute("SwapAction", root)
+			self:SetAttribute("frameref-SwapTarget", root)
+			return self:RunAttribute("SwapAction")
 		end
 	]=]
 
