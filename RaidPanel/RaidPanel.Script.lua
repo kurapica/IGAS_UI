@@ -701,7 +701,7 @@ end
 -- Tool function
 --------------------
 function AddType4Config(type, text)
-	local name = System.Reflector.GetName(type)
+	local name = System.Reflector.GetNameSpaceName(type)
 	local btn = raidPanelConfig:AddMenuButton(text)
 
 	btn.IsCheckButton = true
