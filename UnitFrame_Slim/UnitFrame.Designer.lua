@@ -1,7 +1,6 @@
------------------------------------------
--- Designer for UnitFrame
------------------------------------------
-
 IGAS:NewAddon "IGAS_UI.UnitFrame"
 
-arUnit = Array(iSUnitFrame)
+--==========================
+-- Designer for UnitFrame
+--==========================
+

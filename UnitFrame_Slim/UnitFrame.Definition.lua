@@ -1,43 +1,110 @@
------------------------------------------
--- Definition for UnitFrame
------------------------------------------
-
 IGAS:NewAddon "IGAS_UI.UnitFrame"
+
+--==========================
+-- Definition for UnitFrame
+--==========================
 
 import "System.Widget"
 import "System.Widget.Unit"
 
 _IGASUI_RAIDPANEL_GROUP = "IRaidPanel"	-- Same as the raidPanel, no raidpanel no settings.
-
 _IGASUI_UNITFRAME_GROUP = "IUnitFrame"
 
 PLAYER_COLOR = RAID_CLASS_COLORS[select(2, UnitClass("player"))]
 
-class "iSUnitFrame"
+class "iUnitFrame"
 	inherit "UnitFrame"
-	-- extend "IFSpellHandler"	-- enable this for hover spell casting
-	extend "IFMovable" "IFResizable"
+	extend "IFMovable" "IFResizable" "IFToggleable"
 
-	_IGASUI_RAIDPANEL_GROUP = _IGASUI_RAIDPANEL_GROUP
-	_IGASUI_UNITFRAME_GROUP = _IGASUI_UNITFRAME_GROUP
+	if UnitFrame_Config.ENABLE_HOVER_SPELLCAST then extend "IFSpellHandler" end
+
+	------------------------------------------------------
+	-- Method
+	------------------------------------------------------
+	function ApplyConfig(self, ...)
+		for i = 1, select('#', ...) do
+			local config = select(i, ...)
+
+			if UnitFrame_Config[config] then
+				for _, set in ipairs(UnitFrame_Config[config]) do
+					local obj
+
+					-- Create element
+					if set.Name then
+						obj = self:AddElement(set.Name, set.Type, set.Direction, set.Size, set.Unit)
+					else
+						obj = self:AddElement(set.Type, set.Direction, set.Size, set.Unit)
+					end
+
+					-- Apply Location
+					if not set.Direction and set.Location then
+						obj:ClearAllPoints()
+						for _, anchor in ipairs(set.Location) do
+							local parent = anchor.relativeTo and self[anchor.relativeTo] or self
+
+							if parent then
+								obj:SetPoint(anchor.point, parent, anchor.relativePoint or anchor.point, anchor.xOffset or 0, anchor.yOffset or 0)
+							end
+						end
+					end
+
+					-- Apply Property
+					if set.Property then
+						pcall(obj, set.Property)
+					end
+				end
+			end
+		end
+	end
 
 	------------------------------------------------------
 	-- Property
 	------------------------------------------------------
-	-- IFSpellHandlerGroup
+	property "ToggleState" {
+		Set = function(self, value)
+			if value ~= self.ToggleState then
+				if value then
+					_DB.HideUnit[arUnit[i].OldUnit] = nil
+
+					arUnit[i].Unit = arUnit[i].OldUnit
+					arUnit[i].OldUnit = nil
+				else
+					_DB.HideUnit[arUnit[i].Unit] = true
+
+					arUnit[i].OldUnit = arUnit[i].Unit
+					arUnit[i].Unit = nil
+
+					if IFToggleable._IsModeOn(_IGASUI_UNITFRAME_GROUP) then
+						self.Visible = true
+					end
+				end
+			end
+		end,
+		Get = function(self)
+			return self.OldUnit and true or false
+		end,
+		Type = Boolean,
+	}
+
 	property "IFSpellHandlerGroup" {
 		Get = function(self)
 			return _IGASUI_RAIDPANEL_GROUP
 		end,
 	}
-	-- IFMovingGroup
+
 	property "IFMovingGroup" {
 		Get = function(self)
 			return _IGASUI_UNITFRAME_GROUP
 		end,
 	}
-	-- IFResizingGroup
+
 	property "IFResizingGroup" {
+		Get = function(self)
+			return _IGASUI_UNITFRAME_GROUP
+		end,
+	}
+
+	property "IFTogglingGroup" {
 		Get = function(self)
 			return _IGASUI_UNITFRAME_GROUP
 		end,
@@ -46,15 +113,17 @@ class "iSUnitFrame"
 	------------------------------------------------------
 	-- Constructor
 	------------------------------------------------------
-	function iSUnitFrame(self, name, parent, ...)
+	function iUnitFrame(self, name, parent, ...)
 		Super(self, name, parent, ...)
 
-		self.Panel.VSpacing = 4
+		self.Size = UnitFrame_Config.DEFAULT_SIZE
 
-		self:SetSize(200, 48)
+		self.Panel.VSpacing = UnitFrame_Config.PANEL_VSPACING
+		self.Panel.HSpacing = UnitFrame_Config.PANEL_HSPACING
 
 		self.IFMovable = true
 		self.IFResizable = true
+		self.IFToggleable = true
 
 		-- Health
 		self:AddElement(iHealthBar, "rest")
@@ -70,7 +139,7 @@ class "iSUnitFrame"
 
 		arUnit:Insert(self)
 	end
-endclass "iSUnitFrame"
+endclass "iUnitFrame"
 
 class "iUnitFrame"
 	inherit "iSUnitFrame"

@@ -1,9 +1,8 @@
----------------------------------------------------------------------------------------------------
--- IGAS_UI Main
----------------------------------------------------------------------------------------------------
+IGAS:NewAddon "IGAS_UI"
 
--- Addon Initialize
-IGAS:NewAddon("IGAS_UI")
+--==========================
+-- Main settings
+--==========================
 
 import "System"
 import "System.Widget"
@@ -17,9 +16,9 @@ Log = Logger(_Name)
 
 Log.LogLevel = 2
 
-Log:SetPrefix(1, FontColor.Gray .. "[".. _Name .."]" .. FontColor.Normal)
-Log:SetPrefix(2, FontColor.Green .. "[".. _Name .."]" .. FontColor.Normal)
-Log:SetPrefix(3, FontColor.Red .. "[".. _Name .."]" .. FontColor.Normal)
+Log:SetPrefix(1, FontColor.Gray .. "[".. _Name .."]" .. FontColor.Normal, "Debug")
+Log:SetPrefix(2, FontColor.Green .. "[".. _Name .."]" .. FontColor.Normal, "Info")
+Log:SetPrefix(3, FontColor.Red .. "[".. _Name .."]" .. FontColor.Normal, "Warn")
 
 Log:AddHandler(print)
 
@@ -37,6 +36,9 @@ RAID_CLASS_COLORS = {
     ["MONK"] = { r = 0.0, g = 1.00 , b = 0.59, colorStr = "ff00ff96" },
 }
 
+--==========================
+-- Load saved variables
+--==========================
 function OnLoad(self)
 	-- SavedVariables
 	_DB = self:AddSavedVariable("IGAS_UI_DB")
@@ -53,6 +55,9 @@ function OnLoad(self)
 	OnLoad = nil
 end
 
+--==========================
+-- Show the change log
+--==========================
 function OnEnable(self)
 	IFNoCombatTaskHandler._RegisterNoCombatTask(function()
 		local version = tonumber(GetAddOnMetadata(_Name, "Version"):match("%d+"))
@@ -87,12 +92,15 @@ function OnEnable(self)
 	OnEnable = nil
 end
 
+--==========================
+-- Slash command handler
+--==========================
 function OnSlashCmd(self, option, info)
 	if option and option:lower() == "log" and tonumber(info) then
 		Log.LogLevel = tonumber(info)
 		_DB.LogLevel = Log.LogLevel
 
-		Log(2, "%s's LogLevel is switched to %d.", _Name, Log.LogLevel)
+		Info("%s's LogLevel is switched to %d.", _Name, Log.LogLevel)
 	end
 
 	IGAS.UIParent.IGAS_UI_Manager.Visible = true

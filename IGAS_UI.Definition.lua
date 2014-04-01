@@ -1,8 +1,8 @@
----------------------------------------------------------------------------------------------------
--- IGAS_UI Definition
----------------------------------------------------------------------------------------------------
+IGAS:NewAddon "IGAS_UI"
 
-IGAS:NewAddon("IGAS_UI")
+--==========================
+-- IGAS_UI Definitions
+--==========================
 
 ------------------------------------
 -- UnitFrame & RaidPanel StatusBar
@@ -42,15 +42,6 @@ _Debuff_List = {
 	-- [spellId] = true,
 }
 
-------------------------------------
--- Definition !!!Don't modify!!!
-------------------------------------
-
------------------------------------------------
---- iStatusBarStyle
--- @type interface
--- @name iStatusBarStyle
------------------------------------------------
 interface "iStatusBarStyle"
 	_BACK_MULTI = 0.2
 	_BACK_ALPHA = 0.8
@@ -85,11 +76,6 @@ interface "iStatusBarStyle"
     end
 endinterface "iStatusBarStyle"
 
------------------------------------------------
---- iBorder
--- @type interface
--- @name iBorder
------------------------------------------------
 interface "iBorder"
 	THIN_BORDER = {
 	    edgeFile = "Interface\\Buttons\\WHITE8x8",

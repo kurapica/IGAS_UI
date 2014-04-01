@@ -1,8 +1,9 @@
------------------------------------------
--- Script for UnitFrame
------------------------------------------
-
 IGAS:NewAddon "IGAS_UI.UnitFrame"
+
+--==========================
+-- Script for UnitFrame
+--==========================
+arUnit = Array(iSUnitFrame)
 
 _LockMode = true
 
@@ -16,19 +17,18 @@ Toggle = {
 
 		if not _LockMode then
 			for _, frm in ipairs(arUnit) do
-				if frm ~= frmPlayer then
-					frm:UnregisterUnitWatch()
-				end
+				if frm ~= frmPlayer then frm:UnregisterUnitWatch() end
 			end
 			IFMovable._ModeOn(_IGASUI_UNITFRAME_GROUP)
 			IFResizable._ModeOn(_IGASUI_UNITFRAME_GROUP)
+			IFToggleable._ModeOn(_IGASUI_UNITFRAME_GROUP)
 		else
 			IFMovable._ModeOff(_IGASUI_UNITFRAME_GROUP)
 			IFResizable._ModeOff(_IGASUI_UNITFRAME_GROUP)
+			IFToggleable._ModeOff(_IGASUI_UNITFRAME_GROUP)
 			for _, frm in ipairs(arUnit) do
-				if frm ~= frmPlayer then
-					frm:RegisterUnitWatch()
-				end
+				if frm ~= frmPlayer then frm:RegisterUnitWatch() end
+				if not frm.Unit then frm.Visible = false end
 			end
 		end
 
@@ -66,26 +66,14 @@ _Addon.OnSlashCmd = _Addon.OnSlashCmd + function(self, option, info)
 			IFNoCombatTaskHandler._RegisterNoCombatTask(function()
 				if visible then
 					for i = 1, #arUnit do
-						if arUnit[i].OldUnit and arUnit[i].OldUnit:match(info) then
-							_DB.HideUnit[arUnit[i].OldUnit] = nil
-
-							arUnit[i].Unit = arUnit[i].OldUnit
-							arUnit[i].OldUnit = nil
-
-							arUnit[i].IFMovable = true
-							arUnit[i].IFResizable = true
+						if not arUnit[i].ToggleState and arUnit[i].OldUnit:match(info) then
+							arUnit[i].ToggleState = true
 						end
 					end
 				else
 					for i = 1, #arUnit do
-						if arUnit[i].Unit and arUnit[i].Unit:match(info) then
-							_DB.HideUnit[arUnit[i].Unit] = true
-
-							arUnit[i].OldUnit = arUnit[i].Unit
-							arUnit[i].Unit = nil
-
-							arUnit[i].IFMovable = false
-							arUnit[i].IFResizable = false
+						if arUnit[i].ToggleState and arUnit[i].Unit:match(info) then
+							arUnit[i].ToggleState = false
 						end
 					end
 				end
@@ -176,11 +164,7 @@ function OnLoad(self)
 	_DB.HideUnit = _DB.HideUnit or {}
 	for i = 1, #arUnit do
 		if _DB.HideUnit[arUnit[i].Unit] then
-			arUnit[i].OldUnit = arUnit[i].Unit
-			arUnit[i].Unit = nil
-
-			arUnit[i].IFMovable = false
-			arUnit[i].IFResizable = false
+			arUnit[i].ToggleState = false
 		end
 	end
 
