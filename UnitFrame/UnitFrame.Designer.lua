@@ -1,5 +1,7 @@
 IGAS:NewAddon "IGAS_UI.UnitFrame"
 
+arUnit = Array(iUnitFrame)
+
 --==========================
 -- Player
 --==========================

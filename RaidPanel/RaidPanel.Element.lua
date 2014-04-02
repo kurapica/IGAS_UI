@@ -135,8 +135,8 @@ class "iNameLabel"
 	function iNameLabel(self, ...)
 		Super(self, ...)
 
-		self.iNameLabel.UseClassColor = true
-		self.iNameLabel.DrawLayer = "BORDER"
+		self.UseClassColor = true
+		self.DrawLayer = "BORDER"
 	end
 endclass "iNameLabel"
 

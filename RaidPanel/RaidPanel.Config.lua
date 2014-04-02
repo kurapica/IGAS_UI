@@ -8,6 +8,13 @@ _Buff_List = {
 	-- [spellId] = true,
 }
 
+local index = 0
+
+local function newIndex()
+	index = index + 1
+	return index
+end
+
 RaidPanel_Config = {
 	-- Status bar texture
 	STATUSBAR_TEXTURE_PATH = [[Interface\Tooltips\UI-Tooltip-Background]],
@@ -41,31 +48,31 @@ RaidPanel_Config = {
 			Type = MyHealPredictionBar,
 			Property = { HealthBar = "iHealthBar" },
 			Locale = L"My heal prediction",
-			Index = 1,
+			Index = newIndex(),
 		},
 		AllHealPredictionBar = {
 			Type = AllHealPredictionBar,
 			Property = { HealthBar = "iHealthBar" },
 			Locale = L"All heal prediction",
-			Index = 2,
+			Index = newIndex(),
 		},
 		TotalAbsorbBar = {
 			Type = TotalAbsorbBar,
 			Property = { HealthBar = "iHealthBar" },
 			Locale = L"Total Absorb",
-			Index = 3,
+			Index = newIndex(),
 		},
 		HealAbsorbBar = {
 			Type = HealAbsorbBar,
 			Property = { HealthBar = "iHealthBar" },
 			Locale = L"Heal Absorb",
-			Index = 4,
+			Index = newIndex(),
 		},
 		iPowerBar = {
 			Type = iPowerBar,
 			Direction = "south", Size = 3, Unit = "px",
 			Locale = L"Power bar",
-			Index = 5,
+			Index = newIndex(),
 		},
 		iNameLabel = {
 			Type = iNameLabel,
@@ -74,45 +81,45 @@ RaidPanel_Config = {
 				AnchorPoint("TOPRIGHT", -2, -2),
 			},
 			Locale = L"Name indicator",
-			Index = 6,
+			Index = newIndex(),
 		},
 		iBuffPanel = {
 			Type = iBuffPanel,
 			Location = { AnchorPoint("LEFT") },
 			Locale = L"Buff panel",
-			Index = 7,
+			Index = newIndex(),
 		},
 		iDebuffPanel = {
 			Type = iDebuffPanel,
 			Location = { AnchorPoint("BOTTOMRIGHT") },
 			Locale = L"Debuff panel",
-			Index = 8,
+			Index = newIndex(),
 		},
 		DisconnectIcon = {
 			Type = DisconnectIcon,
 			Location = { AnchorPoint("BOTTOMLEFT") },
 			Locale = L"Disconnect indicator",
-			Index = 9,
+			Index = newIndex(),
 		},
 		RangeChecker = {
 			Type = RangeChecker,
 			Location = { AnchorPoint("CENTER", 16, 0, nil, "LEFT") },
 			Property = { UseIndicator = true },
 			Locale = L"Range indicator",
-			Index = 10,
+			Index = newIndex(),
 		},
 		LeaderIcon = {
 			Type = LeaderIcon,
 			Location = { AnchorPoint("CENTER", 0, 0, nil, "TOPLEFT") },
 			Locale = L"Leader indicator",
-			Index = 11,
+			Index = newIndex(),
 		},
 		RoleIcon = {
 			Type = RoleIcon,
 			Location = { AnchorPoint("TOPRIGHT") },
 			Property = { ShowInCombat = false },
 			Locale = L"Group Role indicator",
-			Index = 12,
+			Index = newIndex(),
 		},
 		RoleIcon_Dead = {
 			Type = RoleIcon,
@@ -123,30 +130,30 @@ RaidPanel_Config = {
 			Type = RaidRosterIcon,
 			Location = { AnchorPoint("TOPLEFT") },
 			Locale = L"Raid roster indicator",
-			Index = 13,
+			Index = newIndex(),
 		},
 		RaidTargetIcon = {
 			Type = RaidTargetIcon,
 			Location = { AnchorPoint("CENTER", 0, 0, "TOP") },
 			Locale = L"Raid/Group target indicator",
-			Index = 14,
+			Index = newIndex(),
 		},
 		ResurrectIcon = {
 			Type = ResurrectIcon,
 			Location = { AnchorPoint("BOTTOM") },
 			Locale = L"Resurrect indicator",
-			Index = 15,
+			Index = newIndex(),
 		},
 		ReadyCheckIcon = {
 			Type = ReadyCheckIcon,
 			Location = { AnchorPoint("BOTTOM") },
 			Locale = L"ReadyCheck indicator",
-			Index = 16,
+			Index = newIndex(),
 		},
 		iTarget = {
 			Type = iTarget,
 			Locale = L"Target indicator",
-			Index = 17,
+			Index = newIndex(),
 		},
 	},
 
@@ -187,5 +194,4 @@ RaidPanel_Config = {
 			"ResurrectIcon",
 		},
 	},
-}
 }

@@ -21,7 +21,8 @@ UnitFrame_Config = {
 	ENABLE_HOVER_SPELLCAST = false,
 
 	-- DockLayout settings for UnitFrame
-	PANEL_VSPACING = 4, PANEL_HSPACING = 0,
+	PANEL_VSPACING = 4,
+	PANEL_HSPACING = 0,
 
 	-- Status bar texture
 	STATUSBAR_TEXTURE_PATH = [[Interface\Tooltips\UI-Tooltip-Background]],
@@ -144,6 +145,7 @@ UnitFrame_Config = {
 		},
 		iBuffPanel = {
 			Type = AuraPanel,
+			Name = "iBuffPanel",
 			Location = { AnchorPoint("BOTTOMLEFT", 0, 4, nil, "TOPLEFT") },
 			Property = {
 				Filter = "HELPFUL",
@@ -166,6 +168,7 @@ UnitFrame_Config = {
 		},
 		iDebuffPanel = {
 			Type = AuraPanel,
+			Name = "iDebuffPanel",
 			Location = { AnchorPoint("BOTTOMRIGHT", 0, 4, nil, "TOPRIGHT") },
 			Property = {
 				Filter = "HARMFUL",
@@ -187,7 +190,8 @@ UnitFrame_Config = {
 			},
 		},
 		iDebuffPanel_ToT = {
-			Type = iDebuffPanel,
+			Type = AuraPanel,
+			Name = "iDebuffPanel",
 			Location = { AnchorPoint("TOPRIGHT", 0, -4, nil, "BOTTOMRIGHT") },
 			Property = {
 				Filter = "HARMFUL",
@@ -209,12 +213,12 @@ UnitFrame_Config = {
 			},
 		},
 		QuestBossIcon = {
-			Type = "QuestBossIcon",
+			Type = QuestBossIcon,
 			Location = { AnchorPoint("CENTER", 0, 0, nil, "LEFT") },
 			Property = { Scale = 2 },
 		},
 		RaidTargetIcon = {
-			Type = "RaidTargetIcon",
+			Type = RaidTargetIcon,
 			Location = { AnchorPoint("CENTER", 0, 0, nil, "TOP") },
 		},
 	},

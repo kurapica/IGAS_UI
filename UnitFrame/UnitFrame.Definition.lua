@@ -35,32 +35,36 @@ class "iUnitFrame"
 
 	__Arguments__{ System.Table }
 	function ApplyConfig(self, config)
-		for _, name in ipairs(config) do
+		for n, name in ipairs(config) do
 			local set = UnitFrame_Config.Elements[name]
 			local obj
 
 			-- Create element
 			if set.Name then
-				obj = self:AddElement(set.Name, set.Type, set.Direction, set.Size, set.Unit)
+				self:AddElement(set.Name, set.Type, set.Direction, set.Size, set.Unit)
+				obj = self:GetElement(set.Name)
 			else
-				obj = self:AddElement(set.Type, set.Direction, set.Size, set.Unit)
+				self:AddElement(set.Type, set.Direction, set.Size, set.Unit)
+				obj = self:GetElement(set.Type)
 			end
 
-			-- Apply Location
-			if not set.Direction and set.Location then
-				obj:ClearAllPoints()
-				for _, anchor in ipairs(set.Location) do
-					local parent = anchor.relativeTo and self[anchor.relativeTo] or self
+			if obj then
+				-- Apply Location
+				if not set.Direction and set.Location then
+					obj:ClearAllPoints()
+					for _, anchor in ipairs(set.Location) do
+						local parent = anchor.relativeTo and self[anchor.relativeTo] or self
 
-					if parent then
-						obj:SetPoint(anchor.point, parent, anchor.relativePoint or anchor.point, anchor.xOffset or 0, anchor.yOffset or 0)
+						if parent then
+							obj:SetPoint(anchor.point, parent, anchor.relativePoint or anchor.point, anchor.xOffset or 0, anchor.yOffset or 0)
+						end
 					end
 				end
-			end
 
-			-- Apply Property
-			if set.Property then
-				pcall(obj, set.Property)
+				-- Apply Property
+				if set.Property then
+					pcall(obj, set.Property)
+				end
 			end
 		end
 	end
@@ -72,15 +76,15 @@ class "iUnitFrame"
 		Set = function(self, value)
 			if value ~= self.ToggleState then
 				if value then
-					_DB.HideUnit[arUnit[i].OldUnit] = nil
+					_DB.HideUnit[self.OldUnit] = nil
 
-					arUnit[i].Unit = arUnit[i].OldUnit
-					arUnit[i].OldUnit = nil
+					self.Unit = self.OldUnit
+					self.OldUnit = nil
 				else
-					_DB.HideUnit[arUnit[i].Unit] = true
+					_DB.HideUnit[self.Unit] = true
 
-					arUnit[i].OldUnit = arUnit[i].Unit
-					arUnit[i].Unit = nil
+					self.OldUnit = self.Unit
+					self.Unit = nil
 
 					if IFToggleable._IsModeOn(_IGASUI_UNITFRAME_GROUP) then
 						self.Visible = true
@@ -89,7 +93,7 @@ class "iUnitFrame"
 			end
 		end,
 		Get = function(self)
-			return self.OldUnit and true or false
+			return not self.OldUnit
 		end,
 		Type = Boolean,
 	}

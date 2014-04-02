@@ -730,7 +730,8 @@ function AddType4Config(type, text)
 end
 
 function UpdateConfig4UnitFrame(unitframe, mnuBtn)
-	unitframe:GetElement(mnuBtn.ElementType).Activated = mnuBtn.Checked
+	local ele = unitframe:GetElement(mnuBtn.ElementType)
+	if ele then ele.Activated = mnuBtn.Checked end
 end
 
 function UpdateConfig4MenuBtn(mnuBtn, unitframe)

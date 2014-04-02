@@ -22,26 +22,30 @@ class "iRaidUnitFrame"
 
 			-- Create element
 			if set.Name then
-				obj = self:AddElement(set.Name, set.Type, set.Direction, set.Size, set.Unit)
+				self:AddElement(set.Name, set.Type, set.Direction, set.Size, set.Unit)
+				obj = self:GetElement(set.Name)
 			else
-				obj = self:AddElement(set.Type, set.Direction, set.Size, set.Unit)
+				self:AddElement(set.Type, set.Direction, set.Size, set.Unit)
+				obj = self:GetElement(set.Type)
 			end
 
-			-- Apply Location
-			if not set.Direction and set.Location then
-				obj:ClearAllPoints()
-				for _, anchor in ipairs(set.Location) do
-					local parent = anchor.relativeTo and self[anchor.relativeTo] or self
+			if obj then
+				-- Apply Location
+				if not set.Direction and set.Location then
+					obj:ClearAllPoints()
+					for _, anchor in ipairs(set.Location) do
+						local parent = anchor.relativeTo and self[anchor.relativeTo] or self
 
-					if parent then
-						obj:SetPoint(anchor.point, parent, anchor.relativePoint or anchor.point, anchor.xOffset or 0, anchor.yOffset or 0)
+						if parent then
+							obj:SetPoint(anchor.point, parent, anchor.relativePoint or anchor.point, anchor.xOffset or 0, anchor.yOffset or 0)
+						end
 					end
 				end
-			end
 
-			-- Apply Property
-			if set.Property then
-				pcall(obj, set.Property)
+				-- Apply Property
+				if set.Property then
+					pcall(obj, set.Property)
+				end
 			end
 		end
 	end
@@ -79,6 +83,8 @@ class "iUnitPanel"
 	-- Constructor
 	------------------------------------------------------
     function iUnitPanel(self, ...)
+    	Super(self, ...)
+
 		self.ElementType = iRaidUnitFrame
 
 		self.OnElementAdd = self.OnElementAdd + OnElementAdd
@@ -108,6 +114,8 @@ class "iPetUnitPanel"
 	-- Constructor
 	------------------------------------------------------
     function iPetUnitPanel(self, ...)
+    	Super(self, ...)
+
 		self.ElementType = iRaidUnitFrame
 
 		self.OnElementAdd = self.OnElementAdd + OnElementAdd

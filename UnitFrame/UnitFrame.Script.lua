@@ -3,8 +3,6 @@ IGAS:NewAddon "IGAS_UI.UnitFrame"
 --==========================
 -- Script for UnitFrame
 --==========================
-arUnit = Array(iSUnitFrame)
-
 _LockMode = true
 
 Toggle = {
