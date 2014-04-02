@@ -1,8 +1,8 @@
------------------------------------------
--- Designer for RaidPanel
------------------------------------------
-
 IGAS:NewAddon "IGAS_UI.RaidPanel"
+
+--==========================
+-- Designer for RaidPanel
+--==========================
 
 SPELLS_PER_PAGE = _G.SPELLS_PER_PAGE
 
@@ -17,42 +17,22 @@ for i = 1, SPELLS_PER_PAGE do
 	Masks:Insert(BindingButton("SpellBindingMask", _G["SpellButton"..i]))
 end
 
-raidPanel = UnitPanel("IGAS_UI_RAIDPANEL")
+raidPanel = iUnitPanel("IGAS_UI_RAIDPANEL")
 raidPanel:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 0, -300)
-raidPanel.ElementType = iRaidUnitFrame
 raidPanel.ElementPrefix = "iRaidUnitFrame"
-raidPanel.VSpacing = 3
-raidPanel.HSpacing = 3
-raidPanel.MarginTop = 3
-raidPanel.MarginBottom = 3
-raidPanel.MarginLeft = 3
-raidPanel.MarginRight = 3
 
 raidPanelMask = Mask("Mask", raidPanel)
 raidPanelMask.AsMove = true
 
-raidPetPanel = PetUnitPanel("IGAS_UI_RAIDPETPANEL")
+raidPetPanel = iPetUnitPanel("IGAS_UI_RAIDPETPANEL")
 raidPetPanel:SetPoint("TOPLEFT", raidPanel, "BOTTOMLEFT")
-raidPetPanel.ElementType = iRaidUnitFrame
 raidPetPanel.ElementPrefix = "iRaidPetUnitFrame"
-raidPetPanel.VSpacing = 3
-raidPetPanel.HSpacing = 3
-raidPetPanel.MarginTop = 3
-raidPetPanel.MarginBottom = 3
-raidPetPanel.MarginLeft = 3
-raidPetPanel.MarginRight = 3
 
-raidDeadPanel = UnitPanel("IGAS_UI_DEADPANEL")
+raidDeadPanel = iUnitPanel("IGAS_UI_DEADPANEL")
 raidDeadPanel:SetPoint("TOPLEFT", raidPetPanel, "BOTTOMLEFT")
-raidDeadPanel.ElementType = iDeadUnitFrame
+raidDeadPanel.Stype = "Dead"
 raidDeadPanel.ElementPrefix = "iRaidDeadUnitFrame"
 raidDeadPanel.ShowDeadOnly = true
-raidDeadPanel.VSpacing = 3
-raidDeadPanel.HSpacing = 3
-raidDeadPanel.MarginTop = 3
-raidDeadPanel.MarginBottom = 3
-raidDeadPanel.MarginLeft = 3
-raidDeadPanel.MarginRight = 3
 
 -- withPanel
 withPanel = Frame("IGASUI_Withpanel", SpellBookFrame)
@@ -355,3 +335,77 @@ for _, v in ipairs({
 end
 
 raidPanelConfig:GetMenuButton(L"Dead panel", L"Filter", L"ROLE").DropDownList.MultiSelect = true
+
+-- Debuff filter
+iDebuffFilter = Form("IGAS_UI_IDebuffFilter")
+iDebuffFilter.Caption = L"Black list"
+iDebuffFilter.Message = L"Double click to remove"
+iDebuffFilter.Resizable = false
+iDebuffFilter:SetSize(300, 400)
+iDebuffFilter.Visible = false
+
+iDebuffBlackList = List("BlackList", iDebuffFilter)
+iDebuffBlackList:SetPoint("TOPLEFT", 4, -26)
+iDebuffBlackList:SetPoint("BOTTOMRIGHT", -4, 26)
+iDebuffBlackList.ShowTootip = true
+
+function iDebuffFilter:OnShow()
+	iDebuffBlackList:SuspendLayout()
+
+    iDebuffBlackList:Clear()
+
+    for spellID in pairs(_DebuffBlackList) do
+        local name, _, icon = GetSpellInfo(spellID)
+
+        iDebuffBlackList:AddItem(spellID, name, icon)
+    end
+
+    iDebuffBlackList:ResumeLayout()
+end
+
+function iDebuffBlackList:OnItemDoubleClick(spellID, name, icon)
+    self:RemoveItem(spellID)
+    _DebuffBlackList[spellID] = nil
+end
+
+function iDebuffBlackList:OnGameTooltipShow(GameTooltip, spellID)
+    GameTooltip:SetSpellByID(spellID)
+end
+
+-- Menu Settings
+mnuRaidPanelDebuffFilter = raidPanelConfig:AddMenuButton(L"Element Settings", L"Debuff filter")
+
+function mnuRaidPanelDebuffFilter:OnClick()
+	iDebuffFilter.Visible = true
+end
+
+mnuRaidPanelDebuffRightMouseRemove = raidPanelConfig:AddMenuButton(L"Element Settings", L"Right mouse-click send debuff to black list")
+mnuRaidPanelDebuffRightMouseRemove.IsCheckButton = true
+
+mnuRaidPanelDebuffShowTooltip = raidPanelConfig:AddMenuButton(L"Element Settings", L"Show buff/debuff tootip")
+mnuRaidPanelDebuffShowTooltip.IsCheckButton = true
+
+function mnuRaidPanelDebuffRightMouseRemove:OnCheckChanged()
+	if raidPanelConfig.Visible then
+		_DB.DebuffRightMouseRemove = self.Checked
+
+		raidPanel:Each(function (self)
+			self:GetElement(iDebuffPanel):Each("MouseEnabled", _DB.ShowDebuffTooltip or _DB.DebuffRightMouseRemove)
+		end)
+	end
+end
+
+function mnuRaidPanelDebuffShowTooltip:OnCheckChanged()
+	if raidPanelConfig.Visible then
+		_DB.ShowDebuffTooltip = self.Checked
+
+		raidPanel:Each(function (self)
+			self:GetElement(iDebuffPanel):Each("ShowTooltip", _DB.ShowDebuffTooltip)
+			self:GetElement(iDebuffPanel):Each("MouseEnabled", _DB.ShowDebuffTooltip or _DB.DebuffRightMouseRemove)
+
+			if self:GetElement(iBuffPanel) then
+				self:GetElement(iBuffPanel):Each("ShowTooltip", _DB.ShowDebuffTooltip)
+			end
+		end)
+	end
+end

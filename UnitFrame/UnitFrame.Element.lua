@@ -1,178 +1,65 @@
 IGAS:NewAddon "IGAS_UI.UnitFrame"
 
 --==========================
--- Definition for UnitFrame
+-- Layout for UnitFrame
 --==========================
-
 import "System.Widget"
 import "System.Widget.Unit"
 
-_IGASUI_RAIDPANEL_GROUP = "IRaidPanel"	-- Same as the raidPanel, no raidpanel no settings.
-_IGASUI_UNITFRAME_GROUP = "IUnitFrame"
+--==========================
+-- Interfaces
+--==========================
+interface "iStatusBarStyle"
+	_BACK_MULTI = 0.2
+	_BACK_ALPHA = 0.8
 
-PLAYER_COLOR = RAID_CLASS_COLORS[select(2, UnitClass("player"))]
+	local oldSetStatusBarColor = StatusBar.SetStatusBarColor
 
-class "iUnitFrame"
-	inherit "UnitFrame"
-	extend "IFMovable" "IFResizable" "IFToggleable"
+	local function SetStatusBarColor(self, r, g, b, a)
+	    if r then
+	        oldSetStatusBarColor(self, r, g, b)
 
-	if UnitFrame_Config.ENABLE_HOVER_SPELLCAST then extend "IFSpellHandler" end
-
-	------------------------------------------------------
-	-- Method
-	------------------------------------------------------
-	function ApplyConfig(self, ...)
-		for i = 1, select('#', ...) do
-			local config = select(i, ...)
-
-			if UnitFrame_Config[config] then
-				for _, set in ipairs(UnitFrame_Config[config]) do
-					local obj
-
-					-- Create element
-					if set.Name then
-						obj = self:AddElement(set.Name, set.Type, set.Direction, set.Size, set.Unit)
-					else
-						obj = self:AddElement(set.Type, set.Direction, set.Size, set.Unit)
-					end
-
-					-- Apply Location
-					if not set.Direction and set.Location then
-						obj:ClearAllPoints()
-						for _, anchor in ipairs(set.Location) do
-							local parent = anchor.relativeTo and self[anchor.relativeTo] or self
-
-							if parent then
-								obj:SetPoint(anchor.point, parent, anchor.relativePoint or anchor.point, anchor.xOffset or 0, anchor.yOffset or 0)
-							end
-						end
-					end
-
-					-- Apply Property
-					if set.Property then
-						pcall(obj, set.Property)
-					end
-				end
-			end
-		end
+	        self.Bg:SetVertexColor(r * _BACK_MULTI, g * _BACK_MULTI, b * _BACK_MULTI, _BACK_ALPHA)
+	    end
 	end
 
 	------------------------------------------------------
-	-- Property
+	-- Initialize
 	------------------------------------------------------
-	property "ToggleState" {
-		Set = function(self, value)
-			if value ~= self.ToggleState then
-				if value then
-					_DB.HideUnit[arUnit[i].OldUnit] = nil
+    function iStatusBarStyle(self)
+		self.StatusBarTexturePath = UnitFrame_Config.STATUSBAR_TEXTURE_PATH
 
-					arUnit[i].Unit = arUnit[i].OldUnit
-					arUnit[i].OldUnit = nil
-				else
-					_DB.HideUnit[arUnit[i].Unit] = true
+		local bgColor = Texture("Bg", self, "BACKGROUND")
+		bgColor:SetTexture(1, 1, 1, 1)
+		bgColor:SetAllPoints()
+		self.Bg = bgColor	-- For quick access
 
-					arUnit[i].OldUnit = arUnit[i].Unit
-					arUnit[i].Unit = nil
+		self.SetStatusBarColor = SetStatusBarColor
+    end
+endinterface "iStatusBarStyle"
 
-					if IFToggleable._IsModeOn(_IGASUI_UNITFRAME_GROUP) then
-						self.Visible = true
-					end
-				end
-			end
-		end,
-		Get = function(self)
-			return self.OldUnit and true or false
-		end,
-		Type = Boolean,
-	}
-
-	property "IFSpellHandlerGroup" {
-		Get = function(self)
-			return _IGASUI_RAIDPANEL_GROUP
-		end,
-	}
-
-	property "IFMovingGroup" {
-		Get = function(self)
-			return _IGASUI_UNITFRAME_GROUP
-		end,
-	}
-
-	property "IFResizingGroup" {
-		Get = function(self)
-			return _IGASUI_UNITFRAME_GROUP
-		end,
-	}
-
-	property "IFTogglingGroup" {
-		Get = function(self)
-			return _IGASUI_UNITFRAME_GROUP
-		end,
+interface "iBorder"
+	THIN_BORDER = {
+	    edgeFile = "Interface\\Buttons\\WHITE8x8",
+	    edgeSize = 1,
 	}
 
 	------------------------------------------------------
-	-- Constructor
+	-- Initialize
 	------------------------------------------------------
-	function iUnitFrame(self, name, parent, ...)
-		Super(self, name, parent, ...)
+    function iBorder(self)
+		local bg = Frame("Back", self)
+		bg.FrameStrata = "BACKGROUND"
+		bg:SetPoint("TOPLEFT", -1, 1)
+		bg:SetPoint("BOTTOMRIGHT", 1, -1)
+		bg.Backdrop = THIN_BORDER
+		bg.BackdropBorderColor = UnitFrame_Config.DEFAULT_BORDER_COLOR
+    end
+endinterface "iBorder"
 
-		self.Size = UnitFrame_Config.DEFAULT_SIZE
-
-		self.Panel.VSpacing = UnitFrame_Config.PANEL_VSPACING
-		self.Panel.HSpacing = UnitFrame_Config.PANEL_HSPACING
-
-		self.IFMovable = true
-		self.IFResizable = true
-		self.IFToggleable = true
-
-		-- Health
-		self:AddElement(iHealthBar, "rest")
-
-		-- Name
-		self:AddElement(NameLabel)
-		self.NameLabel.UseClassColor = true
-		self.NameLabel:SetPoint("RIGHT", self.iHealthBar, "RIGHT", -4, 0)
-
-		-- Level
-		self:AddElement(LevelLabel)
-		self.LevelLabel:SetPoint("RIGHT", self.NameLabel, "LEFT", -4, 0)
-
-		arUnit:Insert(self)
-	end
-endclass "iUnitFrame"
-
-class "iUnitFrame"
-	inherit "iSUnitFrame"
-
-	------------------------------------------------------
-	-- Constructor
-	------------------------------------------------------
-	function iUnitFrame(self, name, parent, ...)
-		Super(self, name, parent, ...)
-
-		-- Power
-		self:AddElement(iPowerBar, "south", 6, "px")
-
-		-- Name
-		self.NameLabel:ClearAllPoints()
-		self.NameLabel:SetPoint("TOPRIGHT", self, "BOTTOMRIGHT")
-
-		-- Cast
-		self:AddElement(iCastBar)
-		self.iCastBar:SetAllPoints(self.iHealthBar)
-
-		-- Percent Health text
-		self:AddElement(HealthTextFrequent)
-		self.HealthTextFrequent.ShowPercent = true
-		self.HealthTextFrequent:SetPoint("RIGHT", self.iHealthBar, "LEFT", -4, 0)
-
-		-- Full Health Text
-		self:AddElement("HealthTextFrequent2", HealthTextFrequent)
-		self.HealthTextFrequent2.ValueFormat = "%.1f"
-		self.HealthTextFrequent2:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 0, -2)
-	end
-endclass "iUnitFrame"
-
+--==========================
+-- Elements
+--==========================
 class "iHealthBar"
 	inherit "HealthBarFrequent"
 	extend "iBorder" "iStatusBarStyle"
@@ -181,11 +68,11 @@ class "iHealthBar"
 		if self.Unit == "target" then
 			local classification = UnitClassification("target")
 			if classification == "worldboss" or classification == "elite" then
-				self.Back.BackdropBorderColor = ELITE_BORDER_COLOR
+				self.Back.BackdropBorderColor = UnitFrame_Config.ELITE_BORDER_COLOR
 			elseif classification == "rareelite" or classification == "rare" then
-				self.Back.BackdropBorderColor = RARE_BORDER_COLOR
+				self.Back.BackdropBorderColor = UnitFrame_Config.RARE_BORDER_COLOR
 			else
-				self.Back.BackdropBorderColor = DEFAULT_BORDER_COLOR
+				self.Back.BackdropBorderColor = UnitFrame_Config.DEFAULT_BORDER_COLOR
 			end
 		end
 		return Super.Refresh(self, ...)
@@ -211,106 +98,14 @@ class "iHiddenManaBar"
 	extend "iBorder" "iStatusBarStyle"
 endclass "iHiddenManaBar"
 
-class "iBuffPanel"
-	inherit "AuraPanel"
-
-	BUFF_SIZE = BUFF_SIZE
-
-	------------------------------------
-	--- Custom Filter method
-	-- @name CustomFilter
-	-- @type function
-	-- @param unit
-	-- @param index
-	-- @param filter
-	-- @return boolean
-	------------------------------------
-	function CustomFilter(self, unit, index, filter)
-		local isEnemy = UnitCanAttack("player", unit)
-		local name, _, _, _, _, duration, _, caster, _, _, spellID = UnitAura(unit, index, filter)
-
-		if name and duration > 0 and (_Buff_List[spellID] or isEnemy or caster == "player") then
-			return true
-		end
-	end
-
-	------------------------------------------------------
-	-- Constructor
-	------------------------------------------------------
-    function iBuffPanel(self, name, parent, ...)
-		Super(self, name, parent, ...)
-
-		self.Filter = "HELPFUL"
-		self.HighLightPlayer = true
-		self.RowCount = 6
-		self.ColumnCount = 6
-		self.MarginTop = 2
-
-		self.ElementWidth = BUFF_SIZE
-		self.ElementHeight = BUFF_SIZE
-    end
-endclass "iBuffPanel"
-
-class "iDebuffPanel"
-	inherit "AuraPanel"
-
-	BUFF_SIZE = BUFF_SIZE
-
-	------------------------------------
-	--- Custom Filter method
-	-- @name CustomFilter
-	-- @type function
-	-- @param unit
-	-- @param index
-	-- @param filter
-	-- @return boolean
-	------------------------------------
-	function CustomFilter(self, unit, index, filter)
-		local isFriend = not UnitCanAttack("player", unit)
-		local name, _, _, _, _, duration, _, caster, _, _, spellID = UnitAura(unit, index, filter)
-
-		if name and duration > 0 and (_Debuff_List[spellID] or isFriend or caster == "player") then
-			return true
-		end
-	end
-
-	------------------------------------------------------
-	-- Constructor
-	------------------------------------------------------
-    function iDebuffPanel(self, name, parent, ...)
-		Super(self, name, parent, ...)
-
-		self.Filter = "HARMFUL"
-		self.HighLightPlayer = true
-		self.RowCount = 6
-		self.ColumnCount = 6
-		self.MarginTop = 2
-
-		self.ElementWidth = BUFF_SIZE
-		self.ElementHeight = BUFF_SIZE
-    end
-endclass "iDebuffPanel"
-
 class "iCastBar"
 	inherit "CastBar"
 
-	STATUSBAR_TEXTURE_PATH = STATUSBAR_TEXTURE_PATH
-
-	------------------------------------------------------
-	-- Method
-	------------------------------------------------------
-
-	------------------------------------
-	--- Custom the statusbar
-	-- @name SetUpCooldownStatus
-	-- @class function
-	-- @param status
-	------------------------------------
 	function SetUpCooldownStatus(self, status)
 		self.__CastBar = status
 		Super.SetUpCooldownStatus(self, status)
-		status.StatusBarTexturePath = STATUSBAR_TEXTURE_PATH
-		status.StatusBarColor = CASTBAR_COLOR
+		status.StatusBarTexturePath = UnitFrame_Config.STATUSBAR_TEXTURE_PATH
+		status.StatusBarColor = UnitFrame_Config.CASTBAR_COLOR
 	end
 endclass "iCastBar"
 
@@ -323,9 +118,7 @@ class "iClassPowerButton"
 	------------------------------------------------------
 	-- Activated
 	property "Activated" {
-		Get = function(self)
-			return self.__Activated
-		end,
+		Field = "__Activated",
 		Set = function(self, value)
 			if self.Activated ~= value then
 				self.__Activated = value
@@ -415,18 +208,20 @@ class "iClassPower"
 
 	MAX_POWER_PER_EMBER = _G.MAX_POWER_PER_EMBER
 
+	PLAYER_COLOR = RAID_CLASS_COLORS[select(2, UnitClass("player"))]
+
 	------------------------------------------------------
 	-- Method
 	------------------------------------------------------
 	function RefreshBar(self)
 		local numBar
 
-		if self.__ClassPowerType == SPELL_POWER_BURNING_EMBERS then
+		if self.ClassPowerType == SPELL_POWER_BURNING_EMBERS then
 			numBar = floor(self.__Max / MAX_POWER_PER_EMBER)
 			if numBar > 3 then
 				numBar = 4
 			end
-		elseif self.__ClassPowerType then
+		elseif self.ClassPowerType then
 			numBar = self.__Max
 		else
 			return
@@ -451,7 +246,7 @@ class "iClassPower"
 			self[i].Activated = false
 			self[i]:Show()
 
-			if self.__ClassPowerType == SPELL_POWER_BURNING_EMBERS then
+			if self.ClassPowerType == SPELL_POWER_BURNING_EMBERS then
 				self[i]:SetMinMaxValues(0, MAX_POWER_PER_EMBER)
 			elseif numBar == 1 then
 				self[i]:SetMinMaxValues(0, self.__Max)
@@ -468,7 +263,7 @@ class "iClassPower"
 
 		local value = self.__Value or 0
 
-		if self.__ClassPowerType == SPELL_POWER_BURNING_EMBERS then
+		if self.ClassPowerType == SPELL_POWER_BURNING_EMBERS then
 			for i = 1, self.__NumBar do
 				if value >= MAX_POWER_PER_EMBER then
 					self[i].Value = MAX_POWER_PER_EMBER
@@ -485,7 +280,7 @@ class "iClassPower"
 		else
 			local needActive = false
 
-			if self.__ClassPowerType == SPELL_POWER_HOLY_POWER then
+			if self.ClassPowerType == SPELL_POWER_HOLY_POWER then
 				if value >= 3 then
 					needActive = true
 				end
@@ -510,9 +305,7 @@ class "iClassPower"
 	------------------------------------------------------
 	-- Value
 	property "Value" {
-		Get = function(self)
-			return self.__Value
-		end,
+		Field = "__Value",
 		Set = function(self, value)
 			if self.__Value ~= value then
 				self.__Value = value
@@ -537,14 +330,6 @@ class "iClassPower"
 	}
 	-- ClassPowerType
 	property "ClassPowerType" {
-		Get = function(self)
-			return self.__ClassPowerType
-		end,
-		Set = function(self, value)
-			if self.__ClassPowerType ~= value then
-				self.__ClassPowerType = value
-			end
-		end,
 		Type = System.Number+nil,
 	}
 
@@ -574,7 +359,7 @@ class "iClassPower"
 
 		if select(2, UnitClass("player")) == "ROGUE" or select(2, UnitClass("player")) == "DRUID" then
 			self.Refresh = IFComboPoint.Refresh
-			self.__ClassPowerType = 100
+			self.ClassPowerType = 100
 			self.__Min, self.__Max = 0, _G.MAX_COMBO_POINTS
 		end
     end
@@ -616,11 +401,6 @@ class "iRuneBar"
 		[6] = 4,
 	}
 
-	-----------------------------------------------
-	--- iRuneButton
-	-- @type class
-	-- @name iRuneButton
-	-----------------------------------------------
 	class "iRuneButton"
 		inherit "Button"
 		extend "IFCooldownStatus"
@@ -630,9 +410,7 @@ class "iRuneBar"
 		------------------------------------------------------
 		-- RuneType
 		property "RuneType" {
-			Get = function(self)
-				return self.__RuneType
-			end,
+			Field = "__RuneType",
 			Set = function(self, value)
 				if self.RuneType ~= value then
 					self.__RuneType = value
@@ -649,9 +427,7 @@ class "iRuneBar"
 		}
 		-- Ready
 		property "Ready" {
-			Get = function(self)
-				return self.__Ready
-			end,
+			Field = "__Ready",
 			Set = function(self, value)
 				if self.Ready ~= value then
 					self.__Ready = value
@@ -739,14 +515,6 @@ class "iEclipseBar"
 	BALANCE_TOOLTIP = _G.BALANCE_TOOLTIP
 
 	------------------------------------------------------
-	-- Script
-	------------------------------------------------------
-
-	------------------------------------------------------
-	-- Method
-	------------------------------------------------------
-
-	------------------------------------------------------
 	-- Property
 	------------------------------------------------------
 	-- SunActivated
@@ -794,9 +562,7 @@ class "iEclipseBar"
 	}
 	-- Value
 	property "Value" {
-		Get = function(self)
-			return self.__Value
-		end,
+		Field = "__Value",
 		Set = function(self, value)
 			self.__Value = value
 
@@ -877,7 +643,7 @@ class "iStaggerBar"
     function iStaggerBar(self, name, parent, ...)
 		Super(self, name, parent, ...)
 
-		self.StatusBarTexturePath = _Addon.STATUSBAR_TEXTURE_PATH
+		self.StatusBarTexturePath = UnitFrame_Config.STATUSBAR_TEXTURE_PATH
 
     	self.FrameLevel = self.FrameLevel + 2
     	self:SetStatusBarColor(1, 0, 0)

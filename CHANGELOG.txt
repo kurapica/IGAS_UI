@@ -1,3 +1,8 @@
+2014/04/02: v32
+	1. Using config file to define what and how the elements should be shown on the screen for each unit frames in raidpanel and unitframe module.
+
+	2. Now you can use right-click toggle show/hide the unit frames.
+
 2013/11/13: v31-2
 	1. Update for IGAS v55.
 

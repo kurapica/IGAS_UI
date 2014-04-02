@@ -4,6 +4,16 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2014/04/02 v32 : </lime>
+</p><br/>
+<p>
+    1. Using config file to define what and how the elements should be shown on the screen for each unit frames in raidpanel and unitframe module.
+</p>
+<p>
+    2. Now you can use right-click toggle show/hide the unit frames.
+</p>
+<br/><br/>
+<p>
 <lime>2013/11/8 v31 : </lime>
 </p><br/>
 <p>

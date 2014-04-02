@@ -1,21 +1,7 @@
 ﻿<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+	<Script file = "RaidPanel.Element.lua"/>
+	<Script file = "RaidPanel.Config.lua"/>
 	<Script file = "RaidPanel.Definition.lua"/>
 	<Script file = "RaidPanel.Designer.lua"/>
 	<Script file = "RaidPanel.Script.lua"/>
-
-	<!-- Elements -->
-	<Script file = "Element\iHealthBar.lua"/>
-	<Script file = "Element\iPowerBar.lua"/>
-	<Script file = "Element\iNameLabel.lua"/>
-	<Script file = "Element\iBuffPanel.lua"/>
-	<Script file = "Element\iDebuffPanel.lua"/>
-	<Script file = "Element\iConnect.lua"/>
-	<Script file = "Element\iRange.lua"/>
-	<Script file = "Element\iLeaderIcon.lua"/>
-	<Script file = "Element\iGroupRole.lua"/>
-	<Script file = "Element\iRaidRosterIcon.lua"/>
-	<Script file = "Element\iRaidTarget.lua"/>
-	<Script file = "Element\iResurrect.lua"/>
-	<Script file = "Element\iReadyCheck.lua"/>
-	<Script file = "Element\iTarget.lua"/>
 </Ui>

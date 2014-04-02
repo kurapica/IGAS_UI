@@ -1,8 +1,8 @@
------------------------------------------
--- Script for RaidPanel
------------------------------------------
-
 IGAS:NewAddon "IGAS_UI.RaidPanel"
+
+--==========================
+-- Script for RaidPanel
+--==========================
 
 SpellBookFrame = _G.SpellBookFrame
 MAX_SKILLLINE_TABS = _G.MAX_SKILLLINE_TABS
@@ -269,6 +269,24 @@ function OnLoad(self)
 			end
 		end
 	end)
+
+	-- Debuff filter
+	_DB.DebuffSpellList = nil
+	_DB.DebuffBlackList = _DB.DebuffBlackList or {}
+
+	_DebuffBlackList = _DB.DebuffBlackList
+
+	-- Default true
+	if _DB.DebuffRightMouseRemove == nil then
+		_DB.DebuffRightMouseRemove = true
+	end
+
+	if _DB.ShowDebuffTooltip == nil then
+		_DB.ShowDebuffTooltip = true
+	end
+
+	mnuRaidPanelDebuffRightMouseRemove.Checked = _DB.DebuffRightMouseRemove
+	mnuRaidPanelDebuffShowTooltip.Checked = _DB.ShowDebuffTooltip
 
 	-- System Events
 	self:RegisterEvent("PLAYER_REGEN_DISABLED")
@@ -763,3 +781,20 @@ function UpdateHealthBar4UseClassColor()
 		self:GetElement(iHealthBar).UseClassColor = flag
 	end)
 end
+
+--------------------
+-- Load elements menu
+--------------------
+local order = {}
+
+for _, ele in pairs(RaidPanel_Config.Elements) do
+	if ele.Locale and ele.Index then
+		order[ele.Index] = ele
+	end
+end
+
+for _, ele in ipairs(order) do
+	AddType4Config(ele.Type, ele.Locale)
+end
+
+order = nil

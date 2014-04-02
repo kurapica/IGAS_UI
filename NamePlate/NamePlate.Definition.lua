@@ -5,25 +5,35 @@ IGAS:NewAddon "IGAS_UI.NamePlate"
 
 import "System.Widget"
 
+-- Debuff size for target name plate
+TARGET_DEBUFF_SIZE = 42
+
+-- Max alpha for debuff length than, if set to 5, the icon should be max alpha if the debuff length than 5s
+TARGET_DEBUFF_MAX_ALPHA_LIMIT = 5
+
 class "NamePlateMask"
 	inherit "VirtualUIObject"
 
-	STATUSBAR_TEXTURE_PATH = STATUSBAR_TEXTURE_PATH
+	STATUSBAR_TEXTURE_PATH = [[Interface\Tooltips\UI-Tooltip-Background]]
+
+	DEFAULT_BORDER_COLOR = ColorType(0, 0, 0)
+
+	THIN_BORDER = {
+	    edgeFile = "Interface\\Buttons\\WHITE8x8",
+	    edgeSize = 1,
+	}
+
+	local function buildBorder(self)
+		local bg = Frame("Back", self)
+		bg.FrameStrata = "BACKGROUND"
+		bg:SetPoint("TOPLEFT", -1, 1)
+		bg:SetPoint("BOTTOMRIGHT", 1, -1)
+		bg.Backdrop = THIN_BORDER
+		bg.BackdropBorderColor = DEFAULT_BORDER_COLOR
+	end
 
 	------------------------------------------------------
-	-- Script
-	------------------------------------------------------
-
-	------------------------------------------------------
-	-- Method
-	------------------------------------------------------
-
-	------------------------------------------------------
-	-- Property
-	------------------------------------------------------
-
-	------------------------------------------------------
-	-- Constructor
+	-- Event Handler
 	------------------------------------------------------
 	local function OnShow(self)
 		self.CastBack:SetAlpha(0)
@@ -39,7 +49,7 @@ class "NamePlateMask"
 		self.HealthBar = ({({parent:GetChildren()})[1]:GetChildren()})[1]
 
 		self.HealthBar:SetStatusBarTexture(STATUSBAR_TEXTURE_PATH, "ARTWORK")
-		iBorder._BuildBorder(self.HealthBar)
+		buildBorder(self.HealthBar)
 
 		-- Original back
 		local back = ({({parent:GetChildren()})[1]:GetRegions()})[2]
@@ -51,7 +61,7 @@ class "NamePlateMask"
 		self.CastBar.OnShow = OnShow
 
 		self.CastBar:SetStatusBarTexture(STATUSBAR_TEXTURE_PATH, "ARTWORK")
-		iBorder._BuildBorder(self.CastBar)
+		buildBorder(self.CastBar)
 
 		self.CastBar.CastBack = ({({({parent:GetChildren()})[1]:GetChildren()})[2]:GetRegions()})[2]
 
@@ -62,13 +72,10 @@ endclass "NamePlateMask"
 class "iDebuffPanel"
 	inherit "AuraPanel"
 
-	TARGET_DEBUFF_SIZE = TARGET_DEBUFF_SIZE
-
 	class "AuraIcon"
 		inherit "Frame"
 		extend "IFCooldownLabel"
 
-		TARGET_DEBUFF_MAX_ALPHA_LIMIT = TARGET_DEBUFF_MAX_ALPHA_LIMIT
 		NORMAL_COLOR = ColorType(1, 1, 1)
 		LAST_COLOR = ColorType(1, 0.12, 0.12)
 

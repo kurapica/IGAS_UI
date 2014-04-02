@@ -1,18 +1,50 @@
------------------------------------------
--- Definition for RaidPanel
------------------------------------------
-
 IGAS:NewAddon "IGAS_UI.RaidPanel"
 
-import "System.Widget"
-import "System.Widget.Unit"
-
+--==========================
+-- Definition for RaidPanel
+--==========================
 _IGASUI_RAIDPANEL_GROUP = "IRaidPanel"
 _IGASUI_SPELLHANDLER = IFSpellHandler._Group(_IGASUI_RAIDPANEL_GROUP)
 
 class "iRaidUnitFrame"
 	inherit "UnitFrame"
 	extend "IFSpellHandler"
+
+	------------------------------------------------------
+	-- Method
+	------------------------------------------------------
+	function ApplyConfig(self, config)
+		if type(config) ~= "table" or #config == 0 then return end
+
+		for _, name in ipairs(config) do
+			local set = RaidPanel_Config.Elements[name]
+			local obj
+
+			-- Create element
+			if set.Name then
+				obj = self:AddElement(set.Name, set.Type, set.Direction, set.Size, set.Unit)
+			else
+				obj = self:AddElement(set.Type, set.Direction, set.Size, set.Unit)
+			end
+
+			-- Apply Location
+			if not set.Direction and set.Location then
+				obj:ClearAllPoints()
+				for _, anchor in ipairs(set.Location) do
+					local parent = anchor.relativeTo and self[anchor.relativeTo] or self
+
+					if parent then
+						obj:SetPoint(anchor.point, parent, anchor.relativePoint or anchor.point, anchor.xOffset or 0, anchor.yOffset or 0)
+					end
+				end
+			end
+
+			-- Apply Property
+			if set.Property then
+				pcall(obj, set.Property)
+			end
+		end
+	end
 
 	------------------------------------------------------
 	-- Property
@@ -26,29 +58,68 @@ class "iRaidUnitFrame"
 	function iRaidUnitFrame(self, name, parent, ...)
 		Super(self, name, parent, ...)
 
-		self.Panel.VSpacing = 1
+		self.Panel.VSpacing = RaidPanel_Config.UNITFRAME_VSPACING
+		self.Panel.HSpacing = RaidPanel_Config.UNITFRAME_HSPACING
 	end
 endclass "iRaidUnitFrame"
 
-class "iDeadUnitFrame"
-	inherit "UnitFrame"
-	extend "IFSpellHandler"
+class "iUnitPanel"
+	inherit "UnitPanel"
+
+	local function OnElementAdd(self, ele)
+		ele:ApplyConfig(RaidPanel_Config.Style[self.Style])
+	end
 
 	------------------------------------------------------
 	-- Property
 	------------------------------------------------------
-	property "IFSpellHandlerGroup" {
-		Get = function(self)
-			return _IGASUI_RAIDPANEL_GROUP
-		end,
-	}
+	property "Style" { Type = String, Default = "Normal" }
 
-	function iDeadUnitFrame(self, name, parent, ...)
-		Super(self, name, parent, ...)
+	------------------------------------------------------
+	-- Constructor
+	------------------------------------------------------
+    function iUnitPanel(self, ...)
+		self.ElementType = iRaidUnitFrame
 
-		self.Panel.VSpacing = 1
+		self.OnElementAdd = self.OnElementAdd + OnElementAdd
+
+		self.VSpacing = RaidPanel_Config.UNITPANEL_VSPACING
+		self.HSpacing = RaidPanel_Config.UNITPANEL_HSPACING
+		self.MarginTop = RaidPanel_Config.UNITPANEL_MARGINTOP
+		self.MarginBottom = RaidPanel_Config.UNITPANEL_MARGINBOTTOM
+		self.MarginLeft = RaidPanel_Config.UNITPANEL_MARGINLEFT
+		self.MarginRight = RaidPanel_Config.UNITPANEL_MARGINRIGHT
+    end
+endclass "iUnitPanel"
+
+class "iPetUnitPanel"
+	inherit "PetUnitPanel"
+
+	local function OnElementAdd(self, ele)
+		ele:ApplyConfig(RaidPanel_Config.Style[self.Style])
 	end
-endclass "iDeadUnitFrame"
+
+	------------------------------------------------------
+	-- Property
+	------------------------------------------------------
+	property "Style" { Type = String, Default = "Pet" }
+
+	------------------------------------------------------
+	-- Constructor
+	------------------------------------------------------
+    function iPetUnitPanel(self, ...)
+		self.ElementType = iRaidUnitFrame
+
+		self.OnElementAdd = self.OnElementAdd + OnElementAdd
+
+		self.VSpacing = RaidPanel_Config.UNITPANEL_VSPACING
+		self.HSpacing = RaidPanel_Config.UNITPANEL_HSPACING
+		self.MarginTop = RaidPanel_Config.UNITPANEL_MARGINTOP
+		self.MarginBottom = RaidPanel_Config.UNITPANEL_MARGINBOTTOM
+		self.MarginLeft = RaidPanel_Config.UNITPANEL_MARGINLEFT
+		self.MarginRight = RaidPanel_Config.UNITPANEL_MARGINRIGHT
+    end
+endclass "iPetUnitPanel"
 
 class "BindingButton"
 	inherit "Mask"
