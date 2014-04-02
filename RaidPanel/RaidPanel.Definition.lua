@@ -29,23 +29,21 @@ class "iRaidUnitFrame"
 				obj = self:GetElement(set.Type)
 			end
 
-			if obj then
-				-- Apply Location
-				if not set.Direction and set.Location then
-					obj:ClearAllPoints()
-					for _, anchor in ipairs(set.Location) do
-						local parent = anchor.relativeTo and self[anchor.relativeTo] or self
+			-- Apply Location
+			if not set.Direction and set.Location then
+				obj:ClearAllPoints()
+				for _, anchor in ipairs(set.Location) do
+					local parent = anchor.relativeTo and self[anchor.relativeTo] or self
 
-						if parent then
-							obj:SetPoint(anchor.point, parent, anchor.relativePoint or anchor.point, anchor.xOffset or 0, anchor.yOffset or 0)
-						end
+					if parent then
+						obj:SetPoint(anchor.point, parent, anchor.relativePoint or anchor.point, anchor.xOffset or 0, anchor.yOffset or 0)
 					end
 				end
+			end
 
-				-- Apply Property
-				if set.Property then
-					pcall(obj, set.Property)
-				end
+			-- Apply Property
+			if set.Property then
+				pcall(obj, set.Property)
 			end
 		end
 	end
