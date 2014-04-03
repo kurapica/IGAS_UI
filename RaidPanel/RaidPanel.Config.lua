@@ -43,6 +43,7 @@ RaidPanel_Config = {
 		iHealthBar = {
 			Type = iHealthBar,
 			Direction = "rest",
+			Property = { UseSmoothColor = true },
 		},
 		MyHealPredictionBar = {
 			Type = MyHealPredictionBar,

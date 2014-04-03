@@ -45,6 +45,7 @@ UnitFrame_Config = {
 		iHealthBar = {
 			Type = iHealthBar,
 			Direction = "rest",
+			Property = { Smoothing = true },
 		},
 		NameLabel = {
 			Type = NameLabel,
@@ -73,6 +74,7 @@ UnitFrame_Config = {
 		iPowerBar = {
 			Type = iPowerBar,
 			Direction = "south", Size = 6, Unit = "px",
+			Property = { Smoothing = true },
 		},
 		iCastBar = {
 			Type = iCastBar,
