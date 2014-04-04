@@ -52,9 +52,8 @@ class "iRaidUnitFrame"
 	-- Property
 	------------------------------------------------------
 	property "IFSpellHandlerGroup" {
-		Get = function(self)
-			return _IGASUI_RAIDPANEL_GROUP
-		end,
+		Set = false,
+		Default = _IGASUI_RAIDPANEL_GROUP,
 	}
 
 	function iRaidUnitFrame(self, name, parent, ...)

@@ -97,27 +97,23 @@ class "iUnitFrame"
 	}
 
 	property "IFSpellHandlerGroup" {
-		Get = function(self)
-			return _IGASUI_RAIDPANEL_GROUP
-		end,
+		Set = false,
+		Default = _IGASUI_RAIDPANEL_GROUP,
 	}
 
 	property "IFMovingGroup" {
-		Get = function(self)
-			return _IGASUI_UNITFRAME_GROUP
-		end,
+		Set = false,
+		Default = _IGASUI_UNITFRAME_GROUP,
 	}
 
 	property "IFResizingGroup" {
-		Get = function(self)
-			return _IGASUI_UNITFRAME_GROUP
-		end,
+		Set = false,
+		Default = _IGASUI_UNITFRAME_GROUP,
 	}
 
 	property "IFTogglingGroup" {
-		Get = function(self)
-			return _IGASUI_UNITFRAME_GROUP
-		end,
+		Set = false,
+		Default = _IGASUI_UNITFRAME_GROUP,
 	}
 
 	------------------------------------------------------
