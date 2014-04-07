@@ -87,7 +87,9 @@ end
 _HiddenFrame = CreateFrame("Frame")
 _HiddenFrame:Hide()
 
-function HideBlzUnitFrame(self)
+function HideBlzUnitFrame(name)
+	self = _G[name]
+
 	self:UnregisterAllEvents()
 	self:Hide()
 
@@ -111,22 +113,19 @@ function HideBlzUnitFrame(self)
 end
 
 function OnEnable(self)
-	HideBlzUnitFrame(_G.PlayerFrame)
-	HideBlzUnitFrame(_G.PetFrame)
-	HideBlzUnitFrame(_G.PartyMemberFrame1)
-	HideBlzUnitFrame(_G.PartyMemberFrame2)
-	HideBlzUnitFrame(_G.PartyMemberFrame3)
-	HideBlzUnitFrame(_G.PartyMemberFrame4)
-	HideBlzUnitFrame(_G.TargetFrame)
-	HideBlzUnitFrame(_G.ComboFrame)
-	HideBlzUnitFrame(_G.FocusFrame)
-	HideBlzUnitFrame(_G.RuneFrame)
-	HideBlzUnitFrame(_G.CastingBarFrame)
-	HideBlzUnitFrame(_G.Boss1TargetFrame)
-	HideBlzUnitFrame(_G.Boss2TargetFrame)
-	HideBlzUnitFrame(_G.Boss3TargetFrame)
-	HideBlzUnitFrame(_G.Boss4TargetFrame)
-	HideBlzUnitFrame(_G.Boss5TargetFrame)
+	for _, unitset in ipairs(Config.Units) do
+		local index = 1
+		local name = unitset["HideFrame" .. index]
+
+		while name do
+			for i = 1, unitset.Max or 1 do
+				HideBlzUnitFrame(name:format(i))
+			end
+
+			index = index + 1
+			name = unitset["HideFrame" .. index]
+		end
+	end
 
 	_M:SecureHook("ShowPartyFrame")
 end

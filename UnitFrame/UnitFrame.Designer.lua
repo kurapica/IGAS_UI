@@ -3,94 +3,47 @@ IGAS:NewAddon "IGAS_UI.UnitFrame"
 arUnit = Array(iUnitFrame)
 
 --==========================
--- Player
+-- Generate unit frames based on Config.Units
 --==========================
-frmPlayer = iUnitFrame("IGAS_UI_PlayerFrame")
-frmPlayer:SetPoint("TOPLEFT", 40, 0)
-frmPlayer:SetSize(200, 36)
-frmPlayer.Unit = "player"
+for _, unitset in ipairs(Config.Units) do
+	for i = 1, unitset.Max or 1 do
+		local unit = unitset.Unit:format(i)
 
-frmPlayer:ApplyConfig()
+		local frm = iUnitFrame("IGAS_UI_" .. unit:gsub("^%a", strupper) .. "Frame")
+		if unitset.Size then frm.Size = unitset.Size end
+		if unitset.Location then
+			local loc = unitset.Location
+			local relativeTo
 
---==========================
--- Pet
---==========================
-local frmPet = iUnitFrame("IGAS_UI_PetFrame")
-frmPet:SetPoint("TOPLEFT", 180, -40)
-frmPet:SetSize(160, 24)
-frmPet.Unit = "pet"
+			if type(loc.relativeTo) == "string" then
+				relativeTo = loc.relativeTo:format(i)
 
-frmPet:ApplyConfig()
+				for _, ufrm in ipairs(arUnit) do
+					if ufrm.Unit == relativeTo then
+						relativeTo = ufrm
+						break
+					end
+				end
+			else
+				relativeTo = loc.relativeTo or UIParent
+			end
 
---==========================
--- Target
---==========================
-local frmTarget = iUnitFrame("IGAS_UI_TargetFrame")
-frmTarget:SetPoint("TOPLEFT", 280, 0)
-frmTarget:SetSize(200, 36)
-frmTarget.Unit = "target"
+			if i > 1 and (unitset.DX or unitset.DY) then
+				loc.xOffset = loc.xOffset + unitset.DX or 0
+				loc.yOffset = loc.yOffset + unitset.DY or 0
+			end
 
-frmTarget:ApplyConfig()
+			frm:SetPoint(loc.point, relativeTo, loc.relativePoint or loc.point, loc.xOffset or 0, loc.yOffset or 0)
+		end
 
---==========================
--- TargetTarget
---==========================
-local frmTargetTarget = iUnitFrame("IGAS_UI_TargetTargetFrame")
-frmTargetTarget:SetPoint("TOPLEFT", 420, -40)
-frmTargetTarget:SetSize(160, 24)
-frmTargetTarget.Unit = "targettarget"
+		frm.Unit = unit
 
-frmTargetTarget:ApplyConfig()
+		if type(unitset.Init) == "function" then
+			pcall(unitset.Init, frm)
+		end
 
---==========================
--- Focus
---==========================
-local frmFocus = iUnitFrame("IGAS_UI_FocusFrame")
-frmFocus:SetPoint("TOPLEFT", 20, -40)
-frmFocus:SetSize(160, 24)
-frmFocus.Unit = "focus"
+		frm:ApplyConfig(unitset.Elements)
 
-frmFocus:SetAttribute("shift-type1", "macro")
-frmFocus:SetAttribute("shift-macrotext1", "/clearfocus")
-frmFocus:ApplyConfig()
-
---==========================
--- Boss
---==========================
-for i = 1, 5 do
-	local frmBoss = iUnitFrame("IGAS_UI_BossFrame"..i)
-	frmBoss:SetPoint("TOPLEFT", 600, - 64 * i)
-	frmBoss:SetSize(200, 36)
-	frmBoss.Unit = "boss"..i
-
-	frmBoss:ApplyConfig()
+		if unit == "player" then frmPlayer = frm end
+	end
 end
-
---==========================
--- Party
---==========================
-for i = 1, 4 do
-	local frmParty = iUnitFrame("IGAS_UI_PartyFrame"..i)
-	frmParty:SetPoint("TOPLEFT", 40, -60 - 64 * i)
-	frmParty:SetSize(200, 36)
-	frmParty.Unit = "party"..i
-
-	frmParty:ApplyConfig()
-
-	local frmPartyPet = iUnitFrame("IGAS_UI_PartyPetFrame"..i)
-	frmPartyPet:SetPoint("BOTTOMLEFT", frmParty, "BOTTOMRIGHT")
-	frmPartyPet:SetSize(160, 24)
-	frmPartyPet.Unit = "partypet"..i
-
-	frmPartyPet:ApplyConfig()
-end
-
---==========================
--- FocusTarget
---==========================
-local frmFocusTarget = iUnitFrame("IGAS_UI_FocusTargetFrame")
-frmFocusTarget:SetPoint("TOPLEFT", 20, -70)
-frmFocusTarget:SetSize(160, 24)
-frmFocusTarget.Unit = "focustarget"
-
-frmFocusTarget:ApplyConfig()

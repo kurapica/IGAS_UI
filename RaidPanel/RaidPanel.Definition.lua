@@ -10,14 +10,24 @@ class "iRaidUnitFrame"
 	inherit "UnitFrame"
 	extend "IFSpellHandler"
 
+	local function setProperty(self, prop, value)
+		self[prop] = value
+	end
+
 	------------------------------------------------------
 	-- Method
 	------------------------------------------------------
 	function ApplyConfig(self, config)
 		if type(config) ~= "table" or #config == 0 then return end
 
+		for prop, value in pairs(config) do
+			if type(prop) == "string" then
+				pcall(setProperty, self, prop, value)
+			end
+		end
+
 		for _, name in ipairs(config) do
-			local set = RaidPanel_Config.Elements[name]
+			local set = Config.Elements[name]
 			local obj
 
 			-- Create element
@@ -27,6 +37,11 @@ class "iRaidUnitFrame"
 			else
 				self:AddElement(set.Type, set.Direction, set.Size, set.Unit)
 				obj = self:GetElement(set.Type)
+			end
+
+			-- Apply init
+			if type(set.Init) == "function" then
+				pcall(set.Init, obj)
 			end
 
 			-- Apply Location
@@ -43,7 +58,9 @@ class "iRaidUnitFrame"
 
 			-- Apply Property
 			if set.Property then
-				pcall(obj, set.Property)
+				for p, v in pairs(set.Property) do
+					pcall(setProperty, obj, p, v)
+				end
 			end
 		end
 	end
@@ -59,8 +76,8 @@ class "iRaidUnitFrame"
 	function iRaidUnitFrame(self, name, parent, ...)
 		Super(self, name, parent, ...)
 
-		self.Panel.VSpacing = RaidPanel_Config.UNITFRAME_VSPACING
-		self.Panel.HSpacing = RaidPanel_Config.UNITFRAME_HSPACING
+		self.Panel.VSpacing = Config.UNITFRAME_VSPACING
+		self.Panel.HSpacing = Config.UNITFRAME_HSPACING
 	end
 endclass "iRaidUnitFrame"
 
@@ -68,7 +85,7 @@ class "iUnitPanel"
 	inherit "UnitPanel"
 
 	local function OnElementAdd(self, ele)
-		ele:ApplyConfig(RaidPanel_Config.Style[self.Style])
+		ele:ApplyConfig(Config.Style[self.Style])
 	end
 
 	------------------------------------------------------
@@ -86,12 +103,12 @@ class "iUnitPanel"
 
 		self.OnElementAdd = self.OnElementAdd + OnElementAdd
 
-		self.VSpacing = RaidPanel_Config.UNITPANEL_VSPACING
-		self.HSpacing = RaidPanel_Config.UNITPANEL_HSPACING
-		self.MarginTop = RaidPanel_Config.UNITPANEL_MARGINTOP
-		self.MarginBottom = RaidPanel_Config.UNITPANEL_MARGINBOTTOM
-		self.MarginLeft = RaidPanel_Config.UNITPANEL_MARGINLEFT
-		self.MarginRight = RaidPanel_Config.UNITPANEL_MARGINRIGHT
+		self.VSpacing = Config.UNITPANEL_VSPACING
+		self.HSpacing = Config.UNITPANEL_HSPACING
+		self.MarginTop = Config.UNITPANEL_MARGINTOP
+		self.MarginBottom = Config.UNITPANEL_MARGINBOTTOM
+		self.MarginLeft = Config.UNITPANEL_MARGINLEFT
+		self.MarginRight = Config.UNITPANEL_MARGINRIGHT
     end
 endclass "iUnitPanel"
 
@@ -99,7 +116,7 @@ class "iPetUnitPanel"
 	inherit "PetUnitPanel"
 
 	local function OnElementAdd(self, ele)
-		ele:ApplyConfig(RaidPanel_Config.Style[self.Style])
+		ele:ApplyConfig(Config.Style[self.Style])
 	end
 
 	------------------------------------------------------
@@ -117,12 +134,12 @@ class "iPetUnitPanel"
 
 		self.OnElementAdd = self.OnElementAdd + OnElementAdd
 
-		self.VSpacing = RaidPanel_Config.UNITPANEL_VSPACING
-		self.HSpacing = RaidPanel_Config.UNITPANEL_HSPACING
-		self.MarginTop = RaidPanel_Config.UNITPANEL_MARGINTOP
-		self.MarginBottom = RaidPanel_Config.UNITPANEL_MARGINBOTTOM
-		self.MarginLeft = RaidPanel_Config.UNITPANEL_MARGINLEFT
-		self.MarginRight = RaidPanel_Config.UNITPANEL_MARGINRIGHT
+		self.VSpacing = Config.UNITPANEL_VSPACING
+		self.HSpacing = Config.UNITPANEL_HSPACING
+		self.MarginTop = Config.UNITPANEL_MARGINTOP
+		self.MarginBottom = Config.UNITPANEL_MARGINBOTTOM
+		self.MarginLeft = Config.UNITPANEL_MARGINLEFT
+		self.MarginRight = Config.UNITPANEL_MARGINRIGHT
     end
 endclass "iPetUnitPanel"
 

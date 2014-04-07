@@ -35,7 +35,7 @@ interface "iStatusBarStyle"
 	-- Initialize
 	------------------------------------------------------
     function iStatusBarStyle(self)
-		self.StatusBarTexturePath = RaidPanel_Config.STATUSBAR_TEXTURE_PATH
+		self.StatusBarTexturePath = Config.STATUSBAR_TEXTURE_PATH
 
 		local bgColor = Texture("Bg", self, "BACKGROUND")
 		bgColor:SetTexture(1, 1, 1, 1)
@@ -61,7 +61,7 @@ interface "iBorder"
 		bg:SetPoint("TOPLEFT", -1, 1)
 		bg:SetPoint("BOTTOMRIGHT", 1, -1)
 		bg.Backdrop = THIN_BORDER
-		bg.BackdropBorderColor = RaidPanel_Config.DEFAULT_BORDER_COLOR
+		bg.BackdropBorderColor = Config.DEFAULT_BORDER_COLOR
     end
 endinterface "iBorder"
 
@@ -246,9 +246,9 @@ class "iTarget"
 			if self.IsTarget ~= value then
 				self.__IsTarget = value
 				if value then
-					self.UpdateFrame.iHealthBar.Back.BackdropBorderColor = RaidPanel_Config.TARGET_BORDER_COLOR
+					self.UpdateFrame.iHealthBar.Back.BackdropBorderColor = Config.TARGET_BORDER_COLOR
 				else
-					self.UpdateFrame.iHealthBar.Back.BackdropBorderColor = RaidPanel_Config.DEFAULT_BORDER_COLOR
+					self.UpdateFrame.iHealthBar.Back.BackdropBorderColor = Config.DEFAULT_BORDER_COLOR
 				end
 			end
 		end,

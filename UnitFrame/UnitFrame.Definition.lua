@@ -11,32 +11,26 @@ class "iUnitFrame"
 	inherit "UnitFrame"
 	extend "IFMovable" "IFResizable" "IFToggleable"
 
-	if UnitFrame_Config.ENABLE_HOVER_SPELLCAST then extend "IFSpellHandler" end
+	if Config.ENABLE_HOVER_SPELLCAST then extend "IFSpellHandler" end
 
 	DEFAULT_SIZE = Size(200, 48)
+
+	local function setProperty(self, prop, value)
+		self[prop] = value
+	end
 
 	------------------------------------------------------
 	-- Method
 	------------------------------------------------------
-	__Arguments__{}
-	function ApplyConfig(self)
-		if not self.Unit then return end
-
-		local config = UnitFrame_Config.Units[self.Unit:match("%a+")]
-
-		if config then ApplyConfig(self, config) end
-
-		if self.Unit == "player" then
-			config = UnitFrame_Config.Classes[select(2, UnitClass("player"))]
-
-			if config then ApplyConfig(self, config) end
-		end
-	end
-
-	__Arguments__{ System.Table }
 	function ApplyConfig(self, config)
+		if type(config) ~= "table" then return end
+
+		if type(config.Init) == "function" then
+			pcall(config.Init, self)
+		end
+
 		for _, name in ipairs(config) do
-			local set = UnitFrame_Config.Elements[name]
+			local set = Config.Elements[name]
 			local obj
 
 			-- Create element
@@ -46,6 +40,11 @@ class "iUnitFrame"
 			else
 				self:AddElement(set.Type, set.Direction, set.Size, set.Unit)
 				obj = self:GetElement(set.Type)
+			end
+
+			-- Apply init
+			if type(set.Init) == "function" then
+				pcall(set.Init, obj)
 			end
 
 			-- Apply Location
@@ -62,7 +61,9 @@ class "iUnitFrame"
 
 			-- Apply Property
 			if set.Property then
-				pcall(obj, set.Property)
+				for p, v in pairs(set.Property) do
+					pcall(setProperty, obj, p, v)
+				end
 			end
 		end
 	end
@@ -124,8 +125,8 @@ class "iUnitFrame"
 
 		self.Size = DEFAULT_SIZE
 
-		self.Panel.VSpacing = UnitFrame_Config.PANEL_VSPACING or 0
-		self.Panel.HSpacing = UnitFrame_Config.PANEL_HSPACING or 0
+		self.Panel.VSpacing = Config.PANEL_VSPACING or 0
+		self.Panel.HSpacing = Config.PANEL_HSPACING or 0
 
 		self.IFMovable = true
 		self.IFResizable = true

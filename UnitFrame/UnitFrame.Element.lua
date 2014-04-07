@@ -1,12 +1,6 @@
 IGAS:NewAddon "IGAS_UI.UnitFrame"
 
 --==========================
--- Layout for UnitFrame
---==========================
-import "System.Widget"
-import "System.Widget.Unit"
-
---==========================
 -- Interfaces
 --==========================
 interface "iStatusBarStyle"
@@ -27,7 +21,7 @@ interface "iStatusBarStyle"
 	-- Initialize
 	------------------------------------------------------
     function iStatusBarStyle(self)
-		self.StatusBarTexturePath = UnitFrame_Config.STATUSBAR_TEXTURE_PATH
+		self.StatusBarTexturePath = Media.STATUSBAR_TEXTURE_PATH
 
 		local bgColor = Texture("Bg", self, "BACKGROUND")
 		bgColor:SetTexture(1, 1, 1, 1)
@@ -53,7 +47,7 @@ interface "iBorder"
 		bg:SetPoint("TOPLEFT", -1, 1)
 		bg:SetPoint("BOTTOMRIGHT", 1, -1)
 		bg.Backdrop = THIN_BORDER
-		bg.BackdropBorderColor = UnitFrame_Config.DEFAULT_BORDER_COLOR
+		bg.BackdropBorderColor = Media.DEFAULT_BORDER_COLOR
     end
 endinterface "iBorder"
 
@@ -68,11 +62,11 @@ class "iHealthBar"
 		if self.Unit == "target" then
 			local classification = UnitClassification("target")
 			if classification == "worldboss" or classification == "elite" then
-				self.Back.BackdropBorderColor = UnitFrame_Config.ELITE_BORDER_COLOR
+				self.Back.BackdropBorderColor = Media.ELITE_BORDER_COLOR
 			elseif classification == "rareelite" or classification == "rare" then
-				self.Back.BackdropBorderColor = UnitFrame_Config.RARE_BORDER_COLOR
+				self.Back.BackdropBorderColor = Media.RARE_BORDER_COLOR
 			else
-				self.Back.BackdropBorderColor = UnitFrame_Config.DEFAULT_BORDER_COLOR
+				self.Back.BackdropBorderColor = Media.DEFAULT_BORDER_COLOR
 			end
 		end
 		return Super.Refresh(self, ...)
@@ -104,8 +98,8 @@ class "iCastBar"
 	function SetUpCooldownStatus(self, status)
 		self.__CastBar = status
 		Super.SetUpCooldownStatus(self, status)
-		status.StatusBarTexturePath = UnitFrame_Config.STATUSBAR_TEXTURE_PATH
-		status.StatusBarColor = UnitFrame_Config.CASTBAR_COLOR
+		status.StatusBarTexturePath = Media.STATUSBAR_TEXTURE_PATH
+		status.StatusBarColor = Media.CASTBAR_COLOR
 	end
 endclass "iCastBar"
 
@@ -643,7 +637,7 @@ class "iStaggerBar"
     function iStaggerBar(self, name, parent, ...)
 		Super(self, name, parent, ...)
 
-		self.StatusBarTexturePath = UnitFrame_Config.STATUSBAR_TEXTURE_PATH
+		self.StatusBarTexturePath = Media.STATUSBAR_TEXTURE_PATH
 
     	self.FrameLevel = self.FrameLevel + 2
     	self:SetStatusBarColor(1, 0, 0)

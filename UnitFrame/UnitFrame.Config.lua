@@ -6,39 +6,13 @@ import "System.Widget.Unit"
 --==========================
 -- Config for UnitFrame
 --==========================
--- Need show buff list
-_Buff_List = {
-	-- [spellId] = true,
-}
-
--- Need show debuff list
-_Debuff_List = {
-	-- [spellId] = true,
-}
-
-UnitFrame_Config = {
+Config = {
 	-- enable hover spell cast like raid panels
 	ENABLE_HOVER_SPELLCAST = false,
 
 	-- DockLayout settings for UnitFrame
 	PANEL_VSPACING = 4,
 	PANEL_HSPACING = 0,
-
-	-- Status bar texture
-	STATUSBAR_TEXTURE_PATH = [[Interface\Tooltips\UI-Tooltip-Background]],
-
-	-- Color settings
-	--- Default border color
-	DEFAULT_BORDER_COLOR = ColorType(0, 0, 0),
-
-	--- Elite target border color
-	ELITE_BORDER_COLOR = ColorType(1, 0.84, 0),
-
-	--- Rare target border color
-	RARE_BORDER_COLOR = ColorType(0.75, 0.75, 0.75),
-
-	--- Cast bar color
-	CASTBAR_COLOR = ColorType(0, 0, 0.8),
 
 	-- Element settings
 	Elements = {
@@ -227,89 +201,146 @@ UnitFrame_Config = {
 
 	-- Units settings
 	Units = {
-		player = {
-			"iHealthBar",
-			"NameLabel",
-			"LevelLabel",
-			"iHiddenManaBar",
-			"iPowerBar",
-			"iCastBar",
-			"HealthTextFrequent",
-			"HealthTextFrequent2",
-			"iClassPower",
-			"TotemBar",
-			"CombatIcon",
-			"PvpIcon",
-			"iPlayerPowerText",
+		{
+			Unit = "player",
+			HideFrame1 = "PlayerFrame",
+			HideFrame2 = "ComboFrame",
+			HideFrame3 = "RuneFrame",
+			HideFrame4 = "CastingBarFrame",
+			Elements = {
+				"iHealthBar",
+				"NameLabel",
+				"LevelLabel",
+				"iHiddenManaBar",
+				"iPowerBar",
+				"iCastBar",
+				"HealthTextFrequent",
+				"HealthTextFrequent2",
+				"iClassPower",
+				"TotemBar",
+				"CombatIcon",
+				"PvpIcon",
+				"iPlayerPowerText",
+			},
+			Size = Size(200, 36),
+			Location = AnchorPoint("TOPLEFT", 40, 0),
 		},
-		pet = {
-			"iHealthBar",
-			"NameLabel",
-			"LevelLabel",
-			"iPowerBar",
-			"iCastBar",
-			"HealthTextFrequent",
-			"HealthTextFrequent2",
-			"iBuffPanel",
-			"iDebuffPanel",
+		{
+			Unit = "pet",
+			HideFrame1 = "PetFrame",
+			Elements = {
+				"iHealthBar",
+				"NameLabel",
+				"LevelLabel",
+				"iPowerBar",
+				"iCastBar",
+				"HealthTextFrequent",
+				"HealthTextFrequent2",
+				"iBuffPanel",
+				"iDebuffPanel",
+			},
+			Size = Size(160, 24),
+			Location = AnchorPoint("TOPLEFT", 180, -40),
 		},
-		target = {
-			"iHealthBar",
-			"NameLabel_Target",
-			"LevelLabel",
-			"iPowerBar",
-			"iCastBar",
-			"HealthTextFrequent",
-			"HealthTextFrequent2",
-			"iBuffPanel",
-			"iDebuffPanel",
-			"QuestBossIcon",
+		{
+			Unit = "target",
+			HideFrame1 = "TargetFrame",
+			Elements = {
+				"iHealthBar",
+				"NameLabel_Target",
+				"LevelLabel",
+				"iPowerBar",
+				"iCastBar",
+				"HealthTextFrequent",
+				"HealthTextFrequent2",
+				"iBuffPanel",
+				"iDebuffPanel",
+				"QuestBossIcon",
+			},
+			Size = Size(200, 36),
+			Location = AnchorPoint("TOPLEFT", 280, 0),
 		},
-		targettarget = {
-			"iHealthBar",
-			"NameLabel_Simple",
-			"LevelLabel",
-			"iDebuffPanel_ToT",
+		{
+			Unit = "targettarget",
+			Elements = {
+				"iHealthBar",
+				"NameLabel_Simple",
+				"LevelLabel",
+				"iDebuffPanel_ToT",
+			},
+			Size = Size(160, 24),
+			Location = AnchorPoint("TOPLEFT", 420, -40),
 		},
-		focus = {
-			"iHealthBar",
-			"NameLabel_Focus",
-			"LevelLabel",
-			"iBuffPanel",
-			"iDebuffPanel",
+		{
+			Unit = "focus",
+			HideFrame1 = "FocusFrame",
+			Elements = {
+				"iHealthBar",
+				"NameLabel_Focus",
+				"LevelLabel",
+				"iBuffPanel",
+				"iDebuffPanel",
+			},
+			Size = Size(160, 24),
+			Location = AnchorPoint("TOPLEFT", 20, -40),
 		},
-		boss = {
-			"iHealthBar",
-			"NameLabel",
-			"LevelLabel",
-			"iPowerBar",
-			"iCastBar",
-			"HealthTextFrequent",
-			"HealthTextFrequent2",
-			"iBuffPanel",
-			"iDebuffPanel",
-			"RaidTargetIcon",
+		{
+			Unit = "boss%d",
+			Max = 5,
+			HideFrame1 = "Boss%dTargetFrame",
+			Elements = {
+				"iHealthBar",
+				"NameLabel",
+				"LevelLabel",
+				"iPowerBar",
+				"iCastBar",
+				"HealthTextFrequent",
+				"HealthTextFrequent2",
+				"iBuffPanel",
+				"iDebuffPanel",
+				"RaidTargetIcon",
+			},
+			Size = Size(200, 36),
+			Location = AnchorPoint("TOPLEFT", 600, - 64), DX = 0, DY = -64
 		},
-		party = {
-			"iHealthBar",
-			"NameLabel",
-			"LevelLabel",
-			"iPowerBar",
-			"iCastBar",
-			"HealthTextFrequent",
-			"HealthTextFrequent2",
-			"iDebuffPanel",
+		{
+			Unit = "party%d",
+			Max = 4,
+			HideFrame1 = "PartyMemberFrame%d",
+			Elements = {
+				"iHealthBar",
+				"NameLabel",
+				"LevelLabel",
+				"iPowerBar",
+				"iCastBar",
+				"HealthTextFrequent",
+				"HealthTextFrequent2",
+				"iDebuffPanel",
+			},
+			Size = Size(200, 36),
+			Location = AnchorPoint("TOPLEFT", 40, - 124), DX = 0, DY = -64
 		},
-		partypet = {
-			"iHealthBar",
-			"NameLabel_Simple",
-			"LevelLabel",
+		{
+			Unit = "partypet%d",
+			Max	= 4,
+			Elements = {
+				"iHealthBar",
+				"NameLabel_Simple",
+				"LevelLabel",
+			},
+			Size = Size(160, 24),
+			Location = AnchorPoint("BOTTOMLEFT", 0, 0, "party%d", "BOTTOMRIGHT")
 		},
-		focustarget = {
-			"iHealthBar",
-			"NameLabel_Simple",
-			"LevelLabel",
-			"iDebuffPanel_ToT",
+		{
+			Unit = "focustarget",
+			Elements = {
+				"iHealthBar",
+				"NameLabel_Simple",
+				"LevelLabel",
+				"iDebuffPanel_ToT",
+			},
+			Size = Size(160, 24),
+			Location = AnchorPoint("TOPLEFT", 20, -70),
 		},
 	},
 

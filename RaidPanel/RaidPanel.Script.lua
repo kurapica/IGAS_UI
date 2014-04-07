@@ -788,7 +788,7 @@ end
 --------------------
 local order = {}
 
-for _, ele in pairs(RaidPanel_Config.Elements) do
+for _, ele in pairs(Config.Elements) do
 	if ele.Locale and ele.Index then
 		order[ele.Index] = ele
 	end

@@ -15,7 +15,7 @@ local function newIndex()
 	return index
 end
 
-RaidPanel_Config = {
+Config = {
 	-- Status bar texture
 	STATUSBAR_TEXTURE_PATH = [[Interface\Tooltips\UI-Tooltip-Background]],
 
