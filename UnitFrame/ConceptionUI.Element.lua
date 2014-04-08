@@ -8,11 +8,11 @@ interface "IFStatusBar"
 	-- Initialize
 	------------------------------------------------------
     function IFStatusBar(self)
-    	self.StatusBarTexturePath = TextureConfig.Blank
-    	self.DefaultColor = TextureConfig.DefaultBarColor
+    	self.StatusBarTexturePath = TextureMap.Blank
+    	self.DefaultColor = TextureMap.DefaultBarColor
 
     	local bg = Texture("Bg", self, "BACKGROUND")
-		bg.Color = TextureConfig.BackgroundColor
+		bg.Color = TextureMap.BackgroundColor
 		bg:SetAllPoints()
     end
 endinterface "IFStatusBar"
@@ -32,3 +32,16 @@ class "iPowerBar"
 		self.UsePowerColor = false
 	end
 endclass "iPowerBar"
+
+class "iBarBackdrop"
+	inherit "Frame"
+
+    function iBarBackdrop(self, ...)
+    	Super(self, ...)
+
+    	self.FrameStrata = "BACKGROUND"
+    	self.Backdrop = TextureMap.Backdrop
+    	self.BackdropColor = TextureMap.BarBackdropColor
+    	self.BackdropBorderColor = TextureMap.BarBackdropColor
+    end
+endclass "iBarBackdrop"

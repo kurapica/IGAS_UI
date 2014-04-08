@@ -30,7 +30,7 @@ class "iUnitFrame"
 		end
 
 		for _, name in ipairs(config) do
-			local set = Config.Elements[name]
+			local set = type(name) == "string" and Config.Elements[name] or name
 			local obj
 
 			-- Create element
@@ -47,16 +47,14 @@ class "iUnitFrame"
 				pcall(set.Init, obj)
 			end
 
+			-- Apply Size
+			if set.Size then
+				pcall(setProperty, obj, "Size", set.Size)
+			end
+
 			-- Apply Location
 			if not set.Direction and set.Location then
-				obj:ClearAllPoints()
-				for _, anchor in ipairs(set.Location) do
-					local parent = anchor.relativeTo and self[anchor.relativeTo] or self
-
-					if parent then
-						obj:SetPoint(anchor.point, parent, anchor.relativePoint or anchor.point, anchor.xOffset or 0, anchor.yOffset or 0)
-					end
-				end
+				obj.Location = set.Location
 			end
 
 			-- Apply Property

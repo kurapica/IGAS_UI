@@ -44,6 +44,10 @@ for _, unitset in ipairs(Config.Units) do
 
 		frm:ApplyConfig(unitset.Elements)
 
+		if type(unitset.Loaded) == "function" then
+			pcall(unitset.Loaded, frm)
+		end
+
 		if unit == "player" then frmPlayer = frm end
 	end
 end

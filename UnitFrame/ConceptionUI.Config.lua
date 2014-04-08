@@ -1,5 +1,40 @@
 IGAS:NewAddon "IGAS_UI.UnitFrame"
 
+--==========================
+-- Init functions
+--==========================
+local function ReMap_OnPositionChanged(self)
+	local prefix = (self::GetCenter() < GetScreenWidth() / 2) and "L_" or "R_"
+
+	local unit = self.Unit
+
+	for _, unitset in ipairs(Config.Units) do
+		if unit:match(unitset.Unit) then
+			for _, ele in ipairs(unitset.Elements) do
+				local config = type(ele) == "string" and Config.Elements[ele] or ele
+				local obj = config.Name and self:GetElement(config.Name) or self:GetElement(config.Type)
+
+				local loc = config[prefix .. "Location"]
+
+				if loc then obj.Location = loc end
+
+				local props = config[prefix .. "Property"]
+
+				if props then pcall(obj, props) end
+			end
+		end
+	end
+end
+
+local function OnUnitFrameLoaded(self)
+	self.Alpha = 1
+	self.Backdrop = TextureMap.Backdrop
+	self.BackdropColor = TextureMap.BackdropColor
+
+	self.OnPositionChanged = self.OnPositionChanged + ReMap_OnPositionChanged
+
+	return ReMap_OnPositionChanged(self)
+end
 
 --==========================
 -- Config for UnitFrame
@@ -9,82 +44,180 @@ Config = {
 	ENABLE_HOVER_SPELLCAST = false,
 
 	-- DockLayout settings for UnitFrame
-	PANEL_VSPACING = 1,
+	PANEL_VSPACING = 2,
 	PANEL_HSPACING = 0,
 
 	-- Element settings
 	Elements = {
-		HealthBar_Left = {
+		HealthBar = {
 			Type = iHealthBar,
 			Direction = "south", Size = 3, Unit = "px",
-			Property = { ReverseFill = true },
+			Property = { Smoothing = true, UseSmoothColor = true },
+			L_Property = { ReverseFill = true },
+			R_Property = { ReverseFill = false },
 		},
-		PowerBar_Left = {
+		PowerBar = {
 			Type = iPowerBar,
 			Direction = "south", Size = 1, Unit = "px",
-			Property = { ReverseFill = true },
+			Property = { Smoothing = true, UseSmoothColor = true },
+			L_Property = { ReverseFill = true },
+			R_Property = { ReverseFill = false },
 		},
-		HealthBar_Right = {
-			Type = iHealthBar,
-			Direction = "south", Size = 3, Unit = "px",
+		HealthText = {
+			Type = HealthTextFrequent,
+			L_Location = { AnchorPoint("TOPLEFT", 0, -2, "iPowerBar", "BOTTOMLEFT") },
+			R_Location = { AnchorPoint("TOPRIGHT", 0, -2, "iPowerBar", "BOTTOMRIGHT") },
+			Property = {
+				Smoothing = false,
+				Font = FontType(FontMap.HandelGotD, 10, "NORMAL", false)
+			},
 		},
-		PowerBar_Right = {
-			Type = iPowerBar,
-			Direction = "south", Size = 1, Unit = "px",
+		PowerText = {
+			Type = PowerTextFrequent,
+			L_Location = { AnchorPoint("TOPRIGHT", 0, -2, "iPowerBar", "BOTTOMRIGHT") },
+			R_Location = { AnchorPoint("TOPLEFT", 0, -2, "iPowerBar", "BOTTOMLEFT") },
+			Property = {
+				Smoothing = false,
+				Font = FontType(FontMap.HandelGotD, 10, "NORMAL", false)
+			},
 		},
-		BarBack = {
-			Type = Frame,
-			Name = "BarBack",
+		NameLabel = {
+			Type = NameLabel,
+			L_Location = { AnchorPoint("BOTTOMLEFT", 0, 2, "iHealthBar", "TOPLEFT") },
+			R_Location = { AnchorPoint("BOTTOMRIGHT", 0, 2, "iHealthBar", "TOPRIGHT") },
+			Property = { UseClassColor = true },
+		},
+		NameLabel_Target = {
+			Type = NameLabel,
+			L_Location = { AnchorPoint("BOTTOMLEFT", 0, 2, "iHealthBar", "TOPLEFT") },
+			R_Location = { AnchorPoint("BOTTOMRIGHT", 0, 2, "iHealthBar", "TOPRIGHT") },
+			Property = { UseClassColor = true, UseTapColor = true, UseSelectionColor = true },
+		},
+		BarBackdrop = {
+			Type = iBarBackdrop,
 			Location = {
 				AnchorPoint("TOPLEFT", -3, 3, "iHealthBar"),
 				AnchorPoint("BOTTOMRIGHT", 3, -3, "iPowerBar"),
 			},
-			Init = function(self)
-				self.FrameStrata = "BACKGROUND"
-				self.Backdrop = TextureConfig.BarBackdrop
-				self.BackdropColor = TextureConfig.BarBackdropColor
-				self.BackdropBorderColor = TextureConfig.BarBackdropColor
-			end,
+		},
+		Arrow = {
+			Type = Texture,
+			Name = "Arrow",
+			L_Location = { AnchorPoint("LEFT", 0, -0.5, "iHealthBar", "RIGHT") },
+			R_Location = { AnchorPoint("RIGHT", 0, -0.5, "iHealthBar", "LEFT") },
+			Size = Size(16, 16),
+			Property = { Visible = false }
+			L_Property = { TexturePath = TextureMap.ArrowL },
+			R_Property = { TexturePath = TextureMap.ArrowR },
 		},
 	},
 
 	-- Units settings
 	Units = {
-		player = {
-			-- Init
-			Init = function(self)
-				self.Alpha = 1
-				self.Backdrop = TextureConfig.Backdrop
-				self.BackdropColor = TextureConfig.BackdropColor
-			end,
-
-			-- Elements
-			"PowerBar_Left",
-			"HealthBar_Left",
-			"BarBack",
+		{
+			Unit = "player",
+			HideFrame1 = "PlayerFrame",
+			HideFrame2 = "ComboFrame",
+			HideFrame3 = "RuneFrame",
+			HideFrame4 = "CastingBarFrame",
+			Elements = {
+				"PowerBar",
+				"HealthBar",
+				"HealthText",
+				"PowerText",
+				"NameLabel",
+				"BarBackdrop",
+				"Arrow",
+			},
+			Size = Size(200, 36),
+			Location = AnchorPoint("TOPLEFT", 40, 0),
+			Loaded = OnUnitFrameLoaded,
 		},
-		pet = {
+		{
+			Unit = "pet",
+			HideFrame1 = "PetFrame",
+			Elements = {
+			},
+			Size = Size(160, 24),
+			Location = AnchorPoint("TOPLEFT", 180, -40),
+			Loaded = OnUnitFrameLoaded,
 		},
-		target = {
+		{
+			Unit = "target",
+			HideFrame1 = "TargetFrame",
+			Elements = {
+				"PowerBar",
+				"HealthBar",
+				"HealthText",
+				"PowerText",
+				"NameLabel_Target",
+				"BarBackdrop",
+				"Arrow",
+			},
+			Size = Size(200, 36),
+			Location = AnchorPoint("TOPLEFT", 280, 0),
+			Loaded = OnUnitFrameLoaded,
 		},
-		targettarget = {
+		{
+			Unit = "targettarget",
+			Elements = {
+			},
+			Size = Size(160, 24),
+			Location = AnchorPoint("TOPLEFT", 420, -40),
+			Loaded = OnUnitFrameLoaded,
 		},
-		focus = {
+		{
+			Unit = "focus",
+			HideFrame1 = "FocusFrame",
+			Elements = {
+			},
+			Size = Size(160, 24),
+			Location = AnchorPoint("TOPLEFT", 20, -40),
+			Loaded = OnUnitFrameLoaded,
 		},
-		boss = {
+		{
+			Unit = "boss%d",
+			Max = 5,
+			HideFrame1 = "Boss%dTargetFrame",
+			Elements = {
+			},
+			Size = Size(200, 36),
+			Location = AnchorPoint("TOPLEFT", 600, - 64), DX = 0, DY = -64,
+			Loaded = OnUnitFrameLoaded,
 		},
-		party = {
+		{
+			Unit = "party%d",
+			Max = 4,
+			HideFrame1 = "PartyMemberFrame%d",
+			Elements = {
+			},
+			Size = Size(200, 36),
+			Location = AnchorPoint("TOPLEFT", 40, - 124), DX = 0, DY = -64,
+			Loaded = OnUnitFrameLoaded,
 		},
-		partypet = {
+		{
+			Unit = "partypet%d",
+			Max	= 4,
+			Elements = {
+			},
+			Size = Size(160, 24),
+			Location = AnchorPoint("BOTTOMLEFT", 0, 0, "party%d", "BOTTOMRIGHT"),
+			Loaded = OnUnitFrameLoaded,
 		},
-		focustarget = {
+		{
+			Unit = "focustarget",
+			Elements = {
+			},
+			Size = Size(160, 24),
+			Location = AnchorPoint("TOPLEFT", 20, -70),
+			Loaded = OnUnitFrameLoaded,
 		},
 	},
 
 	-- Class settings
 	Classes = {
-		DRUID = {  },
-		DEATHKNIGHT = {  },
-		MONK = {  },
+		DRUID = { "iEclipseBar" },
+		DEATHKNIGHT = { "iRuneBar" },
+		MONK = { "iStaggerBar" },
 	},
 }

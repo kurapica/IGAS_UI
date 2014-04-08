@@ -8,7 +8,7 @@ import "System.Widget.Unit"
 --==========================
 local path = [[Interface\AddOns\ConceptionUI\media\]]
 
-TextureConfig = {
+TextureMap = {
 	Blank			= path..[[texture\blank]],
 	Raidicon		= path..[[texture\raidicons]],
 	ArrowD			= path..[[texture\arrowD]],
@@ -63,4 +63,12 @@ TextureConfig = {
 		insets		= {left=5, right=5, top=5, bottom=5},
 		tile		= false
 	},
+}
+
+FontMap = {
+	Edo			= path..[[fonts\edo.ttf]],
+	Pixel			= path..[[fonts\edo.ttf]],
+	Pepsi			= path..[[fonts\edo.ttf]],
+	Invisible		= path..[[fonts\edo.ttf]],
+	HandelGotD		= path..[[fonts\edo.ttf]]
 }
