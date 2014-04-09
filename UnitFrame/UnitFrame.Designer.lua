@@ -12,28 +12,29 @@ for _, unitset in ipairs(Config.Units) do
 		local frm = iUnitFrame("IGAS_UI_" .. unit:gsub("^%a", strupper) .. "Frame")
 		if unitset.Size then frm.Size = unitset.Size end
 		if unitset.Location then
-			local loc = unitset.Location
-			local relativeTo
+			for _, loc in ipairs(unitset.Location) do
+				local relativeTo
 
-			if type(loc.relativeTo) == "string" then
-				relativeTo = loc.relativeTo:format(i)
+				if type(loc.relativeTo) == "string" then
+					relativeTo = loc.relativeTo:format(i)
 
-				for _, ufrm in ipairs(arUnit) do
-					if ufrm.Unit == relativeTo then
-						relativeTo = ufrm
-						break
+					for _, ufrm in ipairs(arUnit) do
+						if ufrm.Unit == relativeTo then
+							relativeTo = ufrm
+							break
+						end
 					end
+				else
+					relativeTo = loc.relativeTo or UIParent
 				end
-			else
-				relativeTo = loc.relativeTo or UIParent
-			end
 
-			if i > 1 and (unitset.DX or unitset.DY) then
-				loc.xOffset = loc.xOffset + unitset.DX or 0
-				loc.yOffset = loc.yOffset + unitset.DY or 0
-			end
+				if i > 1 and (unitset.DX or unitset.DY) then
+					loc.xOffset = loc.xOffset + unitset.DX or 0
+					loc.yOffset = loc.yOffset + unitset.DY or 0
+				end
 
-			frm:SetPoint(loc.point, relativeTo, loc.relativePoint or loc.point, loc.xOffset or 0, loc.yOffset or 0)
+				frm:SetPoint(loc.point, relativeTo, loc.relativePoint or loc.point, loc.xOffset or 0, loc.yOffset or 0)
+			end
 		end
 
 		frm.Unit = unit

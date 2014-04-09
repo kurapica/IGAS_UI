@@ -4,7 +4,7 @@ IGAS:NewAddon "IGAS_UI.UnitFrame"
 -- Init functions
 --==========================
 local function ReMap_OnPositionChanged(self)
-	local prefix = (self::GetCenter() < GetScreenWidth() / 2) and "L_" or "R_"
+	local prefix = (self:GetCenter() < GetScreenWidth() / 2) and "L_" or "R_"
 
 	local unit = self.Unit
 
@@ -27,12 +27,14 @@ local function ReMap_OnPositionChanged(self)
 end
 
 local function OnUnitFrameEnter(self)
+	self.BackdropColor = TextureMap.FocusOnColor
 	if self:GetElement("Arrow") then
 		self:GetElement("Arrow").Visible = true
 	end
 end
 
 local function OnUnitFrameLeave(self)
+	self.BackdropColor = TextureMap.FocusOffColor
 	if self:GetElement("Arrow") then
 		self:GetElement("Arrow").Visible = false
 	end
@@ -167,7 +169,7 @@ Config = {
 			L_Location = { AnchorPoint("LEFT", 0, -0.5, "iHealthBar", "RIGHT") },
 			R_Location = { AnchorPoint("RIGHT", 0, -0.5, "iHealthBar", "LEFT") },
 			Size = Size(16, 16),
-			Property = { Visible = false }
+			Property = { Visible = false },
 			L_Property = { TexturePath = TextureMap.ArrowL },
 			R_Property = { TexturePath = TextureMap.ArrowR },
 		},
@@ -179,7 +181,7 @@ Config = {
 			Type = iCastBar,
 			Location = {
 				AnchorPoint("TOPLEFT"),
-				AnchorPoint("BOTTOMRIGHT", 0, 2, iHealthBar, "TOPRIGHT"),
+				AnchorPoint("BOTTOMRIGHT", 0, 2, "iHealthBar", "TOPRIGHT"),
 			},
 		},
 	},
@@ -199,7 +201,6 @@ Config = {
 				"PowerText",
 				"NameLabel_Major",
 				"LevelLabel_Major",
-				"BarBackdrop",
 				"Arrow",
 				"CastBar",
 			},
@@ -216,7 +217,6 @@ Config = {
 				"HealthText_Min",
 				"PowerText",
 				"NameLabel_Min",
-				"BarBackdrop",
 				"Arrow",
 			},
 			Size = Size(130, 14),
@@ -242,7 +242,6 @@ Config = {
 				"PowerText",
 				"NameLabel_Target",
 				"LevelLabel_Major",
-				"BarBackdrop",
 				"Arrow",
 				"CastBar",
 			},
@@ -268,7 +267,6 @@ Config = {
 				"HealthText_Major",
 				"PowerText",
 				"NameLabel_Major",
-				"BarBackdrop",
 				"Arrow",
 			},
 			Size = Size(130, 14),
@@ -285,7 +283,6 @@ Config = {
 				"HealthText_Major",
 				"PowerText",
 				"NameLabel_Major",
-				"BarBackdrop",
 				"Arrow",
 				"CastBar",
 			},
@@ -304,7 +301,6 @@ Config = {
 				"PowerText",
 				"NameLabel_Major",
 				"LevelLabel_Major",
-				"BarBackdrop",
 				"Arrow",
 				"CastBar",
 			},
@@ -321,7 +317,6 @@ Config = {
 				"HealthText_Min",
 				"PowerText",
 				"NameLabel_Min",
-				"BarBackdrop",
 				"Arrow",
 			},
 			Size = Size(130, 14),

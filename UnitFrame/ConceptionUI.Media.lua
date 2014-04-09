@@ -42,6 +42,10 @@ TextureMap = {
 		insets		= { left=3, right=3, top=3, bottom=3 },
 		tile		= false
 	},
+
+	FocusOffColor	= ColorType(0, 0, 0, 0),
+	FocusOnColor	= ColorType(0, 0, 0, .382),
+
 	BackdropColor	= ColorType(0, 0, 0, 0),
 	BarBackdropColor= ColorType(0, 0, 0, 0.6),
 

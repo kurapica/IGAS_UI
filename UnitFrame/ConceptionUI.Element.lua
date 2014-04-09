@@ -8,12 +8,13 @@ interface "IFStatusBar"
 	-- Initialize
 	------------------------------------------------------
     function IFStatusBar(self)
+    	self.FrameStrata = "MEDIUM"
     	self.StatusBarTexturePath = TextureMap.Blank
     	self.DefaultColor = TextureMap.DefaultBarColor
 
     	local bg = Texture("Bg", self, "BACKGROUND")
 		bg.Color = TextureMap.BackgroundColor
-		bg:SetAllPoints()
+		bg:SetAllPoints(self)
     end
 endinterface "IFStatusBar"
 
@@ -67,6 +68,7 @@ class "iTargetName"
     function iTargetName(self, name, parent, ...)
 		Super(self, name, parent, ...)
 
+		self.JustifyH = "LEFT"
 		self.DrawLayer = "BORDER"
 		self.Font = FontType(FontMap.HandelGotD, 10, "NORMAL", false)
 	end
@@ -78,7 +80,27 @@ class "iCastBar"
 	function SetUpCooldownStatus(self, status)
 		Super.SetUpCooldownStatus(self, status)
 		status.StatusBarTexturePath = TextureMap.Blank
-		status.StatusBarColor = Media.CASTBAR_COLOR
+		status.StatusBarColor = TextureMap.CASTBAR_COLOR
+	end
+
+	function SetAlpha(self, alpha)
+		local parent = self.Parent
+
+		if alpha > 0.5 then
+			parent.NameLabel.Visible = false
+			parent.HealthTextFrequent.Visible = false
+			if parent.LevelLabel then
+				parent.LevelLabel.Visible = false
+			end
+		else
+			parent.NameLabel.Visible = true
+			parent.HealthTextFrequent.Visible = true
+			if parent.LevelLabel then
+				parent.LevelLabel.Visible = true
+			end
+		end
+
+		Super.SetAlpha(self, alpha)
 	end
 
 	function iCastBar(self, ...)
