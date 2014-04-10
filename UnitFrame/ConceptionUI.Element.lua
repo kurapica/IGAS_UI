@@ -60,11 +60,7 @@ class "iTargetName"
 	-- Method
 	------------------------------------------------------
 	function SetText(self, text)
-		if text and text ~= "" then
-			Super.SetText(self, "> " .. text)
-		else
-			Super.SetText("")
-		end
+		return Super.SetText(self, text and text ~= "" and ("> " .. text) or "")
 	end
 
 	------------------------------------------------------
@@ -82,6 +78,8 @@ endclass "iTargetName"
 class "iCastBar"
 	inherit "CastBar"
 
+	_Empty = {}
+
 	function SetUpCooldownStatus(self, status)
 		Super.SetUpCooldownStatus(self, status)
 		status.StatusBarTexturePath = TextureMap.Blank
@@ -89,19 +87,28 @@ class "iCastBar"
 	end
 
 	function SetAlpha(self, alpha)
-		local parent = self.Parent
+		local parent = self.Parent.Parent
+		local unit = self.Unit
+		local flag = alpha < 0.5
 
-		if alpha > 0.5 then
-			parent.NameLabel.Visible = false
-			parent.HealthTextFrequent.Visible = false
-			if parent.LevelLabel then
-				parent.LevelLabel.Visible = false
+		if not unit then return end
+
+		if not self.HideWhenCast then
+			for _, unitset in ipairs(Config.Units) do
+				if unit:match(unitset.Unit) then
+					self.HideWhenCast = unitset.HideWhenCast or _Empty
+					break
+				end
 			end
-		else
-			parent.NameLabel.Visible = true
-			parent.HealthTextFrequent.Visible = true
-			if parent.LevelLabel then
-				parent.LevelLabel.Visible = true
+		end
+
+		for _, ele in ipairs(self.HideWhenCast) do
+			ele = Config.Elements[ele]
+
+			local obj = ele.Name and parent:GetElement(ele.Name) or parent:GetElement(ele.Type)
+
+			if obj then
+				obj.Visible = flag
 			end
 		end
 
@@ -617,7 +624,7 @@ endclass "iEclipseBar"
 
 class "iStaggerBar"
 	inherit "StatusBar"
-	extend "IFStagger"
+	extend "IFStagger" "IFStatusBar"
 
 	local function OnShow(self)
 		self.Ag.Playing = true
@@ -633,7 +640,7 @@ class "iStaggerBar"
     function iStaggerBar(self, name, parent, ...)
 		Super(self, name, parent, ...)
 
-		self.StatusBarTexturePath = Media.STATUSBAR_TEXTURE_PATH
+		self.StatusBarTexturePath = TextureMap.Blank
 
     	self.FrameLevel = self.FrameLevel + 2
     	self:SetStatusBarColor(1, 0, 0)

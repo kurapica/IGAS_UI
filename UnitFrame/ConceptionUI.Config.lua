@@ -22,6 +22,8 @@ local function ReMap_OnPositionChanged(self)
 
 				if props then pcall(obj, props) end
 			end
+
+			break
 		end
 	end
 end
@@ -76,7 +78,7 @@ Config = {
 		PowerBar = {
 			Type = iPowerBar,
 			Direction = "south", Size = 1, Unit = "px",
-			Property = { Smoothing = true, UseSmoothColor = true },
+			Property = { Smoothing = true, UsePowerColor = false },
 			L_Property = { ReverseFill = true },
 			R_Property = { ReverseFill = false },
 		},
@@ -89,11 +91,11 @@ Config = {
 		},
 		HealthText_Major = {
 			Type = HealthTextFrequent,
-			L_Location = { AnchorPoint("BOTTOMRIGHT", 0, 2, "iHealthBar", "TOPRIGHT") },
-			R_Location = { AnchorPoint("BOTTOMLEFT", 0, 2, "iHealthBar", "TOPLEFT") },
+			L_Location = { AnchorPoint("TOPLEFT", 0, -2, "iPowerBar", "BOTTOMLEFT") },
+			R_Location = { AnchorPoint("TOPRIGHT", 0, -2, "iPowerBar", "BOTTOMRIGHT") },
 			Property = {
 				Smoothing = false,
-				Font = FontType(FontMap.HandelGotD, 28, "NORMAL", false)
+				Font = FontType(FontMap.HandelGotD, 10, "NORMAL", false)
 			},
 		},
 		PowerText = {
@@ -102,7 +104,7 @@ Config = {
 			R_Location = { AnchorPoint("TOPLEFT", 0, -2, "iPowerBar", "BOTTOMLEFT") },
 			Property = {
 				Smoothing = false,
-				Font = FontType(UNIT_NAME_FONT, 8, "NORMAL", false)
+				Font = FontType(FontMap.HandelGotD, 10, "NORMAL", false)
 			},
 		},
 		NameLabel_Major = {
@@ -130,7 +132,7 @@ Config = {
 			L_Location = { AnchorPoint("LEFT", 0, 0, "NameLabel", "RIGHT") },
 			R_Location = { AnchorPoint("RIGHT", 0, 0, "NameLabel", "LEFT") },
 			Property = {
-				LevelFormat = "[ %d ]",
+				LevelFormat = "[ %s ]",
 				Font = FontType(UNIT_NAME_FONT, 13, "NORMAL", false),
 			},
 		},
@@ -145,11 +147,11 @@ Config = {
 		},
 		HealthText_Min = {
 			Type = HealthTextFrequent,
-			L_Location = { AnchorPoint("BOTTOMRIGHT", 0, 2, "iHealthBar", "TOPRIGHT") },
-			R_Location = { AnchorPoint("BOTTOMLEFT", 0, 2, "iHealthBar", "TOPLEFT") },
+			L_Location = { AnchorPoint("TOPLEFT", 0, -2, "iPowerBar", "BOTTOMLEFT") },
+			R_Location = { AnchorPoint("TOPRIGHT", 0, -2, "iPowerBar", "BOTTOMRIGHT") },
 			Property = {
 				Smoothing = false,
-				Font = FontType(FontMap.HandelGotD, 12, "NORMAL", false)
+				Font = FontType(FontMap.HandelGotD, 10, "NORMAL", false)
 			},
 		},
 		NameLabel_Min = {
@@ -294,6 +296,10 @@ Config = {
 				"LevelLabel_Major",
 				"Arrow",
 				"CastBar",
+			},
+			HideWhenCast = {
+				"NameLabel_Major",
+				"LevelLabel_Major",
 			},
 			Size = Size(210, 32),
 			Location = { AnchorPoint("TOPLEFT", 40, 0) },
