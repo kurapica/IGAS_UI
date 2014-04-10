@@ -49,7 +49,7 @@ TextureMap = {
 	BackdropColor	= ColorType(0, 0, 0, 0),
 	BarBackdropColor= ColorType(0, 0, 0, 0.6),
 
-	CASTBAR_COLOR	= ColorType(0, 0, 0.8),
+	CASTBAR_COLOR	= ColorType(1, 1, 1),
 
 	DefaultBarColor	= ColorType(1, 1, 1),
 	BackgroundColor	= ColorType(0, 0, 0),

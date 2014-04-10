@@ -45,6 +45,14 @@ for _, unitset in ipairs(Config.Units) do
 
 		frm:ApplyConfig(unitset.Elements)
 
+		if unit == "player" then
+			clsset = Config.Classes[select(2, UnitClass('player'))]
+
+			if clsset then
+				frm:ApplyConfig(clsset)
+			end
+		end
+
 		if type(unitset.Loaded) == "function" then
 			pcall(unitset.Loaded, frm)
 		end

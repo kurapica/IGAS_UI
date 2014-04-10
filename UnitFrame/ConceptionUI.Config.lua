@@ -80,6 +80,13 @@ Config = {
 			L_Property = { ReverseFill = true },
 			R_Property = { ReverseFill = false },
 		},
+		HiddenMana = {
+			Type = iHiddenManaBar,
+			Direction = "south", Size = 1, Unit = "px",
+			Property = { Smoothing = false },
+			L_Property = { ReverseFill = true },
+			R_Property = { ReverseFill = false },
+		},
 		HealthText_Major = {
 			Type = HealthTextFrequent,
 			L_Location = { AnchorPoint("BOTTOMRIGHT", 0, 2, "iHealthBar", "TOPRIGHT") },
@@ -179,9 +186,92 @@ Config = {
 		},
 		CastBar = {
 			Type = iCastBar,
+			Direction = "rest",
+		},
+
+		ClassPower = {
+			Type = iClassPower,
 			Location = {
-				AnchorPoint("TOPLEFT"),
-				AnchorPoint("BOTTOMRIGHT", 0, 2, "iHealthBar", "TOPRIGHT"),
+				AnchorPoint("BOTTOMLEFT", 0, 4, nil, "TOPLEFT"),
+				AnchorPoint("BOTTOMRIGHT", 0, 4, nil, "TOPRIGHT"),
+			},
+			Property = { Height = 6 },
+		},
+		EclipseBar = {
+			Type = iEclipseBar,
+			Location = {
+				AnchorPoint("BOTTOMLEFT", 0, 4, nil, "TOPLEFT"),
+				AnchorPoint("BOTTOMRIGHT", 0, 4, nil, "TOPRIGHT"),
+			},
+			Property = { Height = 6 },
+		},
+		RuneBar = {
+			Type = iRuneBar,
+			Location = {
+				AnchorPoint("BOTTOMLEFT", 0, 4, nil, "TOPLEFT"),
+				AnchorPoint("BOTTOMRIGHT", 0, 4, nil, "TOPRIGHT"),
+			},
+			Property = { Height = 6 },
+		},
+		TotemBar = {
+			Type = TotemBar,
+			Location = { AnchorPoint("BOTTOM", 0, 4, nil, "TOP") },
+		},
+		CombatIcon = {
+			Type = CombatIcon,
+			Location = { AnchorPoint("CENTER", 0, 0, nil, "TOPLEFT") },
+		},
+		StaggerBar = {
+			Type = iStaggerBar,
+			Location = {
+				AnchorPoint("TOPLEFT", 0, 0, "iHealthBar"),
+				AnchorPoint("BOTTOMRIGHT", 0, 0, "iHealthBar"),
+			},
+		},
+		BuffPanel = {
+			Type = AuraPanel,
+			Name = "iBuffPanel",
+			Location = { AnchorPoint("BOTTOMLEFT", 0, 4, nil, "TOPLEFT") },
+			Property = {
+				Filter = "HELPFUL",
+				HighLightPlayer = true,
+				RowCount = 6,
+				ColumnCount = 6,
+				MarginTop = 2,
+				ElementWidth = 24,
+				ElementHeight = 24,
+
+				CustomFilter = function(self, unit, index, filter)
+					local isEnemy = UnitCanAttack("player", unit)
+					local name, _, _, _, _, duration, _, caster, _, _, spellID = UnitAura(unit, index, filter)
+
+					if name and duration > 0 and (_Buff_List[spellID] or isEnemy or caster == "player") then
+						return true
+					end
+				end,
+			},
+		},
+		DebuffPanel = {
+			Type = AuraPanel,
+			Name = "iDebuffPanel",
+			Location = { AnchorPoint("BOTTOMRIGHT", 0, 4, nil, "TOPRIGHT") },
+			Property = {
+				Filter = "HARMFUL",
+				HighLightPlayer = true,
+				RowCount = 6,
+				ColumnCount = 6,
+				MarginTop = 2,
+				ElementWidth = 24,
+				ElementHeight = 24,
+
+				CustomFilter = function (self, unit, index, filter)
+					local isFriend = not UnitCanAttack("player", unit)
+					local name, _, _, _, _, duration, _, caster, _, _, spellID = UnitAura(unit, index, filter)
+
+					if name and duration > 0 and (_Debuff_List[spellID] or isFriend or caster == "player") then
+						return true
+					end
+				end,
 			},
 		},
 	},
@@ -195,6 +285,7 @@ Config = {
 			HideFrame3 = "RuneFrame",
 			HideFrame4 = "CastingBarFrame",
 			Elements = {
+				"HiddenMana",
 				"PowerBar",
 				"HealthBar_Major",
 				"HealthText_Major",
@@ -336,8 +427,8 @@ Config = {
 
 	-- Class settings
 	Classes = {
-		DRUID = { "iEclipseBar" },
-		DEATHKNIGHT = { "iRuneBar" },
-		MONK = { "iStaggerBar" },
+		DRUID = { "EclipseBar" },
+		DEATHKNIGHT = { "RuneBar" },
+		MONK = { "StaggerBar" },
 	},
 }
