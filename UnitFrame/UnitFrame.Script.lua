@@ -15,7 +15,7 @@ Toggle = {
 
 		if not _LockMode then
 			for _, frm in ipairs(arUnit) do
-				if frm ~= frmPlayer then frm:UnregisterUnitWatch() end
+				frm.NoUnitWatch = true
 			end
 			IFMovable._ModeOn(_IGASUI_UNITFRAME_GROUP)
 			IFResizable._ModeOn(_IGASUI_UNITFRAME_GROUP)
@@ -25,7 +25,7 @@ Toggle = {
 			IFResizable._ModeOff(_IGASUI_UNITFRAME_GROUP)
 			IFToggleable._ModeOff(_IGASUI_UNITFRAME_GROUP)
 			for _, frm in ipairs(arUnit) do
-				if frm ~= frmPlayer then frm:RegisterUnitWatch() end
+				frm.NoUnitWatch = false
 				if not frm.Unit then frm.Visible = false end
 			end
 		end

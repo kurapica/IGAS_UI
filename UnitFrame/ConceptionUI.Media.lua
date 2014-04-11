@@ -54,14 +54,6 @@ TextureMap = {
 	DefaultBarColor	= ColorType(1, 1, 1),
 	BackgroundColor	= ColorType(0, 0, 0),
 
-	ButtonBorder = { -- action bar buttons
-		bgFile	= nil,
-		edgeFile	= path..[[texture\backdropPixel]],
-		edgeSize	= 2,
-		insets	= {left=2, right=2, top=2, bottom=2},
-		tile		= false
-	},
-
 	Dropshadow = {
 		bgFile		= nil,
 		edgeFile	= path..[[texture\backdropShadow]],

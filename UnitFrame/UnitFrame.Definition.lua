@@ -59,9 +59,7 @@ class "iUnitFrame"
 
 			-- Apply Property
 			if set.Property then
-				for p, v in pairs(set.Property) do
-					pcall(setProperty, obj, p, v)
-				end
+				pcall(obj, set.Property)
 			end
 		end
 	end
@@ -82,10 +80,9 @@ class "iUnitFrame"
 
 					self.OldUnit = self.Unit
 					self.Unit = nil
-
-					if IFToggleable._IsModeOn(_IGASUI_UNITFRAME_GROUP) then
-						self.Visible = true
-					end
+				end
+				if IFToggleable._IsModeOn(_IGASUI_UNITFRAME_GROUP) then
+					self.Visible = true
 				end
 			end
 		end,

@@ -129,26 +129,11 @@ class "iClassPowerButton"
 	------------------------------------------------------
 	-- Property
 	------------------------------------------------------
-	-- Activated
-	property "Activated" {
-		Field = "__Activated",
-		Set = function(self, value)
-			if self.Activated ~= value then
-				self.__Activated = value
-
-				if value then
-					self.Glow.AnimOut.Playing = false
-
-					self.Glow.AnimIn.Playing = true
-				else
-					self.Glow.AnimIn.Playing = false
-
-					self.Glow.AnimOut.Playing = true
-				end
-			end
-		end,
-		Type = System.Boolean,
-	}
+	__Handler__( function(self, value)
+		self.Glow.AnimOut.Playing = not value
+		self.Glow.AnimIn.Playing = value
+	end )
+	property "Activated" { Type = System.Boolean }
 
 	------------------------------------------------------
 	-- Script Handler
@@ -274,7 +259,7 @@ class "iClassPower"
 	function RefreshValue(self)
 		if not self.__NumBar then return end
 
-		local value = self.__Value or 0
+		local value = self.Value
 
 		if self.ClassPowerType == SPELL_POWER_BURNING_EMBERS then
 			for i = 1, self.__NumBar do
@@ -316,17 +301,8 @@ class "iClassPower"
 	------------------------------------------------------
 	-- Property
 	------------------------------------------------------
-	-- Value
-	property "Value" {
-		Field = "__Value",
-		Set = function(self, value)
-			if self.__Value ~= value then
-				self.__Value = value
-				return self:RefreshValue()
-			end
-		end,
-		Type = System.Number + nil,
-	}
+	__Handler__( RefreshValue )
+	property "Value" { Type = System.Number + nil }
 	-- MinMaxValue
 	property "MinMaxValue" {
 		Get = function(self)
@@ -421,40 +397,25 @@ class "iRuneBar"
 		------------------------------------------------------
 		-- Property
 		------------------------------------------------------
-		-- RuneType
-		property "RuneType" {
-			Field = "__RuneType",
-			Set = function(self, value)
-				if self.RuneType ~= value then
-					self.__RuneType = value
+		__Handler__( function(self, value)
+			if value then
+				self.CooldownStatus.Visible = true
+				self.CooldownStatus.StatusBarColor = RuneColors[value]
+			else
+				self.CooldownStatus.Visible = false
+			end
+		end )
+		property "RuneType" { Type = System.Number + nil }
 
-					if value then
-						self.CooldownStatus.Visible = true
-						self.CooldownStatus.StatusBarColor = RuneColors[value]
-					else
-						self.CooldownStatus.Visible = false
-					end
-				end
-			end,
-			Type = System.Number + nil,
-		}
-		-- Ready
-		property "Ready" {
-			Field = "__Ready",
-			Set = function(self, value)
-				if self.Ready ~= value then
-					self.__Ready = value
-
-					if value then
-						self:OnCooldownUpdate()
-						self.CooldownStatus.Activated = true
-					else
-						self.CooldownStatus.Activated = false
-					end
-				end
-			end,
-			Type = System.Boolean,
-		}
+		__Handler__( function(self, value)
+			if value then
+				self:OnCooldownUpdate()
+				self.CooldownStatus.Activated = true
+			else
+				self.CooldownStatus.Activated = false
+			end
+		end )
+		property "Ready" { Type = System.Boolean }
 
 		------------------------------------------------------
 		-- Constructor
@@ -534,19 +495,12 @@ class "iEclipseBar"
 		end,
 		Type = Boolean,
 	}
-	-- EclipseDirection
-	property "Direction" {
-		Get = function(self)
-			return self.__EclipseBar_Direction or IFEclipse.EclipseDirection.None
-		end,
-		Set = function(self, dir)
-			if dir and self.__EclipseBar_Direction ~= dir then
-				self.__EclipseBar_Direction = dir
-				self.Marker:SetTexCoord(unpack(ECLIPSE_MARKER_COORDS[dir]))
-			end
-		end,
-		Type = IFEclipse.EclipseDirection,
-	}
+
+	__Handler__( function (self, value)
+		self.Marker:SetTexCoord(unpack(ECLIPSE_MARKER_COORDS[value]))
+	end )
+	property "Direction" { Type = IFEclipse.EclipseDirection, Default = IFEclipse.EclipseDirection.None }
+
 	-- MinMaxValue
 	property "MinMaxValue" {
 		Get = function(self)
@@ -557,20 +511,15 @@ class "iEclipseBar"
 		end,
 		Type = System.MinMax,
 	}
-	-- Value
-	property "Value" {
-		Field = "__Value",
-		Set = function(self, value)
-			self.__Value = value
 
-			self.PowerText.Text = tostring(abs(value))
+	__Handler__( function (self, value)
+		self.PowerText.Text = tostring(abs(value))
 
-			if self.__Max and self.__Max > 0 and value then
-				self.Marker:SetPoint("CENTER", (value/self.__Max) *  (self.Width/2), 0)
-			end
-		end,
-		Type = System.Number,
-	}
+		if self.__Max and self.__Max > 0 and value then
+			self.Marker:SetPoint("CENTER", (value/self.__Max) *  (self.Width/2), 0)
+		end
+	end )
+	property "Value" { Type = System.Number }
 
 	------------------------------------------------------
 	-- Script Handler

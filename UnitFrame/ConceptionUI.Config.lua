@@ -6,7 +6,7 @@ IGAS:NewAddon "IGAS_UI.UnitFrame"
 local function ReMap_OnPositionChanged(self)
 	local prefix = (self:GetCenter() < GetScreenWidth() / 2) and "L_" or "R_"
 
-	local unit = self.Unit
+	local unit = self.Unit or self.OldUnit
 
 	for _, unitset in ipairs(Config.Units) do
 		if unit:match(unitset.Unit) then

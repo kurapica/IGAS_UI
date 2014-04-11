@@ -590,23 +590,11 @@ class "IActionButton"
 	-- Interface Property
 	------------------------------------------------------
 	-- IFMovingGroup
-	property "IFMovingGroup" {
-		Get = function(self)
-			return _IGASUI_ACTIONBAR_GROUP
-		end,
-	}
+	property "IFMovingGroup" { Set = false, Default = _IGASUI_ACTIONBAR_GROUP }
 	-- IFResizingGroup
-	property "IFResizingGroup" {
-		Get = function(self)
-			return _IGASUI_ACTIONBAR_GROUP
-		end,
-	}
+	property "IFResizingGroup" { Set = false, Default = _IGASUI_ACTIONBAR_GROUP }
 	-- IFActionHandlerGroup
-	property "IFActionHandlerGroup" {
-		Get = function(self)
-			return _IGASUI_ACTIONBAR_GROUP
-		end,
-	}
+	property "IFActionHandlerGroup" { Set = false, Default = _IGASUI_ACTIONBAR_GROUP }
 
 	------------------------------------------------------
 	-- Property
