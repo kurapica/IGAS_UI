@@ -168,8 +168,8 @@ Config = {
 		BarBackdrop = {
 			Type = iBarBackdrop,
 			Location = {
-				AnchorPoint("TOPLEFT", -3, 3, "iHealthBar"),
-				AnchorPoint("BOTTOMRIGHT", 3, -3),
+				AnchorPoint("TOPLEFT", -1, 1, "iHealthBar"),
+				AnchorPoint("BOTTOMRIGHT", 1, -1),
 			},
 		},
 		Arrow = {
@@ -296,6 +296,7 @@ Config = {
 				"LevelLabel_Major",
 				"Arrow",
 				"CastBar",
+				"BarBackdrop",
 			},
 			HideWhenCast = {
 				"NameLabel_Major",
@@ -341,6 +342,7 @@ Config = {
 				"LevelLabel_Major",
 				"Arrow",
 				"CastBar",
+				"BarBackdrop",
 			},
 			Size = Size(210, 32),
 			Location = { AnchorPoint("TOPLEFT", 280, 0) },
@@ -382,6 +384,7 @@ Config = {
 				"NameLabel_Major",
 				"Arrow",
 				"CastBar",
+				"BarBackdrop",
 			},
 			Size = Size(210, 32),
 			Location = { AnchorPoint("TOPLEFT", 600, - 64) }, DX = 0, DY = -64,
@@ -400,6 +403,7 @@ Config = {
 				"LevelLabel_Major",
 				"Arrow",
 				"CastBar",
+				"BarBackdrop",
 			},
 			Size = Size(210, 32),
 			Location = { AnchorPoint("TOPLEFT", 40, - 114) }, DX = 0, DY = -64,

@@ -499,7 +499,7 @@ class "iEclipseBar"
 	__Handler__( function (self, value)
 		self.Marker:SetTexCoord(unpack(ECLIPSE_MARKER_COORDS[value]))
 	end )
-	property "Direction" { Type = IFEclipse.EclipseDirection, Default = IFEclipse.EclipseDirection.None }
+	property "Direction" { Type = EclipseDirection, Default = EclipseDirection.None }
 
 	-- MinMaxValue
 	property "MinMaxValue" {

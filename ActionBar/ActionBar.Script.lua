@@ -296,6 +296,8 @@ function GenerateConfig(includeContent)
 		bar.HideInPetBattle = header.HideInPetBattle
 		bar.HideInVehicle = header.HideInVehicle
 
+		bar.AlwaysShowGrid = header.AlwaysShowGrid
+
 		bar.AutoSwapRoot = header.AutoSwapRoot
 
 		bar.FreeMode = header.FreeMode
@@ -444,6 +446,8 @@ function LoadConfig(config)
 			header.HideOutOfCombat = bar.HideOutOfCombat
 			header.HideInPetBattle = bar.HideInPetBattle
 			header.HideInVehicle = bar.HideInVehicle
+
+			header.AlwaysShowGrid = bar.AlwaysShowGrid
 		end
 
 		BAG_UPDATE()
@@ -652,6 +656,9 @@ function _Menu:OnShow()
 	_MenuHideInPetBattle.Checked = header.HideInPetBattle
 	_MenuHideInVehicle.Checked = header.HideInVehicle
 
+	-- Always show grid
+	_MenuAlwaysShowGrid.Checked = header.AlwaysShowGrid
+
 	-- Bar FreeMode
 	_MenuFreeMode.Checked = header.FreeMode
 
@@ -844,6 +851,10 @@ end
 
 function _MenuHideInVehicle:OnCheckChanged()
 	_Menu.Parent.HideInVehicle = self.Checked
+end
+
+function _MenuAlwaysShowGrid:OnCheckChanged()
+	_Menu.Parent.AlwaysShowGrid = self.Checked
 end
 
 function _MenuUseDown:OnCheckChanged()

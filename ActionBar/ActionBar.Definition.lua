@@ -950,27 +950,40 @@ class "IActionButton"
 
 	-- LockMode
 	property "LockMode" {
-		Get = function(self)
-			return not self.ShowGrid
-		end,
+		Field = "__LockMode",
 		Set = function(self, value)
-			if self.LockMode ~= value then
-				if not value and self.ReplaceBlzMainAction then return end
-				self.ShowGrid = not value
-				if self.Brother then
-					self.Brother.LockMode = value
-				end
-				if self.Branch then
-					self.Branch.LockMode = value
-				end
-				if self.IHeader then
-					self.IHeader.Checked = value
-				end
-				if self.ITail then
-					self.ITail.Visible = not self.LockMode and not self.FreeMode
-				end
+			if not value and self.ReplaceBlzMainAction then return end
+			self.__LockMode = value
+			self.ShowGrid = self.AlwaysShowGrid or not value
+			if self.Brother then
+				self.Brother.LockMode = value
+			end
+			if self.Branch then
+				self.Branch.LockMode = value
+			end
+			if self.IHeader then
+				self.IHeader.Checked = value
+			end
+			if self.ITail then
+				self.ITail.Visible = not self.LockMode and not self.FreeMode
+			end
 
-				self.ShowFlyOut = self.BranchCount > 0 and (not self.LockMode or not self.FreeMode)
+			self.ShowFlyOut = self.BranchCount > 0 and (not self.LockMode or not self.FreeMode)
+		end,
+		Type = System.Boolean,
+	}
+
+	-- AlwaysShowGrid
+	property "AlwaysShowGrid" {
+		Field = "__AlwaysShowGrid",
+		Set = function(self, value)
+			self.__AlwaysShowGrid = value
+			self.ShowGrid = value or not self.LockMode
+			if self.Brother then
+				self.Brother.AlwaysShowGrid = value
+			end
+			if self.Branch then
+				self.Branch.AlwaysShowGrid = value
 			end
 		end,
 		Type = System.Boolean,

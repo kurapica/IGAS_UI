@@ -88,6 +88,9 @@ _MenuHideInPetBattle.IsCheckButton = true
 _MenuHideInVehicle.IsCheckButton = true
 _MenuAutoHide.DropDownList.MultiSelect = true
 
+_MenuAlwaysShowGrid = _Menu:AddMenuButton(L"Always Show Grid")
+_MenuAlwaysShowGrid.IsCheckButton = true
+
 _MenuUseDown = _Menu:AddMenuButton(L"Use mouse down")
 _MenuUseDown.IsCheckButton = true
 

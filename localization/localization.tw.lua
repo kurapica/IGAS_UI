@@ -93,6 +93,7 @@ L["Swap Pop-up action"] = "切替彈出條動作"
 L["Please input the new set name"] = "請輸入新的配置名稱"
 L["Do you want overwrite the existed set?"] = "是否確定覆蓋已有的配置?"
 L["Do you want load the set?"] = "是否確定載入該配置?"
+L["Always Show Grid"] = "總是顯示網格"
 
 L["Spell Binding"] = "技能綁定"
 L["Lock Raid Panel"] = "鎖定團隊面板"
