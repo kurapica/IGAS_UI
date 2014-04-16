@@ -3,13 +3,17 @@ IGAS:NewAddon "IGAS_UI.UnitFrame"
 --==========================
 -- Init functions
 --==========================
+local function SetProperty(self, prop, value)
+	self[prop] = value
+end
+
 local function ReMap_OnPositionChanged(self)
 	local prefix = (self:GetCenter() < GetScreenWidth() / 2) and "L_" or "R_"
 
 	local unit = self.Unit or self.OldUnit
 
 	for _, unitset in ipairs(Config.Units) do
-		if unit:match(unitset.Unit) then
+		if unit:match("^" .. unitset.Unit .. "$") then
 			for _, ele in ipairs(unitset.Elements) do
 				local config = type(ele) == "string" and Config.Elements[ele] or ele
 				local obj = config.Name and self:GetElement(config.Name) or self:GetElement(config.Type)
@@ -20,7 +24,11 @@ local function ReMap_OnPositionChanged(self)
 
 				local props = config[prefix .. "Property"]
 
-				if props then pcall(obj, props) end
+				if props then
+					for k, v in pairs(props) do
+						SetProperty(obj, k, v)
+					end
+				end
 			end
 
 			break
@@ -185,6 +193,8 @@ Config = {
 		TargetName = {
 			Type = iTargetName,
 			Location = { AnchorPoint("TOPLEFT"), AnchorPoint("BOTTOMRIGHT") },
+			R_Property = { LeftArrow = true, JustifyH = "LEFT" },
+			L_Property = { LeftArrow = false, JustifyH = "RIGHT" },
 		},
 		CastBar = {
 			Type = iCastBar,
@@ -350,12 +360,13 @@ Config = {
 		},
 		{
 			Unit = "targettarget",
-			Elements = { "TargetName", },
+			Elements = { "TargetName" },
 			Size = Size(100, 14),
 			Location = {
 				AnchorPoint("TOPLEFT", 0, 0, "target", "TOPRIGHT"),
 				AnchorPoint("BOTTOMLEFT", 0, 0, "target", "BOTTOMRIGHT"),
 			},
+			Loaded = OnUnitFrameLoaded,
 		},
 		{
 			Unit = "focus",

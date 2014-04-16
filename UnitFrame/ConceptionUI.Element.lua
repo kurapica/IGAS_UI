@@ -60,8 +60,11 @@ class "iTargetName"
 	-- Method
 	------------------------------------------------------
 	function SetText(self, text)
-		return Super.SetText(self, text and text ~= "" and ("> " .. text) or "")
+		Super.SetText(self, text and text ~= "" and (self.LeftArrow and ("> " .. text) or (text .. " <")) or "")
 	end
+
+	__Handler__( "Refresh" )
+	property "LeftArrow" { Type = Boolean, Default = true }
 
 	------------------------------------------------------
 	-- Constructor

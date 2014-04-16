@@ -74,7 +74,7 @@ interface "IFStyle"
 		local borderFrame = Frame("BorderFrame", self)
 		borderFrame:SetPoint('TOPLEFT', -2, 2)
 		borderFrame:SetPoint('BOTTOMRIGHT', 2, -2)
-		borderFrame:SetFrameLevel(self:GetFrameLevel()-2)
+		borderFrame:SetFrameLevel(self:GetFrameLevel()-2 > 0 and self:GetFrameLevel()-2 or 0)
 		borderFrame:SetBackdrop(TextureMap.ButtonBorder)
 		borderFrame:SetBackdropBorderColor(.1, .1, .1, 1)
     end
@@ -107,4 +107,14 @@ class "IActionButton"
 	__Handler__( RefreshBorder )
 	property "EquippedItemIndicator" { Type = Boolean }
 
+	property "Icon" {
+		Get = function(self)
+			return self:GetChild("Icon").TexturePath
+		end,
+		Set = function(self, value)
+			self:GetChild("Icon").TexturePath = value
+			self:GetChild('Icon'):SetTexCoord(.1, .9, .1, .9)
+		end,
+		Type = System.String + nil,
+	}
 endclass "IActionButton"
