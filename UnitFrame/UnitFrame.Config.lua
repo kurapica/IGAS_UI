@@ -223,7 +223,7 @@ Config = {
 				"iPlayerPowerText",
 			},
 			Size = Size(200, 36),
-			Location = AnchorPoint("TOPLEFT", 40, 0),
+			Location = { AnchorPoint("TOPLEFT", 40, 0) },
 		},
 		{
 			Unit = "pet",
@@ -240,7 +240,7 @@ Config = {
 				"iDebuffPanel",
 			},
 			Size = Size(160, 24),
-			Location = AnchorPoint("TOPLEFT", 180, -40),
+			Location = { AnchorPoint("TOPLEFT", 180, -40) },
 		},
 		{
 			Unit = "target",
@@ -258,7 +258,7 @@ Config = {
 				"QuestBossIcon",
 			},
 			Size = Size(200, 36),
-			Location = AnchorPoint("TOPLEFT", 280, 0),
+			Location = { AnchorPoint("TOPLEFT", 280, 0) },
 		},
 		{
 			Unit = "targettarget",
@@ -269,7 +269,7 @@ Config = {
 				"iDebuffPanel_ToT",
 			},
 			Size = Size(160, 24),
-			Location = AnchorPoint("TOPLEFT", 420, -40),
+			Location = { AnchorPoint("TOPLEFT", 420, -40) },
 		},
 		{
 			Unit = "focus",
@@ -282,7 +282,7 @@ Config = {
 				"iDebuffPanel",
 			},
 			Size = Size(160, 24),
-			Location = AnchorPoint("TOPLEFT", 20, -40),
+			Location = { AnchorPoint("TOPLEFT", 20, -40) },
 		},
 		{
 			Unit = "boss%d",
@@ -301,7 +301,7 @@ Config = {
 				"RaidTargetIcon",
 			},
 			Size = Size(200, 36),
-			Location = AnchorPoint("TOPLEFT", 600, - 64), DX = 0, DY = -64
+			Location = { AnchorPoint("TOPLEFT", 600, - 64) }, DX = 0, DY = -64
 		},
 		{
 			Unit = "party%d",
@@ -318,7 +318,7 @@ Config = {
 				"iDebuffPanel",
 			},
 			Size = Size(200, 36),
-			Location = AnchorPoint("TOPLEFT", 40, - 124), DX = 0, DY = -64
+			Location = { AnchorPoint("TOPLEFT", 40, - 124) }, DX = 0, DY = -64
 		},
 		{
 			Unit = "partypet%d",
@@ -329,7 +329,7 @@ Config = {
 				"LevelLabel",
 			},
 			Size = Size(160, 24),
-			Location = AnchorPoint("BOTTOMLEFT", 0, 0, "party%d", "BOTTOMRIGHT")
+			Location = { AnchorPoint("BOTTOMLEFT", 0, 0, "party%d", "BOTTOMRIGHT") },
 		},
 		{
 			Unit = "focustarget",
@@ -340,7 +340,7 @@ Config = {
 				"iDebuffPanel_ToT",
 			},
 			Size = Size(160, 24),
-			Location = AnchorPoint("TOPLEFT", 20, -70),
+			Location = { AnchorPoint("TOPLEFT", 20, -70) },
 		},
 	},
 

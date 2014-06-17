@@ -26,7 +26,11 @@ Toggle = {
 			IFToggleable._ModeOff(_IGASUI_UNITFRAME_GROUP)
 			for _, frm in ipairs(arUnit) do
 				frm.NoUnitWatch = false
-				if not frm.Unit then frm.Visible = false end
+				if not frm.Unit then
+					frm.Visible = false
+				elseif UnitExists(frm.Unit) then
+					frm.Visible = true
+				end
 			end
 		end
 
