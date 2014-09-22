@@ -185,6 +185,7 @@ Config = {
 			"iNameLabel",
 			"iBuffPanel",
 			"iDebuffPanel",
+			"iTarget",
 		},
 		Dead = {
 			"iHealthBar",
@@ -193,6 +194,7 @@ Config = {
 			"RangeChecker",
 			"RoleIcon_Dead",
 			"ResurrectIcon",
+			"iTarget",
 		},
 	},
 }
