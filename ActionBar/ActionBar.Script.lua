@@ -333,6 +333,9 @@ function GenerateConfig(includeContent)
 
 				if branch.FreeMode then
 					bset.Location = branch.Location
+					for _, anchor in ipairs(bset.Location) do
+						anchor.relativeTo = nil	-- Clear the name
+					end
 					bset.Size = branch.Size
 				end
 				bset.HotKey = branch:GetBindingKey()
@@ -429,6 +432,10 @@ function LoadConfig(config)
 					end
 
 					if branch.FreeMode then
+						local name = btn:GetName()
+						for _, anchor in ipairs(bset.Location) do
+							anchor.relativeTo = name	-- Set the name
+						end
 						branch.Location = bset.Location
 						branch.Size = bset.Size
 					end

@@ -1,3 +1,6 @@
+2014/09/30: v33
+	1. Fix pop-up action bar errors.
+
 2014/04/02: v32
 	1. Using config file to define what and how the elements should be shown on the screen for each unit frames in raidpanel and unitframe module.
 

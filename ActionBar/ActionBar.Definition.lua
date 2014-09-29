@@ -633,21 +633,16 @@ class "IActionButton"
 
 	-- Expansion
 	property "Expansion" {
-		Field = "__Expansion",
-		Set = function(self, value)
-			if self.__Expansion ~= value then
-				self.__Expansion = value
-				IFNoCombatTaskHandler._RegisterNoCombatTask(UpdateExpansion, self, value)
-			end
+		Handler = function (self, value)
+			return IFNoCombatTaskHandler._RegisterNoCombatTask(UpdateExpansion, self, value)
 		end,
+		Field = "__Expansion",
 		Type = System.Boolean,
 	}
 
 	-- Brother
 	property "Brother" {
-		Field = "__Brother",
-		Set = function(self, value)
-			self.__Brother = value
+		Handler = function (self, value)
 			if value then
 				value.Header = self.Header
 				value.FreeMode = self.FreeMode
@@ -669,9 +664,7 @@ class "IActionButton"
 
 	-- Branch
 	property "Branch" {
-		Field = "__Branch",
-		Set = function(self, value)
-			self.__Branch = value
+		Handler = function (self, value)
 			if value then
 				value.Root = self.Root
 				value.Header = self.Header
@@ -758,29 +751,26 @@ class "IActionButton"
 
 	-- PetBar
 	property "PetBar" {
-		Field = "__PetBar",
-		Set = function(self, value)
-			if self.PetBar ~= value then
-				if value and self.ReplaceBlzMainAction then return end
-				self.__PetBar = value
-				if value then
-					IFNoCombatTaskHandler._RegisterNoCombatTask(function()
-						self:GenerateBrother(1, _G.NUM_PET_ACTION_SLOTS)
-						local brother = self
-						while brother do
-							brother:GenerateBranch(0)
-							brother:SetAction("pet", brother.ID)
-							brother = brother.Brother
-						end
-						RegisterPetAction(self)
-					end)
-				else
-					IFNoCombatTaskHandler._RegisterNoCombatTask(function()
-						UnregisterPetAction(self)
-						self:GenerateBrother(1, 1)
-						self:SetAction(nil)
-					end)
-				end
+		Handler = function (self, value)
+			if value and self.ReplaceBlzMainAction then return end
+
+			if value then
+				IFNoCombatTaskHandler._RegisterNoCombatTask(function()
+					self:GenerateBrother(1, _G.NUM_PET_ACTION_SLOTS)
+					local brother = self
+					while brother do
+						brother:GenerateBranch(0)
+						brother:SetAction("pet", brother.ID)
+						brother = brother.Brother
+					end
+					RegisterPetAction(self)
+				end)
+			else
+				IFNoCombatTaskHandler._RegisterNoCombatTask(function()
+					UnregisterPetAction(self)
+					self:GenerateBrother(1, 1)
+					self:SetAction(nil)
+				end)
 			end
 		end,
 		Type = System.Boolean,
@@ -788,23 +778,20 @@ class "IActionButton"
 
 	-- StanceBar
 	property "StanceBar" {
-		Field = "__StanceBar",
-		Set = function(self, value)
-			if self.StanceBar ~= value then
-				if value and self.ReplaceBlzMainAction then return end
-				self.__StanceBar = value
-				if value then
-					IFNoCombatTaskHandler._RegisterNoCombatTask(function()
-						self:GenerateBrother(1, _G.NUM_STANCE_SLOTS)
-						self:GenerateBranch(0)
-					end)
-				else
-					IFNoCombatTaskHandler._RegisterNoCombatTask(function()
-						self:GenerateBrother(1, 1)
-						self:GenerateBranch(0)
-						self:SetAction(nil)
-					end)
-				end
+		Handler = function (self, value)
+			if value and self.ReplaceBlzMainAction then return end
+
+			if value then
+				IFNoCombatTaskHandler._RegisterNoCombatTask(function()
+					self:GenerateBrother(1, _G.NUM_STANCE_SLOTS)
+					self:GenerateBranch(0)
+				end)
+			else
+				IFNoCombatTaskHandler._RegisterNoCombatTask(function()
+					self:GenerateBrother(1, 1)
+					self:GenerateBranch(0)
+					self:SetAction(nil)
+				end)
 			end
 		end,
 		Type = System.Boolean,
@@ -815,16 +802,13 @@ class "IActionButton"
 
 	-- HideOutOfCombat
 	property "HideOutOfCombat" {
-		Field = "__HideOutOfCombat",
-		Set = function(self, value)
-			if self.HideOutOfCombat ~= value then
-				if value and self.ReplaceBlzMainAction then return end
-				self.__HideOutOfCombat = value
-				if value then
-					IFNoCombatTaskHandler._RegisterNoCombatTask(RegisterOutCombat, self)
-				else
-					IFNoCombatTaskHandler._RegisterNoCombatTask(UnregisterOutCombat, self)
-				end
+		Handler = function (self, value)
+			if value and self.ReplaceBlzMainAction then return end
+
+			if value then
+				IFNoCombatTaskHandler._RegisterNoCombatTask(RegisterOutCombat, self)
+			else
+				IFNoCombatTaskHandler._RegisterNoCombatTask(UnregisterOutCombat, self)
 			end
 		end,
 		Type = System.Boolean,
@@ -832,16 +816,13 @@ class "IActionButton"
 
 	-- HideInPetBattle
 	property "HideInPetBattle" {
-		Field = "__HideInPetBattle",
-		Set = function(self, value)
-			if self.HideInPetBattle ~= value then
-				if value and self.ReplaceBlzMainAction then return end
-				self.__HideInPetBattle = value
-				if value then
-					IFNoCombatTaskHandler._RegisterNoCombatTask(RegisterNoPetBattle, self)
-				else
-					IFNoCombatTaskHandler._RegisterNoCombatTask(UnregisterNoPetBattle, self)
-				end
+		Handler = function(self, value)
+			if value and self.ReplaceBlzMainAction then return end
+
+			if value then
+				IFNoCombatTaskHandler._RegisterNoCombatTask(RegisterNoPetBattle, self)
+			else
+				IFNoCombatTaskHandler._RegisterNoCombatTask(UnregisterNoPetBattle, self)
 			end
 		end,
 		Type = System.Boolean,
@@ -849,16 +830,13 @@ class "IActionButton"
 
 	-- HideInVehicle
 	property "HideInVehicle" {
-		Field = "__HideInVehicle",
-		Set = function(self, value)
-			if self.HideInVehicle ~= value then
-				if value and self.ReplaceBlzMainAction then return end
-				self.__HideInVehicle = value
-				if value then
-					IFNoCombatTaskHandler._RegisterNoCombatTask(RegisterNoVehicle, self)
-				else
-					IFNoCombatTaskHandler._RegisterNoCombatTask(UnregisterNoVehicle, self)
-				end
+		Handler = function (self, value)
+			if value and self.ReplaceBlzMainAction then return end
+
+			if value then
+				IFNoCombatTaskHandler._RegisterNoCombatTask(RegisterNoVehicle, self)
+			else
+				IFNoCombatTaskHandler._RegisterNoCombatTask(UnregisterNoVehicle, self)
 			end
 		end,
 		Type = System.Boolean,
@@ -866,15 +844,15 @@ class "IActionButton"
 
 	-- AutoSwapRoot
 	property "AutoSwapRoot" {
-		Field = "__AutoSwapRoot",
-		Set = function(self, value)
-			if self.AutoSwapRoot ~= value then
-				self.__AutoSwapRoot = value
-				if value then
-					IFNoCombatTaskHandler._RegisterNoCombatTask(RegisterAutoSwap, self)
-				else
-					IFNoCombatTaskHandler._RegisterNoCombatTask(UnregisterAutoSwap, self)
-				end
+		Handler = function (self, value)
+			if value then
+				IFNoCombatTaskHandler._RegisterNoCombatTask(RegisterAutoSwap, self)
+			else
+				IFNoCombatTaskHandler._RegisterNoCombatTask(UnregisterAutoSwap, self)
+			end
+
+			if self.Brother then
+				self.Brother.AutoSwapRoot = value
 			end
 		end,
 		Type = System.Boolean,
