@@ -59,7 +59,7 @@ function _Scan:OnUpdate(elapsed)
 	if self.__OnUpdateTimer > _Interval then
 		self.__OnUpdateTimer = 0
 
-		if GetCVarBool("nameplateShowEnemies") == 1 or GetCVarBool("nameplateShowFriends") == 1 then
+		if GetCVarBool("nameplateShowEnemies") or GetCVarBool("nameplateShowFriends") then
 			if _MaxNamePlate == 0 then
 				return CheckWorldFrame()
 			else

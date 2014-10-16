@@ -285,8 +285,7 @@ end
 
 function _Timer:OnTimer()
 	-- mail stuff
-	local hasmail = (HasNewMail() or 0);
-	if hasmail > 0 then
+	if HasNewMail() then
 		mail = "|c00FA58F4new!|r "
 	else
 		mail = ""

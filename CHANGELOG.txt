@@ -1,3 +1,6 @@
+2014/10/17: v34
+	1. Update for wow 6.0.
+
 2014/09/30: v33
 	1. Fix pop-up action bar errors.
 
