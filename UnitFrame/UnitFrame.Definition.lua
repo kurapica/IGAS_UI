@@ -14,6 +14,7 @@ class "iUnitFrame"
 	if Config.ENABLE_HOVER_SPELLCAST then extend "IFSpellHandler" end
 
 	DEFAULT_SIZE = Size(200, 48)
+	MIN_SIZE = Size(48, 24)
 
 	local function setProperty(self, prop, value)
 		self[prop] = value
@@ -119,6 +120,7 @@ class "iUnitFrame"
 		Super(self, name, parent, ...)
 
 		self.Size = DEFAULT_SIZE
+		self.MinResize = MIN_SIZE
 
 		self.Panel.VSpacing = Config.PANEL_VSPACING or 0
 		self.Panel.HSpacing = Config.PANEL_HSPACING or 0

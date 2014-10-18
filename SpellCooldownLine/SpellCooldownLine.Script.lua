@@ -37,6 +37,15 @@ do
     end
 
     function UpdateLine()
+        if not btnHandler:GetCenter() then
+            btnHandler.Width = 48
+            btnHandler.Height = 48
+            btnHandler:ClearAllPoints()
+            btnHandler:SetPoint("BOTTOMLEFT", 450, 300)
+
+            _DBChar.SpellCooldownHandlerLocation = btnHandler.Location
+            _DBChar.SpellCooldownHandlerSize = btnHandler.Size
+        end
         local length = abs(GetScreenWidth() - btnHandler:GetCenter() * 2)
 
         if btnHandler:GetCenter() < GetScreenWidth()/2 then

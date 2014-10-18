@@ -1,3 +1,7 @@
+2014/10/18: v35
+	1. Set scale to the action bar wouldn't cause it move out of the screen.
+	2. You can't resize the spell cooldown icon or unitframes to negative size.
+
 2014/10/17: v34
 	1. Update for wow 6.0.
 

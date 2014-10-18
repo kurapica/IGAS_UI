@@ -834,7 +834,26 @@ function _MenuSwap:OnCheckChanged()
 end
 
 function _ListScale:OnItemChoosed(key, item)
-	_Menu.Parent.Scale = key
+	local btn = _Menu.Parent
+	local loc = btn.Location
+	local e = btn:GetEffectiveScale()
+
+	for _, anchor in ipairs(loc) do
+		anchor.xOffset = (anchor.xOffset or 0) / e
+		anchor.yOffset = (anchor.yOffset or 0) / e
+	end
+
+	btn.Scale = key
+
+	e = btn:GetEffectiveScale()
+
+	for _, anchor in ipairs(loc) do
+		anchor.xOffset = (anchor.xOffset or 0) * e
+		anchor.yOffset = (anchor.yOffset or 0) * e
+	end
+
+	btn.Location = loc
+
 	_Menu:Hide()
 end
 

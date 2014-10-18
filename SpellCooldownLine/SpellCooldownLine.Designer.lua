@@ -25,6 +25,7 @@ btnHandler = Button("IGASUI_SpellCooldownLine_Handler")
 btnHandler.Width = 48
 btnHandler.Height = 48
 btnHandler:SetPoint("BOTTOMLEFT", 450, 300)
+btnHandler.MinResize = { width = 18, height = 18}
 
 btnHandler.Backdrop = _Backdrop
 btnHandler:RegisterForClicks("AnyDown", "AnyUp")
