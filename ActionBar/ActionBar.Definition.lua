@@ -1078,7 +1078,7 @@ class "IActionButton"
 	-- Script Handler
 	------------------------------------------------------
 	local function OnMouseDown(self)
-		if not InCombatLockdown() and IsAltKeyDown() and not self.Branch and not self.FlytoutID then
+		if not InCombatLockdown() and IsAltKeyDown() and not self.Branch then
 			return self.Root:ThreadCall(function(self)
 				local l, b, w, h = self:GetRect()
 				local e = self:GetEffectiveScale()
@@ -1111,7 +1111,9 @@ class "IActionButton"
 						end
 					end
 
-					self:GenerateBranch(num)
+					if not self.FlytoutID then
+						self:GenerateBranch(num)
+					end
 				end
 			end)
 		end
