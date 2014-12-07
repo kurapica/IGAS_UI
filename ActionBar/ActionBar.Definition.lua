@@ -28,7 +28,7 @@ class "IActionButton"
 	_IActionButton_ManagerFrame.Visible = false
 
 	-- Init manger frame's enviroment
-	IFNoCombatTaskHandler._RegisterNoCombatTask(function ()
+	Task.NoCombatCall(function ()
 		_IActionButton_ManagerFrame:Execute[[
 			Manager = self
 
@@ -574,11 +574,11 @@ class "IActionButton"
 	function UpdateAction(self)
 		if self.ActionType == "flyout" then
 			if self.Root ~= self then
-				return IFNoCombatTaskHandler._RegisterNoCombatTask(function ()
+				return Task.NoCombatCall(function ()
 					self:SetAction(nil)
 				end)
 			else
-				IFNoCombatTaskHandler._RegisterNoCombatTask(GenerateBranch, self, 0)
+				Task.NoCombatCall(GenerateBranch, self, 0)
 			end
 		end
 		if self.UseBlizzardArt then
@@ -634,7 +634,7 @@ class "IActionButton"
 	-- Expansion
 	property "Expansion" {
 		Handler = function (self, value)
-			return IFNoCombatTaskHandler._RegisterNoCombatTask(UpdateExpansion, self, value)
+			return Task.NoCombatCall(UpdateExpansion, self, value)
 		end,
 		Field = "__Expansion",
 		Type = System.Boolean,
@@ -755,7 +755,7 @@ class "IActionButton"
 			if value and self.ReplaceBlzMainAction then return end
 
 			if value then
-				IFNoCombatTaskHandler._RegisterNoCombatTask(function()
+				Task.NoCombatCall(function()
 					self:GenerateBrother(1, _G.NUM_PET_ACTION_SLOTS)
 					local brother = self
 					while brother do
@@ -766,7 +766,7 @@ class "IActionButton"
 					RegisterPetAction(self)
 				end)
 			else
-				IFNoCombatTaskHandler._RegisterNoCombatTask(function()
+				Task.NoCombatCall(function()
 					UnregisterPetAction(self)
 					self:GenerateBrother(1, 1)
 					self:SetAction(nil)
@@ -782,12 +782,12 @@ class "IActionButton"
 			if value and self.ReplaceBlzMainAction then return end
 
 			if value then
-				IFNoCombatTaskHandler._RegisterNoCombatTask(function()
+				Task.NoCombatCall(function()
 					self:GenerateBrother(1, _G.NUM_STANCE_SLOTS)
 					self:GenerateBranch(0)
 				end)
 			else
-				IFNoCombatTaskHandler._RegisterNoCombatTask(function()
+				Task.NoCombatCall(function()
 					self:GenerateBrother(1, 1)
 					self:GenerateBranch(0)
 					self:SetAction(nil)
@@ -806,9 +806,9 @@ class "IActionButton"
 			if value and self.ReplaceBlzMainAction then return end
 
 			if value then
-				IFNoCombatTaskHandler._RegisterNoCombatTask(RegisterOutCombat, self)
+				Task.NoCombatCall(RegisterOutCombat, self)
 			else
-				IFNoCombatTaskHandler._RegisterNoCombatTask(UnregisterOutCombat, self)
+				Task.NoCombatCall(UnregisterOutCombat, self)
 			end
 		end,
 		Type = System.Boolean,
@@ -820,9 +820,9 @@ class "IActionButton"
 			if value and self.ReplaceBlzMainAction then return end
 
 			if value then
-				IFNoCombatTaskHandler._RegisterNoCombatTask(RegisterNoPetBattle, self)
+				Task.NoCombatCall(RegisterNoPetBattle, self)
 			else
-				IFNoCombatTaskHandler._RegisterNoCombatTask(UnregisterNoPetBattle, self)
+				Task.NoCombatCall(UnregisterNoPetBattle, self)
 			end
 		end,
 		Type = System.Boolean,
@@ -834,9 +834,9 @@ class "IActionButton"
 			if value and self.ReplaceBlzMainAction then return end
 
 			if value then
-				IFNoCombatTaskHandler._RegisterNoCombatTask(RegisterNoVehicle, self)
+				Task.NoCombatCall(RegisterNoVehicle, self)
 			else
-				IFNoCombatTaskHandler._RegisterNoCombatTask(UnregisterNoVehicle, self)
+				Task.NoCombatCall(UnregisterNoVehicle, self)
 			end
 		end,
 		Type = System.Boolean,
@@ -846,9 +846,9 @@ class "IActionButton"
 	property "AutoSwapRoot" {
 		Handler = function (self, value)
 			if value then
-				IFNoCombatTaskHandler._RegisterNoCombatTask(RegisterAutoSwap, self)
+				Task.NoCombatCall(RegisterAutoSwap, self)
 			else
-				IFNoCombatTaskHandler._RegisterNoCombatTask(UnregisterAutoSwap, self)
+				Task.NoCombatCall(UnregisterAutoSwap, self)
 			end
 
 			if self.Brother then
@@ -1041,7 +1041,7 @@ class "IActionButton"
 			if self.Header == self and self.ReplaceBlzMainAction ~= value then
 				self.__ReplaceBlzMainAction = value
 				if value then
-					IFNoCombatTaskHandler._RegisterNoCombatTask(function()
+					Task.NoCombatCall(function()
 						self.FreeMode = false
 						self.LockMode = true
 						self.HideOutOfCombat = false
@@ -1058,7 +1058,7 @@ class "IActionButton"
 						end
 					end)
 				else
-					IFNoCombatTaskHandler._RegisterNoCombatTask(function()
+					Task.NoCombatCall(function()
 						self.LockMode = false
 						self:ClearAllPoints()
 						self.Parent = IGAS.UIParent
@@ -1157,7 +1157,7 @@ class "IActionButton"
 		-- callback from RestrictedEnvironment, maybe add some mechanism solve this later
 		IGAS:GetUI(self).IActionHandler_UpdateExpansion = IActionHandler_UpdateExpansion
 
-		IFNoCombatTaskHandler._RegisterNoCombatTask(SetupActionButton, self)
+		Task.NoCombatCall(SetupActionButton, self)
 
 		self.UseBlizzardArt = true
     end

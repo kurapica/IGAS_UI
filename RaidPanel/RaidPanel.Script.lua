@@ -320,7 +320,7 @@ function OnEnable(self)
 	self:ThreadCall(function()
 		System.Threading.Sleep(3)
 
-		IFNoCombatTaskHandler._RegisterNoCombatTask(function()
+		Task.NoCombatCall(function()
 			_G.CompactRaidFrameContainer:UnregisterAllEvents()
 			_G.CompactRaidFrameManager:UnregisterAllEvents()
 			_G.CompactRaidFrameManager:Show()
@@ -753,7 +753,7 @@ end
 function SetLocation(value)
 	_DBChar.PetPanelLocation = value
 
-	IFNoCombatTaskHandler._RegisterNoCombatTask(function()
+	Task.NoCombatCall(function()
 		if value == "RIGHT" then
 			raidPetPanel:ClearAllPoints()
 			raidPetPanel:SetPoint("TOPLEFT", raidPanel, "TOPRIGHT")

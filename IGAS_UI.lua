@@ -59,7 +59,7 @@ end
 -- Show the change log
 --==========================
 function OnEnable(self)
-	IFNoCombatTaskHandler._RegisterNoCombatTask(function()
+	Task.NoCombatCall(function()
 		local version = tonumber(GetAddOnMetadata(_Name, "Version"):match("%d+"))
 
 		if not _DB.VERSION or _DB.VERSION < version then

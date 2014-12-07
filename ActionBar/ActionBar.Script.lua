@@ -167,7 +167,7 @@ end
 function UPDATE_SHAPESHIFT_FORMS(self)
 	if not _StanceBar then return end
 
-	IFNoCombatTaskHandler._RegisterNoCombatTask(UpdateStanceBar)
+	Task.NoCombatCall(UpdateStanceBar)
 end
 
 function UpdateQuestBar()
@@ -227,7 +227,7 @@ end
 
 function BAG_UPDATE(self)
 	if _ItemType and _QuestBar and not InCombatLockdown() then
-		IFNoCombatTaskHandler._RegisterNoCombatTask(UpdateQuestBar)
+		Task.NoCombatCall(UpdateQuestBar)
 	end
 end
 
@@ -254,8 +254,8 @@ function PLAYER_SPECIALIZATION_CHANGED(self)
 		_DBChar[_LoadingConfig] = GenerateConfig(true)
 		_LoadingConfig = now
 		if _DBChar[now] then
-			IFNoCombatTaskHandler._RegisterNoCombatTask(LoadConfig, _DBChar[now])
-			IFNoCombatTaskHandler._RegisterNoCombatTask(UPDATE_SHAPESHIFT_FORMS)
+			Task.NoCombatCall(LoadConfig, _DBChar[now])
+			Task.NoCombatCall(UPDATE_SHAPESHIFT_FORMS)
 		end
 	end
 end
@@ -986,7 +986,7 @@ end
 
 function _MenuHideBlz:OnCheckChanged()
 	_HiddenMainMenuBar = self.Checked
-	IFNoCombatTaskHandler._RegisterNoCombatTask(UpdateBlzMainMenuBar)
+	Task.NoCombatCall(UpdateBlzMainMenuBar)
 end
 
 function _MenuDelete:OnClick()

@@ -65,7 +65,7 @@ _Addon.OnSlashCmd = _Addon.OnSlashCmd + function(self, option, info)
 			end
 			local visible = (option:lower() == "show")
 
-			IFNoCombatTaskHandler._RegisterNoCombatTask(function()
+			Task.NoCombatCall(function()
 				if visible then
 					for i = 1, #arUnit do
 						if not arUnit[i].ToggleState and arUnit[i].OldUnit:match(info) then
@@ -135,7 +135,7 @@ function OnEnable(self)
 end
 
 function ShowPartyFrame()
-	IFNoCombatTaskHandler._RegisterNoCombatTask(HidePartyFrame)
+	Task.NoCombatCall(HidePartyFrame)
 end
 
 function OnLoad(self)
