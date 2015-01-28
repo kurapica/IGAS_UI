@@ -16,20 +16,17 @@ class "IActionButton"
 	inherit "ActionButton"
 	extend "IFMovable" "IFResizable"
 
-	_Prefix = "IActionButton"
-	_Index = 1
 	_MaxBrother = 12
 	_TempActionBrother = {}
 	_TempActionBranch = {}
-	_IGASUI_ACTIONBAR_GROUP = _IGASUI_ACTIONBAR_GROUP
 
 	-- Manager Frame
-	_IActionButton_ManagerFrame = SecureFrame("IGASUI_IActionButton_Manager", IGAS.UIParent, "SecureHandlerStateTemplate")
-	_IActionButton_ManagerFrame.Visible = false
+	_ManagerFrame = SecureFrame("IGASUI_IActionButton_Manager", IGAS.UIParent, "SecureHandlerStateTemplate")
+	_ManagerFrame.Visible = false
 
 	-- Init manger frame's enviroment
 	Task.NoCombatCall(function ()
-		_IActionButton_ManagerFrame:Execute[[
+		_ManagerFrame:Execute[[
 			Manager = self
 
 			BranchMap = newtable()
@@ -148,133 +145,38 @@ class "IActionButton"
 			]=]
 		]]
 
-		_IActionButton_ManagerFrame:SetAttribute("_onstate-pet", [=[
+		_ManagerFrame:SetAttribute("_onstate-pet", [=[
 			State["pet"] = newstate == "pet"
 			Manager:Run(UpdatePetHeader)
 		]=])
-		_IActionButton_ManagerFrame:SetAttribute("_onstate-incombat", [=[
+		_ManagerFrame:SetAttribute("_onstate-incombat", [=[
 			State["incombat"] = newstate == "incombat"
 			for btn in pairs(InCombatHeader) do
 				Manager:RunFor(btn, StateCheck)
 			end
 		]=])
-		_IActionButton_ManagerFrame:SetAttribute("_onstate-petbattle", [=[
+		_ManagerFrame:SetAttribute("_onstate-petbattle", [=[
 			State["petbattle"] = newstate == "inpetcombat"
 			for btn in pairs(NoPetCombatHeader) do
 				Manager:RunFor(btn, StateCheck)
 			end
 		]=])
-		_IActionButton_ManagerFrame:SetAttribute("_onstate-vehicle", [=[
+		_ManagerFrame:SetAttribute("_onstate-vehicle", [=[
 			State["vehicle"] = newstate == "invehicle"
 			for btn in pairs(NoVehicleHeader) do
 				Manager:RunFor(btn, StateCheck)
 			end
 		]=])
-		_IActionButton_ManagerFrame:RegisterStateDriver("pet", "[pet]pet;nopet;")
-		_IActionButton_ManagerFrame:RegisterStateDriver("incombat", "[combat]incombat;nocombat;")
-		_IActionButton_ManagerFrame:RegisterStateDriver("petbattle", "[petbattle]inpetcombat;nopetcombat;")
-		_IActionButton_ManagerFrame:RegisterStateDriver("vehicle", "[vehicleui]invehicle;novehicle;")
+		_ManagerFrame:RegisterStateDriver("pet", "[pet]pet;nopet;")
+		_ManagerFrame:RegisterStateDriver("incombat", "[combat]incombat;nocombat;")
+		_ManagerFrame:RegisterStateDriver("petbattle", "[petbattle]inpetcombat;nopetcombat;")
+		_ManagerFrame:RegisterStateDriver("vehicle", "[vehicleui]invehicle;novehicle;")
 
-		_IActionButton_ManagerFrame:Execute(("State['pet'] = '%s' == 'pet'"):format(SecureCmdOptionParse("[pet]pet;nopet;")))
-		_IActionButton_ManagerFrame:Execute(("State['incombat'] = '%s' == 'incombat'"):format(SecureCmdOptionParse("[combat]incombat;nocombat;")))
-		_IActionButton_ManagerFrame:Execute(("State['petbattle'] = '%s' == 'inpetcombat'"):format(SecureCmdOptionParse("[petbattle]inpetcombat;nopetcombat;")))
-		_IActionButton_ManagerFrame:Execute(("State['vehicle'] = '%s' == 'invehicle'"):format(SecureCmdOptionParse("[vehicleui]invehicle;novehicle;")))
+		_ManagerFrame:Execute(("State['pet'] = '%s' == 'pet'"):format(SecureCmdOptionParse("[pet]pet;nopet;")))
+		_ManagerFrame:Execute(("State['incombat'] = '%s' == 'incombat'"):format(SecureCmdOptionParse("[combat]incombat;nocombat;")))
+		_ManagerFrame:Execute(("State['petbattle'] = '%s' == 'inpetcombat'"):format(SecureCmdOptionParse("[petbattle]inpetcombat;nopetcombat;")))
+		_ManagerFrame:Execute(("State['vehicle'] = '%s' == 'invehicle'"):format(SecureCmdOptionParse("[vehicleui]invehicle;novehicle;")))
 	end)
-
-	_IActionButton_RegisterPetAction = [[
-		local btn = Manager:GetFrameRef("StateButton")
-		PetHeader[btn] = true
-		Manager:Run(UpdatePetHeader)
-	]]
-
-	_IActionButton_UnregisterPetAction = [[
-		local btn = Manager:GetFrameRef("StateButton")
-		PetHeader[btn] = nil
-		if not btn:IsShown() then
-			btn:Show()
-		end
-	]]
-
-	_IActionButton_RegisterOutCombat = [[
-		local btn = Manager:GetFrameRef("StateButton")
-		InCombatHeader[btn] = true
-		Manager:RunFor(btn, StateCheck)
-	]]
-
-	_IActionButton_UnregisterOutCombat = [[
-		local btn = Manager:GetFrameRef("StateButton")
-		InCombatHeader[btn] = nil
-		Manager:RunFor(btn, StateCheck)
-	]]
-
-	_IActionButton_RegisterNoPetBattle = [[
-		local btn = Manager:GetFrameRef("StateButton")
-		NoPetCombatHeader[btn] = true
-		Manager:RunFor(btn, StateCheck)
-	]]
-
-	_IActionButton_UnregisterNoPetBattle = [[
-		local btn = Manager:GetFrameRef("StateButton")
-		NoPetCombatHeader[btn] = nil
-		Manager:RunFor(btn, StateCheck)
-	]]
-
-	_IActionButton_RegisterNoVehicle = [[
-		local btn = Manager:GetFrameRef("StateButton")
-		NoVehicleHeader[btn] = true
-		Manager:RunFor(btn, StateCheck)
-	]]
-
-	_IActionButton_UnregisterNoVehicle = [[
-		local btn = Manager:GetFrameRef("StateButton")
-		NoVehicleHeader[btn] = nil
-		Manager:RunFor(btn, StateCheck)
-	]]
-
-	_IActionButton_RegisterAutoSwap = [[
-		local btn = Manager:GetFrameRef("AutoSwapButton")
-		AutoSwapHeader[btn] = true
-	]]
-
-	_IActionButton_UnregisterAutoSwap = [[
-		local btn = Manager:GetFrameRef("AutoSwapButton")
-		AutoSwapHeader[btn] = nil
-	]]
-
-	_IActionButton_RegisterBrother = [[
-		local brother, header = Manager:GetFrameRef("BrotherButton"), Manager:GetFrameRef("HeaderButton")
-		HeaderMap[brother] = header
-	]]
-
-	_IActionButton_RemoveBrother = [[
-		local brother = Manager:GetFrameRef("BrotherButton")
-		HeaderMap[brother] = nil
-	]]
-
-	_IActionButton_RegisterBranch = [[
-		local branch, root = Manager:GetFrameRef("BranchButton"), Manager:GetFrameRef("RootButton")
-		BranchMap[branch] = root
-		BranchHeader[root] = true
-	]]
-
-	_IActionButton_RemoveBranch = [[
-		local branch = Manager:GetFrameRef("BranchButton")
-		local root = BranchMap[branch]
-		BranchMap[branch] = nil
-		local chk = false
-
-		if root then
-			for btn, rt in pairs(BranchMap) do
-				if rt == root then
-					chk = true
-					break
-				end
-			end
-			if not chk then
-				BranchHeader[root] = nil
-			end
-		end
-	]]
 
 	_IActionButton_UpdateExpansion = [[
 		local root = Manager:GetFrameRef("ExpansionButton")
@@ -344,86 +246,153 @@ class "IActionButton"
 	]]
 
 	local function RegisterPetAction(self)
-		_IActionButton_ManagerFrame:SetFrameRef("StateButton", self)
-		_IActionButton_ManagerFrame:Execute(_IActionButton_RegisterPetAction)
+		_ManagerFrame:SetFrameRef("StateButton", self)
+		_ManagerFrame:Execute[[
+			local btn = Manager:GetFrameRef("StateButton")
+			PetHeader[btn] = true
+			Manager:Run(UpdatePetHeader)
+		]]
 	end
 
 	local function UnregisterPetAction(self)
-		_IActionButton_ManagerFrame:SetFrameRef("StateButton", self)
-		_IActionButton_ManagerFrame:Execute(_IActionButton_UnregisterPetAction)
+		_ManagerFrame:SetFrameRef("StateButton", self)
+		_ManagerFrame:Execute[[
+			local btn = Manager:GetFrameRef("StateButton")
+			PetHeader[btn] = nil
+			if not btn:IsShown() then
+				btn:Show()
+			end
+		]]
 	end
 
 	local function RegisterOutCombat(self)
-		_IActionButton_ManagerFrame:SetFrameRef("StateButton", self)
-		_IActionButton_ManagerFrame:Execute(_IActionButton_RegisterOutCombat)
+		_ManagerFrame:SetFrameRef("StateButton", self)
+		_ManagerFrame:Execute[[
+			local btn = Manager:GetFrameRef("StateButton")
+			InCombatHeader[btn] = true
+			Manager:RunFor(btn, StateCheck)
+		]]
 	end
 
 	local function UnregisterOutCombat(self)
-		_IActionButton_ManagerFrame:SetFrameRef("StateButton", self)
-		_IActionButton_ManagerFrame:Execute(_IActionButton_UnregisterOutCombat)
+		_ManagerFrame:SetFrameRef("StateButton", self)
+		_ManagerFrame:Execute[[
+			local btn = Manager:GetFrameRef("StateButton")
+			InCombatHeader[btn] = nil
+			Manager:RunFor(btn, StateCheck)
+		]]
 	end
 
 	local function RegisterNoPetBattle(self)
-		_IActionButton_ManagerFrame:SetFrameRef("StateButton", self)
-		_IActionButton_ManagerFrame:Execute(_IActionButton_RegisterNoPetBattle)
+		_ManagerFrame:SetFrameRef("StateButton", self)
+		_ManagerFrame:Execute[[
+			local btn = Manager:GetFrameRef("StateButton")
+			NoPetCombatHeader[btn] = true
+			Manager:RunFor(btn, StateCheck)
+		]]
 	end
 
 	local function UnregisterNoPetBattle(self)
-		_IActionButton_ManagerFrame:SetFrameRef("StateButton", self)
-		_IActionButton_ManagerFrame:Execute(_IActionButton_UnregisterNoPetBattle)
+		_ManagerFrame:SetFrameRef("StateButton", self)
+		_ManagerFrame:Execute[[
+			local btn = Manager:GetFrameRef("StateButton")
+			NoPetCombatHeader[btn] = nil
+			Manager:RunFor(btn, StateCheck)
+		]]
 	end
 
 	local function RegisterNoVehicle(self)
-		_IActionButton_ManagerFrame:SetFrameRef("StateButton", self)
-		_IActionButton_ManagerFrame:Execute(_IActionButton_RegisterNoVehicle)
+		_ManagerFrame:SetFrameRef("StateButton", self)
+		_ManagerFrame:Execute[[
+			local btn = Manager:GetFrameRef("StateButton")
+			NoVehicleHeader[btn] = true
+			Manager:RunFor(btn, StateCheck)
+		]]
 	end
 
 	local function UnregisterNoVehicle(self)
-		_IActionButton_ManagerFrame:SetFrameRef("StateButton", self)
-		_IActionButton_ManagerFrame:Execute(_IActionButton_UnregisterNoVehicle)
+		_ManagerFrame:SetFrameRef("StateButton", self)
+		_ManagerFrame:Execute[[
+			local btn = Manager:GetFrameRef("StateButton")
+			NoVehicleHeader[btn] = nil
+			Manager:RunFor(btn, StateCheck)
+		]]
 	end
 
 	local function RegisterAutoSwap(self)
-		_IActionButton_ManagerFrame:SetFrameRef("AutoSwapButton", self)
-		_IActionButton_ManagerFrame:Execute(_IActionButton_RegisterAutoSwap)
+		_ManagerFrame:SetFrameRef("AutoSwapButton", self)
+		_ManagerFrame:Execute[[
+			local btn = Manager:GetFrameRef("AutoSwapButton")
+			AutoSwapHeader[btn] = true
+		]]
 	end
 
 	local function UnregisterAutoSwap(self)
-		_IActionButton_ManagerFrame:SetFrameRef("AutoSwapButton", self)
-		_IActionButton_ManagerFrame:Execute(_IActionButton_UnregisterAutoSwap)
+		_ManagerFrame:SetFrameRef("AutoSwapButton", self)
+		_ManagerFrame:Execute[[
+			local btn = Manager:GetFrameRef("AutoSwapButton")
+			AutoSwapHeader[btn] = nil
+		]]
 	end
 
 	local function RegisterBrother(brother, header)
-		_IActionButton_ManagerFrame:SetFrameRef("BrotherButton", brother)
-		_IActionButton_ManagerFrame:SetFrameRef("HeaderButton", header)
-		_IActionButton_ManagerFrame:Execute(_IActionButton_RegisterBrother)
+		_ManagerFrame:SetFrameRef("BrotherButton", brother)
+		_ManagerFrame:SetFrameRef("HeaderButton", header)
+		_ManagerFrame:Execute[[
+			local brother, header = Manager:GetFrameRef("BrotherButton"), Manager:GetFrameRef("HeaderButton")
+			HeaderMap[brother] = header
+		]]
 	end
 
 	local function RemoveBrother(brother)
-		_IActionButton_ManagerFrame:SetFrameRef("BrotherButton", brother)
-		_IActionButton_ManagerFrame:Execute(_IActionButton_RemoveBrother)
+		_ManagerFrame:SetFrameRef("BrotherButton", brother)
+		_ManagerFrame:Execute[[
+			local brother = Manager:GetFrameRef("BrotherButton")
+			HeaderMap[brother] = nil
+		]]
 	end
 
 	local function RegisterBranch(button, root)
-		_IActionButton_ManagerFrame:SetFrameRef("BranchButton", button)
-		_IActionButton_ManagerFrame:SetFrameRef("RootButton", root)
-		_IActionButton_ManagerFrame:Execute(_IActionButton_RegisterBranch)
+		_ManagerFrame:SetFrameRef("BranchButton", button)
+		_ManagerFrame:SetFrameRef("RootButton", root)
+		_ManagerFrame:Execute[[
+			local branch, root = Manager:GetFrameRef("BranchButton"), Manager:GetFrameRef("RootButton")
+			BranchMap[branch] = root
+			BranchHeader[root] = true
+		]]
 	end
 
 	local function RemoveBranch(button)
-		_IActionButton_ManagerFrame:SetFrameRef("BranchButton", button)
-		_IActionButton_ManagerFrame:Execute(_IActionButton_RemoveBranch)
+		_ManagerFrame:SetFrameRef("BranchButton", button)
+		_ManagerFrame:Execute[[
+			local branch = Manager:GetFrameRef("BranchButton")
+			local root = BranchMap[branch]
+			BranchMap[branch] = nil
+			local chk = false
+
+			if root then
+				for btn, rt in pairs(BranchMap) do
+					if rt == root then
+						chk = true
+						break
+					end
+				end
+				if not chk then
+					BranchHeader[root] = nil
+				end
+			end
+		]]
 	end
 
 	local function SetupActionButton(self)
-		_IActionButton_ManagerFrame:WrapScript(self, "OnEnter", _IActionButton_WrapEnter)
-		_IActionButton_ManagerFrame:WrapScript(self, "OnClick", _IActionButton_WrapClickPre, _IActionButton_WrapClickPost)
-		_IActionButton_ManagerFrame:WrapScript(self, "OnAttributeChanged", _IActionButton_WrapAttribute)
+		_ManagerFrame:WrapScript(self, "OnEnter", _IActionButton_WrapEnter)
+		_ManagerFrame:WrapScript(self, "OnClick", _IActionButton_WrapClickPre, _IActionButton_WrapClickPost)
+		_ManagerFrame:WrapScript(self, "OnAttributeChanged", _IActionButton_WrapAttribute)
 	end
 
 	local function UpdateExpansion(self, flag)
-		_IActionButton_ManagerFrame:SetFrameRef("ExpansionButton", self)
-		_IActionButton_ManagerFrame:Execute(_IActionButton_UpdateExpansion:format(tostring(flag)))
+		_ManagerFrame:SetFrameRef("ExpansionButton", self)
+		_ManagerFrame:Execute(_IActionButton_UpdateExpansion:format(tostring(flag)))
 	end
 
 	local function IActionHandler_UpdateExpansion(self, flag)
@@ -431,19 +400,8 @@ class "IActionButton"
 	end
 
 	------------------------------------------------------
-	-- Event
-	------------------------------------------------------
-
-	------------------------------------------------------
 	-- Method
 	------------------------------------------------------
-	------------------------------------
-	--- Generate brother action buttons
-	-- @name GenerateBrother
-	-- @type function
-	-- @param row, col
-	-- @return brother last brother
-	------------------------------------
 	function GenerateBrother(self, row, col, force)
 		row = row or self.RowCount
 		col = col or self.ColCount
@@ -512,13 +470,6 @@ class "IActionButton"
 		end
 	end
 
-	------------------------------------
-	--- Generate Branch
-	-- @name GenerateBranch
-	-- @type function
-	-- @param num
-	-- @return nil
-	------------------------------------
 	function GenerateBranch(self, num, force)
 		num = num or self.BranchCount
 
@@ -566,11 +517,6 @@ class "IActionButton"
 		end
 	end
 
-	------------------------------------
-	--- Update the action
-	-- @name UpdateAction
-	-- @type function
-	------------------------------------
 	function UpdateAction(self)
 		if self.ActionType == "flyout" then
 			if self.Root ~= self then
@@ -589,26 +535,17 @@ class "IActionButton"
 	------------------------------------------------------
 	-- Interface Property
 	------------------------------------------------------
-	-- IFMovingGroup
 	property "IFMovingGroup" { Set = false, Default = _IGASUI_ACTIONBAR_GROUP }
-	-- IFResizingGroup
 	property "IFResizingGroup" { Set = false, Default = _IGASUI_ACTIONBAR_GROUP }
-	-- IFActionHandlerGroup
 	property "IFActionHandlerGroup" { Set = false, Default = _IGASUI_ACTIONBAR_GROUP }
 
 	------------------------------------------------------
 	-- Property
 	------------------------------------------------------
-	-- RowCount
 	property "RowCount" { Type = System.Number, Default = 1 }
-
-	-- ColCount
 	property "ColCount" { Type = System.Number, Default = 1 }
-
-	-- BranchCount
 	property "BranchCount" { Type = System.Number }
 
-	-- Visible
 	property "Visible" {
 		Get = function(self)
 			return self:IsShown() and true or false
@@ -631,7 +568,6 @@ class "IActionButton"
 		Type = System.Boolean,
 	}
 
-	-- Expansion
 	property "Expansion" {
 		Handler = function (self, value)
 			return Task.NoCombatCall(UpdateExpansion, self, value)
@@ -640,7 +576,6 @@ class "IActionButton"
 		Type = System.Boolean,
 	}
 
-	-- Brother
 	property "Brother" {
 		Handler = function (self, value)
 			if value then
@@ -662,7 +597,6 @@ class "IActionButton"
 		Type = IActionButton + nil,
 	}
 
-	-- Branch
 	property "Branch" {
 		Handler = function (self, value)
 			if value then
@@ -677,7 +611,6 @@ class "IActionButton"
 		Type = IActionButton + nil,
 	}
 
-	-- Header
 	property "Header" {
 		Get = function(self)
 			return self.__Header or self
@@ -697,7 +630,6 @@ class "IActionButton"
 		Type = IActionButton + nil,
 	}
 
-	-- Root
 	property "Root" {
 		Get = function(self)
 			return self.__Root or self
@@ -717,7 +649,6 @@ class "IActionButton"
 		Type = IActionButton + nil,
 	}
 
-	-- ActionBar
 	property "ActionBar" {
 		Get = function(self)
 			return self.ActionPage
@@ -733,7 +664,6 @@ class "IActionButton"
 		Type = System.Number + nil,
 	}
 
-	-- MainBar
 	property "MainBar" {
 		Get = function(self)
 			return self.MainPage
@@ -749,7 +679,6 @@ class "IActionButton"
 		Type = System.Boolean,
 	}
 
-	-- PetBar
 	property "PetBar" {
 		Handler = function (self, value)
 			if value and self.ReplaceBlzMainAction then return end
@@ -776,7 +705,6 @@ class "IActionButton"
 		Type = System.Boolean,
 	}
 
-	-- StanceBar
 	property "StanceBar" {
 		Handler = function (self, value)
 			if value and self.ReplaceBlzMainAction then return end
@@ -797,10 +725,8 @@ class "IActionButton"
 		Type = System.Boolean,
 	}
 
-	-- QuestBar
 	property "QuestBar" { Type = System.Boolean }
 
-	-- HideOutOfCombat
 	property "HideOutOfCombat" {
 		Handler = function (self, value)
 			if value and self.ReplaceBlzMainAction then return end
@@ -814,7 +740,6 @@ class "IActionButton"
 		Type = System.Boolean,
 	}
 
-	-- HideInPetBattle
 	property "HideInPetBattle" {
 		Handler = function(self, value)
 			if value and self.ReplaceBlzMainAction then return end
@@ -828,7 +753,6 @@ class "IActionButton"
 		Type = System.Boolean,
 	}
 
-	-- HideInVehicle
 	property "HideInVehicle" {
 		Handler = function (self, value)
 			if value and self.ReplaceBlzMainAction then return end
@@ -842,7 +766,6 @@ class "IActionButton"
 		Type = System.Boolean,
 	}
 
-	-- AutoSwapRoot
 	property "AutoSwapRoot" {
 		Handler = function (self, value)
 			if value then
@@ -858,7 +781,6 @@ class "IActionButton"
 		Type = System.Boolean,
 	}
 
-	--- Parent
 	property "Parent" {
 		Get = function(self)
 			return self:GetParent()
@@ -875,7 +797,6 @@ class "IActionButton"
 		Type = UIObject + nil,
 	}
 
-	-- FrameLevel
 	property "FrameLevel" {
 		Get = function(self)
 			return self:GetFrameLevel()
@@ -892,7 +813,6 @@ class "IActionButton"
 		Type = Number,
 	}
 
-	-- FreeMode
 	property "FreeMode" {
 		Get = function(self)
 			return self.IFMovable or self.IFResizable
@@ -926,7 +846,6 @@ class "IActionButton"
 		Type = System.Boolean,
 	}
 
-	-- LockMode
 	property "LockMode" {
 		Field = "__LockMode",
 		Set = function(self, value)
@@ -951,7 +870,6 @@ class "IActionButton"
 		Type = System.Boolean,
 	}
 
-	-- AlwaysShowGrid
 	property "AlwaysShowGrid" {
 		Field = "__AlwaysShowGrid",
 		Set = function(self, value)
@@ -967,7 +885,6 @@ class "IActionButton"
 		Type = System.Boolean,
 	}
 
-	-- MarginX
 	property "MarginX" {
 		Get = function(self)
 			if self.Header == self then
@@ -989,7 +906,6 @@ class "IActionButton"
 		Type = System.Number,
 	}
 
-	-- MarginY
 	property "MarginY" {
 		Get = function(self)
 			if self.Header == self then
@@ -1011,7 +927,6 @@ class "IActionButton"
 		Type = System.Number,
 	}
 
-	-- Scale
 	property "Scale" {
 		Get = function(self)
 			return self:GetScale()
@@ -1028,7 +943,6 @@ class "IActionButton"
 		Type = Number,
 	}
 
-	-- ReplaceBlzMainAction
 	property "ReplaceBlzMainAction" {
 		Get = function(self)
 			if self.Header == self then
@@ -1130,13 +1044,6 @@ class "IActionButton"
 		end
 	end
 
-	function Constructor(self, name, parent, ...)
-		local obj = Super.Constructor(self, _Prefix.._Index, IGAS.UIParent)
-		_Index = _Index + 1
-
-		return obj
-	end
-
 	------------------------------------------------------
 	-- Constructor
 	------------------------------------------------------
@@ -1168,8 +1075,6 @@ class "IHeader"
 
 	_ClickCheckTime = 0.2
 
-	_Prefix = "IHeader"
-	_Index = 1
 	_BackDrop = {
         bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
         edgeFile = "Interface\\ChatFrame\\CHATFRAMEBACKGROUND",
@@ -1272,12 +1177,6 @@ class "IHeader"
 	------------------------------------------------------
 	-- Constructor
 	------------------------------------------------------
-	function Constructor(self, name, parent, ...)
-		local obj = Super.Constructor(self, _Prefix.._Index, IGAS.UIParent)
-		_Index = _Index + 1
-		return obj
-	end
-
     function IHeader(self, name, parent, ...)
 		Super(self, name, parent, ...)
 
@@ -1306,21 +1205,9 @@ endclass "IHeader"
 class "ITail"
 	inherit "Button"
 
-	_Prefix = "ITail"
-	_Index = 1
-
-	------------------------------------------------------
-	-- Script
-	------------------------------------------------------
-
-	------------------------------------------------------
-	-- Method
-	------------------------------------------------------
-
 	------------------------------------------------------
 	-- Property
 	------------------------------------------------------
-	-- ActionButton
 	property "ActionButton" {
 		Get = function(self)
 			return self.Parent
@@ -1372,12 +1259,6 @@ class "ITail"
 	------------------------------------------------------
 	-- Constructor
 	------------------------------------------------------
-	function Constructor(self, name, parent, ...)
-		local obj = Super.Constructor(self, _Prefix.._Index, IGAS.UIParent)
-		_Index = _Index + 1
-		return obj
-	end
-
     function ITail(self, name, parent, ...)
 		Super(self, name, parent, ...)
 
@@ -1399,9 +1280,9 @@ endclass "ITail"
 ------------------------------------------------------
 -- Recycle
 ------------------------------------------------------
-_Recycle_IButtons = Recycle(IActionButton)
-_Recycle_IHeaders = Recycle(IHeader)
-_Recycle_ITails = Recycle(ITail)
+_Recycle_IButtons = Recycle(IActionButton, "IActionButton%d", UIParent)
+_Recycle_IHeaders = Recycle(IHeader, "IHeader%d", UIParent)
+_Recycle_ITails = Recycle(ITail, "ITail%d", UIParent)
 
 function _Recycle_IButtons:OnPop(btn)
 	btn.ShowGrid = true
