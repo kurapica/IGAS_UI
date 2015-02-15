@@ -74,7 +74,7 @@ class "IActionButton"
 						if needHide then
 							if not regBtn then
 								regBtn = branch
-								regBtn:RegisterAutoHide(2)
+								regBtn:RegisterAutoHide(0.25)
 							end
 							regBtn:AddToAutoHide(btn)
 						end
@@ -937,7 +937,7 @@ class "IActionButton"
 				self.Brother.Scale = scale
 			end
 			if self.Branch then
-				self.Branch.Scale = value
+				self.Branch.Scale = scale
 			end
 		end,
 		Type = Number,
