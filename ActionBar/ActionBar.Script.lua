@@ -18,12 +18,8 @@ Toggle = {
 				self.Visible = not value
 			end
 		end)
-		if _Header4CharacterBag then
-			_Header4CharacterBag.Visible = not value
-			CharacterBag0Slot.Visible = not value
-			CharacterBag1Slot.Visible = not value
-			CharacterBag2Slot.Visible = not value
-			CharacterBag3Slot.Visible = not value
+		if _BagSlotBar then
+			_BagSlotBar.IHeader.Visible = not value
 		end
 		Toggle.Update()
 	end,
@@ -34,13 +30,13 @@ _MainBar = nil
 _QuestBar = nil
 _PetBar = nil
 _StanceBar = nil
+_BagSlotBar = nil
+
 _QuestMap = {}
 _ItemType = nil
 
 _HiddenMainMenuBar = false
-
-_Header4CharacterBag = nil
-_Header4CharacterBagLocation = nil
+_BagSlotBarConfig = nil
 
 ITEM_CONSUMABLE = 4
 ITEM_QUEST = 10
@@ -264,14 +260,27 @@ function PLAYER_LOGOUT(self)
 	local spec = GetSpecialization() or 1
 
 	_DBChar[spec] = GenerateConfig(true)
+
+	ClearScreen()	-- make sure no key bindings would be saved
 end
 
 function GenerateConfig(includeContent)
 	local config = {}
 	local btn, branch, bar, set, bset
 
-	config.HiddenMainMenuBar = _HiddenMainMenuBar
-	config.Header4CharacterBagLocation = _Header4CharacterBagLocation
+	if _HiddenMainMenuBar and _BagSlotBar then
+		bar = {}
+
+		-- bar set
+		bar.Location = _BagSlotBar.Location
+
+		bar.MarginX = _BagSlotBar.MarginX
+		bar.MarginY = _BagSlotBar.MarginY
+		bar.Scale = _BagSlotBar.Scale
+		bar.Expansion = _BagSlotBar.Expansion
+
+		config.BagSlotBar = bar
+	end
 
 	for _, header in ipairs(_HeadList) do
 		bar = {}
@@ -364,8 +373,8 @@ function LoadConfig(config)
 	local header, btn, branch
 
 	if config and next(config) then
-		_HiddenMainMenuBar = config.HiddenMainMenuBar
-		_Header4CharacterBagLocation = config.Header4CharacterBagLocation
+		_HiddenMainMenuBar = config.BagSlotBar and true or false
+		_BagSlotBarConfig = config.BagSlotBar
 
 		for _, bar in ipairs(config) do
 			header = NewHeader()
@@ -463,7 +472,7 @@ function LoadConfig(config)
 		NewHeader()
 
 		_HiddenMainMenuBar = false
-		_Header4CharacterBagLocation = nil
+		_BagSlotBarConfig = nil
 	end
 
 	UpdateBlzMainMenuBar()
@@ -520,26 +529,29 @@ end
 
 function UpdateBlzMainMenuBar()
 	if _HiddenMainMenuBar then
-		if not _Header4CharacterBag then
+		if not _BagSlotBar then
 			-- CharacterBag
-			_Header4CharacterBag = _Recycle_IHeaders()
-			_Header4CharacterBag.ActionButton = MainMenuBarBackpackButton
-			_Header4CharacterBag.Visible = not _DBChar.LockBar
+			_BagSlotBar = _Recycle_IButtons()
+			_BagSlotBar.FlyoutDirection = "LEFT"
+			_BagSlotBar:GenerateBranch(4)
+			_BagSlotBar.BagSlot = 0
 
-			MainMenuBarBackpackButton:SetParent(UIParent)
-			CharacterBag0Slot:SetParent(UIParent)
-			CharacterBag1Slot:SetParent(UIParent)
-			CharacterBag2Slot:SetParent(UIParent)
-			CharacterBag3Slot:SetParent(UIParent)
-
-			CharacterBag0Slot.Visible = not _DBChar.LockBar
-			CharacterBag1Slot.Visible = not _DBChar.LockBar
-			CharacterBag2Slot.Visible = not _DBChar.LockBar
-			CharacterBag3Slot.Visible = not _DBChar.LockBar
-
-			if _Header4CharacterBagLocation then
-				MainMenuBarBackpackButton.Location = _Header4CharacterBagLocation
+			local btn = _BagSlotBar
+			for i = 1, 4 do
+				btn = btn.Branch
+				btn.BagSlot = i
 			end
+			btn:BlockEvent("OnMouseDown")
+
+			local iHeader = _Recycle_IHeaders()
+			iHeader.ActionButton = _BagSlotBar
+			iHeader.Visible = not _DBChar.LockBar
+
+			MainMenuBarBackpackButton:SetParent(_HiddenFrame)
+			CharacterBag0Slot:SetParent(_HiddenFrame)
+			CharacterBag1Slot:SetParent(_HiddenFrame)
+			CharacterBag2Slot:SetParent(_HiddenFrame)
+			CharacterBag3Slot:SetParent(_HiddenFrame)
 
 			-- Hidden blizzard frame
 			MultiBarBottomLeft:SetParent(_HiddenFrame)
@@ -569,11 +581,41 @@ function UpdateBlzMainMenuBar()
 				_MainBar.ReplaceBlzMainAction = false
 			end
 		end
+
+		if _BagSlotBarConfig then
+			-- bar set
+			_BagSlotBar.Location = _BagSlotBarConfig.Location
+			_BagSlotBar.MarginX = _BagSlotBarConfig.MarginX
+			_BagSlotBar.MarginY = _BagSlotBarConfig.MarginY
+			_BagSlotBar.Scale = _BagSlotBarConfig.Scale
+			_BagSlotBar.Expansion = _BagSlotBarConfig.Expansion
+		else
+			_BagSlotBar.Location = { AnchorPoint("BOTTOMLEFT", GetScreenWidth() - _BagSlotBar.Width, 0) }
+			_BagSlotBar.Scale = 1
+			_BagSlotBar.Expansion = false
+		end
 	else
 		-- CharacterBag
-		if _Header4CharacterBag then
-			_Recycle_IHeaders(_Header4CharacterBag)
-			_Header4CharacterBag = nil
+		if _BagSlotBar then
+			_BagSlotBarConfig = nil
+
+			-- bar set
+			--[[_BagSlotBarConfig.Location = _BagSlotBar.Location
+
+			_BagSlotBarConfig.MarginX = _BagSlotBar.MarginX
+			_BagSlotBarConfig.MarginY = _BagSlotBar.MarginY
+			_BagSlotBarConfig.Scale = _BagSlotBar.Scale
+			_BagSlotBarConfig.Expansion = _BagSlotBar.Expansion--]]
+
+			_Recycle_IHeaders(_BagSlotBar.IHeader)
+
+			local btn = _BagSlotBar
+			for i = 1, 4 do btn = btn.Branch end
+			btn:UnBlockEvent("OnMouseDown")
+
+			_BagSlotBar:GenerateBranch(0)
+			_Recycle_IButtons(_BagSlotBar)
+			_BagSlotBar = nil
 
 			MainMenuBarBackpackButton:SetParent(MainMenuBarArtFrame)
 			CharacterBag0Slot:SetParent(MainMenuBarArtFrame)
@@ -583,8 +625,6 @@ function UpdateBlzMainMenuBar()
 
 			MainMenuBarBackpackButton:ClearAllPoints()
 			MainMenuBarBackpackButton:SetPoint("BOTTOMRIGHT", -4, 6)
-
-			_Header4CharacterBagLocation = nil
 
 			-- Show blizzard frame
 			MultiBarBottomLeft:SetParent(MainMenuBar)
@@ -613,25 +653,15 @@ function UpdateBlzMainMenuBar()
 	end
 end
 
-function SaveHeadPosition(self)
-	if self == _Header4CharacterBag then
-		_Header4CharacterBagLocation = self.Parent.Location
-	end
-end
-
 --------------------
 -- Script Handler
 --------------------
---[[function MainMenuBarBackpackButton:OnEnter()
-	if not InCombatLockdown() and _Header4CharacterBag then
-		_Header4CharacterBag.Visible = true
-	end
-end--]]
-
 function _Menu:OnShow()
 	local header = self.Parent
+	local notBagSlotBar = header ~= _BagSlotBar
 
 	-- Action Map
+	_MenuMap.Enabled = notBagSlotBar
 	if header.MainBar then
 		_ListActionMap.SelectedIndex = 2
 	elseif header.ActionBar then
@@ -659,6 +689,7 @@ function _Menu:OnShow()
 	_ListMarginY:SelectItemByValue(header.MarginY)
 
 	-- AutoHide
+	_MenuAutoHide.Enabled = notBagSlotBar
 	_MenuHideOutOfCombat.Checked = header.HideOutOfCombat
 	_MenuHideInPetBattle.Checked = header.HideInPetBattle
 	_MenuHideInVehicle.Checked = header.HideInVehicle
@@ -667,15 +698,18 @@ function _Menu:OnShow()
 	_MenuAlwaysShowGrid.Checked = header.AlwaysShowGrid
 
 	-- Bar FreeMode
+	_MenuFreeMode.Enabled = notBagSlotBar
 	_MenuFreeMode.Checked = header.FreeMode
 
 	-- Manual mode
-	_MenuManual.Enabled = header.FreeMode
+	_MenuManual.Enabled = notBagSlotBar and header.FreeMode
 
 	-- Auto Swap
+	_MenuSwap.Enabled = notBagSlotBar
 	_MenuSwap.Checked = header.AutoSwapRoot
 
 	-- Mouse down
+	_MenuUseDown.Enabled = notBagSlotBar
 	_MenuUseDown.Checked = IFActionHandler._IsGroupUseButtonDownEnabled(_IGASUI_ACTIONBAR_GROUP)
 
 	-- Save Set
@@ -691,10 +725,12 @@ function _Menu:OnShow()
 	_ListLoad.SelectedIndex = nil
 
 	-- Hide Blz bar
+	_MenuHideBlz:BlockEvent("OnCheckChanged")
 	_MenuHideBlz.Checked = _HiddenMainMenuBar
+	_MenuHideBlz:UnBlockEvent("OnCheckChanged")
 
 	-- Delete
-	_MenuDelete.Enabled = header~=_HeadList[1]
+	_MenuDelete.Enabled = notBagSlotBar and header~=_HeadList[1]
 end
 
 function _MenuClose:OnClick()

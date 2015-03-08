@@ -1313,7 +1313,6 @@ function _Recycle_IButtons:OnPush(btn)
 end
 
 function _Recycle_IHeaders:OnInit(btn)
-	btn.OnPositionChanged = SaveHeadPosition
 end
 
 function _Recycle_IHeaders:OnPush(btn)
