@@ -94,6 +94,8 @@ L["Please input the new set name"] = "請輸入新的配置名稱"
 L["Do you want overwrite the existed set?"] = "是否確定覆蓋已有的配置?"
 L["Do you want load the set?"] = "是否確定載入該配置?"
 L["Always Show Grid"] = "總是顯示網格"
+L["Popup Duration"] = "彈出條顯示時間"
+L["Please input the popup's duration(0.1 - 5)"] = "請輸入彈出條顯示時間(0.1 - 5)"
 
 L["Spell Binding"] = "技能綁定"
 L["Lock Raid Panel"] = "鎖定團隊面板"

@@ -94,6 +94,9 @@ _MenuAlwaysShowGrid.IsCheckButton = true
 _MenuUseDown = _Menu:AddMenuButton(L"Use mouse down")
 _MenuUseDown.IsCheckButton = true
 
+_MenuPopupDuration = _Menu:AddMenuButton(L"Popup Duration")
+_MenuPopupDuration:ActiveThread("OnClick")
+
 _MenuKeyBinding = _Menu:AddMenuButton(L"Key Binding")
 
 _MenuFreeMode = _Menu:AddMenuButton(L"Free Mode")

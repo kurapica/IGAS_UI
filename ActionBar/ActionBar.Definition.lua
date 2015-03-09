@@ -74,7 +74,7 @@ class "IActionButton"
 						if needHide then
 							if not regBtn then
 								regBtn = branch
-								regBtn:RegisterAutoHide(0.25)
+								regBtn:RegisterAutoHide(Manager:GetAttribute("PopupDuration") or 0.25)
 							end
 							regBtn:AddToAutoHide(btn)
 						end
@@ -531,6 +531,16 @@ class "IActionButton"
 			return Super.UpdateAction(self)
 		end
 	end
+
+	------------------------------------------------------
+	-- Static Property
+	------------------------------------------------------
+	__Static__() __Handler__(function (self, value)
+		Task.NoCombatCall(function ()
+			_ManagerFrame:SetAttribute("PopupDuration", value)
+		end)
+	end)
+	property "PopupDuration" { Type = Number + nil, Default = 0.25 }
 
 	------------------------------------------------------
 	-- Interface Property

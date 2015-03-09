@@ -265,7 +265,7 @@ function PLAYER_LOGOUT(self)
 end
 
 function GenerateConfig(includeContent)
-	local config = {}
+	local config = { PopupDuration = IActionButton.PopupDuration }
 	local btn, branch, bar, set, bset
 
 	if _HiddenMainMenuBar and _BagSlotBar then
@@ -373,6 +373,8 @@ function LoadConfig(config)
 	local header, btn, branch
 
 	if config and next(config) then
+		IActionButton.PopupDuration = config.PopupDuration
+
 		_HiddenMainMenuBar = config.BagSlotBar and true or false
 		_BagSlotBarConfig = config.BagSlotBar
 
@@ -540,6 +542,7 @@ function UpdateBlzMainMenuBar()
 			for i = 1, 4 do
 				btn = btn.Branch
 				btn.BagSlot = i
+				btn.Visible = false
 			end
 			btn:BlockEvent("OnMouseDown")
 
@@ -712,6 +715,9 @@ function _Menu:OnShow()
 	_MenuUseDown.Enabled = notBagSlotBar
 	_MenuUseDown.Checked = IFActionHandler._IsGroupUseButtonDownEnabled(_IGASUI_ACTIONBAR_GROUP)
 
+	-- Popup Duration
+	_MenuPopupDuration.Text = L"Popup Duration" .. " : " .. tostring(IActionButton.PopupDuration)
+
 	-- Save Set
 	_ListSaveSet.SelectedIndex = nil
 
@@ -875,8 +881,8 @@ function _ListScale:OnItemChoosed(key, item)
 	local e = btn:GetEffectiveScale()
 
 	for _, anchor in ipairs(loc) do
-		anchor.xOffset = (anchor.xOffset or 0) / e
-		anchor.yOffset = (anchor.yOffset or 0) / e
+		anchor.xOffset = (anchor.xOffset or 0) * e
+		anchor.yOffset = (anchor.yOffset or 0) * e
 	end
 
 	btn.Scale = key
@@ -884,8 +890,8 @@ function _ListScale:OnItemChoosed(key, item)
 	e = btn:GetEffectiveScale()
 
 	for _, anchor in ipairs(loc) do
-		anchor.xOffset = (anchor.xOffset or 0) * e
-		anchor.yOffset = (anchor.yOffset or 0) * e
+		anchor.xOffset = (anchor.xOffset or 0) / e
+		anchor.yOffset = (anchor.yOffset or 0) / e
 	end
 
 	btn.Location = loc
@@ -924,6 +930,17 @@ function _MenuUseDown:OnCheckChanged()
 		IFActionHandler._EnableGroupUseButtonDown(_IGASUI_ACTIONBAR_GROUP)
 	else
 		IFActionHandler._DisableGroupUseButtonDown(_IGASUI_ACTIONBAR_GROUP)
+	end
+end
+
+function _MenuPopupDuration:OnClick()
+	_Menu.Visible = false
+
+	local value = tonumber(IGAS:MsgBox(L"Please input the popup's duration(0.1 - 5)", "ic") or nil)
+
+	if value then
+		if value < 0.1 or value > 5 then return end
+		IActionButton.PopupDuration = value
 	end
 end
 
