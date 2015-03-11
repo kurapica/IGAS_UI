@@ -537,6 +537,8 @@ function UpdateBlzMainMenuBar()
 			_BagSlotBar.FlyoutDirection = "LEFT"
 			_BagSlotBar:GenerateBranch(4)
 			_BagSlotBar.BagSlot = 0
+			_BagSlotBar.BagSlotCountStyle = "AllEmpty"
+			_BagSlotBar.CountFormat = "(%s)"
 
 			local btn = _BagSlotBar
 			for i = 1, 4 do
@@ -613,6 +615,8 @@ function UpdateBlzMainMenuBar()
 			_Recycle_IHeaders(_BagSlotBar.IHeader)
 
 			local btn = _BagSlotBar
+			_BagSlotBar.BagSlotCountStyle = "Hidden"
+			_BagSlotBar.CountFormat = "%s"
 			for i = 1, 4 do btn = btn.Branch end
 			btn:UnBlockEvent("OnMouseDown")
 
