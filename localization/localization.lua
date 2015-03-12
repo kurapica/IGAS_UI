@@ -4,6 +4,16 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2014/04/02 v33 : </lime>
+</p><br/>
+<p>
+    1. The main menu bag slots are replaced, need IGAS v71.
+</p>
+<p>
+    2. You can change the popup-actionbar's duration in the config menu.
+</p>
+<br/><br/>
+<p>
 <lime>2014/04/02 v32 : </lime>
 </p><br/>
 <p>
