@@ -109,6 +109,7 @@ L["Please input the popup's duration(0.1 - 5)"] = "請輸入彈出條顯示時�
 
 L["Spell Binding"] = "技能綁定"
 L["Lock Raid Panel"] = "鎖定團隊面板"
+L["Indicator"] = "指示器"
 
 L["%s is added to buff line."] = "%s 被加入增益監視列表。"
 L["%s is added to spell cooldown line."] = "%s 被加入技能冷卻監視列表。"

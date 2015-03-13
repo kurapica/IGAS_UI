@@ -317,36 +317,32 @@ function OnEnable(self)
 	self:SecureHook("SpellButton_UpdateButton")
 	LEARNED_SPELL_IN_TAB(self)
 
-	self:ThreadCall(function()
-		System.Threading.Sleep(3)
+	Task.DelayCall(3, Task.NoCombatCall, function()
+		_G.CompactRaidFrameContainer:UnregisterAllEvents()
+		_G.CompactRaidFrameManager:UnregisterAllEvents()
+		_G.CompactRaidFrameManager:Show()
 
-		Task.NoCombatCall(function()
-			_G.CompactRaidFrameContainer:UnregisterAllEvents()
-			_G.CompactRaidFrameManager:UnregisterAllEvents()
-			_G.CompactRaidFrameManager:Show()
+		local button
 
-			local button
-
-			for i=1, 8 do
-				button = _G["CompactRaidFrameManagerDisplayFrameRaidMarkersRaidMarker"..i]
-				button:GetNormalTexture():SetDesaturated(false)
-				button:SetAlpha(1)
-				button:Enable()
-			end
-
-			button = _G["CompactRaidFrameManagerDisplayFrameRaidMarkersRaidMarkerRemove"]
+		for i=1, 8 do
+			button = _G["CompactRaidFrameManagerDisplayFrameRaidMarkersRaidMarker"..i]
 			button:GetNormalTexture():SetDesaturated(false)
 			button:SetAlpha(1)
 			button:Enable()
+		end
 
-			button = _G.CompactRaidFrameManagerDisplayFrameLeaderOptionsInitiateRolePoll
-			button:SetAlpha(1)
-			button:Enable()
+		button = _G["CompactRaidFrameManagerDisplayFrameRaidMarkersRaidMarkerRemove"]
+		button:GetNormalTexture():SetDesaturated(false)
+		button:SetAlpha(1)
+		button:Enable()
 
-			button = _G.CompactRaidFrameManagerDisplayFrameLeaderOptionsInitiateReadyCheck
-			button:SetAlpha(1)
-			button:Enable()
-		end)
+		button = _G.CompactRaidFrameManagerDisplayFrameLeaderOptionsInitiateRolePoll
+		button:SetAlpha(1)
+		button:Enable()
+
+		button = _G.CompactRaidFrameManagerDisplayFrameLeaderOptionsInitiateReadyCheck
+		button:SetAlpha(1)
+		button:Enable()
 	end)
 end
 
@@ -720,7 +716,7 @@ end
 --------------------
 function AddType4Config(type, text)
 	local name = System.Reflector.GetNameSpaceName(type)
-	local btn = raidPanelConfig:AddMenuButton(text)
+	local btn = raidPanelConfig:AddMenuButton(L"Indicator", text)
 
 	btn.IsCheckButton = true
 	btn.ElementName = name
