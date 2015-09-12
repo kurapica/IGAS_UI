@@ -143,7 +143,7 @@ ShowProperty = nil
 ShowLocale = nil
 
 -- Group ->
-for _, v in ipairs(System.Reflector.GetEnums(IFGroup.GroupType)) do
+for v in System.Reflector.GetEnums(IFGroup.GroupType) do
 	local groupBy = raidPanelConfig:AddMenuButton(L"Raid panel", L"Group By", L[v])
 	groupBy.UnitPanel = raidPanel
 	groupBy.IsCheckButton = true
@@ -171,7 +171,7 @@ raidPanelConfig:GetMenuButton(L"Pet panel", L"Group By").DropDownList.MultiSelec
 raidPanelConfig:GetMenuButton(L"Dead panel", L"Group By").DropDownList.MultiSelect = false
 
 -- Sort ->
-for _, v in ipairs(System.Reflector.GetEnums(IFGroup.SortType)) do
+for v in System.Reflector.GetEnums(IFGroup.SortType) do
 	local sortBy = raidPanelConfig:AddMenuButton(L"Raid panel", L"Sort By", L[v])
 	sortBy.UnitPanel = raidPanel
 	sortBy.IsCheckButton = true
@@ -199,7 +199,7 @@ raidPanelConfig:GetMenuButton(L"Pet panel", L"Sort By").DropDownList.MultiSelect
 raidPanelConfig:GetMenuButton(L"Dead panel", L"Sort By").DropDownList.MultiSelect = false
 
 -- Orientation
-for _, v in ipairs(System.Reflector.GetEnums(Orientation)) do
+for v in System.Reflector.GetEnums(Orientation) do
 	local orientation = raidPanelConfig:AddMenuButton(L"Raid panel", L"Orientation", L[v])
 	orientation.UnitPanel = raidPanel
 	orientation.IsCheckButton = true

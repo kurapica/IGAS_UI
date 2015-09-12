@@ -4,6 +4,7 @@
 
 IGAS:NewAddon "IGAS_UI.ActionBar"
 
+import "System"
 import "System.Widget"
 import "System.Widget.Action"
 
@@ -540,7 +541,7 @@ class "IActionButton"
 			_ManagerFrame:SetAttribute("PopupDuration", value)
 		end)
 	end)
-	property "PopupDuration" { Type = Number + nil, Default = 0.25 }
+	property "PopupDuration" { Type = NumberNil, Default = 0.25 }
 
 	------------------------------------------------------
 	-- Interface Property
@@ -552,9 +553,9 @@ class "IActionButton"
 	------------------------------------------------------
 	-- Property
 	------------------------------------------------------
-	property "RowCount" { Type = System.Number, Default = 1 }
-	property "ColCount" { Type = System.Number, Default = 1 }
-	property "BranchCount" { Type = System.Number }
+	property "RowCount" { Type = Number, Default = 1 }
+	property "ColCount" { Type = Number, Default = 1 }
+	property "BranchCount" { Type = Number }
 
 	property "Visible" {
 		Get = function(self)
@@ -575,7 +576,7 @@ class "IActionButton"
 				end
 			end
 		end,
-		Type = System.Boolean,
+		Type = Boolean,
 	}
 
 	property "Expansion" {
@@ -583,7 +584,7 @@ class "IActionButton"
 			return Task.NoCombatCall(UpdateExpansion, self, value)
 		end,
 		Field = "__Expansion",
-		Type = System.Boolean,
+		Type = Boolean,
 	}
 
 	property "Brother" {
@@ -604,7 +605,7 @@ class "IActionButton"
 				end
 			end
 		end,
-		Type = IActionButton + nil,
+		Type = IActionButton,
 	}
 
 	property "Branch" {
@@ -618,7 +619,7 @@ class "IActionButton"
 				value:SetSize(self:GetSize())
 			end
 		end,
-		Type = IActionButton + nil,
+		Type = IActionButton,
 	}
 
 	property "Header" {
@@ -637,7 +638,7 @@ class "IActionButton"
 				end
 			end
 		end,
-		Type = IActionButton + nil,
+		Type = IActionButton,
 	}
 
 	property "Root" {
@@ -656,7 +657,7 @@ class "IActionButton"
 				end
 			end
 		end,
-		Type = IActionButton + nil,
+		Type = IActionButton,
 	}
 
 	property "ActionBar" {
@@ -671,7 +672,7 @@ class "IActionButton"
 				end
 			end
 		end,
-		Type = System.Number + nil,
+		Type = NumberNil,
 	}
 
 	property "MainBar" {
@@ -686,7 +687,7 @@ class "IActionButton"
 				end
 			end
 		end,
-		Type = System.Boolean,
+		Type = Boolean,
 	}
 
 	property "PetBar" {
@@ -712,7 +713,7 @@ class "IActionButton"
 				end)
 			end
 		end,
-		Type = System.Boolean,
+		Type = Boolean,
 	}
 
 	property "StanceBar" {
@@ -732,10 +733,10 @@ class "IActionButton"
 				end)
 			end
 		end,
-		Type = System.Boolean,
+		Type = Boolean,
 	}
 
-	property "QuestBar" { Type = System.Boolean }
+	property "QuestBar" { Type = Boolean }
 
 	property "HideOutOfCombat" {
 		Handler = function (self, value)
@@ -747,7 +748,7 @@ class "IActionButton"
 				Task.NoCombatCall(UnregisterOutCombat, self)
 			end
 		end,
-		Type = System.Boolean,
+		Type = Boolean,
 	}
 
 	property "HideInPetBattle" {
@@ -760,7 +761,7 @@ class "IActionButton"
 				Task.NoCombatCall(UnregisterNoPetBattle, self)
 			end
 		end,
-		Type = System.Boolean,
+		Type = Boolean,
 	}
 
 	property "HideInVehicle" {
@@ -773,7 +774,7 @@ class "IActionButton"
 				Task.NoCombatCall(UnregisterNoVehicle, self)
 			end
 		end,
-		Type = System.Boolean,
+		Type = Boolean,
 	}
 
 	property "AutoSwapRoot" {
@@ -788,7 +789,7 @@ class "IActionButton"
 				self.Brother.AutoSwapRoot = value
 			end
 		end,
-		Type = System.Boolean,
+		Type = Boolean,
 	}
 
 	property "Parent" {
@@ -804,7 +805,7 @@ class "IActionButton"
 				self.Branch.Parent = parent
 			end
 		end,
-		Type = UIObject + nil,
+		Type = UIObject,
 	}
 
 	property "FrameLevel" {
@@ -853,7 +854,7 @@ class "IActionButton"
 
 			self.ShowFlyOut = self.BranchCount > 0 and (not self.LockMode or not self.FreeMode)
 		end,
-		Type = System.Boolean,
+		Type = Boolean,
 	}
 
 	property "LockMode" {
@@ -877,7 +878,7 @@ class "IActionButton"
 
 			self.ShowFlyOut = self.BranchCount > 0 and (not self.LockMode or not self.FreeMode)
 		end,
-		Type = System.Boolean,
+		Type = Boolean,
 	}
 
 	property "AlwaysShowGrid" {
@@ -892,7 +893,7 @@ class "IActionButton"
 				self.Branch.AlwaysShowGrid = value
 			end
 		end,
-		Type = System.Boolean,
+		Type = Boolean,
 	}
 
 	property "MarginX" {
@@ -913,7 +914,7 @@ class "IActionButton"
 				end
 			end
 		end,
-		Type = System.Number,
+		Type = Number,
 	}
 
 	property "MarginY" {
@@ -934,7 +935,7 @@ class "IActionButton"
 				end
 			end
 		end,
-		Type = System.Number,
+		Type = Number,
 	}
 
 	property "Scale" {
@@ -995,7 +996,7 @@ class "IActionButton"
 				end
 			end
 		end,
-		Type = System.Boolean,
+		Type = Boolean,
 	}
 
 	------------------------------------------------------
@@ -1123,7 +1124,7 @@ class "IHeader"
 				self.Visible = false
 			end
 		end,
-		Type = Frame + nil,
+		Type = Frame,
 	}
 	-- Checked
 	property "Checked" {
@@ -1133,7 +1134,7 @@ class "IHeader"
 		Set = function(self, value)
 			self.CheckedTexture.Visible = value
 		end,
-		Type = System.Boolean,
+		Type = Boolean,
 	}
 
 	------------------------------------------------------
@@ -1233,7 +1234,7 @@ class "ITail"
 				self.Visible = false
 			end
 		end,
-		Type = IActionButton + nil,
+		Type = IActionButton,
 	}
 
 	------------------------------------------------------

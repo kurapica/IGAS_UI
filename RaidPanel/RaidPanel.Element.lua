@@ -126,7 +126,7 @@ class "iNameLabel"
 			return UpdateText(self)
 		end,
 		Field = "__iNameLabelThreatLevel",
-		Type = System.Number,
+		Type = Number,
 	}
 
 	------------------------------------------------------
@@ -252,7 +252,7 @@ class "iTarget"
 				end
 			end
 		end,
-		Type = System.Boolean,
+		Type = Boolean,
 	}
 
 	------------------------------------------------------

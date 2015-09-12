@@ -110,47 +110,27 @@ class "SpellIcon"
     ------------------------------------------------------
     -- Spell
     property "Spell" {
-        Get = function(self)
-            return self.__Spell
-        end,
-        Set = function(self, value)
-            self.__Spell = value
+        Handler = function(self, value)
             self.TexturePath = value and GetSpellTexture(value)
         end,
-        Type = System.String + System.Number + nil,
+        Type = StringNumber,
     }
     -- Item
     property "Item" {
-        Get = function(self)
-            return self.__Item
-        end,
-        Set = function(self, value)
-            self.__Item = value
+        Handler = function(self, value)
             self.TexturePath = value and GetItemIcon(value)
         end,
-        Type = System.String + System.Number + nil,
+        Type = StringNumber,
     }
     -- Buff
     property "Buff" {
-        Get = function(self)
-            return self.__Buff
-        end,
-        Set = function(self, value)
-            self.__Buff = value
+        Handler = function(self, value)
             self.TexturePath = value and GetSpellTexture(value)
         end,
-        Type = System.String + System.Number + nil,
+        Type = StringNumber,
     }
     -- OffsetY
-    property "OffsetY" {
-        Get = function(self)
-            return self.__OffsetY or 0
-        end,
-        Set = function(self, value)
-            self.__OffsetY = value
-        end,
-        Type = System.Number,
-    }
+    property "OffsetY" { Type = Number }
 
     ------------------------------------------------------
     -- Script handler

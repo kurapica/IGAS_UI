@@ -128,7 +128,7 @@ class "iClassPowerButton"
 				end
 			end
 		end,
-		Type = System.Boolean,
+		Type = Boolean,
 	}
 
 	------------------------------------------------------
@@ -306,7 +306,7 @@ class "iClassPower"
 				return self:RefreshValue()
 			end
 		end,
-		Type = System.Number + nil,
+		Type = NumberNil,
 	}
 	-- MinMaxValue
 	property "MinMaxValue" {
@@ -320,11 +320,11 @@ class "iClassPower"
 				return self:RefreshBar()
 			end
 		end,
-		Type = System.MinMax,
+		Type = MinMax,
 	}
 	-- ClassPowerType
 	property "ClassPowerType" {
-		Type = System.Number+nil,
+		Type = NumberNil,
 	}
 
 	------------------------------------------------------
@@ -417,7 +417,7 @@ class "iRuneBar"
 					end
 				end
 			end,
-			Type = System.Number + nil,
+			Type = NumberNil,
 		}
 		-- Ready
 		property "Ready" {
@@ -434,7 +434,7 @@ class "iRuneBar"
 					end
 				end
 			end,
-			Type = System.Boolean,
+			Type = Boolean,
 		}
 
 		------------------------------------------------------
@@ -552,7 +552,7 @@ class "iEclipseBar"
 		Set = function(self, value)
 			self.__Min, self.__Max = value.min, value.max
 		end,
-		Type = System.MinMax,
+		Type = MinMax,
 	}
 	-- Value
 	property "Value" {
@@ -566,7 +566,7 @@ class "iEclipseBar"
 				self.Marker:SetPoint("CENTER", (value/self.__Max) *  (self.Width/2), 0)
 			end
 		end,
-		Type = System.Number,
+		Type = Number,
 	}
 
 	------------------------------------------------------
