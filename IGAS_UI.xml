@@ -15,6 +15,7 @@
 	<Include file = "UnitFrame\UnitFrame.xml"/>
 	<Include file = "NamePlate\NamePlate.xml"/>
 	<Script file = "Minimap\Minimap.lua"/>
+	<Script file = "ChatFrame\ChatFrame.lua"/>
 
 	<!-- Manager -->
 	<Script file = "Manager.Designer.lua"/>

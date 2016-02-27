@@ -1,3 +1,7 @@
+2016/02/27 v39
+	1. Add new style for chat frames.
+	2. Update for new IGAS lib, with feature fixed.
+
 2014/10/20: v37
 	1. You can use alt+mouse drag to change the flyout spell's direction, only only to create the popup-buttons.
 
