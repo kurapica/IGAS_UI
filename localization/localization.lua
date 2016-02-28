@@ -4,6 +4,16 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/02/28 v40 : </lime>
+</p><br/>
+<p>
+    1. Reduce memory increasement.
+</p>
+<p>
+    2. A simple change on chat frames.
+</p>
+<br/><br/>
+<p>
 <lime>2014/04/02 v33 : </lime>
 </p><br/>
 <p>

@@ -245,10 +245,11 @@ class "iTarget"
 		Set = function(self, value)
 			if self.IsTarget ~= value then
 				self.__IsTarget = value
+				if not self.TargetBack then self.TargetBack = self.Parent.Parent.iHealthBar.Back end
 				if value then
-					self.UpdateFrame.iHealthBar.Back.BackdropBorderColor = Config.TARGET_BORDER_COLOR
+					self.TargetBack.BackdropBorderColor = Config.TARGET_BORDER_COLOR
 				else
-					self.UpdateFrame.iHealthBar.Back.BackdropBorderColor = Config.DEFAULT_BORDER_COLOR
+					self.TargetBack.BackdropBorderColor = Config.DEFAULT_BORDER_COLOR
 				end
 			end
 		end,
@@ -261,6 +262,6 @@ class "iTarget"
 	function iTarget(self, name, parent, ...)
 		Super(self, name, parent, ...)
 
-		self.UpdateFrame = self.Parent.Parent
+		self.TargetBack = false
 	end
 endclass "iTarget"
