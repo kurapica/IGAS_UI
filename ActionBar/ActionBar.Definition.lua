@@ -514,6 +514,10 @@ class "IActionButton"
 
 				self.BranchCount = num
 				self.ShowFlyOut = num > 0 and (not self.LockMode or not self.FreeMode)
+				if num == 0 and self.AutoActionTask then
+					self.AutoActionTask:RemoveRoot(self)
+					self.AutoActionTask = nil
+				end
 			end
 		end
 	end
@@ -735,8 +739,6 @@ class "IActionButton"
 		end,
 		Type = Boolean,
 	}
-
-	property "QuestBar" { Type = Boolean }
 
 	property "HideOutOfCombat" {
 		Handler = function (self, value)
@@ -1288,12 +1290,313 @@ class "ITail"
     end
 endclass "ITail"
 
+class "AutoPopupMask"
+	inherit "Button"
+
+	_FrameBackdrop = {
+		bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+		edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+		tile = true, tileSize = 16, edgeSize = 8,
+		insets = { left = 3, right = 3, top = 3, bottom = 3 }
+	}
+
+	------------------------------------------------------
+	-- Method
+	------------------------------------------------------
+	function SetParent(self, parent)
+		Super.SetParent(self, parent)
+		if parent then
+			self:ClearAllPoints()
+			self:SetPoint("BOTTOMLEFT")
+			self.Width = parent.Width
+			self.Height = parent.Height
+		else
+			self:ClearAllPoints()
+		end
+	end
+
+	------------------------------------------------------
+	-- Event Handler
+	------------------------------------------------------
+	local function OnShow(self)
+		if not self.Parent then
+			self.Visible = false
+			return
+		end
+		self.Width = self.Parent.Width
+		self.Height = self.Parent.Height
+	end
+
+	local function OnClick(self, button)
+		autoGenerateForm.RootActionButton = self.Parent
+
+		local pd = PopupDialog("IGAS_GUI_MSGBOX", WorldFrame)
+		if pd.Visible then pd:GetChild("OkayBtn"):Click() end
+
+		autoGenerateForm.Visible = true
+	end
+
+	------------------------------------------------------
+	-- Constructor
+	------------------------------------------------------
+    function AutoPopupMask(self, name, parent, ...)
+    	Super(self, name, parent, ...)
+
+		self.Visible = false
+
+		self:SetPoint("BOTTOMLEFT")
+
+		self.TopLevel = true
+		self.FrameStrata = "TOOLTIP"
+		self.MouseEnabled = true
+		self:RegisterForClicks("AnyUp")
+
+		self.Backdrop = _FrameBackdrop
+		self.BackdropColor = ColorType(1, 1, 1, 1)
+
+		self.OnShow = self.OnShow + OnShow
+		self.OnClick = self.OnClick + OnClick
+	end
+endclass "AutoPopupMask"
+
+class "AutoActionTask"
+	enum "AutoActionTaskType" {
+		"List",
+		"Spell",
+		"Item",
+		"Toy",
+		"BattlePet",
+		"Mount",
+		"EquipSet",
+	}
+
+	local yield = coroutine.yield
+
+	local function getList(self)
+		local filter = self.Filter
+		for _, item in ipairs(self.List) do
+			local ty, target = item:match("^%w+_(.*)$")
+			target = tonumber(target) or target
+			if not filter or filter(ty, target) then
+				yield(ty, target)
+			end
+		end
+	end
+
+	local function getSpell(self)
+		local filter = self.Filter
+		local index = 1
+		local _, id = GetSpellBookItemInfo(index, "spell")
+
+		while id do
+			if not filter or filter(id, index) then
+				yield("spell", id)
+			end
+			index = index + 1
+			_, id = GetSpellBookItemInfo(index, "spell")
+		end
+	end
+
+	local function getItem(self)
+		local filter = self.Filter
+		for bag = 0, _G.NUM_BAG_FRAMES do
+			for slot = 1, GetContainerNumSlots(bag) do
+				local link = GetContainerItemLink(bag, slot)
+				link = tonumber(link and link:match("item:(%d+)"))
+				if link and GetItemSpell(link) and (not filter or filter(link, bag, slot)) then yield("item", link) end
+			end
+		end
+	end
+
+	local function getToy(self)
+		local filter = self.Filter
+		local onlyFavourite = self.OnlyFavourite
+		for i = 1, C_ToyBox.GetNumToys() do
+			local index = C_ToyBox.GetToyFromIndex(i)
+
+			if index > 0 then
+				local item = C_ToyBox.GetToyInfo(index)
+				if PlayerHasToy(item) then
+					if not onlyFavourite or C_ToyBox.GetIsFavorite(item) then
+						if not filter or filter(item, index) then
+							yield("item", item)
+						end
+					end
+				end
+			end
+		end
+	end
+
+	local function getBattlePet(self)
+		local filter = self.Filter
+		local onlyFavourite = self.OnlyFavourite
+		for index = 1, C_PetJournal.GetNumPets() do
+			local petID, speciesID, isOwned, _, _, favorite = C_PetJournal.GetPetInfoByIndex(index)
+			if isOwned and (not onlyFavourite or favorite) then
+				if not filter or filter(petID, index) then
+					yield("battlepet", petID)
+				end
+			end
+		end
+	end
+
+	local function getMount(self)
+		local filter = self.Filter
+		local onlyFavourite = self.OnlyFavourite
+		for index = 1, C_MountJournal.GetNumMounts() do
+			local creatureName, creatureID, _, _, summonable, _, isFavorite, _, _, _, owned = C_MountJournal.GetMountInfo(index)
+			if owned and summonable then
+				if not onlyFavourite or isFavorite then
+					if not filter or filter(creatureID, index) then
+						yield("mount", creatureID)
+					end
+				end
+			end
+		end
+	end
+
+	local function getEquipSet(self)
+		local filter = self.Filter
+		local index = 1
+		local name = GetEquipmentSetInfo(index)
+		while name do
+			if not filter or filter(name, index) then
+				yield("equipmentset", name)
+			end
+			index = index + 1
+			name = GetEquipmentSetInfo(index)
+		end
+	end
+
+	local function task(self, root, iter, ...)
+		local mark = self.TaskMark
+		local runOnce = select("#", ...) == 0
+
+		while mark == self.TaskMark do
+			if InCombatLockdown() then Task.Event("PLAYER_REGEN_ENABLED") end
+			if mark ~= self.TaskMark then break end
+			if not root.Branch then break end
+
+			local btn = root
+			local cnt = 0
+			local autoGen = self.AutoGenerate and not root.FreeMode
+			local maxAction = self.MaxAction or 99
+
+			for ty, target, detail in Threading.Iterator(iter), self do
+				if cnt < maxAction then
+					if cnt > 0 then
+						if not btn.Branch then
+							if autoGen then
+								root:GenerateBranch(cnt)
+								btn = btn.Branch
+								btn:SetAction(ty, target, detail)
+								cnt = cnt + 1
+							end
+						else
+							btn = btn.Branch
+							btn:SetAction(ty, target, detail)
+							cnt = cnt + 1
+						end
+					else
+						btn:SetAction(ty, target, detail)
+						cnt = cnt + 1
+					end
+				end
+			end
+
+			root:GenerateBranch(cnt > 1 and cnt - 1 or 1)
+			if cnt <= 1 then root.Branch:SetAction(nil) end
+			if cnt <= 0 then root:SetAction(nil) end
+
+			if runOnce then break end
+
+			Task.Wait(...)
+		end
+
+		Log(4, "Stop task %s for %s", self.Type, root:GetName())
+	end
+
+	function AddRoot(self, root)
+		self.Roots = self.Roots or {}
+		self.Roots[root] = true
+	end
+
+	function RemoveRoot(self, root)
+		if self.Roots and self.Roots[root] then
+			self.Roots[root] = nil
+			self:RestartTask()
+		end
+	end
+
+	function RestartTask(self)
+		self:StopTask()
+		for root in pairs(self.Roots) do
+			self:StartTask(root)
+		end
+	end
+
+	function StartTask(self, root)
+		self.TaskMark = (self.TaskMark or 0)
+
+		if self.Type == AutoActionTaskType.List then
+			return Task.ThreadCall(task, self, getList)
+		elseif AutoActionTaskType.Spell then
+			return Task.ThreadCall(task, self, getSpell, "LEARNED_SPELL_IN_TAB", "SPELLS_CHANGED", "SKILL_LINES_CHANGED", "PLAYER_GUILD_UPDATE", "PLAYER_SPECIALIZATION_CHANGED")
+		elseif AutoActionTaskType.Item then
+			return Task.ThreadCall(task, self, getItem, "BAG_NEW_ITEMS_UPDATED", "BAG_UPDATE")
+		elseif AutoActionTaskType.Toy then
+			return Task.ThreadCall(task, self, getToy, "TOYS_UPDATED")
+		elseif AutoActionTaskType.BattlePet then
+			return Task.ThreadCall(task, self, getBattlePet, "PET_JOURNAL_LIST_UPDATE", "PET_JOURNAL_PET_DELETED")
+		elseif AutoActionTaskType.Mount then
+			return Task.ThreadCall(task, self, getMount, "COMPANION_LEARNED", "COMPANION_UNLEARNED", "MOUNT_JOURNAL_USABILITY_CHANGED")
+		elseif AutoActionTaskType.EquipSet then
+			return Task.ThreadCall(task, self, getEquipSet, "EQUIPMENT_SETS_CHANGED")
+		end
+	end
+
+	function StopTask(self) self.TaskMark = (self.TaskMark or 0) + 1 end
+
+	property "Name" { Type = String }
+	property "Type" { Type = AutoActionTaskType }
+	property "OnlyFavourite" { Type = Boolean }
+	property "AutoGenerate" { Type = Boolean }
+	property "MaxAction" { Type = NaturalNumber }
+	property "Filter" { Type = Function }
+	__Handler__(function(self, code)
+		if code then
+			if code:match("^%s*function") then
+				code = "return " .. code:gsub("^%s*function%s*[^%(]*", "function")
+				self.Filter = assert(loadstring(code))()
+			else
+				self.Filter = loadstring(code)
+			end
+		else
+			self.Filter = nil
+		end
+	end)
+	property "FilterCode" { Type = String }
+	property "List" { Type = Table }
+
+	_AutoActionTask = {}
+
+	function AutoActionTask(self, name)
+		self.Name = name
+		_AutoActionTask[name] = self
+	end
+
+	function __exist(name)
+		return _AutoActionTask[name]
+	end
+endclass "AutoActionTask"
+
 ------------------------------------------------------
 -- Recycle
 ------------------------------------------------------
 _Recycle_IButtons = Recycle(IActionButton, "IActionButton%d", UIParent)
 _Recycle_IHeaders = Recycle(IHeader, "IHeader%d", UIParent)
 _Recycle_ITails = Recycle(ITail, "ITail%d", UIParent)
+_Recycle_AutoPopupMask = Recycle(AutoPopupMask, "AutoPopupMask%d", UIParent)
 
 function _Recycle_IButtons:OnPop(btn)
 	btn.ShowGrid = true
@@ -1311,7 +1614,6 @@ function _Recycle_IButtons:OnPush(btn)
 	btn.ID = 1
 	btn.ActionBar = nil
 	btn.MainBar = false
-	btn.QuestBar = false
 	btn.PetBar = false
 	btn.StanceBar = false
 	btn.HideOutOfCombat = false
@@ -1336,4 +1638,9 @@ end
 
 function _Recycle_ITails:OnPush(btn)
 	btn.ActionButton = nil
+end
+
+function _Recycle_AutoPopupMask:OnPush(mask)
+	mask.Parent = nil
+	mask.Visible = false
 end

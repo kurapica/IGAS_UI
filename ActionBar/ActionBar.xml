@@ -1,6 +1,7 @@
 ﻿<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
 	<Script file = "ActionBar.Definition.lua"/>
 	<Script file = "ActionBar.Designer.lua"/>
+	<Script file = "ActionBar.AutoPopupList.lua"/>
 	<Script file = "ActionBar.Script.lua"/>
 	<Script file = "Style.lua"/>
 </Ui>

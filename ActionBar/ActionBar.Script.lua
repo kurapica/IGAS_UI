@@ -27,7 +27,6 @@ Toggle = {
 }
 
 _MainBar = nil
-_QuestBar = nil
 _PetBar = nil
 _StanceBar = nil
 _BagSlotBar = nil
@@ -75,6 +74,13 @@ function OnLoad(self)
 	_DBCharSet = _DBChar.ActionSet or {}
 	_DBChar.ActionSet = _DBCharSet
 
+	_DBAutoPopupList = _DB.AutoPopupList or {}
+	_DB.AutoPopupList = _DBAutoPopupList
+
+	for name in pairs(_DBAutoPopupList) do
+		autoList:AddItem(name, name)
+	end
+
 	_ActionSetSave = {L"New Set"}
 	_ActionSetLoad = {}
 
@@ -92,11 +98,6 @@ function OnLoad(self)
 	self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
 	self:RegisterEvent("PLAYER_LOGOUT")
 
-	self:RegisterEvent("MERCHANT_SHOW")
-	self:RegisterEvent("MERCHANT_CLOSED")
-	self:RegisterEvent("BAG_OPEN")
-	self:RegisterEvent("BAG_CLOSED")
-
 	self:RegisterEvent("UPDATE_SHAPESHIFT_FORMS")
 
 	_LoadingConfig = GetSpecialization() or 1
@@ -107,10 +108,6 @@ end
 
 function OnEnable(self)
 	UPDATE_SHAPESHIFT_FORMS(self)
-	System.Threading.Sleep(2)
-	_ItemType = {GetAuctionItemClasses()}
-	self:RegisterEvent("BAG_UPDATE")	-- Delay register to reduce cost
-	BAG_UPDATE(self)
 end
 
 _Addon.OnSlashCmd = _Addon.OnSlashCmd + function(self, option, info)
@@ -221,29 +218,6 @@ function UpdateQuestBar()
 	end
 end
 
-function BAG_UPDATE(self)
-	if _ItemType and _QuestBar and not InCombatLockdown() then
-		Task.NoCombatCall(UpdateQuestBar)
-	end
-end
-
-function MERCHANT_SHOW(self)
-	self:UnregisterEvent("BAG_UPDATE")
-end
-
-function MERCHANT_CLOSED(self)
-	self:RegisterEvent("BAG_UPDATE")
-end
-
-function BAG_OPEN(self)
-	self:UnregisterEvent("BAG_UPDATE")
-end
-
-function BAG_CLOSED(self)
-	self:RegisterEvent("BAG_UPDATE")
-	BAG_UPDATE(self)
-end
-
 function PLAYER_SPECIALIZATION_CHANGED(self)
 	local now = GetSpecialization() or 1
 	if now ~= _LoadingConfig then
@@ -296,7 +270,6 @@ function GenerateConfig(includeContent)
 
 		bar.ActionBar = header.ActionBar
 		bar.MainBar = header.MainBar
-		bar.QuestBar = header.QuestBar
 		bar.PetBar = header.PetBar
 		bar.StanceBar = header.StanceBar
 		bar.ReplaceBlzMainAction = header.ReplaceBlzMainAction
@@ -332,6 +305,10 @@ function GenerateConfig(includeContent)
 			set.HotKey = btn:GetBindingKey()
 			if includeContent then
 				set.ActionKind, set.ActionTarget, set.ActionDetail = btn:GetAction()
+			end
+
+			if btn.AutoActionTask then
+				set.AutoActionTask = btn.AutoActionTask.Name
 			end
 
 			-- branch
@@ -401,10 +378,6 @@ function LoadConfig(config)
 			if header.MainBar then
 				_MainBar = header
 			end
-			header.QuestBar = bar.QuestBar
-			if header.QuestBar then
-				_QuestBar = header
-			end
 			header.PetBar = bar.PetBar
 			if header.PetBar then
 				_PetBar = header
@@ -468,7 +441,6 @@ function LoadConfig(config)
 			header.AlwaysShowGrid = bar.AlwaysShowGrid
 		end
 
-		BAG_UPDATE()
 		UPDATE_SHAPESHIFT_FORMS()
 	else
 		NewHeader()
@@ -507,10 +479,6 @@ function RemoveHeader(header)
 		header.MainBar = false
 		header.ReplaceBlzMainAction = false
 		_MainBar = nil
-	end
-	if header == _QuestBar then
-		header.QuestBar = false
-		_QuestBar = nil
 	end
 	if header == _PetBar then
 		header.PetBar = false
@@ -673,12 +641,10 @@ function _Menu:OnShow()
 		_ListActionMap.SelectedIndex = 2
 	elseif header.ActionBar then
 		_ListActionMap.SelectedIndex = header.ActionBar + 2
-	elseif header.QuestBar then
-		_ListActionMap.SelectedIndex = 9
 	elseif header.PetBar then
-		_ListActionMap.SelectedIndex = 10
+		_ListActionMap.SelectedIndex = 9
 	elseif header.StanceBar then
-		_ListActionMap.SelectedIndex = 11
+		_ListActionMap.SelectedIndex = 10
 	else
 		_ListActionMap.SelectedIndex = 1
 	end
@@ -714,6 +680,13 @@ function _Menu:OnShow()
 	-- Auto Swap
 	_MenuSwap.Enabled = notBagSlotBar
 	_MenuSwap.Checked = header.AutoSwapRoot
+
+	-- Auto Generate
+	if header.ActionBar or header.MainBar or header.PetBar or header.StanceBar then
+		_MenuAutoGenerate.Enabled = false
+	else
+		_MenuAutoGenerate.Enabled = true
+	end
 
 	-- Mouse down
 	_MenuUseDown.Enabled = notBagSlotBar
@@ -757,10 +730,6 @@ function _ListActionMap:OnItemChoosed(key, item)
 			_Menu.Parent.MainBar = false
 			_Menu.Parent.ReplaceBlzMainAction = false
 		end
-		if _Menu.Parent == _QuestBar then
-			_QuestBar = nil
-			_Menu.Parent.QuestBar = false
-		end
 		if _Menu.Parent == _PetBar then
 			_PetBar = nil
 			_Menu.Parent.PetBar = false
@@ -771,10 +740,6 @@ function _ListActionMap:OnItemChoosed(key, item)
 		end
 	elseif index == 2 then
 		if not _MainBar then
-			if _Menu.Parent == _QuestBar then
-				_QuestBar = nil
-				_Menu.Parent.QuestBar = false
-			end
 			if _Menu.Parent == _PetBar then
 				_PetBar = nil
 				_Menu.Parent.PetBar = false
@@ -795,30 +760,9 @@ function _ListActionMap:OnItemChoosed(key, item)
 			end
 		end
 	elseif index == 9 then
-		if not _QuestBar then
-			if _Menu.Parent == _MainBar then
-				return
-			end
-			if _Menu.Parent == _PetBar then
-				_PetBar = nil
-				_Menu.Parent.PetBar = false
-			end
-			if _Menu.Parent == _StanceBar then
-				_StanceBar = nil
-				_Menu.Parent.StanceBar = false
-			end
-			_QuestBar = _Menu.Parent
-			_Menu.Parent.QuestBar = true
-			BAG_UPDATE()
-		end
-	elseif index == 10 then
 		if not _PetBar then
 			if _Menu.Parent == _MainBar then
 				return
-			end
-			if _Menu.Parent == _QuestBar then
-				_QuestBar = nil
-				_Menu.Parent.QuestBar = false
 			end
 			if _Menu.Parent == _StanceBar then
 				_StanceBar = nil
@@ -827,14 +771,10 @@ function _ListActionMap:OnItemChoosed(key, item)
 			_PetBar = _Menu.Parent
 			_Menu.Parent.PetBar = true
 		end
-	elseif index == 11 then
+	elseif index == 10 then
 		if not _StanceBar then
 			if _Menu.Parent == _MainBar then
 				return
-			end
-			if _Menu.Parent == _QuestBar then
-				_QuestBar = nil
-				_Menu.Parent.QuestBar = false
 			end
 			if _Menu.Parent == _PetBar then
 				_PetBar = nil
@@ -849,10 +789,6 @@ function _ListActionMap:OnItemChoosed(key, item)
 			_MainBar = nil
 			_Menu.Parent.MainBar = false
 			_Menu.Parent.ReplaceBlzMainAction = false
-		end
-		if _Menu.Parent == _QuestBar then
-			_QuestBar = nil
-			_Menu.Parent.QuestBar = false
 		end
 		if _Menu.Parent == _PetBar then
 			_PetBar = nil
@@ -950,6 +886,26 @@ end
 
 function _MenuKeyBinding:OnClick()
 	IFKeyBinding._ModeOn()
+end
+
+function _MenuAutoGenerate:OnClick()
+	local btn = _Menu.Parent
+	local usedMask = {}
+	while btn do
+		if btn.Branch then
+			local mask = _Recycle_AutoPopupMask()
+			mask.Parent = btn
+			mask.Visible = true
+			tinsert(usedMask, mask)
+		end
+		btn = btn.Brother
+	end
+	_Menu.Visible = false
+	if #usedMask > 0 then
+		IGAS:MsgBox(L"Please click the root button")
+		for _, mask in ipairs(usedMask) do _Recycle_AutoPopupMask(mask) end
+	end
+	usedMask = nil
 end
 
 function _MenuFreeMode:OnCheckChanged()

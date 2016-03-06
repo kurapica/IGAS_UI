@@ -25,7 +25,6 @@ _ListActionMap:SetList({
 	L"Bar 4",
 	L"Bar 5",
 	L"Bar 6",
-	L"Quest Bar",
 	L"Pet Bar",
 	L"Stance Bar",
 })
@@ -106,6 +105,9 @@ _MenuManual = _Menu:AddMenuButton(L"Manual Move&Resize")
 
 _MenuSwap = _Menu:AddMenuButton(L"Swap Pop-up action")
 _MenuSwap.IsCheckButton = true
+
+_MenuAutoGenerate = _Menu:AddMenuButton(L"Auto generate popup actions")
+_MenuAutoGenerate:ActiveThread("OnClick")
 
 _MenuSaveSet = _Menu:AddMenuButton(L"Save Settings")
 _ListSaveSet = List("LstSaveSet", _MenuSaveSet)
