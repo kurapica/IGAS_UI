@@ -100,7 +100,7 @@ function OnSlashCmd(self, option, info)
 		Log.LogLevel = tonumber(info)
 		_DB.LogLevel = Log.LogLevel
 
-		Info("%s's LogLevel is switched to %d.", _Name, Log.LogLevel)
+		Log(2, "%s's LogLevel is switched to %d.", _Name, Log.LogLevel)
 	end
 
 	IGAS.UIParent.IGAS_UI_Manager.Visible = true

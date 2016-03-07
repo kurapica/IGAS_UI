@@ -3,15 +3,6 @@
 -----------------------------------------
 IGAS:NewAddon "IGAS_UI.ActionBar"
 
-_FilterCodeList = [[
--- _type : the action's type like "spell", "item"
--- action : the action's value like spell id, item id
-local _type, action = ...
-
--- return true to generate a button for the action
-return true
-]]
-
 _FilterCodeSpell = [[
 -- spellID : the spell's id
 -- spellIndex : the spell's index in the spell book
@@ -74,6 +65,7 @@ autoGenerateForm = Form("AutoGenerateAction")
 autoGenerateForm.Caption = L"Auto Generate Pop-up Actions"
 autoGenerateForm.Layout = SplitLayoutPanel
 autoGenerateForm.Message = " "
+autoGenerateForm:SetSize(600, 400)
 autoGenerateForm:SetMinResize(400, 300)
 autoGenerateForm:SetMaxResize(900, 600)
 autoGenerateForm.Visible = false
@@ -99,70 +91,37 @@ btnRemove.Text = "-"
 btnRemove.Style = "Classic"
 btnRemove:ActiveThread("OnClick")
 
-autoGenerateForm:AddWidget("OptionGrp", GroupBox, "north", 120, "px")
+autoGenerateForm:AddWidget("OptionGrp", GroupBox, "north", 160, "px")
 grpOption = autoGenerateForm:GetWidget("OptionGrp")
 grpOption.Caption = ""
-grpOption:SetMinResize(120, 120)
+grpOption:SetMinResize(160, 160)
 grpOption:SetMaxResize(300, 300)
 
-autoGenerateForm:AddWidget("ItemList", List, "west", 100, "px")
-itemList = autoGenerateForm:GetWidget("ItemList")
-itemList:SetMinResize(100, 100)
-itemList:SetMaxResize(150, 150)
-itemList.Visible = false
-itemList.ShowTooltip = true
-
-autoGenerateForm:AddWidget("CommitGrp", GroupBox, "south", 24, "px")
+autoGenerateForm:AddWidget("CommitGrp", GroupBox, "south", 32, "px")
 grpCommit = autoGenerateForm:GetWidget("CommitGrp")
 grpCommit.Caption = ""
-grpCommit:SetMinResize(120, 24)
-grpCommit:SetMaxResize(300, 24)
-
-btnSave = NormalButton("btnSave", grpCommit)
-btnSave.Style = "Classic"
-btnSave.Text = L"Save"
-btnSave:SetPoint("TOPLEFT")
-btnSave:SetPoint("BOTTOMLEFT")
-btnSave:SetPoint("RIGHT", grpCommit, "CENTER")
+grpCommit:SetMinResize(120, 32)
+grpCommit:SetMaxResize(300, 32)
 
 btnApply = NormalButton("btnApply", grpCommit)
 btnApply.Style = "Classic"
 btnApply.Text = L"Apply"
-btnApply:SetPoint("TOPRIGHT")
-btnApply:SetPoint("BOTTOMRIGHT")
-btnApply:SetPoint("LEFT", grpCommit, "CENTER")
+btnApply:SetPoint("CENTER", grpCommit)
+btnApply:SetPoint("RIGHT")
+btnApply.Width = 100
+btnApply.Height = 24
+
+btnSave = NormalButton("btnSave", grpCommit)
+btnSave.Style = "Classic"
+btnSave.Text = L"Save"
+btnSave:SetPoint("CENTER", grpCommit)
+btnSave:SetPoint("RIGHT", btnApply, "LEFT")
+btnSave.Width = 100
+btnSave.Height = 24
 
 autoGenerateForm:AddWidget(CodeEditor, "rest")
 editor = autoGenerateForm:GetWidget(CodeEditor)
 editor.Visible = false
-
-btnReceive = Action.ActionButton("IGAS_UI_AUTO_RECEIVE_BUTTON")
-btnReceive:ClearAllPoints()
-btnReceive:SetPoint("CENTER")
-btnReceive.ShowGrid = true
-btnReceive.UseBlizzardArt = true
-btnReceive.FrameStrata = "DIALOG"
-btnReceive.Visible = false
-
-anim = Action.SpellActivationAlert("Alert", btnReceive)
-anim:SetPoint("CENTER")
-anim:SetSize(btnReceive.Width * 1.4, btnReceive.Height * 1.4)
-
-btnAddItem = NormalButton("Add2ItemList", autoGenerateForm)
-btnAddItem:SetPoint("TOPLEFT", itemList, "BOTTOMLEFT")
-btnAddItem:SetPoint("RIGHT", itemList, "CENTER")
-btnAddItem:SetPoint("BOTTOM", 0, 4)
-btnAddItem.Text = "+"
-btnAddItem.Style = "Classic"
-btnAddItem:ActiveThread("OnClick")
-
-btnRemoveItem = NormalButton("Remove4ItemList", autoGenerateForm)
-btnRemoveItem:SetPoint("TOPLEFT", btnAddItem, "TOPRIGHT")
-btnRemoveItem:SetPoint("BOTTOMLEFT", btnAddItem, "BOTTOMRIGHT")
-btnRemoveItem:SetPoint("RIGHT", itemList, "RIGHT")
-btnRemoveItem.Text = "-"
-btnRemoveItem.Style = "Classic"
-btnRemoveItem:ActiveThread("OnClick")
 
 lblType = FontString("lblType", grpOption)
 lblType.FontObject = "ChatFontNormal"
@@ -171,7 +130,6 @@ lblType:SetPoint("RIGHT", grpOption, "CENTER")
 lblType.Text = L"Action Type"
 
 cboType = ComboBox("cboType", grpOption)
-cboType:AddItem("List", L"Use List")
 cboType:AddItem("Spell", L"Spell")
 cboType:AddItem("Item", L"Item")
 cboType:AddItem("Toy", L"Toy")
@@ -213,6 +171,24 @@ chkFavourite:SetPoint("LEFT", grpOption, "CENTER")
 chkFavourite.Text = L"Only Favourite"
 chkFavourite.Checked = false
 
+cboItemClass = ComboBox("cboItemClass", grpOption)
+cboItemClass:SetPoint("TOPLEFT", chkFilter, "BOTTOMLEFT", 0, -16)
+cboItemClass:SetPoint("TOPRIGHT", chkFilter, "BOTTOMRIGHT")
+cboItemClass:AddItem(0, L"All")
+cboItemClass.Value = 0
+for i, v in ipairs{ GetAuctionItemClasses() } do
+	if i == 4 or i == 9 or i == 10 then
+		cboItemClass:AddItem(i, v)
+	end
+end
+cboItemClass.Visible = false
+
+cboItemSubClass = ComboBox("cboItemSubClass", grpOption)
+cboItemSubClass:SetPoint("TOP", cboItemClass)
+cboItemSubClass:SetPoint("RIGHT", -4, 0)
+cboItemSubClass:SetPoint("LEFT", grpOption, "CENTER")
+cboItemSubClass.Visible = false
+
 --------------------------------
 -- Script
 --------------------------------
@@ -222,9 +198,9 @@ function autoList:OnItemChoosed(key)
 	if key then
 		_autoPopupSet = _DBAutoPopupList[key]
 		if _autoPopupSet.Type then
-			cboType.Value = _autoPopupSet.Value
+			cboType.Value = _autoPopupSet.Type
 		else
-			cboType.Value = "List"
+			cboType.Value = "Spell"
 		end
 		if _autoPopupSet.Type == "Toy" or _autoPopupSet.Type == "BattlePet" or _autoPopupSet.Type == "Mount" then
 			chkFavourite.Visible = true
@@ -233,9 +209,19 @@ function autoList:OnItemChoosed(key)
 			chkFavourite.Visible = false
 			chkFavourite.Checked = false
 		end
+		if _autoPopupSet.Type == "Item" then
+			cboItemClass.Visible = true
+			cboItemSubClass.Visible = true
+			cboItemClass.Text = _autoPopupSet.ItemClass or L"All"
+			cboItemClass:OnValueChanged(cboItemClass.Value)
+			cboItemSubClass.Text = _autoPopupSet.ItemSubClass or L"All"
+		else
+			cboItemClass.Visible = false
+			cboItemSubClass.Visible = false
+		end
 		chkFilter.Checked = _autoPopupSet.FilterCode and true or false
 		editor.Visible = chkFilter.Checked
-		editor.Text = _autoPopupSet.FilterCode
+		editor.Text = _autoPopupSet.FilterCode or ""
 		chkAutoGenerate.Checked = _autoPopupSet.AutoGenerate
 		optMaxActionButtons.Enabled = chkAutoGenerate.Checked
 		optMaxActionButtons.Value = _autoPopupSet.MaxAction or 1
@@ -243,74 +229,60 @@ function autoList:OnItemChoosed(key)
 end
 
 function cboType:OnValueChanged(key)
-	if _autoPopupSet.Type == "Toy" or _autoPopupSet.Type == "BattlePet" or _autoPopupSet.Type == "Mount" then
+	if cboType.Value == "Toy" or cboType.Value == "BattlePet" or cboType.Value == "Mount" then
 		chkFavourite.Visible = true
-		chkFavourite.Checked = _autoPopupSet.OnlyFavourite
 	else
 		chkFavourite.Visible = false
 		chkFavourite.Checked = false
 	end
+	if cboType.Value == "Item" then
+		cboItemClass.Visible = true
+		cboItemSubClass.Visible = true
+		cboItemClass.Text = _autoPopupSet.ItemClass or L"All"
+		cboItemClass:OnValueChanged(cboItemClass.Value)
+		cboItemSubClass.Text = _autoPopupSet.ItemSubClass or L"All"
+	else
+		cboItemClass.Visible = false
+		cboItemSubClass.Visible = false
+	end
 end
 
 function btnAdd:OnClick()
-    local name = IGAS:MsgBox("Please input the auto aciton list's name", "ic")
-    if name and not autoList:GetItem(name) then
-    	_DBAutoPopupList[name] = {}
-        autoList:AddItem(name, name)
-    end
+	local name = IGAS:MsgBox("Please input the auto aciton list's name", "ic")
+	if name and not autoList:GetItem(name) then
+		_DBAutoPopupList[name] = { Name = name }
+		autoList:AddItem(name, name)
+	end
 end
 
 function btnRemove:OnClick()
-    local name = autoList:GetSelectedItemValue()
-    if name and IGAS:MsgBox("Are you sure to delete the auto action list?", "n") then
-        autoList:RemoveItem(name)
-        _autoPopupSet = nil
+	local name = autoList:GetSelectedItemValue()
+	if name and IGAS:MsgBox("Are you sure to delete the auto action list?", "n") then
+		autoList:RemoveItem(name)
+		AutoActionTask(_autoPopupSet.Name):Dispose()
 
-        cboType.Value = "List"
+		cboType.Value = "Spell"
 		chkFavourite.Visible = false
 		chkFavourite.Checked = false
 		chkFilter.Checked = false
+		cboItemClass.Visible = false
+		cboItemSubClass.Visible = false
 		editor.Visible = false
 		editor.Text = ""
 		chkAutoGenerate.Checked = false
 		optMaxActionButtons.Enabled = false
 		optMaxActionButtons.Value = 1
-    end
-end
 
-function btnAddItem:OnClick()
-    btnReceive.Visible = true
-    IGAS:MsgBox("Please drag the item into the center button")
-    btnReceive.Visible = false
-end
-
-function btnRemoveItem:OnClick()
-
-end
-
-function btnReceive:OnShow()
-    anim.AnimInPlaying = true
-end
-
-function btnReceive:OnHide()
-    anim:StopAnimation()
-end
-
-function btnReceive:UpdateAction()
-    local kind, target, detail = self:GetAction()
-    print(kind, target, detail)
-    if kind == "spell" then
-        itemList:AddItem("spell-" .. target, GetSpellLink(target))
-    end
-    self:SetAction(nil)
-end
-
-function itemList:OnGameTooltipShow(gametip, key, text)
-    gametip:SetSpellByID(tonumber(key:match("%d+$")))
+		_DBAutoPopupList[_autoPopupSet.Name] = nil
+		_autoPopupSet = nil
+	end
 end
 
 function chkAutoGenerate:OnValueChanged()
-    optMaxActionButtons.Enabled = self.Checked
+	optMaxActionButtons.Enabled = self.Checked
+	if not optMaxActionButtons.Enabled then
+		optMaxActionButtons.Value = 1
+	end
 end
 
 function chkFilter:OnValueChanged()
@@ -318,21 +290,88 @@ function chkFilter:OnValueChanged()
 	if editor.Visible and _autoPopupSet then
 		if not _autoPopupSet.FilterCode then
 			-- Auto generate code
-			if _autoPopupSet.Type == "List" then
-				editor.Text = _FilterCodeList
-			elseif _autoPopupSet.Type == "Spell" then
+			if cboType.Value == "Spell" then
 				editor.Text = _FilterCodeSpell
-			elseif _autoPopupSet.Type == "Item" then
+			elseif cboType.Value == "Item" then
 				editor.Text = _FilterCodeItem
-			elseif _autoPopupSet.Type == "Toy" then
+			elseif cboType.Value == "Toy" then
 				editor.Text = _FilterCodeToy
-			elseif _autoPopupSet.Type == "BattlePet" then
+			elseif cboType.Value == "BattlePet" then
 				editor.Text = _FilterCodeBattlePet
-			elseif _autoPopupSet.Type == "Mount" then
+			elseif cboType.Value == "Mount" then
 				editor.Text = _FilterCodeMount
-			elseif _autoPopupSet.Type == "EquipSet" then
+			elseif cboType.Value == "EquipSet" then
 				editor.Text = _FilterCodeEquipSet
 			end
+		end
+	end
+end
+
+function btnSave:OnClick()
+	if _autoPopupSet then
+		_autoPopupSet.Type = cboType.Value
+		_autoPopupSet.OnlyFavourite = chkFavourite.Checked
+		_autoPopupSet.AutoGenerate = chkAutoGenerate.Checked
+		_autoPopupSet.MaxAction = math.floor(optMaxActionButtons.Value)
+		if _autoPopupSet.Type == "Item" then
+			if cboItemClass.Value > 0 then
+				_autoPopupSet.ItemClass = cboItemClass.Text
+				if cboItemSubClass.Value > 0 then
+					_autoPopupSet.ItemSubClass = cboItemSubClass.Text
+				else
+					_autoPopupSet.ItemSubClass = nil
+				end
+			else
+				_autoPopupSet.ItemClass = nil
+				_autoPopupSet.ItemSubClass = nil
+			end
+		else
+			_autoPopupSet.ItemClass = nil
+			_autoPopupSet.ItemSubClass = nil
+		end
+		local code = editor.Visible and editor.Text
+		if code then code = strtrim(code) end
+		if not code or code == "" then code = nil end
+		_autoPopupSet.FilterCode = code
+
+		local task = AutoActionTask(_autoPopupSet.Name)
+
+		task.Type = _autoPopupSet.Type
+		task.OnlyFavourite = _autoPopupSet.OnlyFavourite
+		task.AutoGenerate = _autoPopupSet.AutoGenerate
+		task.MaxAction = _autoPopupSet.MaxAction
+		task.FilterCode = _autoPopupSet.FilterCode
+		task.ItemClass = _autoPopupSet.ItemClass
+		task.ItemSubClass = _autoPopupSet.ItemSubClass
+	end
+end
+
+function btnApply:OnClick()
+	if _autoPopupSet and autoGenerateForm.RootActionButton then
+		local task = AutoActionTask(_autoPopupSet.Name)
+		task:AddRoot(autoGenerateForm.RootActionButton)
+	end
+end
+
+function autoGenerateForm:OnShow()
+	if not autoGenerateForm.RootActionButton then self.Visible = false end
+	if autoGenerateForm.RootActionButton.AutoActionTask then
+		autoList:SelectItemByValue(autoGenerateForm.RootActionButton.AutoActionTask.Name)
+		autoList:OnItemChoosed(autoGenerateForm.RootActionButton.AutoActionTask.Name)
+	end
+end
+
+function autoGenerateForm:OnHide()
+	autoGenerateForm.RootActionButton = nil
+end
+
+function cboItemClass:OnValueChanged(key)
+	cboItemSubClass:Clear()
+	cboItemSubClass:AddItem(0, L"All")
+	cboItemSubClass.Value = 0
+	if key > 0 then
+		for i, v in ipairs{ GetAuctionItemSubClasses(key) } do
+			cboItemSubClass:AddItem(i, v)
 		end
 	end
 end

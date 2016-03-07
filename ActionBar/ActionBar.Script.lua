@@ -74,8 +74,8 @@ function OnLoad(self)
 	_DBCharSet = _DBChar.ActionSet or {}
 	_DBChar.ActionSet = _DBCharSet
 
-	_DBAutoPopupList = _DB.AutoPopupList or {}
-	_DB.AutoPopupList = _DBAutoPopupList
+	_DBAutoPopupList = _Addon._DB.AutoPopupList or {}
+	_Addon._DB.AutoPopupList = _DBAutoPopupList
 
 	for name in pairs(_DBAutoPopupList) do
 		autoList:AddItem(name, name)
@@ -431,6 +431,11 @@ function LoadConfig(config)
 
 				btn.Expansion = set.Expansion
 
+				if btn.Branch and set.AutoActionTask and _DBAutoPopupList[set.AutoActionTask] then
+					local task = AutoActionTask(set.AutoActionTask)
+					task:AddRoot(btn)
+				end
+
 				btn = btn.Brother
 			end
 
@@ -722,6 +727,15 @@ end
 
 function _ListActionMap:OnItemChoosed(key, item)
 	local index = self.SelectedIndex
+
+	-- Clear auto-pop actions
+	if index > 1 then
+		local btn = _Menu.Parent
+		while btn do
+			btn:GenerateBranch(0)
+			btn = btn.Brother
+		end
+	end
 
 	if index == 1 then
 		_Menu.Parent.ActionBar = nil

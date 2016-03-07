@@ -518,6 +518,7 @@ class "IActionButton"
 					self.AutoActionTask:RemoveRoot(self)
 					self.AutoActionTask = nil
 				end
+				if num > 0 then self:SetAttribute("type2", "macro") end
 			end
 		end
 	end
@@ -1361,27 +1362,17 @@ endclass "AutoPopupMask"
 
 class "AutoActionTask"
 	enum "AutoActionTaskType" {
-		"List",
 		"Spell",
 		"Item",
 		"Toy",
 		"BattlePet",
 		"Mount",
 		"EquipSet",
+		"Profession",
 	}
 
 	local yield = coroutine.yield
-
-	local function getList(self)
-		local filter = self.Filter
-		for _, item in ipairs(self.List) do
-			local ty, target = item:match("^%w+_(.*)$")
-			target = tonumber(target) or target
-			if not filter or filter(ty, target) then
-				yield(ty, target)
-			end
-		end
-	end
+	local tpairs = Threading.Iterator
 
 	local function getSpell(self)
 		local filter = self.Filter
@@ -1399,11 +1390,23 @@ class "AutoActionTask"
 
 	local function getItem(self)
 		local filter = self.Filter
+		local itemCls = self.ItemClass
+		local itemSubCls = self.ItemSubClass
+
 		for bag = 0, _G.NUM_BAG_FRAMES do
 			for slot = 1, GetContainerNumSlots(bag) do
 				local link = GetContainerItemLink(bag, slot)
 				link = tonumber(link and link:match("item:(%d+)"))
-				if link and GetItemSpell(link) and (not filter or filter(link, bag, slot)) then yield("item", link) end
+				if link and GetItemSpell(link) then
+					local pass = true
+					if itemCls then
+						local _, _, _, _, _, cls, subclass = GetItemInfo(link)
+						pass = itemCls == cls and (not itemSubCls or subclass == itemSubCls)
+					end
+					if pass and (not filter or filter(link, bag, slot)) then
+						yield("item", link)
+					end
+				end
 			end
 		end
 	end
@@ -1470,55 +1473,70 @@ class "AutoActionTask"
 
 	local function task(self, root, iter, ...)
 		local mark = self.TaskMark
-		local runOnce = select("#", ...) == 0
+		local processTime = GetTime() - 10
 
-		while mark == self.TaskMark do
+		while self.TaskMark and mark == self.TaskMark do
 			if InCombatLockdown() then Task.Event("PLAYER_REGEN_ENABLED") end
-			if mark ~= self.TaskMark then break end
+			if not self.TaskMark or mark ~= self.TaskMark then break end
 			if not root.Branch then break end
 
-			local btn = root
-			local cnt = 0
-			local autoGen = self.AutoGenerate and not root.FreeMode
-			local maxAction = self.MaxAction or 99
+			if GetTime() - processTime > 0.1 then
+				processTime = GetTime()
 
-			for ty, target, detail in Threading.Iterator(iter), self do
-				if cnt < maxAction then
-					if cnt > 0 then
-						if not btn.Branch then
-							if autoGen then
-								root:GenerateBranch(cnt)
+				local btn = root
+				local cnt = 0
+				local autoGen = self.AutoGenerate and not root.FreeMode
+				local maxAction = autoGen and self.MaxAction or 24
+
+				Log(1, "Start auto-gen %s [%s] %s @task %d", tostring(coroutine.running()), self.Type, root:GetName(), mark)
+
+				for ty, target, detail in tpairs(iter), self do
+					if cnt < maxAction then
+						if cnt > 0 then
+							if not btn.Branch then
+								if autoGen then
+									root:GenerateBranch(cnt)
+									btn.Branch.Visible = btn.Visible
+									btn = btn.Branch
+									btn:SetAction(ty, target, detail)
+									cnt = cnt + 1
+								end
+							else
 								btn = btn.Branch
 								btn:SetAction(ty, target, detail)
 								cnt = cnt + 1
 							end
 						else
-							btn = btn.Branch
 							btn:SetAction(ty, target, detail)
 							cnt = cnt + 1
 						end
-					else
-						btn:SetAction(ty, target, detail)
-						cnt = cnt + 1
+					end
+				end
+
+				if autoGen then
+					root:GenerateBranch(cnt > 1 and cnt - 1 or 1)
+					if cnt <= 1 then root.Branch:SetAction(nil) end
+					if cnt <= 0 then root:SetAction(nil) end
+				else
+					btn = btn.Branch
+					while btn do
+						btn:SetAction(nil)
+						btn = btn.Branch
 					end
 				end
 			end
 
-			root:GenerateBranch(cnt > 1 and cnt - 1 or 1)
-			if cnt <= 1 then root.Branch:SetAction(nil) end
-			if cnt <= 0 then root:SetAction(nil) end
-
-			if runOnce then break end
-
 			Task.Wait(...)
 		end
 
-		Log(4, "Stop task %s for %s", self.Type, root:GetName())
+		Log(1, "Stop auto-gen task %s for %s @task %d", self.Type, root:GetName(), mark)
 	end
 
 	function AddRoot(self, root)
 		self.Roots = self.Roots or {}
 		self.Roots[root] = true
+		root.AutoActionTask = self
+		self:StartTask(root)
 	end
 
 	function RemoveRoot(self, root)
@@ -1530,39 +1548,44 @@ class "AutoActionTask"
 
 	function RestartTask(self)
 		self:StopTask()
-		for root in pairs(self.Roots) do
-			self:StartTask(root)
+		if self.Roots then
+			for root in pairs(self.Roots) do
+				self:StartTask(root)
+			end
 		end
 	end
 
 	function StartTask(self, root)
 		self.TaskMark = (self.TaskMark or 0)
 
-		if self.Type == AutoActionTaskType.List then
-			return Task.ThreadCall(task, self, getList)
-		elseif AutoActionTaskType.Spell then
-			return Task.ThreadCall(task, self, getSpell, "LEARNED_SPELL_IN_TAB", "SPELLS_CHANGED", "SKILL_LINES_CHANGED", "PLAYER_GUILD_UPDATE", "PLAYER_SPECIALIZATION_CHANGED")
-		elseif AutoActionTaskType.Item then
-			return Task.ThreadCall(task, self, getItem, "BAG_NEW_ITEMS_UPDATED", "BAG_UPDATE")
-		elseif AutoActionTaskType.Toy then
-			return Task.ThreadCall(task, self, getToy, "TOYS_UPDATED")
-		elseif AutoActionTaskType.BattlePet then
-			return Task.ThreadCall(task, self, getBattlePet, "PET_JOURNAL_LIST_UPDATE", "PET_JOURNAL_PET_DELETED")
-		elseif AutoActionTaskType.Mount then
-			return Task.ThreadCall(task, self, getMount, "COMPANION_LEARNED", "COMPANION_UNLEARNED", "MOUNT_JOURNAL_USABILITY_CHANGED")
-		elseif AutoActionTaskType.EquipSet then
-			return Task.ThreadCall(task, self, getEquipSet, "EQUIPMENT_SETS_CHANGED")
+		if self.Type == AutoActionTaskType.Spell then
+			return Task.ThreadCall(task, self, root, getSpell, "LEARNED_SPELL_IN_TAB", "SPELLS_CHANGED", "SKILL_LINES_CHANGED", "PLAYER_GUILD_UPDATE", "PLAYER_SPECIALIZATION_CHANGED")
+		elseif self.Type == AutoActionTaskType.Item then
+			return Task.ThreadCall(task, self, root, getItem, "BAG_NEW_ITEMS_UPDATED", "BAG_UPDATE")
+		elseif self.Type == AutoActionTaskType.Toy then
+			return Task.ThreadCall(task, self, root, getToy, "TOYS_UPDATED")
+		elseif self.Type == AutoActionTaskType.BattlePet then
+			return Task.ThreadCall(task, self, root, getBattlePet, "PET_JOURNAL_LIST_UPDATE", "PET_JOURNAL_PET_DELETED")
+		elseif self.Type == AutoActionTaskType.Mount then
+			return Task.ThreadCall(task, self, root, getMount, "COMPANION_LEARNED", "COMPANION_UNLEARNED", "MOUNT_JOURNAL_USABILITY_CHANGED")
+		elseif self.Type == AutoActionTaskType.EquipSet then
+			return Task.ThreadCall(task, self, root, getEquipSet, "EQUIPMENT_SETS_CHANGED")
 		end
 	end
 
 	function StopTask(self) self.TaskMark = (self.TaskMark or 0) + 1 end
 
 	property "Name" { Type = String }
+
+	__Handler__(RestartTask)
 	property "Type" { Type = AutoActionTaskType }
+
 	property "OnlyFavourite" { Type = Boolean }
+
 	property "AutoGenerate" { Type = Boolean }
+
 	property "MaxAction" { Type = NaturalNumber }
-	property "Filter" { Type = Function }
+
 	__Handler__(function(self, code)
 		if code then
 			if code:match("^%s*function") then
@@ -1576,18 +1599,34 @@ class "AutoActionTask"
 		end
 	end)
 	property "FilterCode" { Type = String }
-	property "List" { Type = Table }
+
+	property "ItemClass" { Type = String }
+
+	property "ItemSubClass" { Type = String }
 
 	_AutoActionTask = {}
 
-	function AutoActionTask(self, name)
-		self.Name = name
-		_AutoActionTask[name] = self
+	function Dispoe(self)
+		self:StopTask()
+		for root in pairs(self.Roots) do
+			root.AutoActionTask = nil
+		end
+		_AutoActionTask[self.Name] = nil
 	end
 
-	function __exist(name)
-		return _AutoActionTask[name]
+	function AutoActionTask(self, name)
+		_AutoActionTask[name] = self
+		self.Name = name
+		self.Type = _DBAutoPopupList[name].Type
+		self.OnlyFavourite = _DBAutoPopupList[name].OnlyFavourite
+		self.AutoGenerate = _DBAutoPopupList[name].AutoGenerate
+		self.MaxAction = _DBAutoPopupList[name].MaxAction
+		self.FilterCode = _DBAutoPopupList[name].FilterCode
+		self.ItemClass = _DBAutoPopupList[name].ItemClass
+		self.ItemSubClass = _DBAutoPopupList[name].ItemSubClass
 	end
+
+	function __exist(name) return _AutoActionTask[name] end
 endclass "AutoActionTask"
 
 ------------------------------------------------------
