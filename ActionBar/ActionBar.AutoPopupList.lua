@@ -87,12 +87,14 @@ grpOption = autoGenerateForm:GetWidget("OptionGrp")
 grpOption.Caption = ""
 grpOption:SetMinResize(160, 160)
 grpOption:SetMaxResize(300, 300)
+grpOption.Visible = false
 
 autoGenerateForm:AddWidget("CommitGrp", GroupBox, "south", 32, "px")
 grpCommit = autoGenerateForm:GetWidget("CommitGrp")
 grpCommit.Caption = ""
 grpCommit:SetMinResize(120, 32)
 grpCommit:SetMaxResize(300, 32)
+grpCommit.Visible = false
 
 btnApply = NormalButton("btnApply", grpCommit)
 btnApply.Style = "Classic"
@@ -215,41 +217,11 @@ function autoList:OnItemChoosed(key)
 		chkAutoGenerate.Checked = _autoPopupSet.AutoGenerate
 		optMaxActionButtons.Enabled = chkAutoGenerate.Checked
 		optMaxActionButtons.Value = _autoPopupSet.MaxAction or 1
-	end
-end
 
-function cboType:OnValueChanged(key)
-	if cboType.Value == "Toy" or cboType.Value == "BattlePet" or cboType.Value == "Mount" then
-		chkFavourite.Visible = true
+		grpOption.Visible = true
+		grpCommit.Visible = true
 	else
-		chkFavourite.Visible = false
-		chkFavourite.Checked = false
-	end
-	if cboType.Value == "Item" then
-		cboItemClass.Visible = true
-		cboItemSubClass.Visible = true
-		cboItemClass.Text = _autoPopupSet.ItemClass or L"All"
-		cboItemClass:OnValueChanged(cboItemClass.Value)
-		cboItemSubClass.Text = _autoPopupSet.ItemSubClass or L"All"
-	else
-		cboItemClass.Visible = false
-		cboItemSubClass.Visible = false
-	end
-end
-
-function btnAdd:OnClick()
-	local name = IGAS:MsgBox(L"Please input the auto aciton list's name", "ic")
-	if name and not autoList:GetItem(name) then
-		_DBAutoPopupList[name] = { Name = name }
-		autoList:AddItem(name, name)
-	end
-end
-
-function btnRemove:OnClick()
-	local name = autoList:GetSelectedItemValue()
-	if name and IGAS:MsgBox(L"Are you sure to delete the auto action list?", "n") then
-		autoList:RemoveItem(name)
-		AutoActionTask(_autoPopupSet.Name):Dispose()
+		_autoPopupSet = nil
 
 		cboType.Value = "Item"
 		chkFavourite.Visible = false
@@ -263,8 +235,47 @@ function btnRemove:OnClick()
 		optMaxActionButtons.Enabled = false
 		optMaxActionButtons.Value = 1
 
+		grpOption.Visible = false
+		grpCommit.Visible = false
+	end
+end
+
+function cboType:OnValueChanged(key)
+	if cboType.Value == "Toy" or cboType.Value == "BattlePet" or cboType.Value == "Mount" then
+		chkFavourite.Visible = true
+	else
+		chkFavourite.Visible = false
+		chkFavourite.Checked = false
+	end
+	if cboType.Value == "Item" then
+		cboItemClass.Visible = true
+		cboItemSubClass.Visible = true
+		cboItemClass.Text = _autoPopupSet and _autoPopupSet.ItemClass or L"All"
+		cboItemClass:OnValueChanged(cboItemClass.Value)
+		cboItemSubClass.Text = _autoPopupSet and _autoPopupSet.ItemSubClass or L"All"
+	else
+		cboItemClass.Visible = false
+		cboItemSubClass.Visible = false
+	end
+end
+
+function btnAdd:OnClick()
+	local name = IGAS:MsgBox(L"Please input the auto aciton list's name", "ic")
+	if name and not autoList:GetItem(name) then
+		_DBAutoPopupList[name] = { Name = name }
+		autoList:AddItem(name, name)
+		autoList:SelectItemByValue(name)
+		autoList:OnItemChoosed(name)
+	end
+end
+
+function btnRemove:OnClick()
+	local name = autoList:GetSelectedItemValue()
+	if name and IGAS:MsgBox(L"Are you sure to delete the auto action list?", "n") then
+		autoList:RemoveItem(name)
+		AutoActionTask(_autoPopupSet.Name):Dispose()
 		_DBAutoPopupList[_autoPopupSet.Name] = nil
-		_autoPopupSet = nil
+		autoList:OnItemChoosed(nil)
 	end
 end
 
@@ -348,6 +359,9 @@ function autoGenerateForm:OnShow()
 	if autoGenerateForm.RootActionButton.AutoActionTask then
 		autoList:SelectItemByValue(autoGenerateForm.RootActionButton.AutoActionTask.Name)
 		autoList:OnItemChoosed(autoGenerateForm.RootActionButton.AutoActionTask.Name)
+	else
+		autoList:SelectItemByValue(nil)
+		autoList:OnItemChoosed(nil)
 	end
 end
 

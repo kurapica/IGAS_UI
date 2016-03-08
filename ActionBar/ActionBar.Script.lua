@@ -432,8 +432,7 @@ function LoadConfig(config)
 				btn.Expansion = set.Expansion
 
 				if btn.Branch and set.AutoActionTask and _DBAutoPopupList[set.AutoActionTask] then
-					local task = AutoActionTask(set.AutoActionTask)
-					task:AddRoot(btn)
+					AutoActionTask(set.AutoActionTask):AddRoot(btn)
 				end
 
 				btn = btn.Brother
