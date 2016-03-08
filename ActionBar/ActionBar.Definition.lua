@@ -1408,7 +1408,6 @@ class "AutoActionTask"
 		local onlyFavourite = self.OnlyFavourite
 		for i = 1, C_ToyBox.GetNumToys() do
 			local index = C_ToyBox.GetToyFromIndex(i)
-
 			if index > 0 then
 				local item = C_ToyBox.GetToyInfo(index)
 				if PlayerHasToy(item) then

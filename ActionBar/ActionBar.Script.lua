@@ -108,6 +108,10 @@ end
 
 function OnEnable(self)
 	UPDATE_SHAPESHIFT_FORMS(self)
+
+	-- Load toy informations
+	C_ToyBox.FilterToys()
+	for name, v in pairs(_DBAutoPopupList) do if v.Type == "Toy" then AutoActionTask(name):RestartTask() end end
 end
 
 _Addon.OnSlashCmd = _Addon.OnSlashCmd + function(self, option, info)

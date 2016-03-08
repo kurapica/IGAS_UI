@@ -1,3 +1,6 @@
+2016/03/08 v43
+	1. Fix auto-gen toy actions failed when entering the game.
+
 2016/03/08 v41
 	1. Add auto-generate for popup-action bars.
 	2. Right-click root button of popup-action bar wouldn't trigger the action.
