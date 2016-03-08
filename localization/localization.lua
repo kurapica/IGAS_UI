@@ -4,6 +4,16 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/03/08 v41 : </lime>
+</p><br/>
+<p>
+    1. Add "Auto generate popup actions" in the action bar's menu. You can use it to config the root button of a popup-action button list, like auto-generte a list of potion items. The root button can only be normal button(not map to blizzard's action bar, and etc) with popup buttons. You can bind many root buttons to one action list, so the actions would be generated on those buttons with orders.
+</p>
+<p>
+    2. Right-click popup-action root button wouldn't trigger the action now.
+</p>
+<br/><br/>
+<p>
 <lime>2016/02/28 v40 : </lime>
 </p><br/>
 <p>

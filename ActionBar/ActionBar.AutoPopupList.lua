@@ -3,15 +3,6 @@
 -----------------------------------------
 IGAS:NewAddon "IGAS_UI.ActionBar"
 
-_FilterCodeSpell = [[
--- spellID : the spell's id
--- spellIndex : the spell's index in the spell book
-local spellID, spellIndex = ...
-
--- return true to generate a button for the action
-return true
-]]
-
 _FilterCodeItem = [[
 -- itemID : the item's id
 -- bag : the bag
@@ -130,7 +121,6 @@ lblType:SetPoint("RIGHT", grpOption, "CENTER")
 lblType.Text = L"Action Type"
 
 cboType = ComboBox("cboType", grpOption)
-cboType:AddItem("Spell", L"Spell")
 cboType:AddItem("Item", L"Item")
 cboType:AddItem("Toy", L"Toy")
 cboType:AddItem("BattlePet", L"BattlePet")
@@ -200,7 +190,7 @@ function autoList:OnItemChoosed(key)
 		if _autoPopupSet.Type then
 			cboType.Value = _autoPopupSet.Type
 		else
-			cboType.Value = "Spell"
+			cboType.Value = "Item"
 		end
 		if _autoPopupSet.Type == "Toy" or _autoPopupSet.Type == "BattlePet" or _autoPopupSet.Type == "Mount" then
 			chkFavourite.Visible = true
@@ -209,7 +199,7 @@ function autoList:OnItemChoosed(key)
 			chkFavourite.Visible = false
 			chkFavourite.Checked = false
 		end
-		if _autoPopupSet.Type == "Item" then
+		if cboType.Value == "Item" then
 			cboItemClass.Visible = true
 			cboItemSubClass.Visible = true
 			cboItemClass.Text = _autoPopupSet.ItemClass or L"All"
@@ -248,7 +238,7 @@ function cboType:OnValueChanged(key)
 end
 
 function btnAdd:OnClick()
-	local name = IGAS:MsgBox("Please input the auto aciton list's name", "ic")
+	local name = IGAS:MsgBox(L"Please input the auto aciton list's name", "ic")
 	if name and not autoList:GetItem(name) then
 		_DBAutoPopupList[name] = { Name = name }
 		autoList:AddItem(name, name)
@@ -257,16 +247,16 @@ end
 
 function btnRemove:OnClick()
 	local name = autoList:GetSelectedItemValue()
-	if name and IGAS:MsgBox("Are you sure to delete the auto action list?", "n") then
+	if name and IGAS:MsgBox(L"Are you sure to delete the auto action list?", "n") then
 		autoList:RemoveItem(name)
 		AutoActionTask(_autoPopupSet.Name):Dispose()
 
-		cboType.Value = "Spell"
+		cboType.Value = "Item"
 		chkFavourite.Visible = false
 		chkFavourite.Checked = false
 		chkFilter.Checked = false
-		cboItemClass.Visible = false
-		cboItemSubClass.Visible = false
+		cboItemClass.Visible = true
+		cboItemSubClass.Visible = true
 		editor.Visible = false
 		editor.Text = ""
 		chkAutoGenerate.Checked = false
@@ -290,9 +280,7 @@ function chkFilter:OnValueChanged()
 	if editor.Visible and _autoPopupSet then
 		if not _autoPopupSet.FilterCode then
 			-- Auto generate code
-			if cboType.Value == "Spell" then
-				editor.Text = _FilterCodeSpell
-			elseif cboType.Value == "Item" then
+			if cboType.Value == "Item" then
 				editor.Text = _FilterCodeItem
 			elseif cboType.Value == "Toy" then
 				editor.Text = _FilterCodeToy
@@ -343,6 +331,8 @@ function btnSave:OnClick()
 		task.FilterCode = _autoPopupSet.FilterCode
 		task.ItemClass = _autoPopupSet.ItemClass
 		task.ItemSubClass = _autoPopupSet.ItemSubClass
+
+		return task:RestartTask()
 	end
 end
 

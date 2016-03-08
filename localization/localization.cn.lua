@@ -7,6 +7,16 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/03/08 v41 : </lime>
+</p><br/>
+<p>
+    1. 在动作条菜单上增加"自动填充弹出动作条"选项，可以使用它对弹出条的根按钮进行设定，比如自动生成药剂列表。根按钮必须是普通（没有映射到系统动作条）的并带有弹出按钮。也可以绑定多个根按钮到同一个动作列表，当这个动作列表更新时，会按照顺序填充这些弹出动作条。
+</p>
+<p>
+    2. 右键点击弹出条根按钮不再触发动作.
+</p>
+<br/><br/>
+<p>
 <lime>2016/02/28 v40 : </lime>
 </p><br/>
 <p>
@@ -218,3 +228,21 @@ L["Double click to remove"] = "双击项目移除"
 
 L["Right mouse-click send debuff to black list"] = "右键点击减益送至黑名单"
 L["Show buff/debuff tootip"] = "显示增益/减益的提示"
+
+L["Auto generate popup actions"] = "自动填充弹出动作条"
+L["Please click the root button"] = "请点击弹出条的根按钮"
+L["Auto Generate Pop-up Actions"] = "自动填充弹出动作条设定"
+L["Apply"] = "适用"
+L["Save"] = "保存"
+L["Action Type"] = "动作类型"
+L["Item"] = "背包物品"
+L["Toy"] = "玩具"
+L["BattlePet"] = "宠物"
+L["Mount"] = "坐骑"
+L["EquipSet"] = "套装"
+L["Auto-generate buttons"] = "自动生成按钮"
+L["Use filter"] = "使用过滤代码"
+L["Only Favourite"] = "只有最爱"
+L["All"] = "所有"
+L["Please input the auto aciton list's name"] = "请输入自动动作列表的名字"
+L["Are you sure to delete the auto action list?"] = "确认是否删除该自动动作列表"

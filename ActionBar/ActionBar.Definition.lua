@@ -518,7 +518,11 @@ class "IActionButton"
 					self.AutoActionTask:RemoveRoot(self)
 					self.AutoActionTask = nil
 				end
-				if num > 0 then self:SetAttribute("type2", "macro") end
+				if num > 0 then
+					self:SetAttribute("type2", "custom")
+				else
+					self:SetAttribute("type2", nil)
+				end
 			end
 		end
 	end
@@ -1362,36 +1366,21 @@ endclass "AutoPopupMask"
 
 class "AutoActionTask"
 	enum "AutoActionTaskType" {
-		"Spell",
 		"Item",
 		"Toy",
 		"BattlePet",
 		"Mount",
 		"EquipSet",
-		"Profession",
 	}
 
 	local yield = coroutine.yield
 	local tpairs = Threading.Iterator
 
-	local function getSpell(self)
-		local filter = self.Filter
-		local index = 1
-		local _, id = GetSpellBookItemInfo(index, "spell")
-
-		while id do
-			if not filter or filter(id, index) then
-				yield("spell", id)
-			end
-			index = index + 1
-			_, id = GetSpellBookItemInfo(index, "spell")
-		end
-	end
-
 	local function getItem(self)
 		local filter = self.Filter
 		local itemCls = self.ItemClass
 		local itemSubCls = self.ItemSubClass
+		local generated = {}
 
 		for bag = 0, _G.NUM_BAG_FRAMES do
 			for slot = 1, GetContainerNumSlots(bag) do
@@ -1403,12 +1392,15 @@ class "AutoActionTask"
 						local _, _, _, _, _, cls, subclass = GetItemInfo(link)
 						pass = itemCls == cls and (not itemSubCls or subclass == itemSubCls)
 					end
-					if pass and (not filter or filter(link, bag, slot)) then
+					if pass and not generated[link] and (not filter or filter(link, bag, slot)) then
+						generated[link] = true
 						yield("item", link)
 					end
 				end
 			end
 		end
+
+		generated = nil
 	end
 
 	local function getToy(self)
@@ -1433,14 +1425,17 @@ class "AutoActionTask"
 	local function getBattlePet(self)
 		local filter = self.Filter
 		local onlyFavourite = self.OnlyFavourite
+		local generated = {}
 		for index = 1, C_PetJournal.GetNumPets() do
 			local petID, speciesID, isOwned, _, _, favorite = C_PetJournal.GetPetInfoByIndex(index)
-			if isOwned and (not onlyFavourite or favorite) then
+			if isOwned and not generated[speciesID] and (not onlyFavourite or favorite) then
+				generated[speciesID] = true
 				if not filter or filter(petID, index) then
 					yield("battlepet", petID)
 				end
 			end
 		end
+		generated = nil
 	end
 
 	local function getMount(self)
@@ -1471,49 +1466,65 @@ class "AutoActionTask"
 		end
 	end
 
-	local function task(self, root, iter, ...)
+	local function task(self, iter, ...)
 		local mark = self.TaskMark
 		local processTime = GetTime() - 10
+		local roots = self.Roots
 
 		while self.TaskMark and mark == self.TaskMark do
 			if InCombatLockdown() then Task.Event("PLAYER_REGEN_ENABLED") end
 			if not self.TaskMark or mark ~= self.TaskMark then break end
-			if not root.Branch then break end
 
 			if GetTime() - processTime > 0.1 then
 				processTime = GetTime()
 
+				local rIdx = 1
+				local root = roots[rIdx]
 				local btn = root
 				local cnt = 0
 				local autoGen = self.AutoGenerate and not root.FreeMode
 				local maxAction = autoGen and self.MaxAction or 24
 
-				Log(1, "Start auto-gen %s [%s] %s @task %d", tostring(coroutine.running()), self.Type, root:GetName(), mark)
+				Log(1, "Process auto-gen [%s] %s @pid %d", self.Type, self.Name, mark)
 
 				for ty, target, detail in tpairs(iter), self do
-					if cnt < maxAction then
-						if cnt > 0 then
-							if not btn.Branch then
-								if autoGen then
-									root:GenerateBranch(cnt)
-									btn.Branch.Visible = btn.Visible
+					while root do
+						if cnt < maxAction then
+							if cnt > 0 then
+								if not btn.Branch then
+									if autoGen then
+										root:GenerateBranch(cnt)
+										btn.Branch.Visible = btn.Visible
+										btn = btn.Branch
+										btn:SetAction(ty, target, detail)
+										cnt = cnt + 1
+										break
+									end
+								else
 									btn = btn.Branch
 									btn:SetAction(ty, target, detail)
 									cnt = cnt + 1
+									break
 								end
 							else
-								btn = btn.Branch
 								btn:SetAction(ty, target, detail)
 								cnt = cnt + 1
+								break
 							end
-						else
-							btn:SetAction(ty, target, detail)
-							cnt = cnt + 1
+						end
+						rIdx = rIdx + 1
+						root = roots[rIdx]
+						if root then
+							btn = root
+							cnt = 0
+							autoGen = self.AutoGenerate and not root.FreeMode
+							maxAction = autoGen and self.MaxAction or 24
 						end
 					end
 				end
 
 				if autoGen then
+					root = btn.Root
 					root:GenerateBranch(cnt > 1 and cnt - 1 or 1)
 					if cnt <= 1 then root.Branch:SetAction(nil) end
 					if cnt <= 0 then root:SetAction(nil) end
@@ -1524,52 +1535,74 @@ class "AutoActionTask"
 						btn = btn.Branch
 					end
 				end
+
+				-- Clear
+				for rIdx = rIdx + 1, #self.Roots do
+					root = roots[rIdx]
+					autoGen = self.AutoGenerate and not root.FreeMode
+
+					if autoGen then
+						root:GenerateBranch(1)
+						root.Branch:SetAction(nil)
+						root:SetAction(nil)
+					else
+						while root do
+							root:SetAction(nil)
+							root = root.Branch
+						end
+					end
+				end
 			end
 
 			Task.Wait(...)
 		end
 
-		Log(1, "Stop auto-gen task %s for %s @task %d", self.Type, root:GetName(), mark)
+		Log(1, "Stop auto-gen [%s] %s @pid %d", self.Type, self.Name, mark)
 	end
 
 	function AddRoot(self, root)
 		self.Roots = self.Roots or {}
-		self.Roots[root] = true
+		if root.AutoActionTask == self then return end
+		for _, r in ipairs(self.Roots) do if r == root then return end end
+		if root.AutoActionTask then root.AutoActionTask:RemoveRoot(root) end
+		tinsert(self.Roots, root)
 		root.AutoActionTask = self
-		self:StartTask(root)
+		return self:RestartTask()
 	end
 
 	function RemoveRoot(self, root)
-		if self.Roots and self.Roots[root] then
-			self.Roots[root] = nil
-			self:RestartTask()
-		end
-	end
-
-	function RestartTask(self)
-		self:StopTask()
 		if self.Roots then
-			for root in pairs(self.Roots) do
-				self:StartTask(root)
+			for i, r in ipairs(self.Roots) do
+				if r == root then
+					tremove(self.Roots, i)
+					root.AutoActionTask = nil
+
+					return self:RestartTask()
+				end
 			end
 		end
 	end
 
-	function StartTask(self, root)
-		self.TaskMark = (self.TaskMark or 0)
+	function RestartTask(self)
+		self.TaskMark = (self.TaskMark or 0) + 1
+		if self.Roots and #self.Roots > 0 then
+			return self:StartTask()
+		end
+	end
 
-		if self.Type == AutoActionTaskType.Spell then
-			return Task.ThreadCall(task, self, root, getSpell, "LEARNED_SPELL_IN_TAB", "SPELLS_CHANGED", "SKILL_LINES_CHANGED", "PLAYER_GUILD_UPDATE", "PLAYER_SPECIALIZATION_CHANGED")
-		elseif self.Type == AutoActionTaskType.Item then
-			return Task.ThreadCall(task, self, root, getItem, "BAG_NEW_ITEMS_UPDATED", "BAG_UPDATE")
+	function StartTask(self)
+		self.TaskMark = self.TaskMark or 0
+
+		if self.Type == AutoActionTaskType.Item then
+			return Task.ThreadCall(task, self, getItem, "BAG_NEW_ITEMS_UPDATED", "BAG_UPDATE")
 		elseif self.Type == AutoActionTaskType.Toy then
-			return Task.ThreadCall(task, self, root, getToy, "TOYS_UPDATED")
+			return Task.ThreadCall(task, self, getToy, "TOYS_UPDATED")
 		elseif self.Type == AutoActionTaskType.BattlePet then
-			return Task.ThreadCall(task, self, root, getBattlePet, "PET_JOURNAL_LIST_UPDATE", "PET_JOURNAL_PET_DELETED")
+			return Task.ThreadCall(task, self, getBattlePet, "PET_JOURNAL_LIST_UPDATE", "PET_JOURNAL_PET_DELETED")
 		elseif self.Type == AutoActionTaskType.Mount then
-			return Task.ThreadCall(task, self, root, getMount, "COMPANION_LEARNED", "COMPANION_UNLEARNED", "MOUNT_JOURNAL_USABILITY_CHANGED")
+			return Task.ThreadCall(task, self, getMount, "COMPANION_LEARNED", "COMPANION_UNLEARNED", "MOUNT_JOURNAL_USABILITY_CHANGED")
 		elseif self.Type == AutoActionTaskType.EquipSet then
-			return Task.ThreadCall(task, self, root, getEquipSet, "EQUIPMENT_SETS_CHANGED")
+			return Task.ThreadCall(task, self, getEquipSet, "EQUIPMENT_SETS_CHANGED")
 		end
 	end
 
@@ -1608,14 +1641,14 @@ class "AutoActionTask"
 
 	function Dispoe(self)
 		self:StopTask()
-		for root in pairs(self.Roots) do
-			root.AutoActionTask = nil
-		end
+		if self.Roots then for _, root in ipairs(self.Roots) do root.AutoActionTask = nil end end
+		self.Roots = nil
 		_AutoActionTask[self.Name] = nil
 	end
 
 	function AutoActionTask(self, name)
 		_AutoActionTask[name] = self
+
 		self.Name = name
 		self.Type = _DBAutoPopupList[name].Type
 		self.OnlyFavourite = _DBAutoPopupList[name].OnlyFavourite
