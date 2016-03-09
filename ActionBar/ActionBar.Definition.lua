@@ -1479,6 +1479,7 @@ class "AutoActionTask"
 
 				local rIdx = 1
 				local root = roots[rIdx]
+				if not root then break end
 				local btn = root
 				local cnt = 0
 				local autoGen = self.AutoGenerate and not root.FreeMode
