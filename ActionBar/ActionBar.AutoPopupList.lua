@@ -289,6 +289,7 @@ end
 function chkFilter:OnValueChanged()
 	editor.Visible = self.Checked
 	if editor.Visible and _autoPopupSet then
+		autoGenerateForm.Panel:Layout()
 		if not _autoPopupSet.FilterCode then
 			-- Auto generate code
 			if cboType.Value == "Item" then

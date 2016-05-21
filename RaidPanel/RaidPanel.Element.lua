@@ -137,6 +137,8 @@ class "iNameLabel"
 
 		self.UseClassColor = true
 		self.DrawLayer = "BORDER"
+
+		self:SetWordWrap(false)
 	end
 endclass "iNameLabel"
 
