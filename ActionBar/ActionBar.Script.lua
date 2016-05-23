@@ -144,11 +144,10 @@ function UpdateStanceBar()
 
 	local btn = _StanceBar
 	for i = 1, GetNumShapeshiftForms() do
-	    local name = select(2, GetShapeshiftFormInfo(i))
-	    name = GetSpellLink(name)
-	    name = tonumber(name and name:match("spell:(%d+)"))
-	    if name then
-	    	btn:SetAction("spell", name)
+	    local id = select(5, GetShapeshiftFormInfo(i))
+
+	    if id then
+	    	btn:SetAction("spell", id)
 	    	btn.Visible = true
 	    	btn = btn.Brother
 	    end
