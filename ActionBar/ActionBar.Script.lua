@@ -94,6 +94,23 @@ function OnLoad(self)
 	_ListLoadSet.Keys = _ActionSetLoad
 	_ListLoadSet.Items = _ActionSetLoad
 
+	-- Action bar's layout
+	_ActionBarLayout = _Addon._DB.ActionBarLayout or {}
+	_Addon._DB.ActionBarLayout = _ActionBarLayout
+
+	_ActionBarLayoutSave = {L"New Layout"}
+	_ActionBarLayoutLoad = {L"Reset"}
+
+	for name in pairs(_ActionBarLayout) do
+		tinsert(_ActionBarLayoutSave, name)
+		tinsert(_ActionBarLayoutLoad, name)
+	end
+
+	_ListBarSave.Keys = _ActionBarLayoutSave
+	_ListBarSave.Items = _ActionBarLayoutSave
+	_ListBarLoad.Keys = _ActionBarLayoutLoad
+	_ListBarLoad.Items = _ActionBarLayoutLoad
+
 	-- Register system events
 	self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
 	self:RegisterEvent("PLAYER_LOGOUT")
@@ -241,12 +258,95 @@ function PLAYER_LOGOUT(self)
 	ClearScreen()	-- make sure no key bindings would be saved
 end
 
+function GenerateBarConfig(header, includeContent)
+	local bar = {}
+
+	-- bar set
+	bar.Location = header.Location
+	if header.FreeMode then
+		bar.Size = header.Size
+	end
+
+	bar.RowCount = header.RowCount
+	bar.ColCount = header.ColCount
+
+	bar.ActionBar = header.ActionBar
+	bar.MainBar = header.MainBar
+	bar.PetBar = header.PetBar
+	bar.StanceBar = header.StanceBar
+	bar.ReplaceBlzMainAction = header.ReplaceBlzMainAction
+
+	bar.HideOutOfCombat = header.HideOutOfCombat
+	bar.HideInPetBattle = header.HideInPetBattle
+	bar.HideInVehicle = header.HideInVehicle
+
+	bar.AlwaysShowGrid = header.AlwaysShowGrid
+
+	bar.AutoSwapRoot = header.AutoSwapRoot
+
+	bar.FreeMode = header.FreeMode
+	bar.LockMode = header.LockMode
+
+	bar.MarginX = header.MarginX
+	bar.MarginY = header.MarginY
+	bar.Scale = header.Scale
+
+	-- brother
+	local btn = header
+
+	while btn do
+		local set = {}
+
+		if btn.FreeMode then
+			set.Location = btn.Location
+			set.Size = btn.Size
+		end
+		set.BranchCount = btn.BranchCount
+		set.Expansion = btn.Expansion
+		set.FlyoutDirection = btn.FlyoutDirection
+		set.HotKey = btn:GetBindingKey()
+		if includeContent then
+			set.ActionKind, set.ActionTarget, set.ActionDetail = btn:GetAction()
+		end
+
+		if btn.AutoActionTask then
+			set.AutoActionTask = btn.AutoActionTask.Name
+		end
+
+		-- branch
+		local branch = btn.Branch
+
+		while branch do
+			local bset = {}
+
+			if branch.FreeMode then
+				bset.Location = branch.Location
+				for _, anchor in ipairs(bset.Location) do
+					anchor.relativeTo = nil	-- Clear the name
+				end
+				bset.Size = branch.Size
+			end
+			bset.HotKey = branch:GetBindingKey()
+			if includeContent then
+				bset.ActionKind, bset.ActionTarget, bset.ActionDetail = branch:GetAction()
+			end
+
+			tinsert(set, bset)
+			branch = branch.Branch
+		end
+
+		tinsert(bar, set)
+		btn = btn.Brother
+	end
+
+	return bar
+end
+
 function GenerateConfig(includeContent)
 	local config = { PopupDuration = IActionButton.PopupDuration }
-	local btn, branch, bar, set, bset
 
 	if _HiddenMainMenuBar and _BagSlotBar then
-		bar = {}
+		local bar = {}
 
 		-- bar set
 		bar.Location = _BagSlotBar.Location
@@ -260,90 +360,117 @@ function GenerateConfig(includeContent)
 	end
 
 	for _, header in ipairs(_HeadList) do
-		bar = {}
-
-		-- bar set
-		bar.Location = header.Location
-		if header.FreeMode then
-			bar.Size = header.Size
-		end
-
-		bar.RowCount = header.RowCount
-		bar.ColCount = header.ColCount
-
-		bar.ActionBar = header.ActionBar
-		bar.MainBar = header.MainBar
-		bar.PetBar = header.PetBar
-		bar.StanceBar = header.StanceBar
-		bar.ReplaceBlzMainAction = header.ReplaceBlzMainAction
-
-		bar.HideOutOfCombat = header.HideOutOfCombat
-		bar.HideInPetBattle = header.HideInPetBattle
-		bar.HideInVehicle = header.HideInVehicle
-
-		bar.AlwaysShowGrid = header.AlwaysShowGrid
-
-		bar.AutoSwapRoot = header.AutoSwapRoot
-
-		bar.FreeMode = header.FreeMode
-		bar.LockMode = header.LockMode
-
-		bar.MarginX = header.MarginX
-		bar.MarginY = header.MarginY
-		bar.Scale = header.Scale
-
-		-- brother
-		btn = header
-
-		while btn do
-			set = {}
-
-			if btn.FreeMode then
-				set.Location = btn.Location
-				set.Size = btn.Size
-			end
-			set.BranchCount = btn.BranchCount
-			set.Expansion = btn.Expansion
-			set.FlyoutDirection = btn.FlyoutDirection
-			set.HotKey = btn:GetBindingKey()
-			if includeContent then
-				set.ActionKind, set.ActionTarget, set.ActionDetail = btn:GetAction()
-			end
-
-			if btn.AutoActionTask then
-				set.AutoActionTask = btn.AutoActionTask.Name
-			end
-
-			-- branch
-			branch = btn.Branch
-
-			while branch do
-				bset = {}
-
-				if branch.FreeMode then
-					bset.Location = branch.Location
-					for _, anchor in ipairs(bset.Location) do
-						anchor.relativeTo = nil	-- Clear the name
-					end
-					bset.Size = branch.Size
-				end
-				bset.HotKey = branch:GetBindingKey()
-				if includeContent then
-					bset.ActionKind, bset.ActionTarget, bset.ActionDetail = branch:GetAction()
-				end
-
-				tinsert(set, bset)
-				branch = branch.Branch
-			end
-
-			tinsert(bar, set)
-			btn = btn.Brother
-		end
-
-		tinsert(config, bar)
+		tinsert(config, GenerateBarConfig(header, includeContent))
 	end
 
 	return config
+end
+
+function LoadBarConfig(header, bar)
+	header.IHeader.Visible = false
+
+	if bar then
+		header.AutoSwapRoot = bar.AutoSwapRoot
+
+		header.FreeMode = bar.FreeMode
+		header.LockMode = bar.LockMode
+
+		header.MarginX = bar.MarginX
+		header.MarginY = bar.MarginY
+		header.Scale = bar.Scale
+
+		header.Location = bar.Location
+		if header.FreeMode then
+			header.Size = bar.Size
+		end
+
+		header.ActionBar = bar.ActionBar
+		header.MainBar = bar.MainBar
+		if header.MainBar then
+			_MainBar = header
+		end
+		header.PetBar = bar.PetBar
+		if header.PetBar then
+			_PetBar = header
+		end
+		header.StanceBar = bar.StanceBar
+		if header.StanceBar then
+			_StanceBar = header
+		end
+
+		header:GenerateBrother(bar.RowCount, bar.ColCount)
+
+		header.ReplaceBlzMainAction = bar.ReplaceBlzMainAction
+
+		local btn = header
+
+		for _, set in ipairs(bar) do
+			btn.FlyoutDirection = set.FlyoutDirection
+			btn:SetBindingKey(set.HotKey)
+			if set.ActionKind and set.ActionTarget then
+				btn:SetAction(set.ActionKind, set.ActionTarget, set.ActionDetail)
+			end
+
+			if btn.FreeMode then
+				btn.Location = set.Location
+				btn.Size = set.Size
+			end
+
+			btn:GenerateBranch(set.BranchCount)
+
+			local branch = btn.Branch
+
+			for _, bset in ipairs(set) do
+				branch:SetBindingKey(bset.HotKey)
+				if bset.ActionKind and bset.ActionTarget then
+					branch:SetAction(bset.ActionKind, bset.ActionTarget, bset.ActionDetail)
+				end
+
+				if branch.FreeMode then
+					local name = btn:GetName()
+					for _, anchor in ipairs(bset.Location) do
+						anchor.relativeTo = name	-- Set the name
+					end
+					branch.Location = bset.Location
+					branch.Size = bset.Size
+				end
+
+				branch.Visible = btn.Expansion
+
+				branch = branch.Branch
+			end
+
+			btn.Expansion = set.Expansion
+
+			if btn.Branch and set.AutoActionTask and _DBAutoPopupList[set.AutoActionTask] then
+				AutoActionTask(set.AutoActionTask):AddRoot(btn)
+			end
+
+			btn = btn.Brother
+		end
+
+		header.HideOutOfCombat = bar.HideOutOfCombat
+		header.HideInPetBattle = bar.HideInPetBattle
+		header.HideInVehicle = bar.HideInVehicle
+
+		header.AlwaysShowGrid = bar.AlwaysShowGrid
+	else
+		if header == _MainBar then
+			header.MainBar = false
+			header.ReplaceBlzMainAction = false
+			_MainBar = nil
+		end
+		if header == _PetBar then
+			header.PetBar = false
+			_PetBar = nil
+		end
+		if header == _StanceBar then
+			header.StanceBar = false
+			_StanceBar = nil
+		end
+		header:GenerateBrother(1, 1)
+		header:GenerateBranch(0)
+	end
 end
 
 function LoadConfig(config)
@@ -360,92 +487,7 @@ function LoadConfig(config)
 
 		for _, bar in ipairs(config) do
 			header = NewHeader()
-			header.IHeader.Visible = false
-
-			header.AutoSwapRoot = bar.AutoSwapRoot
-
-			header.FreeMode = bar.FreeMode
-			header.LockMode = bar.LockMode
-
-			header.MarginX = bar.MarginX
-			header.MarginY = bar.MarginY
-			header.Scale = bar.Scale
-
-			header.Location = bar.Location
-			if header.FreeMode then
-				header.Size = bar.Size
-			end
-
-			header.ActionBar = bar.ActionBar
-			header.MainBar = bar.MainBar
-			if header.MainBar then
-				_MainBar = header
-			end
-			header.PetBar = bar.PetBar
-			if header.PetBar then
-				_PetBar = header
-			end
-			header.StanceBar = bar.StanceBar
-			if header.StanceBar then
-				_StanceBar = header
-			end
-
-			header:GenerateBrother(bar.RowCount, bar.ColCount)
-
-			header.ReplaceBlzMainAction = bar.ReplaceBlzMainAction
-
-			btn = header
-
-			for _, set in ipairs(bar) do
-				btn.FlyoutDirection = set.FlyoutDirection
-				btn:SetBindingKey(set.HotKey)
-				if set.ActionKind and set.ActionTarget then
-					btn:SetAction(set.ActionKind, set.ActionTarget, set.ActionDetail)
-				end
-
-				if btn.FreeMode then
-					btn.Location = set.Location
-					btn.Size = set.Size
-				end
-
-				btn:GenerateBranch(set.BranchCount)
-
-				branch = btn.Branch
-
-				for _, bset in ipairs(set) do
-					branch:SetBindingKey(bset.HotKey)
-					if bset.ActionKind and bset.ActionTarget then
-						branch:SetAction(bset.ActionKind, bset.ActionTarget, bset.ActionDetail)
-					end
-
-					if branch.FreeMode then
-						local name = btn:GetName()
-						for _, anchor in ipairs(bset.Location) do
-							anchor.relativeTo = name	-- Set the name
-						end
-						branch.Location = bset.Location
-						branch.Size = bset.Size
-					end
-
-					branch.Visible = btn.Expansion
-
-					branch = branch.Branch
-				end
-
-				btn.Expansion = set.Expansion
-
-				if btn.Branch and set.AutoActionTask and _DBAutoPopupList[set.AutoActionTask] then
-					AutoActionTask(set.AutoActionTask):AddRoot(btn)
-				end
-
-				btn = btn.Brother
-			end
-
-			header.HideOutOfCombat = bar.HideOutOfCombat
-			header.HideInPetBattle = bar.HideInPetBattle
-			header.HideInVehicle = bar.HideInVehicle
-
-			header.AlwaysShowGrid = bar.AlwaysShowGrid
+			LoadBarConfig(header, bar)
 		end
 
 		UPDATE_SHAPESHIFT_FORMS()
@@ -713,6 +755,10 @@ function _Menu:OnShow()
 
 	-- Load Layout
 	_ListLoad.SelectedIndex = nil
+
+	-- Aciton Bar's Layout
+	_ListBarSave.SelectedIndex = nil
+	_ListBarLoad.SelectedIndex = nil
 
 	-- Hide Blz bar
 	_MenuHideBlz:BlockEvent("OnCheckChanged")
@@ -1008,6 +1054,50 @@ function _ListLoad:OnItemChoosed(key, item)
 		self:ThreadCall(function (self)
 			if IGAS:MsgBox(L"Do you want load the layout?", "n") then
 				LoadConfig(_DB[key])
+			end
+		end)
+	end
+end
+
+
+function _ListBarSave:OnItemChoosed(key, item)
+	local header = _Menu.Parent
+	_Menu:Hide()
+	if key == L"New Layout" then
+		self:ThreadCall(function (self)
+			local name = ""
+			while strtrim(name) == "" or name == L"New Layout" or name == L"Reset" or _ActionBarLayout[name] do
+				name = IGAS:MsgBox(L"Please input the new layout name", "ic")
+				if not name then
+					return
+				end
+			end
+			_ActionBarLayout[name] = GenerateBarConfig(header)
+			tinsert(_ActionBarLayoutSave, name)
+			tinsert(_ActionBarLayoutLoad, name)
+		end)
+	else
+		self:ThreadCall(function (self)
+			if IGAS:MsgBox(L"Do you want overwrite the existed layout?", "n") then
+				_ActionBarLayout[key] = GenerateBarConfig(header)
+			end
+		end)
+	end
+end
+
+function _ListBarLoad:OnItemChoosed(key, item)
+	local header = _Menu.Parent
+	_Menu:Hide()
+	if key == L"Reset" then
+		self:ThreadCall(function (self)
+			if IGAS:MsgBox(L"Do you want reset the layout?", "n") then
+				LoadBarConfig(header)
+			end
+		end)
+	else
+		self:ThreadCall(function (self)
+			if IGAS:MsgBox(L"Do you want load the layout?", "n") then
+				LoadBarConfig(header, _ActionBarLayout[key])
 			end
 		end)
 	end

@@ -1,3 +1,6 @@
+2016/06/01 v47
+	1. Now you can save and apply layout on single action bar.
+
 2016/05/24 v46
 	1. Fix the stance bar.
 

@@ -7,6 +7,13 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/06/01 v47 : </lime>
+</p><br/>
+<p>
+    1. 现在可以保存单个动作条的样式，并将它应用到其他的单独动作条上。
+</p>
+<br/><br/>
+<p>
 <lime>2016/03/08 v41 : </lime>
 </p><br/>
 <p>
@@ -246,3 +253,6 @@ L["Only Favourite"] = "只有最爱"
 L["All"] = "所有"
 L["Please input the auto aciton list's name"] = "请输入自动动作列表的名字"
 L["Are you sure to delete the auto action list?"] = "确认是否删除该自动动作列表"
+
+L["Save action bar's layout"] = "保存该动作条布局"
+L["Apply action bar's layout"] = "应用单独的动作条布局"

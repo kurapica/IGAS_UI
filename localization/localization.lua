@@ -4,6 +4,13 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/06/01 v47 : </lime>
+</p><br/>
+<p>
+    1. Single action bar's layout can be save now, also can be applied to other single action bars.
+</p>
+<br/><br/>
+<p>
 <lime>2016/03/08 v41 : </lime>
 </p><br/>
 <p>

@@ -312,7 +312,7 @@ function btnSave:OnClick()
 		_autoPopupSet.Type = cboType.Value
 		_autoPopupSet.OnlyFavourite = chkFavourite.Checked
 		_autoPopupSet.AutoGenerate = chkAutoGenerate.Checked
-		_autoPopupSet.MaxAction = math.floor(optMaxActionButtons.Value)
+		_autoPopupSet.MaxAction = math.round(optMaxActionButtons.Value)
 		if _autoPopupSet.Type == "Item" then
 			if cboItemClass.Value > 0 then
 				_autoPopupSet.ItemClass = cboItemClass.Text
@@ -375,8 +375,13 @@ function cboItemClass:OnValueChanged(key)
 	cboItemSubClass:AddItem(0, L"All")
 	cboItemSubClass.Value = 0
 	if key > 0 then
+		local idx
 		for i, v in ipairs{ GetAuctionItemSubClasses(key) } do
 			cboItemSubClass:AddItem(i, v)
+			idx = i
+		end
+		if key == 4 then
+			cboItemSubClass:AddItem(idx+1, cboItemClass.Text)
 		end
 	end
 end

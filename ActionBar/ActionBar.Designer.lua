@@ -137,6 +137,20 @@ _ListLoad.Height = 250
 _ListLoad.Visible = false
 _MenuLoad.DropDownList = _ListLoad
 
+_MenuBarSave = _Menu:AddMenuButton(L"Save action bar's layout")
+_ListBarSave = List("LstBarSave", _MenuBarSave)
+_ListBarSave.Width = 150
+_ListBarSave.Height = 250
+_ListBarSave.Visible = false
+_MenuBarSave.DropDownList = _ListBarSave
+
+_MenuBarLoad = _Menu:AddMenuButton(L"Apply action bar's layout")
+_ListBarLoad = List("LstBarLoad", _MenuBarLoad)
+_ListBarLoad.Width = 150
+_ListBarLoad.Height = 250
+_ListBarLoad.Visible = false
+_MenuBarLoad.DropDownList = _ListBarLoad
+
 _MenuHideBlz = _Menu:AddMenuButton(L"Hidden MainMenuBar")
 _MenuHideBlz.IsCheckButton = true
 
