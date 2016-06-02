@@ -702,6 +702,7 @@ function _Menu:OnShow()
 	_MenuLock.Checked = not IFActionHandler._IsGroupDragEnabled(_IGASUI_ACTIONBAR_GROUP)
 
 	-- Button Scale
+	_ListScale:SelectItemByValue(mround(header.Scale*10)/10)
 
 	-- Button MarginX
 	_ListMarginX:SelectItemByValue(header.MarginX)
