@@ -1,3 +1,8 @@
+2016/06/02 v48
+	1. Fix a float number error.
+	2. Fix action bar's scale not show well.
+	3. Need IGAS v84 to fix the action bar's menu not shown bug.
+
 2016/06/01 v47
 	1. Now you can save and apply layout on single action bar.
 

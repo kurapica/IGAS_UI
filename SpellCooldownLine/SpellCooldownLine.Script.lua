@@ -66,6 +66,33 @@ do
         lineBuff.Height = btnHandler.Height - 4
         lineBuff.Width = abs(GetScreenWidth() - btnHandler:GetCenter() * 2)
 
+        if _DBChar.StartColor then
+            lineCooldown.Color = _FullColor
+            lineBuff.Color = _FullColor
+            if btnHandler:GetCenter() < GetScreenWidth()/2 then
+                lineCooldown:SetGradientAlpha("HORIZONTAL",
+                    _DBChar.StartColor.r, _DBChar.StartColor.g, _DBChar.StartColor.b, 1,
+                    _DBChar.EndColor.r, _DBChar.EndColor.g, _DBChar.EndColor.b, 0
+                )
+                lineBuff:SetGradientAlpha("HORIZONTAL",
+                    _DBChar.StartColor.r, _DBChar.StartColor.g, _DBChar.StartColor.b, 1,
+                    _DBChar.EndColor.r, _DBChar.EndColor.g, _DBChar.EndColor.b, 0
+                )
+            else
+                lineCooldown:SetGradientAlpha("HORIZONTAL",
+                    _DBChar.EndColor.r, _DBChar.EndColor.g, _DBChar.EndColor.b, 0,
+                    _DBChar.StartColor.r, _DBChar.StartColor.g, _DBChar.StartColor.b, 1
+                )
+                lineBuff:SetGradientAlpha("HORIZONTAL",
+                    _DBChar.EndColor.r, _DBChar.EndColor.g, _DBChar.EndColor.b, 0,
+                    _DBChar.StartColor.r, _DBChar.StartColor.g, _DBChar.StartColor.b, 1
+                )
+            end
+        else
+            lineCooldown.Color = _NoColor
+            lineBuff.Color = _NoColor
+        end
+
         for i = 1, _MAX_FRAG do
             lineCooldown[i]:ClearAllPoints()
             lineCooldown[i]:SetPoint("CENTER", GetPosition(0, 2^i, 0), 0)
@@ -205,22 +232,6 @@ function OnLoad(self)
     end
 
     UpdateLine()
-
-    if _DBChar.StartColor then
-        lineCooldown.Color = _FullColor
-        lineCooldown:SetGradientAlpha("HORIZONTAL",
-            _DBChar.StartColor.r, _DBChar.StartColor.g, _DBChar.StartColor.b, 1,
-            _DBChar.EndColor.r, _DBChar.EndColor.g, _DBChar.EndColor.b, 0
-        )
-        lineBuff.Color = _FullColor
-        lineBuff:SetGradientAlpha("HORIZONTAL",
-            _DBChar.StartColor.r, _DBChar.StartColor.g, _DBChar.StartColor.b, 1,
-            _DBChar.EndColor.r, _DBChar.EndColor.g, _DBChar.EndColor.b, 0
-        )
-    else
-        lineCooldown.Color = _NoColor
-        lineBuff.Color = _NoColor
-    end
 
     btnHandler.Mode = _DBChar.SpellCooldownHandlerMode or Mode.Normal
     UpdateMode()
@@ -449,15 +460,27 @@ function btnHandler:OnMouseWheel(wheel)
         _DBChar.EndColor = ColorType(random(100)/100, random(100)/100, random(100)/100)
 
         lineCooldown.Color = _FullColor
-        lineCooldown:SetGradientAlpha("HORIZONTAL",
-            _DBChar.StartColor.r, _DBChar.StartColor.g, _DBChar.StartColor.b, 1,
-            _DBChar.EndColor.r, _DBChar.EndColor.g, _DBChar.EndColor.b, 0
-        )
         lineBuff.Color = _FullColor
-        lineBuff:SetGradientAlpha("HORIZONTAL",
-            _DBChar.StartColor.r, _DBChar.StartColor.g, _DBChar.StartColor.b, 1,
-            _DBChar.EndColor.r, _DBChar.EndColor.g, _DBChar.EndColor.b, 0
-        )
+        if btnHandler:GetCenter() < GetScreenWidth()/2 then
+            lineCooldown:SetGradientAlpha("HORIZONTAL",
+                _DBChar.StartColor.r, _DBChar.StartColor.g, _DBChar.StartColor.b, 1,
+                _DBChar.EndColor.r, _DBChar.EndColor.g, _DBChar.EndColor.b, 0
+            )
+            lineBuff.Color = _FullColor
+            lineBuff:SetGradientAlpha("HORIZONTAL",
+                _DBChar.StartColor.r, _DBChar.StartColor.g, _DBChar.StartColor.b, 1,
+                _DBChar.EndColor.r, _DBChar.EndColor.g, _DBChar.EndColor.b, 0
+            )
+        else
+            lineCooldown:SetGradientAlpha("HORIZONTAL",
+                _DBChar.EndColor.r, _DBChar.EndColor.g, _DBChar.EndColor.b, 0,
+                _DBChar.StartColor.r, _DBChar.StartColor.g, _DBChar.StartColor.b, 1
+            )
+            lineBuff:SetGradientAlpha("HORIZONTAL",
+                _DBChar.EndColor.r, _DBChar.EndColor.g, _DBChar.EndColor.b, 0,
+                _DBChar.StartColor.r, _DBChar.StartColor.g, _DBChar.StartColor.b, 1
+            )
+        end
     else
         lineCooldown.Color = _NoColor
         lineBuff.Color = _NoColor

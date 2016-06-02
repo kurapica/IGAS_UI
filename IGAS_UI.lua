@@ -105,3 +105,14 @@ function OnSlashCmd(self, option, info)
 
 	IGAS.UIParent.IGAS_UI_Manager.Visible = true
 end
+
+--==========================
+-- Helper
+--==========================
+function mround(v)
+	local a = math.abs(v)
+	local f = math.floor(v)
+	if (a-f) >= 0.5 then f = f + 1 end
+	if v < 0 then return -f end
+	return f
+end

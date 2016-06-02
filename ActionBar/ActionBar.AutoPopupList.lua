@@ -312,7 +312,7 @@ function btnSave:OnClick()
 		_autoPopupSet.Type = cboType.Value
 		_autoPopupSet.OnlyFavourite = chkFavourite.Checked
 		_autoPopupSet.AutoGenerate = chkAutoGenerate.Checked
-		_autoPopupSet.MaxAction = math.round(optMaxActionButtons.Value)
+		_autoPopupSet.MaxAction = mround(optMaxActionButtons.Value)
 		if _autoPopupSet.Type == "Item" then
 			if cboItemClass.Value > 0 then
 				_autoPopupSet.ItemClass = cboItemClass.Text
