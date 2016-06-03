@@ -1,3 +1,6 @@
+2016/06/03 v49
+	1. CompactRaidFrameManager won't be shown when solo.
+
 2016/06/02 v48
 	1. Fix a float number error.
 	2. Fix action bar's scale not show well.

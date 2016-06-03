@@ -317,10 +317,13 @@ function OnEnable(self)
 	self:SecureHook("SpellButton_UpdateButton")
 	LEARNED_SPELL_IN_TAB(self)
 
-	Task.DelayCall(3, Task.NoCombatCall, function()
+	Task.NoCombatCall(function()
+		self:RegisterEvent("GROUP_ROSTER_UPDATE")
+
 		_G.CompactRaidFrameContainer:UnregisterAllEvents()
+		_G.CompactRaidFrameContainer:Hide()
 		_G.CompactRaidFrameManager:UnregisterAllEvents()
-		_G.CompactRaidFrameManager:Show()
+		--_G.CompactRaidFrameManager:Show()
 
 		local button
 
@@ -343,6 +346,18 @@ function OnEnable(self)
 		button = _G.CompactRaidFrameManagerDisplayFrameLeaderOptionsInitiateReadyCheck
 		button:SetAlpha(1)
 		button:Enable()
+
+		return GROUP_ROSTER_UPDATE(self)
+	end)
+end
+
+function GROUP_ROSTER_UPDATE(self)
+	Task.NoCombatCall(function()
+		if IsInGroup() then
+			_G.CompactRaidFrameManager:Show()
+		else
+			_G.CompactRaidFrameManager:Hide()
+		end
 	end)
 end
 
