@@ -20,4 +20,8 @@
 	<!-- Manager -->
 	<Script file = "Manager.Designer.lua"/>
 	<Script file = "Manager.Script.lua"/>
+
+	<!-- MacroCondition -->
+	<Script file = "MacroCondition.Designer.lua"/>
+	<Script file = "MacroCondition.Script.lua"/>
 </Ui>

@@ -4,6 +4,19 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/06/04 v50 : </lime>
+</p><br/>
+<p>
+    1. The unit frame system can use auto hide now.
+</p>
+<p>
+    2. The auto hide for action bar and unit system now use macro conditions, a macro condition maker form is added, you can find it by click the 'Auto Hide' in the menus.
+</p>
+<p>
+    3. Three default macro condition is applied, one is 'solo with no target no combat', the second is 'in pet battle' and the last is 'in the vehicle', more can added by yourself.
+</p>
+<br/><br/>
+<p>
 <lime>2016/06/01 v47 : </lime>
 </p><br/>
 <p>

@@ -2,6 +2,11 @@ IGAS:NewAddon "IGAS_UI.UnitFrame"
 
 arUnit = Array(iUnitFrame)
 
+_Menu = DropDownList("Menu", IGAS.UIParent.IGASUI_IUnitFrame_Manager)
+_Menu.ShowOnCursor = false
+_Menu.AutoHide = false
+_Menu.Visible = false
+
 --==========================
 -- Generate unit frames based on Config.Units
 --==========================

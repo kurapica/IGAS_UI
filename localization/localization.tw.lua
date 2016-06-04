@@ -7,6 +7,19 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/06/04 v50 : </lime>
+</p><br/>
+<p>
+    1. 頭像系統也可以使用自動隱藏功能。
+</p>
+<p>
+    2. 自動隱藏使用宏的條件進行判定，新的宏條件製作界面加入，通過點擊動作條或者頭像的菜單進入。
+</p>
+<p>
+    3. 默認提供三個宏條件，第一個是"單人游戲并沒有目標也不在戰鬥"，第二個是"在寵物對戰中", 第三個是"在載具中"。更多宏條件可以自行配製。
+</p>
+<br/><br/>
+<p>
 <lime>2016/06/01 v47 : </lime>
 </p><br/>
 <p>
@@ -238,6 +251,7 @@ L["Please click the root button"] = "請點擊彈出條的根按鈕"
 L["Auto Generate Pop-up Actions"] = "自動填充彈出動作條設定"
 L["Apply"] = "適用"
 L["Save"] = "保存"
+L["Close"] = "關閉"
 L["Action Type"] = "動作類型"
 L["Item"] = "背包物品"
 L["Toy"] = "玩具"
@@ -253,3 +267,49 @@ L["Are you sure to delete the auto action list?"] = "確認是否刪除該自動
 
 L["Save action bar's layout"] = "保存該動作條佈局"
 L["Apply action bar's layout"] = "應用單獨的動作條佈局"
+
+L["Macro Condition Editor"] = "宏條件編輯器"
+L["Conditon Maker"] = "條件生成器"
+L["Double-click items in the left list to select a condition.\nDoublc-click items in the bottom list to dis-select."] = "雙擊左邊的列表來選擇壹個條件。\n雙擊壹個下面的列表來移除壹個條件。"
+L["Click the link to add or remove the conditions."] = "點擊鏈接來添加或者移除條件。"
+
+L["Player is in a vehicle and can exit it at will."] = "玩家在壹個載具中並且可以正常退出。"
+L["Player is in combat."] = "玩家在戰鬥中。"
+L["Conditional target exists and is dead."] = "條件對象存在並且已死亡。"
+L["Conditional target exists."] = "條件對象存在。"
+L["The player can use a flying mount in this zone (though incorrect in Wintergrasp during a battle)."] = "玩家在當前地區可以飛行（盡管可能因為其它原因不能，比如冬擁湖戰鬥時）"
+L["Mounted or in flight form AND in the air."] = "玩家飛行中。"
+L["The player is in any form."] = "玩家處於任意姿態中。類似德魯伊的變身，戰士的防禦姿態等。"
+L["The player is not in any form."] = "玩家不處於任意姿態中。"
+L["The player is in form 1."] = "玩家處於第壹個姿態。"
+L["The player is in form 2."] = "玩家處於第二個姿態。"
+L["The player is in form 3."] = "玩家處於第三個姿態。"
+L["The player is in form 4."] = "玩家處於第四個姿態。"
+L["Player is in a party."] = "玩家在壹個隊伍中。"
+L["Player is in a raid."] = "玩家在壹個團隊中。"
+L["Conditional target exists and can be targeted by harmful spells (e.g.  [Fireball])."] = "條件對象存在並且可以被施以傷害法術。（例如火球術）"
+L["Conditional target exists and can be targeted by helpful spells (e.g.  [Heal])."] = "條件對象存在並且可以被施以輔助法術（例如治療術）"
+L["Player is indoors."] = "玩家在室內。"
+L["Player is mounted."] = "玩家使用坐騎中。"
+L["Player is outdoors."] = "玩家在室外。"
+L["Conditional target exists and is in your party."] = "條件對象存在並且在玩家隊伍中。"
+L["The player has a pet."] = "玩家帶有寵物。"
+L["Currently participating in a pet battle."] = "玩家正在進行寵物對戰。"
+L["Conditional target exists and is in your raid/party."] = "條件對象存在並且在玩家的團隊中。"
+L["Player is currently resting."] = "玩家處於休息狀態。"
+L["Player's active the first specialization group (spec, talents and glyphs)."] = "玩家的第壹個專精啟用中。"
+L["Player's active the second specialization group (spec, talents and glyphs)."] = "玩家的第二個專精啟用中。"
+L["Player is stealthed."] = "玩家處於潛行狀態。"
+L["Player is swimming."] = "玩家處於潛水狀態。"
+L["Player has vehicle UI."] = "玩家正在使用載具。"
+L["Player currently has an extra action bar/button."] = "玩家目前有壹個額外動作條/按鈕。"
+L["Player's main action bar is currently replaced by the override action bar."] = "玩家的主動作條正被override動作覆蓋。"
+L["Player's main action bar is currently replaced by the possess action bar."] = "玩家的主動作條正被被控制者的動作條覆蓋。比如心靈控制"
+L["Player's main action bar is currently replaced by a temporary shapeshift action bar."] = "玩家的動作條被壹個臨時變形動作條覆蓋。（玩家被boss變形後）"
+
+L["The conditional target :"] = "條件對象："
+L["The macro conditions :"] = "宏條件："
+L["Solo no combat no target"] = "無隊友無目標無戰鬥"
+L["In a vehicle"] = "載具中"
+L["In a pet battle"] = "寵物對戰中"
+L["Are you sure to delete the macro condition?"] = "您是否確定刪除這個宏條件？"

@@ -20,7 +20,10 @@ Toggle = {
 			IFMovable._ModeOn(_IGASUI_UNITFRAME_GROUP)
 			IFResizable._ModeOn(_IGASUI_UNITFRAME_GROUP)
 			IFToggleable._ModeOn(_IGASUI_UNITFRAME_GROUP)
+			_Menu:SetPoint("TOPLEFT", IGAS.UIParent.IGAS_UI_Manager, "TOPRIGHT")
+			_Menu.Visible = true
 		else
+			_Menu.Visible = false
 			IFMovable._ModeOff(_IGASUI_UNITFRAME_GROUP)
 			IFResizable._ModeOff(_IGASUI_UNITFRAME_GROUP)
 			IFToggleable._ModeOff(_IGASUI_UNITFRAME_GROUP)
@@ -31,6 +34,7 @@ Toggle = {
 				elseif UnitExists(frm.Unit) then
 					frm.Visible = true
 				end
+				frm:RefreshForAutoHide()
 			end
 		end
 
@@ -163,9 +167,38 @@ function OnLoad(self)
 
 	-- Hide no need unitframe
 	_DB.HideUnit = _DB.HideUnit or {}
-	for i = 1, #arUnit do
-		if _DB.HideUnit[arUnit[i].Unit] then
-			arUnit[i].ToggleState = false
+	_DB.AutoHideData = _DB.AutoHideData or {}
+
+	for i, unitf in ipairs(arUnit) do
+		local unit = unitf.Unit
+
+		if _DB.HideUnit[unit] then
+			unitf.ToggleState = false
+		else
+			unitf.AutoHideCondition = _DB.AutoHideData[unit]
+		end
+
+		-- Menu part
+		local _MenuUnit = _Menu:AddMenuButton(L"Auto Hide" .. " " ..unit)
+		_MenuUnit.Enabled = unitf.ToggleState
+		_MenuUnit:ActiveThread("OnClick")
+
+		_MenuUnit.OnClick = function(self)
+			local data = _Addon:SelectMacroCondition(_DB.AutoHideData[unit])
+
+			if data then
+				_DB.AutoHideData[unit] = data
+				unitf.AutoHideCondition = data
+			end
+		end
+
+		unitf.OnAutoHideChanged = function(self, new, old, prop)
+			if prop == "ToggleState" then
+				if not new then
+					_DB.AutoHideData[unit] = nil
+				end
+				_MenuUnit.Enabled = new
+			end
 		end
 	end
 

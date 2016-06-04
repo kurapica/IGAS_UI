@@ -20,6 +20,54 @@ class "iUnitFrame"
 		self[prop] = value
 	end
 
+	-- Manager Frame
+	_ManagerFrame = SecureFrame("IGASUI_IUnitFrame_Manager", IGAS.UIParent, "SecureHandlerStateTemplate")
+	_ManagerFrame.Visible = false
+
+	-- Init manger frame's enviroment
+	Task.NoCombatCall(function ()
+		_ManagerFrame:Execute[[
+			Manager = self
+
+			State = newtable()
+		]]
+	end)
+
+	local function RegisterAutoHide(self, cond)
+		local unit = self.Unit
+
+		self.AutoHideState = "autohide" .. unit
+
+		_ManagerFrame:SetFrameRef("StateButton", self)
+		_ManagerFrame:Execute(([[
+			State["%s"] = Manager:GetFrameRef("StateButton")
+		]]):format(self.AutoHideState))
+
+		_ManagerFrame:RegisterStateDriver(self.AutoHideState, cond)
+		_ManagerFrame:SetAttribute("_onstate-" .. self.AutoHideState, ([[
+			local uf = State["%s"]
+			if newstate == "hide" then
+				UnregisterUnitWatch(uf)
+				uf:Hide()
+			else
+				local unit = uf:GetAttribute("unit")
+
+				if unit and unit ~= "player" then
+					RegisterUnitWatch(uf)
+				elseif unit then
+					uf:Show()
+				end
+			end
+		]]):format(self.AutoHideState))
+		_ManagerFrame:SetAttribute("state-" .. self.AutoHideState, nil)
+	end
+
+	local function UnregisterAutoHide(self)
+		if self.AutoHideState then
+			_ManagerFrame:UnregisterStateDriver(self.AutoHideState)
+		end
+	end
+
 	------------------------------------------------------
 	-- Method
 	------------------------------------------------------
@@ -65,32 +113,60 @@ class "iUnitFrame"
 		end
 	end
 
+	function RefreshForAutoHide(self)
+		if self.AutoHideState then
+			_ManagerFrame:SetAttribute("state-" .. self.AutoHideState, nil)
+		end
+	end
+
 	------------------------------------------------------
 	-- Property
 	------------------------------------------------------
 	property "ToggleState" {
-		Set = function(self, value)
-			if value ~= self.ToggleState then
-				if value then
-					_DB.HideUnit[self.OldUnit] = nil
+		Handler = function (self, value)
+			if value then
+				_DB.HideUnit[self.OldUnit] = nil
 
-					self.Unit = self.OldUnit
-					self.OldUnit = nil
-				else
-					_DB.HideUnit[self.Unit] = true
-
-					self.OldUnit = self.Unit
-					self.Unit = nil
-				end
-				if IFToggleable._IsModeOn(_IGASUI_UNITFRAME_GROUP) then
-					self.Visible = true
-				end
+				self.Unit = self.OldUnit
+				self.OldUnit = nil
+			else
+				UnregisterAutoHide(self)
+				_DB.HideUnit[self.Unit] = true
+				self.OldUnit = self.Unit
+				self.Unit = nil
+			end
+			if IFToggleable._IsModeOn(_IGASUI_UNITFRAME_GROUP) then
+				self.Visible = true
 			end
 		end,
-		Get = function(self)
-			return not self.OldUnit
-		end,
 		Type = Boolean,
+		Default = true,
+		Event = "OnAutoHideChanged"
+	}
+
+	property "AutoHideCondition" {
+		Set = function(self, value)
+			Task.NoCombatCall(function()
+				if value and next(value) then
+					local cond = ""
+					for k in pairs(value) do
+						cond = cond .. k .. "hide;"
+					end
+					cond = cond .. "show;"
+					RegisterAutoHide(self, cond)
+				else
+					UnregisterAutoHide(self)
+					if self.ToggleState then
+						local unit = self.Unit
+						if unit == "player" then
+							self:Show()
+						else
+							self:RegisterUnitWatch()
+						end
+					end
+				end
+			end)
+		end,
 	}
 
 	property "IFSpellHandlerGroup" {

@@ -36,9 +36,6 @@ class "IActionButton"
 			RootExpansion = newtable()
 			HideBranchList = newtable()
 			State = newtable()
-			InCombatHeader = newtable()
-			NoPetCombatHeader = newtable()
-			NoVehicleHeader = newtable()
 			PetHeader = newtable()
 			AutoSwapHeader = newtable()
 
@@ -150,33 +147,9 @@ class "IActionButton"
 			State["pet"] = newstate == "pet"
 			Manager:Run(UpdatePetHeader)
 		]=])
-		_ManagerFrame:SetAttribute("_onstate-incombat", [=[
-			State["incombat"] = newstate == "incombat"
-			for btn in pairs(InCombatHeader) do
-				Manager:RunFor(btn, StateCheck)
-			end
-		]=])
-		_ManagerFrame:SetAttribute("_onstate-petbattle", [=[
-			State["petbattle"] = newstate == "inpetcombat"
-			for btn in pairs(NoPetCombatHeader) do
-				Manager:RunFor(btn, StateCheck)
-			end
-		]=])
-		_ManagerFrame:SetAttribute("_onstate-vehicle", [=[
-			State["vehicle"] = newstate == "invehicle"
-			for btn in pairs(NoVehicleHeader) do
-				Manager:RunFor(btn, StateCheck)
-			end
-		]=])
 		_ManagerFrame:RegisterStateDriver("pet", "[pet]pet;nopet;")
-		_ManagerFrame:RegisterStateDriver("incombat", "[combat]incombat;nocombat;")
-		_ManagerFrame:RegisterStateDriver("petbattle", "[petbattle]inpetcombat;nopetcombat;")
-		_ManagerFrame:RegisterStateDriver("vehicle", "[vehicleui]invehicle;novehicle;")
 
 		_ManagerFrame:Execute(("State['pet'] = '%s' == 'pet'"):format(SecureCmdOptionParse("[pet]pet;nopet;")))
-		_ManagerFrame:Execute(("State['incombat'] = '%s' == 'incombat'"):format(SecureCmdOptionParse("[combat]incombat;nocombat;")))
-		_ManagerFrame:Execute(("State['petbattle'] = '%s' == 'inpetcombat'"):format(SecureCmdOptionParse("[petbattle]inpetcombat;nopetcombat;")))
-		_ManagerFrame:Execute(("State['vehicle'] = '%s' == 'invehicle'"):format(SecureCmdOptionParse("[vehicleui]invehicle;novehicle;")))
 	end)
 
 	_IActionButton_UpdateExpansion = [[
@@ -266,58 +239,42 @@ class "IActionButton"
 		]]
 	end
 
-	local function RegisterOutCombat(self)
+	local function RegisterAutoHide(self, cond)
+		self.AutoHideState = "autohide" .. self.Name
+
 		_ManagerFrame:SetFrameRef("StateButton", self)
-		_ManagerFrame:Execute[[
-			local btn = Manager:GetFrameRef("StateButton")
-			InCombatHeader[btn] = true
-			Manager:RunFor(btn, StateCheck)
-		]]
+		_ManagerFrame:Execute(([[
+			State["%s"] = Manager:GetFrameRef("StateButton")
+		]]):format(self.AutoHideState))
+
+		_ManagerFrame:RegisterStateDriver(self.AutoHideState, cond)
+		_ManagerFrame:SetAttribute("_onstate-" .. self.AutoHideState, ([[
+			local uf = State["%s"]
+
+			if newstate == "hide" then
+				-- Unregister HideBranch
+				for root in pairs(HideBranchList) do
+					if root == uf or HeaderMap[root] == uf then
+						root:UnregisterAutoHide()
+						HideBranchList[root] = nil
+					end
+				end
+				if uf:IsShown() then
+					uf:Hide()
+				end
+			else
+				if not uf:IsShown() then
+					uf:Show()
+				end
+			end
+		]]):format(self.AutoHideState))
+		_ManagerFrame:SetAttribute("state-" .. self.AutoHideState, nil)
 	end
 
-	local function UnregisterOutCombat(self)
-		_ManagerFrame:SetFrameRef("StateButton", self)
-		_ManagerFrame:Execute[[
-			local btn = Manager:GetFrameRef("StateButton")
-			InCombatHeader[btn] = nil
-			Manager:RunFor(btn, StateCheck)
-		]]
-	end
-
-	local function RegisterNoPetBattle(self)
-		_ManagerFrame:SetFrameRef("StateButton", self)
-		_ManagerFrame:Execute[[
-			local btn = Manager:GetFrameRef("StateButton")
-			NoPetCombatHeader[btn] = true
-			Manager:RunFor(btn, StateCheck)
-		]]
-	end
-
-	local function UnregisterNoPetBattle(self)
-		_ManagerFrame:SetFrameRef("StateButton", self)
-		_ManagerFrame:Execute[[
-			local btn = Manager:GetFrameRef("StateButton")
-			NoPetCombatHeader[btn] = nil
-			Manager:RunFor(btn, StateCheck)
-		]]
-	end
-
-	local function RegisterNoVehicle(self)
-		_ManagerFrame:SetFrameRef("StateButton", self)
-		_ManagerFrame:Execute[[
-			local btn = Manager:GetFrameRef("StateButton")
-			NoVehicleHeader[btn] = true
-			Manager:RunFor(btn, StateCheck)
-		]]
-	end
-
-	local function UnregisterNoVehicle(self)
-		_ManagerFrame:SetFrameRef("StateButton", self)
-		_ManagerFrame:Execute[[
-			local btn = Manager:GetFrameRef("StateButton")
-			NoVehicleHeader[btn] = nil
-			Manager:RunFor(btn, StateCheck)
-		]]
+	local function UnregisterAutoHide(self)
+		if self.AutoHideState then
+			_ManagerFrame:UnregisterStateDriver(self.AutoHideState)
+		end
 	end
 
 	local function RegisterAutoSwap(self)
@@ -745,43 +702,23 @@ class "IActionButton"
 		Type = Boolean,
 	}
 
-	property "HideOutOfCombat" {
+	property "AutoHideCondition" {
 		Handler = function (self, value)
-			if value and self.ReplaceBlzMainAction then return end
-
-			if value then
-				Task.NoCombatCall(RegisterOutCombat, self)
-			else
-				Task.NoCombatCall(UnregisterOutCombat, self)
-			end
+			Task.NoCombatCall(function()
+				if value and next(value) then
+					local cond = ""
+					for k in pairs(value) do
+						cond = cond .. k .. "hide;"
+					end
+					cond = cond .. "show;"
+					RegisterAutoHide(self, cond)
+				else
+					UnregisterAutoHide(self)
+					self:Show()
+				end
+			end)
 		end,
-		Type = Boolean,
-	}
-
-	property "HideInPetBattle" {
-		Handler = function(self, value)
-			if value and self.ReplaceBlzMainAction then return end
-
-			if value then
-				Task.NoCombatCall(RegisterNoPetBattle, self)
-			else
-				Task.NoCombatCall(UnregisterNoPetBattle, self)
-			end
-		end,
-		Type = Boolean,
-	}
-
-	property "HideInVehicle" {
-		Handler = function (self, value)
-			if value and self.ReplaceBlzMainAction then return end
-
-			if value then
-				Task.NoCombatCall(RegisterNoVehicle, self)
-			else
-				Task.NoCombatCall(UnregisterNoVehicle, self)
-			end
-		end,
-		Type = Boolean,
+		Type = Table,
 	}
 
 	property "AutoSwapRoot" {
@@ -1059,6 +996,15 @@ class "IActionButton"
 			if self.ITail then
 				self.ITail.Visible = not self.LockMode and not self.FreeMode
 			end
+		end
+	end
+
+	------------------------------------------------------
+	-- Method
+	------------------------------------------------------
+	function RefreshForAutoHide(self)
+		if self.AutoHideState then
+			_ManagerFrame:SetAttribute("state-" .. self.AutoHideState, nil)
 		end
 	end
 

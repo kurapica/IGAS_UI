@@ -79,13 +79,7 @@ _ListMarginY.Visible = false
 _MenuMarginY.DropDownList = _ListMarginY
 
 _MenuAutoHide = _Menu:AddMenuButton(L"Auto Hide")
-_MenuHideOutOfCombat = _MenuAutoHide:AddMenuButton(L"Out of combat")
-_MenuHideInPetBattle = _MenuAutoHide:AddMenuButton(L"In petbattle")
-_MenuHideInVehicle = _MenuAutoHide:AddMenuButton(L"In vehicle")
-_MenuHideOutOfCombat.IsCheckButton = true
-_MenuHideInPetBattle.IsCheckButton = true
-_MenuHideInVehicle.IsCheckButton = true
-_MenuAutoHide.DropDownList.MultiSelect = true
+_MenuAutoHide:ActiveThread("OnClick")
 
 _MenuAlwaysShowGrid = _Menu:AddMenuButton(L"Always Show Grid")
 _MenuAlwaysShowGrid.IsCheckButton = true

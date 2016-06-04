@@ -14,8 +14,10 @@ Toggle = {
 		_HeadList:Each(function(self)
 			self.LockMode = value
 			self.IHeader.Visible = not value
-			if self.HideOutOfCombat then
-				self.Visible = not value
+			if not value then
+				self.Visible = true
+			else
+				self:RefreshForAutoHide()
 			end
 		end)
 		if _BagSlotBar then
@@ -139,10 +141,6 @@ _Addon.OnSlashCmd = _Addon.OnSlashCmd + function(self, option, info)
 
 		if info == "reset" then
 			LoadConfig()
-		elseif info == "show" then
-			_HeadList:Each("HideOutOfCombat", false)
-		elseif info == "hide" then
-			_HeadList:Each("HideOutOfCombat", true)
 		elseif info == "unlock" then
 			Toggle.Set(false)
 		elseif info == "lock" then
@@ -276,9 +274,7 @@ function GenerateBarConfig(header, includeContent)
 	bar.StanceBar = header.StanceBar
 	bar.ReplaceBlzMainAction = header.ReplaceBlzMainAction
 
-	bar.HideOutOfCombat = header.HideOutOfCombat
-	bar.HideInPetBattle = header.HideInPetBattle
-	bar.HideInVehicle = header.HideInVehicle
+	bar.AutoHideCondition = System.Reflector.Clone(header.AutoHideCondition)
 
 	bar.AlwaysShowGrid = header.AlwaysShowGrid
 
@@ -449,9 +445,7 @@ function LoadBarConfig(header, bar)
 			btn = btn.Brother
 		end
 
-		header.HideOutOfCombat = bar.HideOutOfCombat
-		header.HideInPetBattle = bar.HideInPetBattle
-		header.HideInVehicle = bar.HideInVehicle
+		header.AutoHideCondition = System.Reflector.Clone(bar.AutoHideCondition)
 
 		header.AlwaysShowGrid = bar.AlwaysShowGrid
 	else
@@ -712,9 +706,6 @@ function _Menu:OnShow()
 
 	-- AutoHide
 	_MenuAutoHide.Enabled = notBagSlotBar
-	_MenuHideOutOfCombat.Checked = header.HideOutOfCombat
-	_MenuHideInPetBattle.Checked = header.HideInPetBattle
-	_MenuHideInVehicle.Checked = header.HideInVehicle
 
 	-- Always show grid
 	_MenuAlwaysShowGrid.Checked = header.AlwaysShowGrid
@@ -911,16 +902,14 @@ function _ListMarginY:OnItemChoosed(key, item)
 	_Menu:Hide()
 end
 
-function _MenuHideOutOfCombat:OnCheckChanged()
-	_Menu.Parent.HideOutOfCombat = self.Checked
-end
+function _MenuAutoHide:OnClick()
+	local header = _Menu.Parent
 
-function _MenuHideInPetBattle:OnCheckChanged()
-	_Menu.Parent.HideInPetBattle = self.Checked
-end
+	local data = _Addon:SelectMacroCondition(header.AutoHideCondition)
 
-function _MenuHideInVehicle:OnCheckChanged()
-	_Menu.Parent.HideInVehicle = self.Checked
+	if data then
+		header.AutoHideCondition = data
+	end
 end
 
 function _MenuAlwaysShowGrid:OnCheckChanged()
