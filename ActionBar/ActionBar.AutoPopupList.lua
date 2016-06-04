@@ -260,7 +260,13 @@ function cboType:OnValueChanged(key)
 end
 
 function btnAdd:OnClick()
-
+	local name = IGAS:MsgBox(L"Please input the auto aciton list's name", "ic")
+	if name and not autoList:GetItem(name) then
+		_DBAutoPopupList[name] = { Name = name }
+		autoList:AddItem(name, name)
+		autoList:SelectItemByValue(name)
+		autoList:OnItemChoosed(name)
+	end
 end
 
 function btnRemove:OnClick()
