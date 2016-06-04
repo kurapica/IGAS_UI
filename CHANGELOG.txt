@@ -1,3 +1,6 @@
+22016/06/04 v50
+	1. An auto hide system is built based on macro condition.
+
 2016/06/03 v49
 	1. CompactRaidFrameManager won't be shown when solo.
 

@@ -36,6 +36,7 @@ class "IActionButton"
 			RootExpansion = newtable()
 			HideBranchList = newtable()
 			State = newtable()
+			AutoHideMap = newtable()
 			PetHeader = newtable()
 			AutoSwapHeader = newtable()
 
@@ -94,43 +95,15 @@ class "IActionButton"
 				end
 			]==]
 
-			StateCheck = [==[
-				local hide = false
-				if InCombatHeader[self] and not State["incombat"] then
-					hide = true
-				end
-
-				if not hide and NoPetCombatHeader[self] and State["petbattle"] then
-					hide = true
-				end
-
-				if not hide and NoVehicleHeader[self] and State["vehicle"] then
-					hide = true
-				end
-
-				if hide then
-					-- Unregister HideBranch
-					for root in pairs(HideBranchList) do
-						if root == self or HeaderMap[root] == self then
-							root:UnregisterAutoHide()
-							HideBranchList[root] = nil
-						end
-					end
-					if self:IsShown() then
-						self:Hide()
-					end
-				else
-					if not self:IsShown() then
-						self:Show()
-					end
-				end
-			]==]
-
 			UpdatePetHeader = [=[
 				if State["pet"] then
 					for btn in pairs(PetHeader) do
 						if not btn:IsShown() then
-							btn:Show()
+							if not AutoHideMap[btn] or State[btn] then
+								btn:Show()
+							end
+						elseif AutoHideMap[btn] and not State[btn] then
+							btn:Hide()
 						end
 					end
 				else
@@ -244,27 +217,38 @@ class "IActionButton"
 
 		_ManagerFrame:SetFrameRef("StateButton", self)
 		_ManagerFrame:Execute(([[
-			State["%s"] = Manager:GetFrameRef("StateButton")
+			local name = "%s"
+			local bar = Manager:GetFrameRef("StateButton")
+			AutoHideMap[name] = bar
+			AutoHideMap[bar] = name
 		]]):format(self.AutoHideState))
 
 		_ManagerFrame:RegisterStateDriver(self.AutoHideState, cond)
 		_ManagerFrame:SetAttribute("_onstate-" .. self.AutoHideState, ([[
-			local uf = State["%s"]
+			local name = "%s"
+			local bar = AutoHideMap[name]
+			if not bar then return end
+
+			State[bar] = newstate ~= "hide"
 
 			if newstate == "hide" then
 				-- Unregister HideBranch
 				for root in pairs(HideBranchList) do
-					if root == uf or HeaderMap[root] == uf then
+					if root == bar or HeaderMap[root] == bar then
 						root:UnregisterAutoHide()
 						HideBranchList[root] = nil
 					end
 				end
-				if uf:IsShown() then
-					uf:Hide()
+				if bar:IsShown() then
+					bar:Hide()
 				end
 			else
-				if not uf:IsShown() then
-					uf:Show()
+				if not bar:IsShown() then
+					if not PetHeader[bar] or State["pet"] then
+						bar:Show()
+					end
+				elseif PetHeader[bar] and not State["pet"] then
+					bar:Hide()
 				end
 			end
 		]]):format(self.AutoHideState))
@@ -274,6 +258,24 @@ class "IActionButton"
 	local function UnregisterAutoHide(self)
 		if self.AutoHideState then
 			_ManagerFrame:UnregisterStateDriver(self.AutoHideState)
+
+			_ManagerFrame:SetFrameRef("StateButton", self)
+			_ManagerFrame:Execute(([[
+				local name = "%s"
+				local bar = Manager:GetFrameRef("StateButton")
+				AutoHideMap[name] = nil
+				AutoHideMap[bar] = nil
+				State[bar] = nil
+
+				if not PetHeader[bar] or State["pet"] then
+					bar:Show()
+				else
+					bar:Hide()
+				end
+			]]):format(self.AutoHideState))
+			_ManagerFrame:SetAttribute("state-" .. self.AutoHideState, nil)
+
+			self.AutoHideState = nil
 		end
 	end
 
@@ -714,7 +716,6 @@ class "IActionButton"
 					RegisterAutoHide(self, cond)
 				else
 					UnregisterAutoHide(self)
-					self:Show()
 				end
 			end)
 		end,

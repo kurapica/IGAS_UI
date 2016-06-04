@@ -229,7 +229,7 @@ function OnLoad(self)
 	_DB = _Addon._DB.MacroConditions or {}
 	_Addon._DB.MacroConditions = _DB
 
-	if true or not _DB.Keys then
+	if not _DB.Keys then
 		-- Init with default settings
 		_DB.Keys = {
 			"[@target,noexists,nocombat,nogroup]",

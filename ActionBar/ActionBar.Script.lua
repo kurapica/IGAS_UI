@@ -23,6 +23,7 @@ Toggle = {
 		if _BagSlotBar then
 			_BagSlotBar.IHeader.Visible = not value
 		end
+		if value then UpdateStanceBar() end
 		Toggle.Update()
 	end,
 	Update = function() end,
@@ -131,6 +132,10 @@ function OnEnable(self)
 	-- Load toy informations
 	C_ToyBox.FilterToys()
 	for name, v in pairs(_DBAutoPopupList) do if v.Type == "Toy" then AutoActionTask(name):RestartTask() end end
+
+	_HeadList:Each(function(self)
+		self:RefreshForAutoHide()
+	end)
 end
 
 _Addon.OnSlashCmd = _Addon.OnSlashCmd + function(self, option, info)
@@ -531,6 +536,7 @@ function RemoveHeader(header)
 		header.StanceBar = false
 		_StanceBar = nil
 	end
+	header.AutoHideCondition = nil
 	header:GenerateBrother(1, 1)
 	header:GenerateBranch(0)
 	_HeadList:Remove(header)
