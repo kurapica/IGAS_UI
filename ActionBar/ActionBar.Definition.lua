@@ -1414,94 +1414,90 @@ class "AutoActionTask"
 
 	local function task(self, iter, ...)
 		local mark = self.TaskMark
-		local processTime = GetTime() - 10
 		local roots = self.Roots
 
 		while self.TaskMark and mark == self.TaskMark do
 			if InCombatLockdown() then Task.Event("PLAYER_REGEN_ENABLED") end
 			if not self.TaskMark or mark ~= self.TaskMark then break end
 
-			if GetTime() - processTime > 0.1 then
-				processTime = GetTime()
+			local rIdx = 1
+			local root = roots[rIdx]
+			if not root then break end
+			local btn = root
+			local cnt = 0
+			local autoGen = self.AutoGenerate and not root.FreeMode
+			local maxAction = autoGen and self.MaxAction or 24
 
-				local rIdx = 1
-				local root = roots[rIdx]
-				if not root then break end
-				local btn = root
-				local cnt = 0
-				local autoGen = self.AutoGenerate and not root.FreeMode
-				local maxAction = autoGen and self.MaxAction or 24
+			Log(1, "Process auto-gen [%s] %s @pid %d", self.Type, self.Name, mark)
 
-				Log(1, "Process auto-gen [%s] %s @pid %d", self.Type, self.Name, mark)
-
-				for ty, target, detail in tpairs(iter), self do
-					while root do
-						if cnt < maxAction then
-							if cnt > 0 then
-								if not btn.Branch then
-									if autoGen then
-										root:GenerateBranch(cnt)
-										btn.Branch.Visible = btn.Visible
-										btn = btn.Branch
-										btn:SetAction(ty, target, detail)
-										cnt = cnt + 1
-										break
-									end
-								else
+			for ty, target, detail in tpairs(iter), self do
+				while root do
+					if cnt < maxAction then
+						if cnt > 0 then
+							if not btn.Branch then
+								if autoGen then
+									root:GenerateBranch(cnt)
+									btn.Branch.Visible = btn.Visible
 									btn = btn.Branch
 									btn:SetAction(ty, target, detail)
 									cnt = cnt + 1
 									break
 								end
 							else
+								btn = btn.Branch
 								btn:SetAction(ty, target, detail)
 								cnt = cnt + 1
 								break
 							end
-						end
-						rIdx = rIdx + 1
-						root = roots[rIdx]
-						if root then
-							btn = root
-							cnt = 0
-							autoGen = self.AutoGenerate and not root.FreeMode
-							maxAction = autoGen and self.MaxAction or 24
+						else
+							btn:SetAction(ty, target, detail)
+							cnt = cnt + 1
+							break
 						end
 					end
+					rIdx = rIdx + 1
+					root = roots[rIdx]
+					if root then
+						btn = root
+						cnt = 0
+						autoGen = self.AutoGenerate and not root.FreeMode
+						maxAction = autoGen and self.MaxAction or 24
+					end
 				end
+			end
+
+			if autoGen then
+				root = btn.Root
+				root:GenerateBranch(cnt > 1 and cnt - 1 or 1)
+				if cnt <= 1 then root.Branch:SetAction(nil) end
+				if cnt <= 0 then root:SetAction(nil) end
+			else
+				btn = btn.Branch
+				while btn do
+					btn:SetAction(nil)
+					btn = btn.Branch
+				end
+			end
+
+			-- Clear
+			for rIdx = rIdx + 1, #self.Roots do
+				root = roots[rIdx]
+				autoGen = self.AutoGenerate and not root.FreeMode
 
 				if autoGen then
-					root = btn.Root
-					root:GenerateBranch(cnt > 1 and cnt - 1 or 1)
-					if cnt <= 1 then root.Branch:SetAction(nil) end
-					if cnt <= 0 then root:SetAction(nil) end
+					root:GenerateBranch(1)
+					root.Branch:SetAction(nil)
+					root:SetAction(nil)
 				else
-					btn = btn.Branch
-					while btn do
-						btn:SetAction(nil)
-						btn = btn.Branch
-					end
-				end
-
-				-- Clear
-				for rIdx = rIdx + 1, #self.Roots do
-					root = roots[rIdx]
-					autoGen = self.AutoGenerate and not root.FreeMode
-
-					if autoGen then
-						root:GenerateBranch(1)
-						root.Branch:SetAction(nil)
+					while root do
 						root:SetAction(nil)
-					else
-						while root do
-							root:SetAction(nil)
-							root = root.Branch
-						end
+						root = root.Branch
 					end
 				end
 			end
 
 			Task.Wait(...)
+			Task.Delay(0.1) --Use delay to block too many BAG_UPDATE at a same time
 		end
 
 		Log(1, "Stop auto-gen [%s] %s @pid %d", self.Type, self.Name, mark)

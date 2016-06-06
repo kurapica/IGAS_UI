@@ -165,7 +165,6 @@ function UpdateStanceBar()
 	local btn = _StanceBar
 	for i = 1, GetNumShapeshiftForms() do
 	    local id = select(5, GetShapeshiftFormInfo(i))
-
 	    if id then
 	    	btn:SetAction("spell", id)
 	    	btn.Visible = true
@@ -178,6 +177,8 @@ function UpdateStanceBar()
 		btn:SetAction(nil)
 		btn = btn.Brother
 	end
+
+	_StanceBar:RefreshForAutoHide()
 end
 
 function UPDATE_SHAPESHIFT_FORMS(self)
