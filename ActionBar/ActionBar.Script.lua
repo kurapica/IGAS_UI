@@ -80,8 +80,30 @@ function OnLoad(self)
 	_DBAutoPopupList = _Addon._DB.AutoPopupList or {}
 	_Addon._DB.AutoPopupList = _DBAutoPopupList
 
-	for name in pairs(_DBAutoPopupList) do
+	for name, popset in pairs(_DBAutoPopupList) do
 		autoList:AddItem(name, name)
+
+		-- Check if the popset use old version data
+		if popset.Type == "Item" then
+			if popset.ItemClass and not tonumber(popset.ItemClass) then
+				for itemClass, clsset in pairs(_AuctionItemClasses) do
+					if clsset.Name == popset.ItemClass then
+						popset.ItemClass = itemClass
+
+						if popset.ItemSubClass and not tonumber(popset.ItemSubClass) then
+							for isubCls, nsubCls in pairs(clsset.SubClass) do
+								if popset.ItemSubClass == nsubCls then
+									popset.ItemSubClass = isubCls
+									break
+								end
+							end
+						end
+
+						break
+					end
+				end
+			end
+		end
 	end
 
 	_ActionSetSave = {L"New Set"}

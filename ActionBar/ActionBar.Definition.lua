@@ -1329,6 +1329,15 @@ class "AutoActionTask"
 		local itemSubCls = self.ItemSubClass
 		local generated = {}
 
+		if itemCls then
+			local cls = _AuctionItemClasses[itemCls]
+			itemCls = cls.Name
+
+			if itemSubCls then
+				itemSubCls = cls.SubClass[itemSubCls]
+			end
+		end
+
 		for bag = 0, _G.NUM_BAG_FRAMES do
 			for slot = 1, GetContainerNumSlots(bag) do
 				local link = GetContainerItemLink(bag, slot)
@@ -1576,9 +1585,9 @@ class "AutoActionTask"
 	end)
 	property "FilterCode" { Type = String }
 
-	property "ItemClass" { Type = String }
+	property "ItemClass" { Type = Number }
 
-	property "ItemSubClass" { Type = String }
+	property "ItemSubClass" { Type = Number }
 
 	_AutoActionTask = {}
 

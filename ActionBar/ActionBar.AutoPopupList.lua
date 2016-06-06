@@ -168,8 +168,24 @@ cboItemClass:SetPoint("TOPLEFT", chkFilter, "BOTTOMLEFT", 0, -16)
 cboItemClass:SetPoint("TOPRIGHT", chkFilter, "BOTTOMRIGHT")
 cboItemClass:AddItem(0, L"All")
 cboItemClass.Value = 0
-for i, v in ipairs{ GetAuctionItemClasses() } do
-	if i == 4 or i == 9 or i == 10 then
+
+_AuctionItemClasses = { GetAuctionItemClasses() }
+for i, v in ipairs(_AuctionItemClasses) do
+	_AuctionItemClasses[i] = {
+		Name = v,
+		SubClass = { GetAuctionItemSubClasses(i) }
+	}
+	if i == 4 then
+		tinsert(_AuctionItemClasses[i].SubClass, v)
+	elseif i == 6 then
+		for j in ipairs(_AuctionItemClasses[i].SubClass) do
+			if j ~= 10 and j ~= 11 then
+				_AuctionItemClasses[i].SubClass[j] = nil
+			end
+		end
+	end
+
+	if i == 4 or i == 6 or i == 9 or i == 10 then
 		cboItemClass:AddItem(i, v)
 	end
 end
@@ -204,9 +220,9 @@ function autoList:OnItemChoosed(key)
 		if cboType.Value == "Item" then
 			cboItemClass.Visible = true
 			cboItemSubClass.Visible = true
-			cboItemClass.Text = _autoPopupSet.ItemClass or L"All"
+			cboItemClass.Value = _autoPopupSet.ItemClass or 0
 			cboItemClass:OnValueChanged(cboItemClass.Value)
-			cboItemSubClass.Text = _autoPopupSet.ItemSubClass or L"All"
+			cboItemSubClass.Value = _autoPopupSet.ItemSubClass or 0
 		else
 			cboItemClass.Visible = false
 			cboItemSubClass.Visible = false
@@ -250,9 +266,9 @@ function cboType:OnValueChanged(key)
 	if cboType.Value == "Item" then
 		cboItemClass.Visible = true
 		cboItemSubClass.Visible = true
-		cboItemClass.Text = _autoPopupSet and _autoPopupSet.ItemClass or L"All"
+		cboItemClass.Value = _autoPopupSet and _autoPopupSet.ItemClass or 0
 		cboItemClass:OnValueChanged(cboItemClass.Value)
-		cboItemSubClass.Text = _autoPopupSet and _autoPopupSet.ItemSubClass or L"All"
+		cboItemSubClass.Value = _autoPopupSet and _autoPopupSet.ItemSubClass or 0
 	else
 		cboItemClass.Visible = false
 		cboItemSubClass.Visible = false
@@ -315,9 +331,9 @@ function btnSave:OnClick()
 		_autoPopupSet.MaxAction = mround(optMaxActionButtons.Value)
 		if _autoPopupSet.Type == "Item" then
 			if cboItemClass.Value > 0 then
-				_autoPopupSet.ItemClass = cboItemClass.Text
+				_autoPopupSet.ItemClass = cboItemClass.Value
 				if cboItemSubClass.Value > 0 then
-					_autoPopupSet.ItemSubClass = cboItemSubClass.Text
+					_autoPopupSet.ItemSubClass = cboItemSubClass.Value
 				else
 					_autoPopupSet.ItemSubClass = nil
 				end
@@ -375,13 +391,8 @@ function cboItemClass:OnValueChanged(key)
 	cboItemSubClass:AddItem(0, L"All")
 	cboItemSubClass.Value = 0
 	if key > 0 then
-		local idx
-		for i, v in ipairs{ GetAuctionItemSubClasses(key) } do
+		for i, v in pairs(_AuctionItemClasses[key].SubClass) do
 			cboItemSubClass:AddItem(i, v)
-			idx = i
-		end
-		if key == 4 then
-			cboItemSubClass:AddItem(idx+1, cboItemClass.Text)
 		end
 	end
 end

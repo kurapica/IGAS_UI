@@ -1,3 +1,6 @@
+2016/06/06 v53
+	1. Fix the auto-gen fail when switch the client's language.
+
 2016/06/06 v52
 	1. The auto hide stance bar won't be shown when updated.
 	2. The updating for the auto popup bars will be delayed for 0.1 sec, to block too many BAG_UPDATE at a same time. And fix the items won't be displayed when player first enter the game world.
