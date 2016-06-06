@@ -185,21 +185,20 @@ function UpdateStanceBar()
 	_StanceBar:GenerateBrother(1, _G.NUM_STANCE_SLOTS)
 
 	local btn = _StanceBar
+	_StanceBar.Visible = false
 	for i = 1, GetNumShapeshiftForms() do
 	    local id = select(5, GetShapeshiftFormInfo(i))
 	    if id then
 	    	btn:SetAction("spell", id)
-	    	btn.Visible = true
 	    	btn = btn.Brother
 	    end
 	end
-
 	while btn do
-		btn.Visible = false
 		btn:SetAction(nil)
 		btn = btn.Brother
 	end
 
+	_StanceBar.Visible = true
 	_StanceBar:RefreshForAutoHide()
 end
 

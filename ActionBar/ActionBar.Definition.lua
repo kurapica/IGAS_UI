@@ -533,6 +533,14 @@ class "IActionButton"
 			if self.Visible ~= value then
 				if value then
 					self:Show()
+					if self.StanceBar then
+						local btn = self.Brother
+						while btn and btn.Spell do
+							btn:Show()
+							btn = btn.Brother
+						end
+						return
+					end
 				else
 					self:Hide()
 				end

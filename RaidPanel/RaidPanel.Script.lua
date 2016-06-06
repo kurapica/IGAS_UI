@@ -317,7 +317,7 @@ function OnEnable(self)
 	self:SecureHook("SpellButton_UpdateButton")
 	LEARNED_SPELL_IN_TAB(self)
 
-	Task.NoCombatCall(function()
+	--[[Task.NoCombatCall(function()
 		self:RegisterEvent("GROUP_ROSTER_UPDATE")
 
 		_G.CompactRaidFrameContainer:UnregisterAllEvents()
@@ -348,9 +348,9 @@ function OnEnable(self)
 		button:Enable()
 
 		return GROUP_ROSTER_UPDATE(self)
-	end)
+	end)--]]
 end
-
+--[[
 function GROUP_ROSTER_UPDATE(self)
 	Task.NoCombatCall(function()
 		if IsInGroup() then
@@ -359,7 +359,7 @@ function GROUP_ROSTER_UPDATE(self)
 			_G.CompactRaidFrameManager:Hide()
 		end
 	end)
-end
+end--]]
 
 function PLAYER_REGEN_DISABLED(self)
 	if raidPanelMask.Visible then
