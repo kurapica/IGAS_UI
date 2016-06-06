@@ -36,6 +36,7 @@ class "IActionButton"
 			RootExpansion = newtable()
 			HideBranchList = newtable()
 			State = newtable()
+			StanceBar = newtable()
 			AutoHideMap = newtable()
 			PetHeader = newtable()
 			AutoSwapHeader = newtable()
@@ -43,10 +44,20 @@ class "IActionButton"
 			ShowBrother = [==[
 				local header = HeaderMap[self] or self
 
-				for btn, hd in pairs(HeaderMap) do
-					if hd == header then
-						if not BranchMap[btn] or RootExpansion[ BranchMap[btn] ] then
-							btn:Show()
+				if StanceBar[1] == header then
+					for btn, hd in pairs(HeaderMap) do
+						if hd == header then
+							if btn:GetAttribute("spell") then
+								btn:Show()
+							end
+						end
+					end
+				else
+					for btn, hd in pairs(HeaderMap) do
+						if hd == header then
+							if not BranchMap[btn] or RootExpansion[ BranchMap[btn] ] then
+								btn:Show()
+							end
 						end
 					end
 				end
@@ -309,6 +320,22 @@ class "IActionButton"
 		_ManagerFrame:Execute[[
 			local brother = Manager:GetFrameRef("BrotherButton")
 			HeaderMap[brother] = nil
+		]]
+	end
+
+	local function RegisterStanceBar(self)
+		_ManagerFrame:SetFrameRef("StanceHeader", self)
+		_ManagerFrame:Execute[[
+			StanceBar[1] = Manager:GetFrameRef("StanceHeader")
+		]]
+	end
+
+	local function UnregisterStanceBar(self)
+		_ManagerFrame:SetFrameRef("StanceHeader", self)
+		_ManagerFrame:Execute[[
+			if StanceBar[1] == Manager:GetFrameRef("StanceHeader") then
+				StanceBar[1] = nil
+			end
 		]]
 	end
 
@@ -700,9 +727,11 @@ class "IActionButton"
 				Task.NoCombatCall(function()
 					self:GenerateBrother(1, _G.NUM_STANCE_SLOTS)
 					self:GenerateBranch(0)
+					RegisterStanceBar(self)
 				end)
 			else
 				Task.NoCombatCall(function()
+					UnregisterStanceBar(self)
 					self:GenerateBrother(1, 1)
 					self:GenerateBranch(0)
 					self:SetAction(nil)

@@ -1,3 +1,6 @@
+2016/06/06 v55
+	1. Continue fix stance bar.
+
 2016/06/06 v54
 	1. Stance bar no longer diplay empty action buttons.
 	2. No longer control the CompactRaidFrame since you can decide what to do with it yourself.
