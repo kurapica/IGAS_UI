@@ -313,3 +313,5 @@ L["Solo no combat no target"] = "無隊友無目標無戰鬥"
 L["In a vehicle"] = "載具中"
 L["In a pet battle"] = "寵物對戰中"
 L["Are you sure to delete the macro condition?"] = "您是否確定刪除這個宏條件？"
+
+L["Lock Quest Tracker"] = "鎖定任務列表"

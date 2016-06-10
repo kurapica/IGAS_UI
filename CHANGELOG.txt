@@ -1,3 +1,6 @@
+2016/06/11 v57
+	1. The objective tracker frame can be move to anywhere now.
+
 2016/06/10 v56
 	1. Stance bar no longer show empty slot.
 

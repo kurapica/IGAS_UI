@@ -16,6 +16,7 @@
 	<Include file = "NamePlate\NamePlate.xml"/>
 	<Script file = "Minimap\Minimap.lua"/>
 	<Script file = "ChatFrame\ChatFrame.lua"/>
+	<Script file = "QuestMover\QuestMover.lua"/>
 
 	<!-- Manager -->
 	<Script file = "Manager.Designer.lua"/>
