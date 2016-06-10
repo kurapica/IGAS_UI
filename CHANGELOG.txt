@@ -1,3 +1,6 @@
+2016/06/10 v56
+	1. Stance bar no longer show empty slot.
+
 2016/06/06 v55
 	1. Continue fix stance bar.
 

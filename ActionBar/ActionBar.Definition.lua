@@ -254,12 +254,12 @@ class "IActionButton"
 					bar:Hide()
 				end
 			else
-				if not bar:IsShown() then
-					if not PetHeader[bar] or State["pet"] then
-						bar:Show()
-					end
-				elseif PetHeader[bar] and not State["pet"] then
-					bar:Hide()
+				if PetHeader[bar] and not State["pet"] then
+					if bar:IsShown() then bar:Hide() end
+				elseif StanceBar[1] == bar and not bar:GetAttribute("spell") then
+					if bar:IsShown() then bar:Hide() end
+				elseif not bar:IsShown() then
+					bar:Show()
 				end
 			end
 		]]):format(self.AutoHideState))
