@@ -7,6 +7,20 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/06/01 v58 : </lime>
+</p><br/>
+<p>
+    1. 你可以使用相反的順序來自動生成物品列表。
+</p>
+<br/><br/>
+<p>
+<lime>2016/06/01 v57 : </lime>
+</p><br/>
+<p>
+    1. 現在你可以隨意移動任務面板。
+</p>
+<br/><br/>
+<p>
 <lime>2016/06/04 v50 : </lime>
 </p><br/>
 <p>
@@ -315,3 +329,5 @@ L["In a pet battle"] = "寵物對戰中"
 L["Are you sure to delete the macro condition?"] = "您是否確定刪除這個宏條件？"
 
 L["Lock Quest Tracker"] = "鎖定任務列表"
+
+L["Use reverse order"] = "使用相反的順序"

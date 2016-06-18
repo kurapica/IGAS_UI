@@ -4,6 +4,20 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/06/01 v58 : </lime>
+</p><br/>
+<p>
+    1. You can choose the reversed order to generate the item list.
+</p>
+<br/><br/>
+<p>
+<lime>2016/06/01 v57 : </lime>
+</p><br/>
+<p>
+    1. You can move the task list to anywhere now.
+</p>
+<br/><br/>
+<p>
 <lime>2016/06/04 v50 : </lime>
 </p><br/>
 <p>

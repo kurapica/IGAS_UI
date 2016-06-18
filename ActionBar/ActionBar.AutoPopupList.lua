@@ -163,6 +163,14 @@ chkFavourite:SetPoint("LEFT", grpOption, "CENTER")
 chkFavourite.Text = L"Only Favourite"
 chkFavourite.Checked = false
 
+chkOrder = CheckBox("chkOrder", grpOption)
+chkOrder:GetChild("Text").FontObject = "ChatFontNormal"
+chkOrder:SetPoint("TOP", chkFilter)
+chkOrder:SetPoint("RIGHT", -4, 0)
+chkOrder:SetPoint("LEFT", grpOption, "CENTER")
+chkOrder.Text = L"Use reverse order"
+chkOrder.Checked = false
+
 cboItemClass = ComboBox("cboItemClass", grpOption)
 cboItemClass:SetPoint("TOPLEFT", chkFilter, "BOTTOMLEFT", 0, -16)
 cboItemClass:SetPoint("TOPRIGHT", chkFilter, "BOTTOMRIGHT")
@@ -220,12 +228,15 @@ function autoList:OnItemChoosed(key)
 		if cboType.Value == "Item" then
 			cboItemClass.Visible = true
 			cboItemSubClass.Visible = true
+			chkOrder.Visible = true
 			cboItemClass.Value = _autoPopupSet.ItemClass or 0
 			cboItemClass:OnValueChanged(cboItemClass.Value)
 			cboItemSubClass.Value = _autoPopupSet.ItemSubClass or 0
+			chkOrder.Checked = _autoPopupSet.UseReverseOrder
 		else
 			cboItemClass.Visible = false
 			cboItemSubClass.Visible = false
+			chkOrder.Visible = false
 		end
 		chkFilter.Checked = _autoPopupSet.FilterCode and true or false
 		editor.Visible = chkFilter.Checked
@@ -245,11 +256,13 @@ function autoList:OnItemChoosed(key)
 		chkFilter.Checked = false
 		cboItemClass.Visible = true
 		cboItemSubClass.Visible = true
+		chkOrder.Visible = true
 		editor.Visible = false
 		editor.Text = ""
 		chkAutoGenerate.Checked = false
 		optMaxActionButtons.Enabled = false
 		optMaxActionButtons.Value = 1
+		chkOrder.Checked = false
 
 		grpOption.Visible = false
 		grpCommit.Visible = false
@@ -266,12 +279,15 @@ function cboType:OnValueChanged(key)
 	if cboType.Value == "Item" then
 		cboItemClass.Visible = true
 		cboItemSubClass.Visible = true
+		chkOrder.Visible = true
 		cboItemClass.Value = _autoPopupSet and _autoPopupSet.ItemClass or 0
 		cboItemClass:OnValueChanged(cboItemClass.Value)
 		cboItemSubClass.Value = _autoPopupSet and _autoPopupSet.ItemSubClass or 0
+		chkOrder.Checked = _autoPopupSet and _autoPopupSet.UseReverseOrder
 	else
 		cboItemClass.Visible = false
 		cboItemSubClass.Visible = false
+		chkOrder.Visible = false
 	end
 end
 
@@ -337,13 +353,16 @@ function btnSave:OnClick()
 				else
 					_autoPopupSet.ItemSubClass = nil
 				end
+				_autoPopupSet.UseReverseOrder = chkOrder.Checked
 			else
 				_autoPopupSet.ItemClass = nil
 				_autoPopupSet.ItemSubClass = nil
+				_autoPopupSet.UseReverseOrder = nil
 			end
 		else
 			_autoPopupSet.ItemClass = nil
 			_autoPopupSet.ItemSubClass = nil
+			_autoPopupSet.UseReverseOrder = nil
 		end
 		local code = editor.Visible and editor.Text
 		if code then code = strtrim(code) end
@@ -359,6 +378,7 @@ function btnSave:OnClick()
 		task.FilterCode = _autoPopupSet.FilterCode
 		task.ItemClass = _autoPopupSet.ItemClass
 		task.ItemSubClass = _autoPopupSet.ItemSubClass
+		task.UseReverseOrder = _autoPopupSet.UseReverseOrder
 
 		return task:RestartTask()
 	end

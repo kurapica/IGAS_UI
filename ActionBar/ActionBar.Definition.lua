@@ -1375,19 +1375,39 @@ class "AutoActionTask"
 			end
 		end
 
-		for bag = 0, _G.NUM_BAG_FRAMES do
-			for slot = 1, GetContainerNumSlots(bag) do
-				local link = GetContainerItemLink(bag, slot)
-				link = tonumber(link and link:match("item:(%d+)"))
-				if link and GetItemSpell(link) then
-					local pass = true
-					if itemCls then
-						local _, _, _, _, _, cls, subclass = GetItemInfo(link)
-						pass = itemCls == cls and (not itemSubCls or subclass == itemSubCls)
+		if self.UseReverseOrder then
+			for bag = _G.NUM_BAG_FRAMES, 0, -1 do
+				for slot = GetContainerNumSlots(bag), 1, -1  do
+					local link = GetContainerItemLink(bag, slot)
+					link = tonumber(link and link:match("item:(%d+)"))
+					if link and GetItemSpell(link) then
+						local pass = true
+						if itemCls then
+							local _, _, _, _, _, cls, subclass = GetItemInfo(link)
+							pass = itemCls == cls and (not itemSubCls or subclass == itemSubCls)
+						end
+						if pass and not generated[link] and (not filter or filter(link, bag, slot)) then
+							generated[link] = true
+							yield("item", link)
+						end
 					end
-					if pass and not generated[link] and (not filter or filter(link, bag, slot)) then
-						generated[link] = true
-						yield("item", link)
+				end
+			end
+		else
+			for bag = 0, _G.NUM_BAG_FRAMES do
+				for slot = 1, GetContainerNumSlots(bag) do
+					local link = GetContainerItemLink(bag, slot)
+					link = tonumber(link and link:match("item:(%d+)"))
+					if link and GetItemSpell(link) then
+						local pass = true
+						if itemCls then
+							local _, _, _, _, _, cls, subclass = GetItemInfo(link)
+							pass = itemCls == cls and (not itemSubCls or subclass == itemSubCls)
+						end
+						if pass and not generated[link] and (not filter or filter(link, bag, slot)) then
+							generated[link] = true
+							yield("item", link)
+						end
 					end
 				end
 			end
@@ -1626,6 +1646,8 @@ class "AutoActionTask"
 
 	property "ItemSubClass" { Type = Number }
 
+	property "UseReverseOrder" { Type = Boolean }
+
 	_AutoActionTask = {}
 
 	function Dispoe(self)
@@ -1646,6 +1668,7 @@ class "AutoActionTask"
 		self.FilterCode = _DBAutoPopupList[name].FilterCode
 		self.ItemClass = _DBAutoPopupList[name].ItemClass
 		self.ItemSubClass = _DBAutoPopupList[name].ItemSubClass
+		self.UseReverseOrder = _DBAutoPopupList[name].UseReverseOrder
 	end
 
 	function __exist(name) return _AutoActionTask[name] end

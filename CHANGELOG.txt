@@ -1,3 +1,6 @@
+2016/06/11 v58
+	1. You can choose "Use reverse order" to generate item list.
+
 2016/06/11 v57
 	1. The objective tracker frame can be move to anywhere now.
 
