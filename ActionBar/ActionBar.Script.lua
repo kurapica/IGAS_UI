@@ -50,6 +50,11 @@ GameTooltip = _G.GameTooltip
 UIParent = _G.UIParent
 ITEM_BIND_QUEST = _G.ITEM_BIND_QUEST
 
+COLOR_NORMAL = ColorType(1, 1, 1)
+COLOR_OOR = ColorType(1, 0.3, 0.1)
+COLOR_OOM = ColorType(0.1, 0.3, 1)
+COLOR_UNUSABLE = ColorType(0.4, 0.4, 0.4)
+
 ------------------------------------------------------
 -- Module Script Handler
 ------------------------------------------------------
@@ -135,6 +140,35 @@ function OnLoad(self)
 	_ListBarSave.Items = _ActionBarLayoutSave
 	_ListBarLoad.Keys = _ActionBarLayoutLoad
 	_ListBarLoad.Items = _ActionBarLayoutLoad
+
+	-- Global Styles
+	_ActionBarGlobalStyle = _Addon._DB.ActionBarGlobalStyle or {}
+	_Addon._DB.ActionBarGlobalStyle = _ActionBarGlobalStyle
+
+	-- Unusable color
+	_ActionBarColorUnusable = _ActionBarGlobalStyle.ColorUnusable or {
+		ENABLE = false,
+		OOM = COLOR_OOM,
+		OOR = COLOR_OOR,
+		UNUSABLE = COLOR_UNUSABLE,
+	}
+	_ActionBarGlobalStyle.ColorUnusable = _ActionBarColorUnusable
+
+	_MenuColorOOM.Color = _ActionBarColorUnusable.OOM
+	_MenuColorOOR.Color = _ActionBarColorUnusable.OOR
+	_MenuColorUnusable.Color = _ActionBarColorUnusable.UNUSABLE
+
+	COLOR_OOM = _ActionBarColorUnusable.OOM
+	COLOR_OOR = _ActionBarColorUnusable.OOR
+	COLOR_UNUSABLE = _ActionBarColorUnusable.UNUSABLE
+
+	if _ActionBarColorUnusable.ENABLE then
+		_MenuColorToggle.Text = L"Disable"
+
+		InstallUnusableColor()
+	else
+		_MenuColorToggle.Text = L"Enable"
+	end
 
 	-- Register system events
 	self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
@@ -699,6 +733,61 @@ function UpdateBlzMainMenuBar()
 	end
 end
 
+function UpdateUsableColor(self)
+	if self.Usable then
+		if self.InRange == false then
+			self:GetChild("Icon").VertexColor = COLOR_OOR
+		else
+			self:GetChild("Icon").VertexColor = COLOR_NORMAL
+		end
+	else
+		local atype = self.ActionType
+		local _, oom
+		if atype == "action" then
+			_, oom = IsUsableAction(self.ActionTarget)
+		elseif atype == "spell" then
+			_, oom = IsUsableSpell((GetSpellInfo(self.ActionTarget)))
+		end
+		if oom then
+			self:GetChild("Icon").VertexColor = COLOR_OOM
+		else
+			self:GetChild("Icon").VertexColor = COLOR_UNUSABLE
+		end
+	end
+end
+
+function InstallUnusableColor()
+	class (IActionButton) (function(_ENV)
+		__Handler__( UpdateUsableColor )
+		property "InRange" { Type = BooleanNil_01 }
+
+		__Handler__( UpdateUsableColor )
+		property "Usable" { Type = BooleanNil }
+	end)
+
+	-- Refresh buttons
+	local i = 1
+
+	while _G["IActionButton" .. i] do
+		local btn = IGAS["IActionButton" .. i]
+		btn:GetChild("HotKey"):SetVertexColor(1, 1, 1)
+		btn:Refresh()
+		i = i + 1
+	end
+end
+
+function RefreshForUnusableColor()
+	if _ActionBarColorUnusable.ENABLE then
+		-- Refresh buttons
+		local i = 1
+
+		while _G["IActionButton" .. i] do
+			UpdateUsableColor(IGAS["IActionButton" .. i])
+			i = i + 1
+		end
+	end
+end
+
 --------------------
 -- Script Handler
 --------------------
@@ -1135,4 +1224,44 @@ function _MenuNew:OnClick()
 	if IGAS:MsgBox(L"Please confirm to create new action bar", "n") then
 		NewHeader()
 	end
+end
+
+function _MenuColorToggle:OnClick()
+	if _ActionBarColorUnusable.ENABLE then
+		if IGAS:MsgBox(L"Disable the feature would require reload, \ndo you continue?", "n") then
+			_ActionBarColorUnusable.ENABLE = false
+			ReloadUI()
+		end
+	else
+		_ActionBarColorUnusable.ENABLE = true
+		_MenuColorToggle.Text = L"Disable"
+		InstallUnusableColor()
+	end
+end
+
+function _MenuColorOOM:OnColorPicked(r, g, b, a)
+	local color = ColorType(r, g, b, a)
+
+	COLOR_OOM = color
+	_ActionBarColorUnusable.OOM = color
+
+	return RefreshForUnusableColor()
+end
+
+function _MenuColorOOR:OnColorPicked(r, g, b, a)
+	local color = ColorType(r, g, b, a)
+
+	COLOR_OOR = color
+	_ActionBarColorUnusable.OOR = color
+
+	return RefreshForUnusableColor()
+end
+
+function _MenuColorUnusable:OnColorPicked(r, g, b, a)
+	local color = ColorType(r, g, b, a)
+
+	COLOR_UNUSABLE = color
+	_ActionBarColorUnusable.UNUSABLE = color
+
+	return RefreshForUnusableColor()
 end
