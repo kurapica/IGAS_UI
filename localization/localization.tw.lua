@@ -7,6 +7,16 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/06/21 v59 : </lime>
+</p><br/>
+<p>
+    1. 動作條菜單重新調整，便於使用。
+</p>
+<p>
+    2. 你可以在菜單中找到"動作按鈕着色"，根據幾種情況調整按鈕顔色。
+</p>
+<br/><br/>
+<p>
 <lime>2016/06/01 v58 : </lime>
 </p><br/>
 <p>
@@ -331,3 +341,14 @@ L["Are you sure to delete the macro condition?"] = "您是否確定刪除這個�
 L["Lock Quest Tracker"] = "鎖定任務列表"
 
 L["Use reverse order"] = "使用相反的順序"
+
+L["Global Style"] = "全局樣式"
+L["Bar Style"] = "動作條樣式"
+L["Save & Load"] = "保存&加載"
+L["Color the action button"] = "動作按鈕著色"
+L["Enable"] = "啓用"
+L["Disable"] = "停用"
+L["Lack of resource"] = "缺乏資源"
+L["Out of range"] = "距離過遠"
+L["Unusable for other reason"] = "其他原因不可用"
+L["Disable the feature would require reload, \ndo you continue?"] = "停用此功能需要重載游戲，\n是否繼續?"

@@ -7,6 +7,16 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/06/21 v59 : </lime>
+</p><br/>
+<p>
+    1. 动作条菜单重新调整，使用多级组织方便使用。
+</p>
+<p>
+    2. 你可以在菜单中找到"动作按钮着色"，根据几种情况调整按钮颜色。
+</p>
+<br/><br/>
+<p>
 <lime>2016/06/01 v58 : </lime>
 </p><br/>
 <p>
@@ -333,3 +343,14 @@ L["Are you sure to delete the macro condition?"] = "您是否确定删除这个�
 
 L["Lock Quest Tracker"] = "锁定任务列表"
 L["Use reverse order"] = "使用相反的顺序"
+
+L["Global Style"] = "全局样式"
+L["Bar Style"] = "动作条样式"
+L["Save & Load"] = "保存&加载"
+L["Color the action button"] = "动作按钮着色"
+L["Enable"] = "启用"
+L["Disable"] = "停用"
+L["Lack of resource"] = "缺乏资源"
+L["Out of range"] = "距离过远"
+L["Unusable for other reason"] = "其他原因不可用"
+L["Disable the feature would require reload, \ndo you continue?"] = "停用此功能需要重载游戏，\n是否继续？"

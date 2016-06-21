@@ -4,6 +4,16 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/06/21 v59 : </lime>
+</p><br/>
+<p>
+    1. The menu of the action bar system is re-arranged.
+</p>
+<p>
+    2. You can find 'Color the action button' in the menu to set color for the action buttons under several conditions.
+</p>
+<br/><br/>
+<p>
 <lime>2016/06/01 v58 : </lime>
 </p><br/>
 <p>
