@@ -170,6 +170,18 @@ function OnLoad(self)
 		_MenuColorToggle.Text = L"Enable"
 	end
 
+	-- Use cooldown label
+	_ActionBarUseCooldownLabel = _ActionBarGlobalStyle.UseCooldownLabel or { ENABLE = false }
+	_ActionBarGlobalStyle.UseCooldownLabel = _ActionBarUseCooldownLabel
+
+	if _ActionBarUseCooldownLabel.ENABLE then
+		_MenuCDLabelToggle.Text = L"Disable"
+
+		InstallUseCooldownLabel()
+	else
+		_MenuCDLabelToggle.Text = L"Enable"
+	end
+
 	-- Register system events
 	self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
 	self:RegisterEvent("PLAYER_LOGOUT")
@@ -788,6 +800,15 @@ function RefreshForUnusableColor()
 	end
 end
 
+function InstallUseCooldownLabel()
+	class (IActionButton) (function(_ENV)
+		extend "IFCooldownLabel"
+
+		property "IFCooldownLabelUseDecimal" { Type = Boolean, Default = true }
+		property "IFCooldownLabelAutoColor" { Type = Boolean, Default = true }
+	end)
+end
+
 --------------------
 -- Script Handler
 --------------------
@@ -1264,4 +1285,18 @@ function _MenuColorUnusable:OnColorPicked(r, g, b, a)
 	_ActionBarColorUnusable.UNUSABLE = color
 
 	return RefreshForUnusableColor()
+end
+
+function _MenuCDLabelToggle:OnClick()
+	if _ActionBarUseCooldownLabel.ENABLE then
+		if IGAS:MsgBox(L"Disable the feature would require reload, \ndo you continue?", "n") then
+			_ActionBarUseCooldownLabel.ENABLE = false
+			ReloadUI()
+		end
+	else
+		if IGAS:MsgBox(L"Enable the feature would require reload, \ndo you continue?", "n") then
+			_ActionBarUseCooldownLabel.ENABLE = true
+			ReloadUI()
+		end
+	end
 end

@@ -60,9 +60,54 @@ function OnLoad(self)
 	_Addon._DB.RaidPanel = _DB
 	_Addon._DBChar.RaidPanel = _DBChar
 
+	_LoadingConfig = GetSpecialization() or 1
+
+	-- Update from old save
+	if not _DBChar.Version then
+		local oldSave = _DBChar
+
+		_DBChar = { Version = 1 }
+		_Addon._DBChar.RaidPanel = _DBChar
+
+		-- Check Specialization
+		for i = 1, 4 do
+			if oldSave[i] then
+				_DBChar[i] = System.Reflector.Clone(oldSave)
+
+				for j = 1, 4 do
+					_DBChar[i][j] = nil
+				end
+
+				_DBChar[i].SpellBindings = oldSave[i]
+			end
+		end
+
+		if not _DBChar[_LoadingConfig] then
+			_DBChar[_LoadingConfig] = System.Reflector.Clone(oldSave)
+			for j = 1, 4 do
+				_DBChar[_LoadingConfig][j] = nil
+			end
+		end
+	end
+
+	_DBChar[_LoadingConfig] = _DBChar[_LoadingConfig] or {}
+
+	LoadConfig(_DBChar[_LoadingConfig])
+
+	-- System Events
+	self:RegisterEvent("PLAYER_REGEN_DISABLED")
+	self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
+	self:RegisterEvent("PLAYER_LOGOUT")
+	self:RegisterEvent("LEARNED_SPELL_IN_TAB")
+end
+
+function LoadConfig(_DBChar)
 	-- Load location
 	if _DBChar.Location then
 		raidPanel.Location = _DBChar.Location
+	else
+		raidPanel:ClearAllPoints()
+		raidPanel:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 0, -300)
 	end
 
 	-- Load disable settings
@@ -136,24 +181,30 @@ function OnLoad(self)
 		_DBChar.PetPanelLocation = "RIGHT"
 	end
 
-	if _DBChar.ElementWidth then
-		raidPanel.ElementWidth = _DBChar.ElementWidth
-		raidPetPanel.ElementWidth = _DBChar.ElementWidth
-		raidDeadPanel.ElementWidth = _DBChar.ElementWidth
-	end
+	_DBChar.ElementWidth = _DBChar.ElementWidth or 80
+	raidPanel.ElementWidth = _DBChar.ElementWidth
+	raidPetPanel.ElementWidth = _DBChar.ElementWidth
+	raidDeadPanel.ElementWidth = _DBChar.ElementWidth
 
 	mnuRaidPanelSetWidth.Text = L"Width : " .. tostring(raidPanel.ElementWidth)
 
-	if _DBChar.ElementHeight then
-		raidPanel.ElementHeight = _DBChar.ElementHeight
-		raidPetPanel.ElementHeight = _DBChar.ElementHeight
-		raidDeadPanel.ElementHeight = _DBChar.ElementHeight
-	end
+	_DBChar.ElementHeight = _DBChar.ElementHeight or 32
+	raidPanel.ElementHeight = _DBChar.ElementHeight
+	raidPetPanel.ElementHeight = _DBChar.ElementHeight
+	raidDeadPanel.ElementHeight = _DBChar.ElementHeight
 
 	mnuRaidPanelSetHeight.Text = L"Height : " .. tostring(raidPanel.ElementHeight)
 
 	_DBChar.PowerHeight = _DBChar.PowerHeight or 3
 	mnuRaidPanelSetPowerHeight.Text = L"Power Height : " .. tostring(_DBChar.PowerHeight)
+
+	-- Aura Size
+	_DBChar.AuraSize = _DBChar.AuraSize or 16
+	mnuRaidPanelSetAuraSize.Text = L"Aura Size : " .. tostring(_DBChar.AuraSize)
+
+	local font = AuraCountFont.Font
+	font.height = _DBChar.AuraSize
+	AuraCountFont.Font = font
 
 	-- Load Config
 	SetLocation(_DBChar.PetPanelLocation)
@@ -212,25 +263,28 @@ function OnLoad(self)
 		for _, v in ipairs(_GroupFilter) do
 			if v == self.FilterValue then
 				self.Checked = true
-				break
+				return
 			end
 		end
+		self.Checked = false
 	end)
 	classFilterArray:Each(function(self)
 		for _, v in ipairs(_ClassFilter) do
 			if v == self.FilterValue then
 				self.Checked = true
-				break
+				return
 			end
 		end
+		self.Checked = false
 	end)
 	roleFilterArray:Each(function(self)
 		for _, v in ipairs(_RoleFilter) do
 			if v == self.FilterValue then
 				self.Checked = true
-				break
+				return
 			end
 		end
+		self.Checked = false
 	end)
 
 	-- Filter for dead
@@ -249,25 +303,28 @@ function OnLoad(self)
 		for _, v in ipairs(_DeadGroupFilter) do
 			if v == self.FilterValue then
 				self.Checked = true
-				break
+				return
 			end
 		end
+		self.Checked = false
 	end)
 	classDeadFilterArray:Each(function(self)
 		for _, v in ipairs(_DeadClassFilter) do
 			if v == self.FilterValue then
 				self.Checked = true
-				break
+				return
 			end
 		end
+		self.Checked = false
 	end)
 	roleDeadFilterArray:Each(function(self)
 		for _, v in ipairs(_DeadRoleFilter) do
 			if v == self.FilterValue then
 				self.Checked = true
-				break
+				return
 			end
 		end
+		self.Checked = false
 	end)
 
 	-- Debuff filter
@@ -277,26 +334,48 @@ function OnLoad(self)
 	_DebuffBlackList = _DB.DebuffBlackList
 
 	-- Default true
-	if _DB.DebuffRightMouseRemove == nil then
-		_DB.DebuffRightMouseRemove = true
+	if _DBChar.DebuffRightMouseRemove == nil then
+		_DBChar.DebuffRightMouseRemove = true
 	end
 
-	if _DB.ShowDebuffTooltip == nil then
-		_DB.ShowDebuffTooltip = true
+	if _DBChar.ShowDebuffTooltip == nil then
+		_DBChar.ShowDebuffTooltip = true
 	end
 
-	mnuRaidPanelDebuffRightMouseRemove.Checked = _DB.DebuffRightMouseRemove
-	mnuRaidPanelDebuffShowTooltip.Checked = _DB.ShowDebuffTooltip
+	mnuRaidPanelDebuffRightMouseRemove.Checked = _DBChar.DebuffRightMouseRemove
+	mnuRaidPanelDebuffShowTooltip.Checked = _DBChar.ShowDebuffTooltip
 
-	-- System Events
-	self:RegisterEvent("PLAYER_REGEN_DISABLED")
-	self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
-	self:RegisterEvent("PLAYER_LOGOUT")
-	self:RegisterEvent("LEARNED_SPELL_IN_TAB")
+	local showTooltip = _DBChar.ShowDebuffTooltip
+	local enableMouse = _DBChar.ShowDebuffTooltip or _DBChar.DebuffRightMouseRemove
 
-	_LoadingConfig = GetSpecialization() or 1
-	if _DBChar[_LoadingConfig] then
-		_IGASUI_SPELLHANDLER:Import(_DBChar[_LoadingConfig])
+	raidPanel:Each(function (self)
+		local ele = self:GetElement(iDebuffPanel)
+		if ele then
+			ele:Each("ShowTooltip", showTooltip)
+			ele:Each("MouseEnabled", enableMouse)
+		end
+
+		ele = self:GetElement(iBuffPanel)
+		if ele then
+			ele:Each("ShowTooltip", showTooltip)
+		end
+	end)
+
+	raidPetPanel:Each(function (self)
+		local ele = self:GetElement(iDebuffPanel)
+		if ele then
+			ele:Each("ShowTooltip", showTooltip)
+			ele:Each("MouseEnabled", enableMouse)
+		end
+
+		ele = self:GetElement(iBuffPanel)
+		if ele then
+			ele:Each("ShowTooltip", showTooltip)
+		end
+	end)
+
+	if _DBChar.SpellBindings then
+		_IGASUI_SPELLHANDLER:Import(_DBChar.SpellBindings)
 	end
 
 	mnuRaidPanelSetUseClassColor.Checked = _DBChar.ElementUseClassColor
@@ -393,12 +472,16 @@ end
 function PLAYER_SPECIALIZATION_CHANGED(self)
 	local now = GetSpecialization() or 1
 	if now ~= _LoadingConfig then
-		_DBChar[_LoadingConfig] = _IGASUI_SPELLHANDLER:Export()
+		_DBChar[_LoadingConfig].SpellBindings = _IGASUI_SPELLHANDLER:Export()
+
+		if not _DBChar[now] then
+			_DBChar[now] = System.Reflector.Clone(_DBChar[_LoadingConfig])
+			_DBChar[now].SpellBindings = nil
+		end
+
 		_LoadingConfig = now
 
-		if _DBChar[now] then
-			_IGASUI_SPELLHANDLER:Import(_DBChar[now])
-		end
+		LoadConfig(_DBChar[now])
 	end
 	LEARNED_SPELL_IN_TAB(self)
 end
@@ -429,9 +512,7 @@ function LEARNED_SPELL_IN_TAB(self)
 end
 
 function PLAYER_LOGOUT(self)
-	local spec = GetSpecialization() or 1
-
-	_DBChar[spec] = _IGASUI_SPELLHANDLER:Export()
+	_DBChar[_LoadingConfig].SpellBindings = _IGASUI_SPELLHANDLER:Export()
 end
 
 --------------------
@@ -458,7 +539,7 @@ function chkMode:OnHide()
 end
 
 function raidPanelMask:OnMoveFinished()
-	_DBChar.Location = raidPanel.Location
+	_DBChar[_LoadingConfig].Location = raidPanel.Location
 end
 
 function raidPanelMask:OnShow()
@@ -492,19 +573,59 @@ end
 function raidPanel:OnElementAdd(unitframe)
 	raidpanelMenuArray:Each(UpdateConfig4MenuBtn, unitframe)
 	if iPowerBar then
-		unitframe:AddElement(iPowerBar, "south", _DBChar.PowerHeight, "px")
+		unitframe:AddElement(iPowerBar, "south", _DBChar[_LoadingConfig].PowerHeight, "px")
+	end
+
+	local value = _DBChar[_LoadingConfig].AuraSize
+
+	if iBuffPanel then
+		local ele = unitframe:GetElement(iBuffPanel)
+
+		if ele then
+			ele.ElementWidth = value
+			ele.ElementHeight = value
+		end
+	end
+
+	if iDebuffPanel then
+		local ele = unitframe:GetElement(iDebuffPanel)
+
+		if ele then
+			ele.ElementWidth = value
+			ele.ElementHeight = value
+		end
 	end
 end
 
 function raidPetPanel:OnElementAdd(unitframe)
 	raidpanelMenuArray:Each(UpdateConfig4MenuBtn, unitframe)
+
+	local value = _DBChar[_LoadingConfig].AuraSize
+
+	if iBuffPanel then
+		local ele = unitframe:GetElement(iBuffPanel)
+
+		if ele then
+			ele.ElementWidth = value
+			ele.ElementHeight = value
+		end
+	end
+
+	if iDebuffPanel then
+		local ele = unitframe:GetElement(iDebuffPanel)
+
+		if ele then
+			ele.ElementWidth = value
+			ele.ElementHeight = value
+		end
+	end
 end
 
 function mnuRaidPanelSetWidth:OnClick()
 	local value = tonumber(IGAS:MsgBox(L"Please input the element's width(px)", "ic") or nil)
 
 	if value and value > 10 then
-		_DBChar.ElementWidth = value
+		_DBChar[_LoadingConfig].ElementWidth = value
 		raidPanel.ElementWidth = value
 		raidPetPanel.ElementWidth = value
 		raidDeadPanel.ElementWidth = value
@@ -520,8 +641,8 @@ end
 function mnuRaidPanelSetHeight:OnClick()
 	local value = tonumber(IGAS:MsgBox(L"Please input the element's height(px)", "ic") or nil)
 
-	if value and value > _DBChar.PowerHeight then
-		_DBChar.ElementHeight = value
+	if value and value > _DBChar[_LoadingConfig].PowerHeight then
+		_DBChar[_LoadingConfig].ElementHeight = value
 		raidPanel.ElementHeight = value
 		raidPetPanel.ElementHeight = value
 		raidDeadPanel.ElementHeight = value
@@ -538,21 +659,57 @@ function mnuRaidPanelSetPowerHeight:OnClick()
 	local value = tonumber(IGAS:MsgBox(L"Please input the power bar's height(px)", "ic") or nil)
 
 	if value and value > 0 and value < raidPanel.ElementHeight then
-		_DBChar.PowerHeight = value
+		_DBChar[_LoadingConfig].PowerHeight = value
 
 		if iPowerBar then
 			raidPanel:Each(function (self)
-				self:AddElement(iPowerBar, "south", _DBChar.PowerHeight, "px")
+				self:AddElement(iPowerBar, "south", _DBChar[_LoadingConfig].PowerHeight, "px")
 			end)
 		end
 
-		self.Text = L"Power Height : " .. tostring(_DBChar.PowerHeight)
+		self.Text = L"Power Height : " .. tostring(_DBChar[_LoadingConfig].PowerHeight)
+	end
+end
+
+function mnuRaidPanelSetAuraSize:OnClick()
+	local value = tonumber(IGAS:MsgBox(L"Please input the aura's size(px)", "ic") or nil)
+
+	if value and value > 0 then
+		_DBChar[_LoadingConfig].AuraSize = value
+
+		local font = AuraCountFont.Font
+		font.height = _DBChar[_LoadingConfig].AuraSize
+		AuraCountFont.Font = font
+
+		if iBuffPanel then
+			raidPanel:Each(function (self)
+				local ele = self:GetElement(iBuffPanel)
+
+				if ele then
+					ele.ElementWidth = value
+					ele.ElementHeight = value
+				end
+			end)
+		end
+
+		if iDebuffPanel then
+			raidPanel:Each(function (self)
+				local ele = self:GetElement(iDebuffPanel)
+
+				if ele then
+					ele.ElementWidth = value
+					ele.ElementHeight = value
+				end
+			end)
+		end
+
+		self.Text = L"Aura Size : " .. tostring(_DBChar[_LoadingConfig].AuraSize)
 	end
 end
 
 function mnuRaidPanelSetUseClassColor:OnCheckChanged()
 	if raidPanelConfig.Visible then
-		_DBChar.ElementUseClassColor = self.Checked
+		_DBChar[_LoadingConfig].ElementUseClassColor = self.Checked
 
 		UpdateHealthBar4UseClassColor()
 	end
@@ -588,33 +745,33 @@ end
 
 function mnuRaidPanelActivated:OnCheckChanged()
 	if raidPanelConfig.Visible then
-		_DBChar.RaidPanelActivated = self.Checked
+		_DBChar[_LoadingConfig].RaidPanelActivated = self.Checked
 
-		raidPanel.Activated = _DBChar.RaidPanelActivated
+		raidPanel.Activated = _DBChar[_LoadingConfig].RaidPanelActivated
 	end
 end
 
 function mnuRaidPetPanelActivated:OnCheckChanged()
 	if raidPanelConfig.Visible then
-		_DBChar.RaidPetPanelActivated = self.Checked
+		_DBChar[_LoadingConfig].RaidPetPanelActivated = self.Checked
 
-		raidPetPanel.Activated = _DBChar.RaidPetPanelActivated
+		raidPetPanel.Activated = _DBChar[_LoadingConfig].RaidPetPanelActivated
 	end
 end
 
 function mnuRaidPetPanelDeactivateInRaid:OnCheckChanged()
 	if raidPanelConfig.Visible then
-		_DBChar.RaidPetPanelDeactivateInRaid = self.Checked
+		_DBChar[_LoadingConfig].RaidPetPanelDeactivateInRaid = self.Checked
 
-		raidPetPanel.DeactivateInRaid = _DBChar.RaidPetPanelDeactivateInRaid
+		raidPetPanel.DeactivateInRaid = _DBChar[_LoadingConfig].RaidPetPanelDeactivateInRaid
 	end
 end
 
 function mnuRaidDeadPanelActivated:OnCheckChanged()
 	if raidPanelConfig.Visible then
-		_DBChar.RaidDeadPanelActivated = self.Checked
+		_DBChar[_LoadingConfig].RaidDeadPanelActivated = self.Checked
 
-		raidDeadPanel.Activated = _DBChar.RaidDeadPanelActivated
+		raidDeadPanel.Activated = _DBChar[_LoadingConfig].RaidDeadPanelActivated
 	end
 end
 
@@ -762,7 +919,7 @@ function SetOrientation(self, value)
 end
 
 function SetLocation(value)
-	_DBChar.PetPanelLocation = value
+	_DBChar[_LoadingConfig].PetPanelLocation = value
 
 	Task.NoCombatCall(function()
 		if value == "RIGHT" then
@@ -782,7 +939,7 @@ function SetLocation(value)
 end
 
 function UpdateHealthBar4UseClassColor()
-	local flag = _DBChar.ElementUseClassColor
+	local flag = _DBChar[_LoadingConfig].ElementUseClassColor
 	raidPanel:Each(function(self)
 		self:GetElement(iHealthBar).UseClassColor = flag
 	end)

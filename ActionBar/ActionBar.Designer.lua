@@ -167,3 +167,8 @@ _MenuColorOOR.IsColorPicker = true
 
 _MenuColorUnusable = _MenuColorBar:AddMenuButton(L"Unusable for other reason")
 _MenuColorUnusable.IsColorPicker = true
+
+_MenuCDLabel = _Menu:AddMenuButton(L"Global Style", L"Use cooldown label")
+
+_MenuCDLabelToggle = _MenuCDLabel:AddMenuButton(L"Enable")
+_MenuCDLabelToggle:ActiveThread("OnClick")

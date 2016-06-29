@@ -10,6 +10,8 @@ import "System.Widget.Unit"
 --==========================
 -- Global
 --==========================
+AuraCountFont = Font("IGAS_AuraCountFont")
+AuraCountFont:CopyFontObject("NumberFontNormal")
 
 --==========================
 -- Interfaces
@@ -80,7 +82,7 @@ class "iHealthBar"
 
 		self.UseDebuffColor = true
 
-		if _DBChar.ElementUseClassColor then
+		if _DBChar[GetSpecialization() or 1].ElementUseClassColor then
 			self.UseClassColor = true
 		end
 		self.FrameLevel = self.FrameLevel + 1
@@ -160,7 +162,8 @@ class "iBuffPanel"
 	-- Event Handler
 	------------------------------------------------------
 	local function OnElementAdd(self, element)
-		element.ShowTooltip = _DB.ShowDebuffTooltip
+		element.ShowTooltip = _DBChar[GetSpecialization() or 1].ShowDebuffTooltip
+		element:GetChild("Count").FontObject = AuraCountFont
 	end
 
 	------------------------------------------------------
@@ -198,7 +201,7 @@ class "iDebuffPanel"
 	-- Event Handler
 	------------------------------------------------------
 	local function OnMouseUp(self, button)
-		if _DB.DebuffRightMouseRemove and button == "RightButton" then
+		if button == "RightButton" and _DBChar[GetSpecialization() or 1].DebuffRightMouseRemove then
 			local name, _, _, _, _, _, _, _, _, _, spellID = UnitAura(self.Parent.Unit, self.Index, self.Parent.Filter)
 
 			if name then
@@ -210,8 +213,8 @@ class "iDebuffPanel"
 	end
 
 	local function OnElementAdd(self, element)
-		element.ShowTooltip = _DB.ShowDebuffTooltip
-		element.MouseEnabled = _DB.ShowDebuffTooltip or _DB.DebuffRightMouseRemove
+		element.ShowTooltip = _DBChar[GetSpecialization() or 1].ShowDebuffTooltip
+		element.MouseEnabled = _DBChar[GetSpecialization() or 1].ShowDebuffTooltip or _DBChar[GetSpecialization() or 1].DebuffRightMouseRemove
 		element.OnMouseUp = element.OnMouseUp + OnMouseUp
 	end
 

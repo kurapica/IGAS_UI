@@ -79,10 +79,12 @@ raidpanelPropArray = Array(DropDownList.DropDownMenuButton)
 mnuRaidPanelSetWidth = raidPanelConfig:AddMenuButton(L"Element Settings", "Width")
 mnuRaidPanelSetHeight = raidPanelConfig:AddMenuButton(L"Element Settings", "Height")
 mnuRaidPanelSetPowerHeight = raidPanelConfig:AddMenuButton(L"Element Settings", "PowerHeight")
+mnuRaidPanelSetAuraSize = raidPanelConfig:AddMenuButton(L"Element Settings", "AuraSize")
 mnuRaidPanelSetUseClassColor = raidPanelConfig:AddMenuButton(L"Element Settings", L"Use Class Color")
 mnuRaidPanelSetWidth:ActiveThread("OnClick")
 mnuRaidPanelSetHeight:ActiveThread("OnClick")
 mnuRaidPanelSetPowerHeight:ActiveThread("OnClick")
+mnuRaidPanelSetAuraSize:ActiveThread("OnClick")
 mnuRaidPanelSetUseClassColor.IsCheckButton = true
 
 -- Activated
@@ -387,24 +389,56 @@ mnuRaidPanelDebuffShowTooltip.IsCheckButton = true
 
 function mnuRaidPanelDebuffRightMouseRemove:OnCheckChanged()
 	if raidPanelConfig.Visible then
-		_DB.DebuffRightMouseRemove = self.Checked
+		_DBChar[_LoadingConfig].DebuffRightMouseRemove = self.Checked
+
+		local enableMouse = _DBChar[_LoadingConfig].ShowDebuffTooltip or _DBChar[_LoadingConfig].DebuffRightMouseRemove
 
 		raidPanel:Each(function (self)
-			self:GetElement(iDebuffPanel):Each("MouseEnabled", _DB.ShowDebuffTooltip or _DB.DebuffRightMouseRemove)
+			local ele = self:GetElement(iDebuffPanel)
+			if ele then
+				ele:Each("MouseEnabled", enableMouse)
+			end
+		end)
+
+		raidPetPanel:Each(function (self)
+			local ele = self:GetElement(iDebuffPanel)
+			if ele then
+				ele:Each("MouseEnabled", enableMouse)
+			end
 		end)
 	end
 end
 
 function mnuRaidPanelDebuffShowTooltip:OnCheckChanged()
 	if raidPanelConfig.Visible then
-		_DB.ShowDebuffTooltip = self.Checked
+		_DBChar[_LoadingConfig].ShowDebuffTooltip = self.Checked
+
+		local showTooltip = _DBChar[_LoadingConfig].ShowDebuffTooltip
+		local enableMouse = _DBChar[_LoadingConfig].ShowDebuffTooltip or _DBChar[_LoadingConfig].DebuffRightMouseRemove
 
 		raidPanel:Each(function (self)
-			self:GetElement(iDebuffPanel):Each("ShowTooltip", _DB.ShowDebuffTooltip)
-			self:GetElement(iDebuffPanel):Each("MouseEnabled", _DB.ShowDebuffTooltip or _DB.DebuffRightMouseRemove)
+			local ele = self:GetElement(iDebuffPanel)
+			if ele then
+				ele:Each("ShowTooltip", showTooltip)
+				ele:Each("MouseEnabled", enableMouse)
+			end
 
-			if self:GetElement(iBuffPanel) then
-				self:GetElement(iBuffPanel):Each("ShowTooltip", _DB.ShowDebuffTooltip)
+			ele = self:GetElement(iBuffPanel)
+			if ele then
+				ele:Each("ShowTooltip", showTooltip)
+			end
+		end)
+
+		raidPetPanel:Each(function (self)
+			local ele = self:GetElement(iDebuffPanel)
+			if ele then
+				ele:Each("ShowTooltip", showTooltip)
+				ele:Each("MouseEnabled", enableMouse)
+			end
+
+			ele = self:GetElement(iBuffPanel)
+			if ele then
+				ele:Each("ShowTooltip", showTooltip)
 			end
 		end)
 	end

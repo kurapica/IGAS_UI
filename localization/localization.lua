@@ -4,6 +4,19 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/06/29 v60 : </lime>
+</p><br/>
+<p>
+    1. You can find 'Use cooldown label' in the menu to add a cooldown label.
+</p>
+<p>
+    2. You can change the aura icon's size of the raid panel.
+</p>
+<p>
+    3. The settings of the raid panel now follow the character's Specialization.
+</p>
+<br/><br/>
+<p>
 <lime>2016/06/21 v59 : </lime>
 </p><br/>
 <p>

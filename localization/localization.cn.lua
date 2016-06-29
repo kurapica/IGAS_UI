@@ -7,6 +7,19 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/06/29 v60 : </lime>
+</p><br/>
+<p>
+    1. 你可以在菜单中找到"使用冷却标签"，来给按钮增加一个显示冷却时间的标签。
+</p>
+<p>
+    2. 你可以调整团队面板中的增/减益图标大小。
+</p>
+<p>
+    3. 团队面板的设置调整为按角色的专精保存。
+</p>
+<br/><br/>
+<p>
 <lime>2016/06/21 v59 : </lime>
 </p><br/>
 <p>
@@ -354,3 +367,9 @@ L["Lack of resource"] = "缺乏资源"
 L["Out of range"] = "距离过远"
 L["Unusable for other reason"] = "其他原因不可用"
 L["Disable the feature would require reload, \ndo you continue?"] = "停用此功能需要重载游戏，\n是否继续？"
+
+L["Use cooldown label"] = "使用冷却标签"
+L["Enable the feature would require reload, \ndo you continue?"] = "启用此功能需要重载游戏，\n是否继续？"
+
+L["Aura Size : "] = "增/减益图标大小 : "
+L["Please input the aura's size(px)"] = "请输入增/减益图标大小(像素)"

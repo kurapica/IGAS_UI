@@ -1,3 +1,8 @@
+2016/06/29 v60
+	1. You can use cooldown label for the action buttons.
+	2. You can modify the raidpanel's aura size.
+	3. The raid panel's settings will follow the character's Specialization.
+
 2016/06/21 v59
 	1. You can color the action button with colors under several conditions.
 
