@@ -1,3 +1,6 @@
+2016/06/30 v61
+	1. "Hide Global cooldown" is added for action bar.
+
 2016/06/29 v60
 	1. You can use cooldown label for the action buttons.
 	2. You can modify the raidpanel's aura size.

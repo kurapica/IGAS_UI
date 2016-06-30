@@ -182,6 +182,11 @@ function OnLoad(self)
 		_MenuCDLabelToggle.Text = L"Enable"
 	end
 
+	-- Hide global cooldown
+	_ActionBarHideGlobalCD = _ActionBarGlobalStyle.HideGlobalCD or { ENABLE = false }
+	_ActionBarGlobalStyle.HideGlobalCD = _ActionBarHideGlobalCD
+	_MenuNoGCD.Checked = _ActionBarHideGlobalCD.ENABLE
+
 	-- Register system events
 	self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
 	self:RegisterEvent("PLAYER_LOGOUT")
@@ -1299,4 +1304,8 @@ function _MenuCDLabelToggle:OnClick()
 			ReloadUI()
 		end
 	end
+end
+
+function _MenuNoGCD:OnCheckChanged()
+	_ActionBarHideGlobalCD.ENABLE = self.Checked
 end

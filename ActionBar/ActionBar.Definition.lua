@@ -1037,6 +1037,12 @@ class "IActionButton"
 		end
 	end
 
+	local function OnCooldownUpdate(self, start, duration)
+		if duration and duration < 1.6 and _ActionBarHideGlobalCD.ENABLE then
+			return true
+		end
+	end
+
 	------------------------------------------------------
 	-- Method
 	------------------------------------------------------
@@ -1062,6 +1068,7 @@ class "IActionButton"
 
 		self.OnEnter = self.OnEnter + OnEnter
 		self.OnMouseDown = self.OnMouseDown + OnMouseDown
+		self.OnCooldownUpdate = self.OnCooldownUpdate + OnCooldownUpdate
 
 		-- callback from RestrictedEnvironment, maybe add some mechanism solve this later
 		IGAS:GetUI(self).IActionHandler_UpdateExpansion = IActionHandler_UpdateExpansion

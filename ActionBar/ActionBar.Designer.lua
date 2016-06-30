@@ -154,6 +154,9 @@ _MenuDelete:ActiveThread("OnClick")
 _MenuNew = _Menu:AddMenuButton(L"New Bar")
 _MenuNew:ActiveThread("OnClick")
 
+_MenuNoGCD = _Menu:AddMenuButton(L"Global Style", L"Hide Global cooldown")
+_MenuNoGCD.IsCheckButton = true
+
 _MenuColorBar = _Menu:AddMenuButton(L"Global Style", L"Color the action button")
 
 _MenuColorToggle = _MenuColorBar:AddMenuButton(L"Enable")

@@ -4,6 +4,13 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/06/30 v61 : </lime>
+</p><br/>
+<p>
+    1. "Hide Global cooldown" option is added for action bar.
+</p>
+<br/><br/>
+<p>
 <lime>2016/06/29 v60 : </lime>
 </p><br/>
 <p>

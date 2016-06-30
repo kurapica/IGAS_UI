@@ -7,6 +7,13 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/06/30 v61 : </lime>
+</p><br/>
+<p>
+    1. "隱藏公共冷卻" 選項已被加入動作條系統。
+</p>
+<br/><br/>
+<p>
 <lime>2016/06/29 v60 : </lime>
 </p><br/>
 <p>
@@ -371,3 +378,5 @@ L["Enable the feature would require reload, \ndo you continue?"] = "啓用此功
 
 L["Aura Size : "] = "增/減益圖標大小"
 L["Please input the aura's size(px)"] = "請輸入增/減益圖標大小(像素)"
+
+L["Hide Global cooldown"] = "隱藏公共冷卻"
