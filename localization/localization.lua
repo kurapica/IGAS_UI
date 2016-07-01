@@ -4,6 +4,13 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/07/01 v62 : </lime>
+</p><br/>
+<p>
+    1. You can resize the quest list to fix no quest displayed with QuestMover.
+</p>
+<br/><br/>
+<p>
 <lime>2016/06/30 v61 : </lime>
 </p><br/>
 <p>

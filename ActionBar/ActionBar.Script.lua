@@ -809,6 +809,13 @@ function InstallUseCooldownLabel()
 	class (IActionButton) (function(_ENV)
 		extend "IFCooldownLabel"
 
+		function SetUpCooldownLabel(self, label)
+			label:SetPoint("CENTER")
+			if self.Height > 0 then
+				label:SetFont(label:GetFont(), self.Height * 2 / 3, "OUTLINE")
+			end
+		end
+
 		property "IFCooldownLabelUseDecimal" { Type = Boolean, Default = true }
 		property "IFCooldownLabelAutoColor" { Type = Boolean, Default = true }
 	end)

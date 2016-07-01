@@ -20,8 +20,16 @@ Toggle = {
 			if not mask then
 				mask = Mask("IGAS_UI_ObjectiveTracker_Mask", IGAS.ObjectiveTrackerFrame)
 				mask.AsMove = true
+				mask.AsResize = true
 				mask.OnMoveFinished = function()
+					_DB.ENABLE = true
+					_DB.Location = ObjectiveTrackerFrame.Location
 					Task.NoCombatCall(RefreshMiniButtonPos)
+				end
+				mask.OnResizeFinished = function()
+					_DB.ENABLE = true
+					_DB.Location = ObjectiveTrackerFrame.Location
+					_DB.Size = ObjectiveTrackerFrame.Size
 				end
 			end
 
@@ -34,13 +42,26 @@ Toggle = {
 }
 
 function OnLoad(self)
-	if _G["ObjectiveTrackerFrame"] then
-		_G["ObjectiveTrackerFrame"]:SetMovable(true)
-		_G["ObjectiveTrackerFrame"]:SetUserPlaced(true)
+	_DB = _Addon._DB.QuestMover or {}
+	_Addon._DB.QuestMover = _DB
+
+	if _DB.ENABLE then
+		if ObjectiveTrackerFrame then
+			ObjectiveTrackerFrame:SetMovable(true)
+			ObjectiveTrackerFrame:SetUserPlaced(true)
+		end
 	end
 end
 
 function OnEnable(self)
+	if _DB.Location then
+		ObjectiveTrackerFrame.Location = _DB.Location
+	end
+
+	if _DB.Size then
+		ObjectiveTrackerFrame.Size = _DB.Size
+	end
+
 	Task.NoCombatCall(RefreshMiniButtonPos)
 end
 

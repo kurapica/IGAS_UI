@@ -1,3 +1,6 @@
+2016/07/01 v62
+	1. You can resize the quest list to fix the quest can't be displayed.
+
 2016/06/30 v61
 	1. "Hide Global cooldown" is added for action bar.
 
