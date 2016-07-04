@@ -34,6 +34,12 @@ raidDeadPanel.Stype = "Dead"
 raidDeadPanel.ElementPrefix = "iRaidDeadUnitFrame"
 raidDeadPanel.ShowDeadOnly = true
 
+raidUnitWatchPanel = iUnitWatchPanel("IGAS_UI_UNITWATCHPANEL")
+raidUnitWatchPanel:SetPoint("BOTTOMLEFT", raidPanel, "TOPLEFT")
+raidUnitWatchPanel.ElementPrefix = "iUnitWatchFrame"
+raidUnitWatchPanel.AutoSize = true
+raidUnitWatchPanel.AutoPosition = true
+
 -- withPanel
 withPanel = Frame("IGASUI_Withpanel", SpellBookFrame)
 withPanel.Visible = false
@@ -108,6 +114,11 @@ mnuRaidPetPanelLocationBottom = raidPanelConfig:AddMenuButton(L"Pet panel", L"Lo
 mnuRaidPetPanelLocationBottom.IsCheckButton = true
 
 raidPanelConfig:GetMenuButton(L"Pet panel", L"Location").DropDownList.MultiSelect = false
+
+-- UnitWatchPanel
+mnuRaidUnitWatchList = raidPanelConfig:AddMenuButton(L"Unit watch panel", L"Modify unit list")
+mnuRaidUnitwatchAutoLayout = raidPanelConfig:AddMenuButton(L"Unit watch panel", L"Auto layout")
+mnuRaidUnitwatchAutoLayout.IsCheckButton = true
 
 -- Show ->
 ShowProperty = {"ShowRaid", "ShowParty", "ShowPlayer", "ShowSolo"}
@@ -222,11 +233,19 @@ for v in System.Reflector.GetEnums(Orientation) do
 	orientation.ConfigName = "Orientation"
 	orientation.ConfigValue = v
 	raidpanelPropArray:Insert(orientation)
+
+	orientation = raidPanelConfig:AddMenuButton(L"Unit watch panel", L"Orientation", L[v])
+	orientation.UnitPanel = raidUnitWatchPanel
+	orientation.IsCheckButton = true
+	orientation.ConfigName = "Orientation"
+	orientation.ConfigValue = v
+	raidpanelPropArray:Insert(orientation)
 end
 
 raidPanelConfig:GetMenuButton(L"Raid panel", L"Orientation").DropDownList.MultiSelect = false
 raidPanelConfig:GetMenuButton(L"Pet panel", L"Orientation").DropDownList.MultiSelect = false
 raidPanelConfig:GetMenuButton(L"Dead panel", L"Orientation").DropDownList.MultiSelect = false
+raidPanelConfig:GetMenuButton(L"Unit watch panel", L"Orientation").DropDownList.MultiSelect = false
 
 -- Raid -> Filter -> Group
 groupFilterArray = Array(DropDownList.DropDownMenuButton)
@@ -387,59 +406,80 @@ mnuRaidPanelDebuffRightMouseRemove.IsCheckButton = true
 mnuRaidPanelDebuffShowTooltip = raidPanelConfig:AddMenuButton(L"Element Settings", L"Show buff/debuff tootip")
 mnuRaidPanelDebuffShowTooltip.IsCheckButton = true
 
-function mnuRaidPanelDebuffRightMouseRemove:OnCheckChanged()
-	if raidPanelConfig.Visible then
-		_DBChar[_LoadingConfig].DebuffRightMouseRemove = self.Checked
+-- Unit List
+frmUnitList = Form("IGAS_UI_UNITLIST") {
+	Visible = false,
+	Size = Size(200, 400),
+	Caption = L"Unit List",
+	Resizable = false,
+}
 
-		local enableMouse = _DBChar[_LoadingConfig].ShowDebuffTooltip or _DBChar[_LoadingConfig].DebuffRightMouseRemove
+helper = HTMLViewer("HTMLViewer", frmUnitList) {
+	Location = {
+		AnchorPoint("TOPLEFT", 0, 0, nil, "TOPRIGHT"),
+		AnchorPoint("BOTTOMLEFT", 0, 0, nil, "BOTTOMRIGHT"),
+	},
+	Width = 400,
+	Backdrop = {},
+	Visible = false,
+}
 
-		raidPanel:Each(function (self)
-			local ele = self:GetElement(iDebuffPanel)
-			if ele then
-				ele:Each("MouseEnabled", enableMouse)
-			end
-		end)
+lstWatchUnit = List("WatchList", frmUnitList) {
+	Location = {
+		AnchorPoint("TOPLEFT", 4, -26),
+		AnchorPoint("BOTTOMRIGHT", -4, 26),
+	},
+}
 
-		raidPetPanel:Each(function (self)
-			local ele = self:GetElement(iDebuffPanel)
-			if ele then
-				ele:Each("MouseEnabled", enableMouse)
-			end
-		end)
-	end
-end
+btnAdd = NormalButton("Add2List", frmUnitList) {
+	Location = {
+		AnchorPoint("TOPLEFT", 0, 0, "WatchList", "BOTTOMLEFT"),
+		AnchorPoint("BOTTOM", 0, 4),
+	},
+	Width = 40,
+	Style = "Classic",
+	Text = "+",
+}
 
-function mnuRaidPanelDebuffShowTooltip:OnCheckChanged()
-	if raidPanelConfig.Visible then
-		_DBChar[_LoadingConfig].ShowDebuffTooltip = self.Checked
+btnRemove = NormalButton("Remove4List", frmUnitList) {
+	Location = {
+		AnchorPoint("TOPLEFT", 0, 0, "Add2List", "TOPRIGHT"),
+		AnchorPoint("BOTTOM", 0, 4),
+	},
+	Width = 40,
+	Style = "Classic",
+	Text = "-",
+}
 
-		local showTooltip = _DBChar[_LoadingConfig].ShowDebuffTooltip
-		local enableMouse = _DBChar[_LoadingConfig].ShowDebuffTooltip or _DBChar[_LoadingConfig].DebuffRightMouseRemove
+btnUp = NormalButton("MoveUp", frmUnitList) {
+	Location = {
+		AnchorPoint("TOPLEFT", 0, 0, "Remove4List", "TOPRIGHT"),
+		AnchorPoint("BOTTOM", 0, 4),
+	},
+	Width = 40,
+	Style = "Classic",
+	Text = L"Up",
+}
 
-		raidPanel:Each(function (self)
-			local ele = self:GetElement(iDebuffPanel)
-			if ele then
-				ele:Each("ShowTooltip", showTooltip)
-				ele:Each("MouseEnabled", enableMouse)
-			end
+btnDown = NormalButton("MoveDown", frmUnitList) {
+	Location = {
+		AnchorPoint("TOPLEFT", 0, 0, "MoveUp", "TOPRIGHT"),
+		AnchorPoint("BOTTOM", 0, 4),
+	},
+	Width = 40,
+	Style = "Classic",
+	Text = L"Down",
+}
 
-			ele = self:GetElement(iBuffPanel)
-			if ele then
-				ele:Each("ShowTooltip", showTooltip)
-			end
-		end)
+btnInfo = NormalButton("Info", frmUnitList) {
+	Location = {
+		AnchorPoint("TOPLEFT", 0, 0, "MoveDown", "TOPRIGHT"),
+		AnchorPoint("BOTTOM", 0, 4),
+		AnchorPoint("RIGHT"),
+	},
+	Style = "Classic",
+	Text = "?",
+}
 
-		raidPetPanel:Each(function (self)
-			local ele = self:GetElement(iDebuffPanel)
-			if ele then
-				ele:Each("ShowTooltip", showTooltip)
-				ele:Each("MouseEnabled", enableMouse)
-			end
-
-			ele = self:GetElement(iBuffPanel)
-			if ele then
-				ele:Each("ShowTooltip", showTooltip)
-			end
-		end)
-	end
-end
+btnAdd:ActiveThread("OnClick")
+btnRemove:ActiveThread("OnClick")

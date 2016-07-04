@@ -141,10 +141,57 @@ class "iPetUnitPanel"
     end
 endclass "iPetUnitPanel"
 
+class "iUnitWatchPanel"
+	inherit "SecureFrame"
+	extend "IFSecurePanel"
+
+	MAX_RAID_MEMBERS = _G.MAX_RAID_MEMBERS
+	NUM_RAID_GROUPS = _G.NUM_RAID_GROUPS
+	MEMBERS_PER_RAID_GROUP = _G.MEMBERS_PER_RAID_GROUP
+
+	local function OnElementAdd(self, ele)
+		ele:ApplyConfig(Config.Style[self.Style])
+	end
+
+	------------------------------------------------------
+	-- Property
+	------------------------------------------------------
+	property "Style" { Type = String, Default = "UnitWatch" }
+
+	------------------------------------------------------
+	-- Constructor
+	------------------------------------------------------
+    function iUnitWatchPanel(self, name, parent, ...)
+		Super(self, name, parent, ...)
+
+		self.ElementType = iRaidUnitFrame
+
+		self.OnElementAdd = self.OnElementAdd + OnElementAdd
+
+		self.RowCount = MEMBERS_PER_RAID_GROUP
+		self.ColumnCount = NUM_RAID_GROUPS
+		self.ElementWidth = 80
+		self.ElementHeight = 32
+
+		self.Orientation = Orientation.HORIZONTAL
+		self.AutoSize = true
+
+		self.VSpacing = Config.UNITPANEL_VSPACING
+		self.HSpacing = Config.UNITPANEL_HSPACING
+		self.MarginTop = Config.UNITPANEL_MARGINTOP
+		self.MarginBottom = Config.UNITPANEL_MARGINBOTTOM
+		self.MarginLeft = Config.UNITPANEL_MARGINLEFT
+		self.MarginRight = Config.UNITPANEL_MARGINRIGHT
+    end
+endclass "iUnitWatchPanel"
+
 class "BindingButton"
 	inherit "Mask"
 
 	BOOKTYPE_SPELL = _G.BOOKTYPE_SPELL
+
+	HELPFUL_COLOR = ColorType(0, 1, 0, 0.4)
+	HARMFUL_COLOR = ColorType(1, 0, 0, 0.6)
 
 	------------------------------------------------------
 	-- Script
@@ -173,7 +220,7 @@ class "BindingButton"
 		if slotType == "FUTURESPELL" or slotType == "FLYOUT" or isPassive then
 			return
 		else
-			_IGASUI_SPELLHANDLER.Spell(spellId, self.With).Key = key
+			_IGASUI_SPELLHANDLER.Spell(spellId, self.With, IsHarmfulSpell(slot, BOOKTYPE_SPELL)).Key = key
 			return Masks:Each(RefreshBindingKey)
 		end
 	end
@@ -186,8 +233,23 @@ class "BindingButton"
 	-- @return nil
 	------------------------------------
 	function ClearBindingKey(self, oldkey)
-		if oldkey then
-			_IGASUI_SPELLHANDLER:Clear(oldkey)
+		if _G.SpellBookFrame.bookType ~= BOOKTYPE_SPELL then
+			return
+		end
+
+		local parent = IGAS:GetUI(self.Parent)
+		local slot, slotType, slotID = SpellBook_GetSpellBookSlot(parent)
+		local skillType, spellId = GetSpellBookItemInfo(slot, BOOKTYPE_SPELL)
+		local isPassive = IsPassiveSpell(slot, BOOKTYPE_SPELL)
+
+		if slotType == "FUTURESPELL" or slotType == "FLYOUT" or isPassive then
+			return
+		end
+
+		if spellId then
+			_IGASUI_SPELLHANDLER:Clear("Spell", spellId)
+
+			return Masks:Each(RefreshBindingKey)
 		end
 	end
 
@@ -218,9 +280,17 @@ class "BindingButton"
 		if slotType == "FUTURESPELL" or slotType == "FLYOUT" or isPassive then
 			self.Visible = false
 		else
+			local isHarmful = IsHarmfulSpell(slot, BOOKTYPE_SPELL)
+
 			self.Visible = true
 			local set = _IGASUI_SPELLHANDLER.Spell(spellId)
 			self.BindKey, self.With = set.Key, set.With
+
+			if isHarmful then
+				self.BackdropColor = HARMFUL_COLOR
+			else
+				self.BackdropColor = HELPFUL_COLOR
+			end
 		end
 
 		if withPanel.Target == self then

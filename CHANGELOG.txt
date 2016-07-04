@@ -1,3 +1,7 @@
+2016/07/04 v63
+	1. An unit watch panel is added to monitor units like target, focus and etc.
+	2. Harmful and helpful spell can be binded with the same key, require IGAS v93 and more lastest versions.
+
 2016/07/01 v62
 	1. You can resize the quest list to fix the quest can't be displayed.
 

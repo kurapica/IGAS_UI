@@ -7,6 +7,16 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/07/04 v63 : </lime>
+</p><br/>
+<p>
+    1. 新的單體監視面板加入，可以監視類如target, focus之類的單體。
+</p>
+<p>
+    2. 傷害和增益法術可以使用同一個按鍵，需要IGAS v93及以上版本支持。
+</p>
+<br/><br/>
+<p>
 <lime>2016/07/01 v62 : </lime>
 </p><br/>
 <p>
@@ -142,6 +152,40 @@ L["ChangeLog"] = [[
 </p><br/>
 <p>
     1. 死者面板追加，僅顯示死亡的玩家，默認不使用，單獨的配置菜單提供。
+</p>
+</body>
+</html>
+]]
+
+L["Unit List Info"] = [[
+<html>
+<body>
+<p>
+單體ID是玩家用于交互的標識符。比如"player"表示玩家目前的角色，"target"表示玩家的目標，而"targettarget"則表示目標的目標。
+</p>
+<br/>
+<p><lime>基礎單體ID :</lime></p><br/>
+<p><lightgreen>"arenaN"</lightgreen>第N個競技場對手 (1,2,3,4,5).</p>
+<p><lightgreen>"arenapetN"</lightgreen>第N個競技場對手的寵物 (1,2,3,4,5).</p>
+<p><lightgreen>"bossN"</lightgreen>當前的第N個boss級怪物 (1,2,3,4).</p>
+<p><lightgreen>"focus"</lightgreen>玩家當前的焦點，利用/focus命令指定。</p>
+<p><lightgreen>"partyN"</lightgreen>第N個隊友 (1,2,3,4).</p>
+<p><lightgreen>"partypetN"</lightgreen>第N個隊友的寵物 (1,2,3,,4).</p>
+<p><lightgreen>"pet"</lightgreen>玩家的寵物.</p>
+<p><lightgreen>"player"</lightgreen>玩家本人.</p>
+<p><lightgreen>"raidN"</lightgreen>第N個團隊成員(1,2,3,...,40).</p>
+<p><lightgreen>"raidpetN"</lightgreen>第N個團隊成員的寵物 (1,2,3,...,40)</p>
+<p><lightgreen>"target"</lightgreen>玩家的目標.</p>
+<p><lightgreen>"vehicle"</lightgreen>玩家的載具.</p>
+<br/><br/>
+<p><lime>特別單體ID :</lime></p><br/>
+<p><lightgreen>"maintank"</lightgreen> 主坦克.</p>
+<p><lightgreen>"mainassist"</lightgreen> 助理，通常是副坦克.</p>
+<p><lightgreen>"tank"</lightgreen> 坦克（可以是複數個）.</p>
+<br/><br/>
+<p><lime>目標擴展 :</lime></p><br/>
+<p>
+你可以在單體ID之後加上"target"後綴表示該單體的目標，比如"partypet2target"。你也可以爲特別單體ID加上該後綴，比如"maintanktarget"-主坦克的目標，會被相應的進行轉換。
 </p>
 </body>
 </html>
@@ -387,3 +431,12 @@ L["Aura Size : "] = "增/減益圖標大小"
 L["Please input the aura's size(px)"] = "請輸入增/減益圖標大小(像素)"
 
 L["Hide Global cooldown"] = "隱藏公共冷卻"
+
+L["Unit watch panel"] = "單體監視面板"
+L["Modify unit list"] = "修改單體列表"
+L["Unit List"] = "單體列表"
+L["Up"] = "上"
+L["Down"] = "下"
+L["Please input the unit id"] = "請輸入單體ID"
+L["Are you sure to delete the unit id"] = "是否確認刪除該單體ID"
+L["Auto layout"] = "自動布局"

@@ -7,6 +7,16 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/07/04 v63 : </lime>
+</p><br/>
+<p>
+    1. 新的单体监视面板被加入，可以单独监视类似target, focus之类的单体。
+</p>
+<p>
+    2. 伤害和增益法术可以使用同样的按键绑定，需要IGAS v93及以上的库版本支持。
+</p>
+<br/><br/>
+<p>
 <lime>2016/07/01 v62 : </lime>
 </p><br/>
 <p>
@@ -145,6 +155,40 @@ L["ChangeLog"] = [[
 </p><br/>
 <p>
 	1. 死者面板增加，仅显示死亡的角色，默认不启用，单独的配置菜单提供。
+</p>
+</body>
+</html>
+]]
+
+L["Unit List Info"] = [[
+<html>
+<body>
+<p>
+单体ID是玩家用于交互的标识符。比如"player"表示玩家目前的角色，"target"表示玩家的目标，而"targettarget"则表示目标的目标。
+</p>
+<br/>
+<p><lime>基础单体ID :</lime></p><br/>
+<p><lightgreen>"arenaN"</lightgreen>第N个竞技场对手 (1,2,3,4,5).</p>
+<p><lightgreen>"arenapetN"</lightgreen>第N个竞技场对手的宠物 (1,2,3,4,5).</p>
+<p><lightgreen>"bossN"</lightgreen>当前的第N个boss级怪物 (1,2,3,4).</p>
+<p><lightgreen>"focus"</lightgreen>玩家当前的焦点，利用/focus命令指定。</p>
+<p><lightgreen>"partyN"</lightgreen>第N个队友 (1,2,3,4).</p>
+<p><lightgreen>"partypetN"</lightgreen>第N个队友的宠物 (1,2,3,,4).</p>
+<p><lightgreen>"pet"</lightgreen>玩家的宠物.</p>
+<p><lightgreen>"player"</lightgreen>玩家本人.</p>
+<p><lightgreen>"raidN"</lightgreen>第N个团队成员(1,2,3,...,40).</p>
+<p><lightgreen>"raidpetN"</lightgreen>第N个团队成员的宠物 (1,2,3,...,40)</p>
+<p><lightgreen>"target"</lightgreen>玩家的目标.</p>
+<p><lightgreen>"vehicle"</lightgreen>玩家的载具.</p>
+<br/><br/>
+<p><lime>特别单体ID :</lime></p><br/>
+<p><lightgreen>"maintank"</lightgreen> 主坦克.</p>
+<p><lightgreen>"mainassist"</lightgreen> 助理，通常是副坦克.</p>
+<p><lightgreen>"tank"</lightgreen> 坦克（可以是复数个）.</p>
+<br/><br/>
+<p><lime>目标扩展 :</lime></p><br/>
+<p>
+你可以在单体ID之后加上"target"后缀表示该单体的目标，比如"partypet2target"。你也可以为特别单体ID加上该后缀，比如"maintanktarget"-主坦克的目标，会被相应的进行转换。
 </p>
 </body>
 </html>
@@ -389,3 +433,12 @@ L["Aura Size : "] = "增/减益图标大小 : "
 L["Please input the aura's size(px)"] = "请输入增/减益图标大小(像素)"
 
 L["Hide Global cooldown"] = "隐藏公共冷却"
+
+L["Unit watch panel"] = "单体监视面板"
+L["Modify unit list"] = "修改单体列表"
+L["Unit List"] = "单体列表"
+L["Up"] = "上"
+L["Down"] = "下"
+L["Please input the unit id"] = "请输入单体ID"
+L["Are you sure to delete the unit id"] = "是否确认删除该单体ID"
+L["Auto layout"] = "自动布局"

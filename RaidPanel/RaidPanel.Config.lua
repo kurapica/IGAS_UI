@@ -196,5 +196,18 @@ Config = {
 			"ResurrectIcon",
 			"iTarget",
 		},
+		UnitWatch = {
+			"iHealthBar",
+			"MyHealPredictionBar",
+			"AllHealPredictionBar",
+			"TotalAbsorbBar",
+			"HealAbsorbBar",
+			"iNameLabel",
+			"iBuffPanel",
+			"iDebuffPanel",
+			"RangeChecker",
+			"RaidTargetIcon",
+			"ResurrectIcon",
+		},
 	},
 }

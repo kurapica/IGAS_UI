@@ -118,6 +118,7 @@ function LoadConfig(_DBChar)
 
 		raidPanel:Each(UpdateConfig4UnitFrame, self)
 		raidPetPanel:Each(UpdateConfig4UnitFrame, self)
+		raidUnitWatchPanel:Each(UpdateConfig4UnitFrame, self)
 	end)
 
 	-- Load raid panel settings
@@ -129,6 +130,9 @@ function LoadConfig(_DBChar)
 
 	_DBChar.RaidDeadPanelSet = _DBChar.RaidDeadPanelSet or {}
 	_RaidDeadPanelSet = _DBChar.RaidDeadPanelSet
+
+	_DBChar.RaidUnitWatchSet = _DBChar.RaidUnitWatchSet or {}
+	_RaidUnitWatchSet = _DBChar.RaidUnitWatchSet
 
 	-- Default settings
 	if not next(_RaidPanelSet) then
@@ -161,6 +165,12 @@ function LoadConfig(_DBChar)
 		_RaidDeadPanelSet.Orientation = "HORIZONTAL"
 	end
 
+	if not next(_RaidUnitWatchSet) then
+		_RaidUnitWatchSet.Orientation = "HORIZONTAL"
+		_RaidUnitWatchSet.UnitList = { "tank", "tanktarget" }
+		_RaidUnitWatchSet.AutoLayout = true
+	end
+
 	if _DBChar.RaidPanelActivated == nil then
 		_DBChar.RaidPanelActivated = true
 	end
@@ -185,6 +195,7 @@ function LoadConfig(_DBChar)
 	raidPanel.ElementWidth = _DBChar.ElementWidth
 	raidPetPanel.ElementWidth = _DBChar.ElementWidth
 	raidDeadPanel.ElementWidth = _DBChar.ElementWidth
+	raidUnitWatchPanel.ElementWidth = _DBChar.ElementWidth
 
 	mnuRaidPanelSetWidth.Text = L"Width : " .. tostring(raidPanel.ElementWidth)
 
@@ -192,19 +203,16 @@ function LoadConfig(_DBChar)
 	raidPanel.ElementHeight = _DBChar.ElementHeight
 	raidPetPanel.ElementHeight = _DBChar.ElementHeight
 	raidDeadPanel.ElementHeight = _DBChar.ElementHeight
+	raidUnitWatchPanel.ElementHeight = _DBChar.ElementHeight
 
 	mnuRaidPanelSetHeight.Text = L"Height : " .. tostring(raidPanel.ElementHeight)
 
 	_DBChar.PowerHeight = _DBChar.PowerHeight or 3
-	mnuRaidPanelSetPowerHeight.Text = L"Power Height : " .. tostring(_DBChar.PowerHeight)
+	UpdatePowerHeight()
 
 	-- Aura Size
 	_DBChar.AuraSize = _DBChar.AuraSize or 16
-	mnuRaidPanelSetAuraSize.Text = L"Aura Size : " .. tostring(_DBChar.AuraSize)
-
-	local font = AuraCountFont.Font
-	font.height = _DBChar.AuraSize
-	AuraCountFont.Font = font
+	UpdateAuraSizeForAll()
 
 	-- Load Config
 	SetLocation(_DBChar.PetPanelLocation)
@@ -235,6 +243,7 @@ function LoadConfig(_DBChar)
 			raidDeadPanel[k] = v
 		end
 	end
+	SetOrientation(raidUnitWatchPanel, _RaidUnitWatchSet.Orientation)
 	raidpanelPropArray:Each(function(self)
 		if self.ConfigValue then
 			self.Checked = (self.UnitPanel[self.ConfigName] == self.ConfigValue)
@@ -334,46 +343,14 @@ function LoadConfig(_DBChar)
 	_DebuffBlackList = _DB.DebuffBlackList
 
 	-- Default true
-	if _DBChar.DebuffRightMouseRemove == nil then
-		_DBChar.DebuffRightMouseRemove = true
-	end
-
-	if _DBChar.ShowDebuffTooltip == nil then
-		_DBChar.ShowDebuffTooltip = true
-	end
+	if _DBChar.DebuffRightMouseRemove == nil then _DBChar.DebuffRightMouseRemove = true end
+	if _DBChar.ShowDebuffTooltip == nil then _DBChar.ShowDebuffTooltip = true end
 
 	mnuRaidPanelDebuffRightMouseRemove.Checked = _DBChar.DebuffRightMouseRemove
 	mnuRaidPanelDebuffShowTooltip.Checked = _DBChar.ShowDebuffTooltip
+	UpdateAllAuraIconTip()
 
-	local showTooltip = _DBChar.ShowDebuffTooltip
-	local enableMouse = _DBChar.ShowDebuffTooltip or _DBChar.DebuffRightMouseRemove
-
-	raidPanel:Each(function (self)
-		local ele = self:GetElement(iDebuffPanel)
-		if ele then
-			ele:Each("ShowTooltip", showTooltip)
-			ele:Each("MouseEnabled", enableMouse)
-		end
-
-		ele = self:GetElement(iBuffPanel)
-		if ele then
-			ele:Each("ShowTooltip", showTooltip)
-		end
-	end)
-
-	raidPetPanel:Each(function (self)
-		local ele = self:GetElement(iDebuffPanel)
-		if ele then
-			ele:Each("ShowTooltip", showTooltip)
-			ele:Each("MouseEnabled", enableMouse)
-		end
-
-		ele = self:GetElement(iBuffPanel)
-		if ele then
-			ele:Each("ShowTooltip", showTooltip)
-		end
-	end)
-
+	-- Spell bindings
 	if _DBChar.SpellBindings then
 		_IGASUI_SPELLHANDLER:Import(_DBChar.SpellBindings)
 	end
@@ -390,55 +367,17 @@ function LoadConfig(_DBChar)
 
 	raidDeadPanel:InitWithCount(10)
 	raidDeadPanel.Activated = _DBChar.RaidDeadPanelActivated
+
+	mnuRaidUnitwatchAutoLayout.Checked = _RaidUnitWatchSet.AutoLayout
+	raidUnitWatchPanel.KeepMaxSize = not _RaidUnitWatchSet.AutoLayout
+	raidUnitWatchPanel.AutoPosition = _RaidUnitWatchSet.AutoLayout
+	InstallUnitList()
 end
 
 function OnEnable(self)
 	self:SecureHook("SpellButton_UpdateButton")
 	LEARNED_SPELL_IN_TAB(self)
-
-	--[[Task.NoCombatCall(function()
-		self:RegisterEvent("GROUP_ROSTER_UPDATE")
-
-		_G.CompactRaidFrameContainer:UnregisterAllEvents()
-		_G.CompactRaidFrameContainer:Hide()
-		_G.CompactRaidFrameManager:UnregisterAllEvents()
-		--_G.CompactRaidFrameManager:Show()
-
-		local button
-
-		for i=1, 8 do
-			button = _G["CompactRaidFrameManagerDisplayFrameRaidMarkersRaidMarker"..i]
-			button:GetNormalTexture():SetDesaturated(false)
-			button:SetAlpha(1)
-			button:Enable()
-		end
-
-		button = _G["CompactRaidFrameManagerDisplayFrameRaidMarkersRaidMarkerRemove"]
-		button:GetNormalTexture():SetDesaturated(false)
-		button:SetAlpha(1)
-		button:Enable()
-
-		button = _G.CompactRaidFrameManagerDisplayFrameLeaderOptionsInitiateRolePoll
-		button:SetAlpha(1)
-		button:Enable()
-
-		button = _G.CompactRaidFrameManagerDisplayFrameLeaderOptionsInitiateReadyCheck
-		button:SetAlpha(1)
-		button:Enable()
-
-		return GROUP_ROSTER_UPDATE(self)
-	end)--]]
 end
---[[
-function GROUP_ROSTER_UPDATE(self)
-	Task.NoCombatCall(function()
-		if IsInGroup() then
-			_G.CompactRaidFrameManager:Show()
-		else
-			_G.CompactRaidFrameManager:Hide()
-		end
-	end)
-end--]]
 
 function PLAYER_REGEN_DISABLED(self)
 	if raidPanelMask.Visible then
@@ -571,54 +510,20 @@ function chkFocus:OnValueChanged()
 end
 
 function raidPanel:OnElementAdd(unitframe)
-	raidpanelMenuArray:Each(UpdateConfig4MenuBtn, unitframe)
-	if iPowerBar then
-		unitframe:AddElement(iPowerBar, "south", _DBChar[_LoadingConfig].PowerHeight, "px")
-	end
-
-	local value = _DBChar[_LoadingConfig].AuraSize
-
-	if iBuffPanel then
-		local ele = unitframe:GetElement(iBuffPanel)
-
-		if ele then
-			ele.ElementWidth = value
-			ele.ElementHeight = value
-		end
-	end
-
-	if iDebuffPanel then
-		local ele = unitframe:GetElement(iDebuffPanel)
-
-		if ele then
-			ele.ElementWidth = value
-			ele.ElementHeight = value
-		end
-	end
+	return InitUnitFrame(unitframe)
 end
 
 function raidPetPanel:OnElementAdd(unitframe)
-	raidpanelMenuArray:Each(UpdateConfig4MenuBtn, unitframe)
+	return InitUnitFrame(unitframe)
+end
 
-	local value = _DBChar[_LoadingConfig].AuraSize
+function raidUnitWatchPanel:OnElementAdd(unitframe)
+	return InitUnitFrame(unitframe)
+end
 
-	if iBuffPanel then
-		local ele = unitframe:GetElement(iBuffPanel)
-
-		if ele then
-			ele.ElementWidth = value
-			ele.ElementHeight = value
-		end
-	end
-
-	if iDebuffPanel then
-		local ele = unitframe:GetElement(iDebuffPanel)
-
-		if ele then
-			ele.ElementWidth = value
-			ele.ElementHeight = value
-		end
-	end
+function raidUnitWatchPanel:OnElementRemove(unitframe)
+	unitframe.Unit = nil
+	unitframe.Visible = false
 end
 
 function mnuRaidPanelSetWidth:OnClick()
@@ -629,6 +534,7 @@ function mnuRaidPanelSetWidth:OnClick()
 		raidPanel.ElementWidth = value
 		raidPetPanel.ElementWidth = value
 		raidDeadPanel.ElementWidth = value
+		raidUnitWatchPanel.ElementWidth = value
 
 		self.Text = L"Width : " .. tostring(value)
 
@@ -646,6 +552,7 @@ function mnuRaidPanelSetHeight:OnClick()
 		raidPanel.ElementHeight = value
 		raidPetPanel.ElementHeight = value
 		raidDeadPanel.ElementHeight = value
+		raidUnitWatchPanel.ElementHeight = value
 
 		self.Text = L"Height : " .. tostring(value)
 
@@ -661,13 +568,7 @@ function mnuRaidPanelSetPowerHeight:OnClick()
 	if value and value > 0 and value < raidPanel.ElementHeight then
 		_DBChar[_LoadingConfig].PowerHeight = value
 
-		if iPowerBar then
-			raidPanel:Each(function (self)
-				self:AddElement(iPowerBar, "south", _DBChar[_LoadingConfig].PowerHeight, "px")
-			end)
-		end
-
-		self.Text = L"Power Height : " .. tostring(_DBChar[_LoadingConfig].PowerHeight)
+		UpdatePowerHeight()
 	end
 end
 
@@ -677,33 +578,7 @@ function mnuRaidPanelSetAuraSize:OnClick()
 	if value and value > 0 then
 		_DBChar[_LoadingConfig].AuraSize = value
 
-		local font = AuraCountFont.Font
-		font.height = _DBChar[_LoadingConfig].AuraSize
-		AuraCountFont.Font = font
-
-		if iBuffPanel then
-			raidPanel:Each(function (self)
-				local ele = self:GetElement(iBuffPanel)
-
-				if ele then
-					ele.ElementWidth = value
-					ele.ElementHeight = value
-				end
-			end)
-		end
-
-		if iDebuffPanel then
-			raidPanel:Each(function (self)
-				local ele = self:GetElement(iDebuffPanel)
-
-				if ele then
-					ele.ElementWidth = value
-					ele.ElementHeight = value
-				end
-			end)
-		end
-
-		self.Text = L"Aura Size : " .. tostring(_DBChar[_LoadingConfig].AuraSize)
+		return UpdateAuraSizeForAll()
 	end
 end
 
@@ -721,6 +596,7 @@ function raidpanelMenuArray:OnCheckChanged(index)
 
 		raidPanel:Each(UpdateConfig4UnitFrame, self[index])
 		raidPetPanel:Each(UpdateConfig4UnitFrame, self[index])
+		raidUnitWatchPanel:Each(UpdateConfig4UnitFrame, self[index])
 	end
 end
 
@@ -739,6 +615,8 @@ function raidpanelPropArray:OnCheckChanged(index)
 			_RaidPetPanelSet[self[index].ConfigName] = raidPetPanel[self[index].ConfigName]
 		elseif self[index].UnitPanel == raidDeadPanel then
 			_RaidDeadPanelSet[self[index].ConfigName] = raidDeadPanel[self[index].ConfigName]
+		elseif self[index].UnitPanel == raidUnitWatchPanel then
+			_RaidUnitWatchSet[self[index].ConfigName] = raidUnitWatchPanel[self[index].ConfigName]
 		end
 	end
 end
@@ -883,6 +761,103 @@ function roleDeadFilterArray:OnCheckChanged(index)
 	end
 end
 
+function mnuRaidPanelDebuffRightMouseRemove:OnCheckChanged()
+	if raidPanelConfig.Visible then
+		_DBChar[_LoadingConfig].DebuffRightMouseRemove = self.Checked
+
+		UpdateAllAuraIconTip()
+	end
+end
+
+function mnuRaidPanelDebuffShowTooltip:OnCheckChanged()
+	if raidPanelConfig.Visible then
+		_DBChar[_LoadingConfig].ShowDebuffTooltip = self.Checked
+
+		UpdateAllAuraIconTip()
+	end
+end
+
+function mnuRaidUnitWatchList:OnClick()
+	lstWatchUnit.Keys = _RaidUnitWatchSet.UnitList
+	lstWatchUnit.Items = _RaidUnitWatchSet.UnitList
+
+	frmUnitList.Visible = true
+	frmUnitList.Modified = false
+end
+
+function mnuRaidUnitwatchAutoLayout:OnCheckChanged()
+	if raidPanelConfig.Visible then
+		_RaidUnitWatchSet.AutoLayout = self.Checked
+
+		raidUnitWatchPanel.KeepMaxSize = not _RaidUnitWatchSet.AutoLayout
+		raidUnitWatchPanel.AutoPosition = _RaidUnitWatchSet.AutoLayout
+
+		InstallUnitList()
+	end
+end
+
+function btnAdd:OnClick()
+	local unit = IGAS:MsgBox(L"Please input the unit id", "ic")
+
+	if unit and strtrim(unit) ~= "" then
+		unit = strlower(strtrim(unit))
+
+		for _, v in ipairs(lstWatchUnit.Keys) do
+			if v == unit then return end
+		end
+
+		tinsert(_RaidUnitWatchSet.UnitList, unit)
+		lstWatchUnit:Refresh()
+		frmUnitList.Modified = true
+	end
+end
+
+function btnRemove:OnClick()
+	local index = lstWatchUnit.SelectedIndex
+	if index > 0 and IGAS:MsgBox(L"Are you sure to delete the unit id", "n") then
+		tremove(_RaidUnitWatchSet.UnitList, index)
+		lstWatchUnit:Refresh()
+		frmUnitList.Modified = true
+	end
+end
+
+function btnUp:OnClick()
+	local index = lstWatchUnit.SelectedIndex
+	if index > 1 then
+		local lst = _RaidUnitWatchSet.UnitList
+
+		lst[index], lst[index-1] = lst[index-1], lst[index]
+		lstWatchUnit:Refresh()
+		lstWatchUnit.SelectedIndex = index - 1
+		frmUnitList.Modified = true
+	end
+end
+
+function btnDown:OnClick()
+	local index = lstWatchUnit.SelectedIndex
+	local lst = _RaidUnitWatchSet.UnitList
+
+	if index > 0 and index < #lst  then
+		lst[index], lst[index+1] = lst[index+1], lst[index]
+		lstWatchUnit:Refresh()
+		lstWatchUnit.SelectedIndex = index + 1
+		frmUnitList.Modified = true
+	end
+end
+
+function btnInfo:OnClick()
+	helper.Visible = true
+	helper.Text = L"Unit List Info"
+end
+
+function frmUnitList:OnHide()
+	helper.Visible = false
+
+	if frmUnitList.Modified then
+		Task.NoCombatCall(InstallUnitList)
+	end
+end
+
 --------------------
 -- Tool function
 --------------------
@@ -948,6 +923,226 @@ function UpdateHealthBar4UseClassColor()
 	end)
 	raidDeadPanel:Each(function(self)
 		self:GetElement(iHealthBar).UseClassColor = flag
+	end)
+	raidUnitWatchPanel:Each(function(self)
+		self:GetElement(iHealthBar).UseClassColor = flag
+	end)
+end
+
+function UpdatePowerHeight()
+	local value = _DBChar[_LoadingConfig].PowerHeight
+
+	raidPanel:Each(function (self)
+		if self:GetElement(iPowerBar) then
+			self:AddElement(iPowerBar, "south", value, "px")
+		end
+	end)
+	raidPetPanel:Each(function(self)
+		if self:GetElement(iPowerBar) then
+			self:AddElement(iPowerBar, "south", value, "px")
+		end
+	end)
+	raidUnitWatchPanel:Each(function (self)
+		if self:GetElement(iPowerBar) then
+			self:AddElement(iPowerBar, "south", value, "px")
+		end
+	end)
+
+	mnuRaidPanelSetPowerHeight.Text = L"Power Height : " .. tostring(value)
+end
+
+function UpdateAuraSizeForAll()
+	local font = AuraCountFont.Font
+	font.height = _DBChar[_LoadingConfig].AuraSize
+	AuraCountFont.Font = font
+
+	raidPanel:Each(UpdateAuraSizeForFrame)
+	raidPetPanel:Each(UpdateAuraSizeForFrame)
+	raidUnitWatchPanel:Each(UpdateAuraSizeForFrame)
+
+	mnuRaidPanelSetAuraSize.Text = L"Aura Size : " .. tostring(_DBChar[_LoadingConfig].AuraSize)
+end
+
+function UpdateAuraSizeForFrame(unitframe)
+	local value = _DBChar[_LoadingConfig].AuraSize
+
+	ele = unitframe:GetElement(iBuffPanel)
+
+	if ele then
+		ele.ElementWidth = value
+		ele.ElementHeight = value
+	end
+
+	local ele = unitframe:GetElement(iDebuffPanel)
+
+	if ele then
+		ele.ElementWidth = value
+		ele.ElementHeight = value
+	end
+end
+
+function InitUnitFrame(unitframe)
+	raidpanelMenuArray:Each(UpdateConfig4MenuBtn, unitframe)
+
+	local ele = unitframe:GetElement(iPowerBar)
+
+	if ele then
+		unitframe:AddElement(iPowerBar, "south", _DBChar[_LoadingConfig].PowerHeight, "px")
+	end
+
+	UpdateAuraSizeForFrame(unitframe)
+end
+
+function UpdateAuraIconTip(self, showTooltip, enableMouse)
+	local ele = self:GetElement(iDebuffPanel)
+	if ele then
+		ele:Each("ShowTooltip", showTooltip)
+		ele:Each("MouseEnabled", enableMouse)
+	end
+
+	ele = self:GetElement(iBuffPanel)
+	if ele then
+		ele:Each("ShowTooltip", showTooltip)
+	end
+end
+
+function UpdateAllAuraIconTip()
+	local showTooltip = _DBChar[_LoadingConfig].ShowDebuffTooltip
+	local enableMouse = _DBChar[_LoadingConfig].ShowDebuffTooltip or _DBChar[_LoadingConfig].DebuffRightMouseRemove
+
+	raidPanel:Each(UpdateAuraIconTip, showTooltip, enableMouse)
+	raidPetPanel:Each(UpdateAuraIconTip, showTooltip, enableMouse)
+	raidUnitWatchPanel:Each(UpdateAuraIconTip, showTooltip, enableMouse)
+end
+
+local _TempList = {}
+local _TankList = {}
+local _RefreshUnitListMark = 0
+
+function InstallUnitList()
+	_RefreshUnitListMark = _RefreshUnitListMark + 1
+
+	return RefreshUnitList()
+end
+
+function RefreshUnitList()
+	Task.NoCombatCall(function()
+		local list = _RaidUnitWatchSet.UnitList
+		local scanRole = false
+
+		for i, unit in ipairs(list) do
+			if unit:match("maintank") or unit:match("mainassist") or unit:match("tank") then
+				scanRole = true
+				break
+			end
+		end
+
+		if scanRole then
+			wipe(_TempList)
+			wipe(_TankList)
+
+			local unit
+			local maintank, mainassist
+
+			if IsInRaid() then
+				for i = 1, GetNumGroupMembers() do
+					unit = "raid" .. i
+					if GetPartyAssignment("MAINTANK", unit) then
+						maintank = unit
+					elseif GetPartyAssignment("MAINASSIST", unit) then
+						mainassist = unit
+					end
+
+					if UnitGroupRolesAssigned(unit) == "TANK" then
+						tinsert(_TankList, unit)
+					end
+				end
+			else
+				for i = 0, GetNumSubgroupMembers() do
+					unit = i == 0 and "player" or ("party" .. i)
+
+					if GetPartyAssignment("MAINTANK", unit) then
+						maintank = unit
+					elseif GetPartyAssignment("MAINASSIST", unit) then
+						mainassist = unit
+					end
+
+					if UnitGroupRolesAssigned(unit) == "TANK" then
+						tinsert(_TankList, unit)
+					end
+				end
+			end
+
+			for i, unit in ipairs(list) do
+				if unit:match("maintank") then
+					if maintank then
+						unit = unit:gsub("maintank", maintank)
+						if not _TempList[unit] then
+							_TempList[unit] = true
+							tinsert(_TempList, unit)
+						end
+					end
+				elseif unit:match("mainassist") then
+					if mainassist then
+						unit = unit:gsub("mainassist", mainassist)
+						if not _TempList[unit] then
+							_TempList[unit] = true
+							tinsert(_TempList, unit)
+						end
+					end
+				elseif unit:match("tank") then
+					if #_TankList > 0 then
+						for _, tank in ipairs(_TankList) do
+							tunit = unit:gsub("tank", tank)
+							if not _TempList[tunit] then
+								_TempList[tunit] = true
+								tinsert(_TempList, tunit)
+							end
+						end
+					end
+				else
+					if not _TempList[unit] then
+						_TempList[unit] = true
+						tinsert(_TempList, unit)
+					end
+				end
+			end
+
+			raidUnitWatchPanel.Count = #_TempList
+
+			for i, unit in ipairs(_TempList) do
+				raidUnitWatchPanel.Element[i].Unit = unit
+				if _RaidUnitWatchSet.AutoLayout then
+					raidUnitWatchPanel.Element[i].NoUnitWatch = false
+				else
+					raidUnitWatchPanel.Element[i].NoUnitWatch = true
+					raidUnitWatchPanel.Element[i].Visible = true
+				end
+			end
+
+			wipe(_TempList)
+			wipe(_TankList)
+
+			local currentMark = _RefreshUnitListMark
+
+			Task.WaitCall("GROUP_ROSTER_UPDATE", "UNIT_NAME_UPDATE", function()
+				if currentMark == _RefreshUnitListMark then
+					return RefreshUnitList()
+				end
+			end)
+		else
+			raidUnitWatchPanel.Count = #list
+
+			for i, unit in ipairs(list) do
+				raidUnitWatchPanel.Element[i].Unit = unit
+				if _RaidUnitWatchSet.AutoLayout then
+					raidUnitWatchPanel.Element[i].NoUnitWatch = false
+				else
+					raidUnitWatchPanel.Element[i].NoUnitWatch = true
+					raidUnitWatchPanel.Element[i].Visible = true
+				end
+			end
+		end
 	end)
 end
 
