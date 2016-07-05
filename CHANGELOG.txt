@@ -1,3 +1,6 @@
+2016/07/05 v64
+	1. Fix the quest mover not work until reload game once.
+
 2016/07/04 v63
 	1. An unit watch panel is added to monitor units like target, focus and etc.
 	2. Harmful and helpful spell can be binded with the same key, require IGAS v93 and more lastest versions.

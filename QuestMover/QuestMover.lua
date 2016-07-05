@@ -22,12 +22,20 @@ Toggle = {
 				mask.AsMove = true
 				mask.AsResize = true
 				mask.OnMoveFinished = function()
-					_DB.ENABLE = true
+					if not _DB.ENABLE then
+						_DB.ENABLE = true
+						ObjectiveTrackerFrame:SetMovable(true)
+						ObjectiveTrackerFrame:SetUserPlaced(true)
+					end
 					_DB.Location = ObjectiveTrackerFrame.Location
 					Task.NoCombatCall(RefreshMiniButtonPos)
 				end
 				mask.OnResizeFinished = function()
-					_DB.ENABLE = true
+					if not _DB.ENABLE then
+						_DB.ENABLE = true
+						ObjectiveTrackerFrame:SetMovable(true)
+						ObjectiveTrackerFrame:SetUserPlaced(true)
+					end
 					_DB.Location = ObjectiveTrackerFrame.Location
 					_DB.Size = ObjectiveTrackerFrame.Size
 				end
