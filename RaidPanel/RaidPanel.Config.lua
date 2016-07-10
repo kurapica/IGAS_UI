@@ -6,6 +6,7 @@ IGAS:NewAddon "IGAS_UI.RaidPanel"
 -- Need show buff list
 _Buff_List = {
 	-- [spellId] = true,
+	[155777] = true, -- [Druid][Germination]
 }
 
 local index = 0

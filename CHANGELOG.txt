@@ -1,3 +1,6 @@
+2016/07/10 v65
+	1. Add Germination to the need show buff list.
+
 2016/07/05 v64
 	1. Fix the quest mover not work until reload game once.
 
