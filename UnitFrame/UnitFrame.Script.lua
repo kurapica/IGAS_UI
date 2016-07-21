@@ -20,8 +20,6 @@ Toggle = {
 			IFMovable._ModeOn(_IGASUI_UNITFRAME_GROUP)
 			IFResizable._ModeOn(_IGASUI_UNITFRAME_GROUP)
 			IFToggleable._ModeOn(_IGASUI_UNITFRAME_GROUP)
-			_Menu:SetPoint("TOPLEFT", IGAS.UIParent.IGAS_UI_Manager, "TOPRIGHT")
-			_Menu.Visible = true
 		else
 			_Menu.Visible = false
 			IFMovable._ModeOff(_IGASUI_UNITFRAME_GROUP)
@@ -178,26 +176,11 @@ function OnLoad(self)
 			unitf.AutoHideCondition = _DB.AutoHideData[unit]
 		end
 
-		-- Menu part
-		local _MenuUnit = _Menu:AddMenuButton(L"Auto Hide" .. " " ..unit)
-		_MenuUnit.Enabled = unitf.ToggleState
-		_MenuUnit:ActiveThread("OnClick")
-
-		_MenuUnit.OnClick = function(self)
-			local data = _Addon:SelectMacroCondition(_DB.AutoHideData[unit])
-
-			if data then
-				_DB.AutoHideData[unit] = data
-				unitf.AutoHideCondition = data
-			end
-		end
-
 		unitf.OnAutoHideChanged = function(self, new, old, prop)
 			if prop == "ToggleState" then
 				if not new then
 					_DB.AutoHideData[unit] = nil
 				end
-				_MenuUnit.Enabled = new
 			end
 		end
 	end
@@ -205,6 +188,17 @@ function OnLoad(self)
 	-- Fix for PETBATTLES taint error
 	if _G.FRAMELOCK_STATES and _G.FRAMELOCK_STATES.PETBATTLES then
 		wipe(_G.FRAMELOCK_STATES.PETBATTLES)
+	end
+end
+
+function _MenuAutoHide:OnClick()
+	local unitf = _Menu.Parent
+	local unit = unitf.Unit
+	local data = _Addon:SelectMacroCondition(_DB.AutoHideData[unit])
+
+	if data then
+		_DB.AutoHideData[unit] = data
+		unitf.AutoHideCondition = data
 	end
 end
 
@@ -225,3 +219,16 @@ function arUnit:OnSizeChanged(i)
 	end
 end
 
+function arUnit:OnEnter(i)
+	if not _LockMode then
+		_Menu.Visible = false
+		_Menu:ClearAllPoints()
+		_Menu.Parent = arUnit[i]
+		_Menu:SetPoint("TOPLEFT", arUnit[i], "TOPRIGHT")
+
+		-- Refresh
+		_MenuAutoHide.Enabled = arUnit[i].ToggleState
+
+		_Menu:Show()
+	end
+end

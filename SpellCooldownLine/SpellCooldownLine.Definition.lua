@@ -174,7 +174,8 @@ class "SpellIcon"
 
         local alphaInLine = Alpha("alpha", agInLine)
         alphaInLine.Order = 1
-        alphaInLine.Change = _Full_Alpha
+        alphaInLine.FromAlpha = 0
+        alphaInLine.ToAlpha = _Full_Alpha
         alphaInLine.Duration = 1
 
         local tranInLine = Translation("trans", agInLine)
@@ -205,6 +206,7 @@ class "SpellIcon"
         local alphaScale = Alpha("alpha", agFinal)
         alphaScale.Order = 2
         alphaScale.Duration = 0.4
-        alphaScale.Change = -_Full_Alpha
+        alphaScale.FromAlpha = _Full_Alpha
+        alphaScale.ToAlpha = 0
     end
 endclass "SpellIcon"

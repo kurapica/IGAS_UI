@@ -325,6 +325,7 @@ L["MAGE"] = "法師"
 L["WARLOCK"] = "術士"
 L["MONK"] = "武僧"
 L["DRUID"] = "德魯伊"
+L["DEMONHUNTER"] = "惡魔獵手"
 
 L["MAINTANK"] = "主坦克"
 L["MAINASSIST"] = "副坦克"

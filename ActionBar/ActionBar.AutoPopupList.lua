@@ -174,29 +174,32 @@ chkOrder.Checked = false
 cboItemClass = ComboBox("cboItemClass", grpOption)
 cboItemClass:SetPoint("TOPLEFT", chkFilter, "BOTTOMLEFT", 0, -16)
 cboItemClass:SetPoint("TOPRIGHT", chkFilter, "BOTTOMRIGHT")
-cboItemClass:AddItem(0, L"All")
 cboItemClass.Value = 0
 
-_AuctionItemClasses = { GetAuctionItemClasses() }
-for i, v in ipairs(_AuctionItemClasses) do
-	_AuctionItemClasses[i] = {
-		Name = v,
-		SubClass = { GetAuctionItemSubClasses(i) }
-	}
-	if i == 4 then
-		tinsert(_AuctionItemClasses[i].SubClass, v)
-	elseif i == 6 then
-		for j in ipairs(_AuctionItemClasses[i].SubClass) do
-			if j ~= 10 and j ~= 11 then
-				_AuctionItemClasses[i].SubClass[j] = nil
-			end
-		end
+_AuctionItemClasses = {}
+
+local i = 0
+local itemCls = GetItemClassInfo(i)
+
+while itemCls and #itemCls > 0 do
+	_AuctionItemClasses[i] = { Name = itemCls, SubClass = {} }
+
+	local j = 0
+	local itemSubCls = GetItemSubClassInfo(i, j)
+
+	while itemSubCls and #itemSubCls > 0 do
+		_AuctionItemClasses[i].SubClass[j] = itemSubCls
+
+		j = j + 1
+		itemSubCls = GetItemSubClassInfo(i, j)
 	end
 
-	if i == 4 or i == 6 or i == 9 or i == 10 then
-		cboItemClass:AddItem(i, v)
-	end
+	cboItemClass:AddItem(i, itemCls)
+
+	i = i + 1
+	itemCls = GetItemClassInfo(i)
 end
+
 cboItemClass.Visible = false
 
 cboItemSubClass = ComboBox("cboItemSubClass", grpOption)
@@ -231,7 +234,7 @@ function autoList:OnItemChoosed(key)
 			chkOrder.Visible = true
 			cboItemClass.Value = _autoPopupSet.ItemClass or 0
 			cboItemClass:OnValueChanged(cboItemClass.Value)
-			cboItemSubClass.Value = _autoPopupSet.ItemSubClass or 0
+			cboItemSubClass.Value = _autoPopupSet.ItemSubClass or 100
 			chkOrder.Checked = _autoPopupSet.UseReverseOrder
 		else
 			cboItemClass.Visible = false
@@ -282,7 +285,7 @@ function cboType:OnValueChanged(key)
 		chkOrder.Visible = true
 		cboItemClass.Value = _autoPopupSet and _autoPopupSet.ItemClass or 0
 		cboItemClass:OnValueChanged(cboItemClass.Value)
-		cboItemSubClass.Value = _autoPopupSet and _autoPopupSet.ItemSubClass or 0
+		cboItemSubClass.Value = _autoPopupSet and _autoPopupSet.ItemSubClass or 100
 		chkOrder.Checked = _autoPopupSet and _autoPopupSet.UseReverseOrder
 	else
 		cboItemClass.Visible = false
@@ -346,19 +349,13 @@ function btnSave:OnClick()
 		_autoPopupSet.AutoGenerate = chkAutoGenerate.Checked
 		_autoPopupSet.MaxAction = mround(optMaxActionButtons.Value)
 		if _autoPopupSet.Type == "Item" then
-			if cboItemClass.Value > 0 then
-				_autoPopupSet.ItemClass = cboItemClass.Value
-				if cboItemSubClass.Value > 0 then
-					_autoPopupSet.ItemSubClass = cboItemSubClass.Value
-				else
-					_autoPopupSet.ItemSubClass = nil
-				end
-				_autoPopupSet.UseReverseOrder = chkOrder.Checked
+			_autoPopupSet.ItemClass = cboItemClass.Value
+			if cboItemSubClass.Value < 100 then
+				_autoPopupSet.ItemSubClass = cboItemSubClass.Value
 			else
-				_autoPopupSet.ItemClass = nil
 				_autoPopupSet.ItemSubClass = nil
-				_autoPopupSet.UseReverseOrder = nil
 			end
+			_autoPopupSet.UseReverseOrder = chkOrder.Checked
 		else
 			_autoPopupSet.ItemClass = nil
 			_autoPopupSet.ItemSubClass = nil
@@ -408,11 +405,16 @@ end
 
 function cboItemClass:OnValueChanged(key)
 	cboItemSubClass:Clear()
-	cboItemSubClass:AddItem(0, L"All")
-	cboItemSubClass.Value = 0
-	if key > 0 then
-		for i, v in pairs(_AuctionItemClasses[key].SubClass) do
-			cboItemSubClass:AddItem(i, v)
-		end
+	cboItemSubClass:AddItem(100, L"All")
+	cboItemSubClass.Value = 100
+
+	local subCls = _AuctionItemClasses[key].SubClass
+
+	for i = 0, #subCls do
+		cboItemSubClass:AddItem(i, subCls[i])
 	end
+end
+
+function cboItemSubClass:OnValueChanged(key, text)
+	print(key, text)
 end

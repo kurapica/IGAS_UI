@@ -155,7 +155,7 @@ class "iBuffPanel"
 
 		if name and UnitCanAttack("player", unit) then return true end
 
-		if name and caster == "player" and (count > 0 or (_Buff_List[spellID] or _IGASUI_HELPFUL_SPELL[spellID] or _IGASUI_HELPFUL_SPELL[name]) and duration > 0 and duration < 31) then
+		if name and caster == "player" and ((count > 0 and duration > 0) or ((_Buff_List[spellID] or _IGASUI_HELPFUL_SPELL[spellID] or _IGASUI_HELPFUL_SPELL[name]) and duration > 0 and duration < 31)) then
 			return true
 		end
 	end

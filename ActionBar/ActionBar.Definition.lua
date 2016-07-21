@@ -1326,7 +1326,7 @@ class "AutoPopupMask"
 	local function OnClick(self, button)
 		autoGenerateForm.RootActionButton = self.Parent
 
-		local pd = PopupDialog("IGAS_GUI_MSGBOX", WorldFrame)
+		local pd = PopupDialog("IGAS_GUI_MSGBOX", UIParent)
 		if pd.Visible then pd:GetChild("OkayBtn"):Click() end
 
 		autoGenerateForm.Visible = true
@@ -1373,24 +1373,14 @@ class "AutoActionTask"
 		local itemSubCls = self.ItemSubClass
 		local generated = {}
 
-		if itemCls then
-			local cls = _AuctionItemClasses[itemCls]
-			itemCls = cls.Name
-
-			if itemSubCls then
-				itemSubCls = cls.SubClass[itemSubCls]
-			end
-		end
-
 		if self.UseReverseOrder then
 			for bag = _G.NUM_BAG_FRAMES, 0, -1 do
 				for slot = GetContainerNumSlots(bag), 1, -1  do
-					local link = GetContainerItemLink(bag, slot)
-					link = tonumber(link and link:match("item:(%d+)"))
+					local link = GetContainerItemID(bag, slot)
 					if link and GetItemSpell(link) then
 						local pass = true
 						if itemCls then
-							local _, _, _, _, _, cls, subclass = GetItemInfo(link)
+							local cls, subclass = select(12, GetItemInfo(link))
 							pass = itemCls == cls and (not itemSubCls or subclass == itemSubCls)
 						end
 						if pass and not generated[link] and (not filter or filter(link, bag, slot)) then
@@ -1403,12 +1393,11 @@ class "AutoActionTask"
 		else
 			for bag = 0, _G.NUM_BAG_FRAMES do
 				for slot = 1, GetContainerNumSlots(bag) do
-					local link = GetContainerItemLink(bag, slot)
-					link = tonumber(link and link:match("item:(%d+)"))
+					local link = GetContainerItemID(bag, slot)
 					if link and GetItemSpell(link) then
 						local pass = true
 						if itemCls then
-							local _, _, _, _, _, cls, subclass = GetItemInfo(link)
+							local cls, subclass = select(12, GetItemInfo(link))
 							pass = itemCls == cls and (not itemSubCls or subclass == itemSubCls)
 						end
 						if pass and not generated[link] and (not filter or filter(link, bag, slot)) then
@@ -1457,15 +1446,18 @@ class "AutoActionTask"
 		generated = nil
 	end
 
+	local mountIDS
+
 	local function getMount(self)
+		mountIDS = mountIDS or C_MountJournal.GetMountIDs()
 		local filter = self.Filter
 		local onlyFavourite = self.OnlyFavourite
-		for index = 1, C_MountJournal.GetNumMounts() do
-			local creatureName, creatureID, _, _, summonable, _, isFavorite, _, _, _, owned = C_MountJournal.GetMountInfo(index)
+		for _, id in ipairs(mountIDS) do
+			local creatureName, creatureID, _, _, summonable, _, isFavorite, _, _, _, owned = C_MountJournal.GetMountInfoByID(id)
 			if owned and summonable then
 				if not onlyFavourite or isFavorite then
-					if not filter or filter(creatureID, index) then
-						yield("mount", creatureID)
+					if not filter or filter(id, index) then
+						yield("mount", id)
 					end
 				end
 			end
@@ -1651,7 +1643,7 @@ class "AutoActionTask"
 
 	property "ItemClass" { Type = Number }
 
-	property "ItemSubClass" { Type = Number }
+	property "ItemSubClass" { Type = NumberNil }
 
 	property "UseReverseOrder" { Type = Boolean }
 

@@ -87,28 +87,6 @@ function OnLoad(self)
 
 	for name, popset in pairs(_DBAutoPopupList) do
 		autoList:AddItem(name, name)
-
-		-- Check if the popset use old version data
-		if popset.Type == "Item" then
-			if popset.ItemClass and not tonumber(popset.ItemClass) then
-				for itemClass, clsset in pairs(_AuctionItemClasses) do
-					if clsset.Name == popset.ItemClass then
-						popset.ItemClass = itemClass
-
-						if popset.ItemSubClass and not tonumber(popset.ItemSubClass) then
-							for isubCls, nsubCls in pairs(clsset.SubClass) do
-								if popset.ItemSubClass == nsubCls then
-									popset.ItemSubClass = isubCls
-									break
-								end
-							end
-						end
-
-						break
-					end
-				end
-			end
-		end
 	end
 
 	_ActionSetSave = {L"New Set"}
@@ -203,7 +181,7 @@ function OnEnable(self)
 	UPDATE_SHAPESHIFT_FORMS(self)
 
 	-- Load toy informations
-	C_ToyBox.FilterToys()
+	C_ToyBox.ForceToyRefilter()
 	for name, v in pairs(_DBAutoPopupList) do if v.Type == "Toy" then AutoActionTask(name):RestartTask() end end
 
 	_HeadList:Each(function(self)
@@ -1315,4 +1293,15 @@ end
 
 function _MenuNoGCD:OnCheckChanged()
 	_ActionBarHideGlobalCD.ENABLE = self.Checked
+end
+
+function IGAS.GameTooltip:OnTooltipSetItem()
+	local item = self:GetItem()
+	if item then
+		local itemCls, itemSubCls = select(6, GetItemInfo(item))
+		if itemCls and itemSubCls then
+			self:AddLine("    ")
+			self:AddLine(itemCls .. "-" .. itemSubCls)
+		end
+	end
 end

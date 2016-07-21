@@ -1,3 +1,6 @@
+2016/07/21 v66
+	1. Update for wow 7.0, reset the player settings.
+
 2016/07/10 v65
 	1. Add Germination to the need show buff list.
 

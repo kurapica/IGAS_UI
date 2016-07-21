@@ -274,6 +274,7 @@ for _, v in ipairs({
 		"WARLOCK",
 		"MONK",
 		"DRUID",
+		"DEMONHUNTER",
 	}) do
 	local classFilter = raidPanelConfig:AddMenuButton(L"Raid panel", L"Filter", L"CLASS", L[v])
 	classFilter.IsCheckButton = true
@@ -329,6 +330,7 @@ for _, v in ipairs({
 		"WARLOCK",
 		"MONK",
 		"DRUID",
+		"DEMONHUNTER",
 	}) do
 	local classFilter = raidPanelConfig:AddMenuButton(L"Dead panel", L"Filter", L"CLASS", L[v])
 	classFilter.IsCheckButton = true

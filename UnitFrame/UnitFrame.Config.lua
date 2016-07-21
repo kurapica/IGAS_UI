@@ -80,14 +80,6 @@ Config = {
 			},
 			Property = { Height = 6 },
 		},
-		iEclipseBar = {
-			Type = iEclipseBar,
-			Location = {
-				AnchorPoint("BOTTOMLEFT", 0, 4, nil, "TOPLEFT"),
-				AnchorPoint("BOTTOMRIGHT", 0, 4, nil, "TOPRIGHT"),
-			},
-			Property = { Height = 6 },
-		},
 		iRuneBar = {
 			Type = iRuneBar,
 			Location = {
@@ -115,9 +107,10 @@ Config = {
 		iStaggerBar = {
 			Type = iStaggerBar,
 			Location = {
-				AnchorPoint("TOPLEFT", 0, 0, "iHealthBar"),
-				AnchorPoint("BOTTOMRIGHT", 0, 0, "iHealthBar"),
+				AnchorPoint("BOTTOMLEFT", 0, 4, nil, "TOPLEFT"),
+				AnchorPoint("BOTTOMRIGHT", 0, 4, nil, "TOPRIGHT"),
 			},
+			Property = { Height = 6 },
 		},
 		iBuffPanel = {
 			Type = AuraPanel,
@@ -129,16 +122,42 @@ Config = {
 				RowCount = 6,
 				ColumnCount = 6,
 				MarginTop = 2,
+				ElementWidth = 16,
+				ElementHeight = 16,
+				TopToBottom = false,
+			},
+		},
+		iPlayerBuffPanel = {
+			Type = AuraPanel,
+			Name = "iPlayerBuffPanel",
+			Location = { AnchorPoint("BOTTOMLEFT", 0, 4, nil, "TOPLEFT") },
+			Property = {
+				Filter = "HELPFUL|PLAYER",
+				HighLightPlayer = true,
+				RowCount = 3,
+				ColumnCount = 3,
+				MarginTop = 2,
 				ElementWidth = 24,
 				ElementHeight = 24,
+				TopToBottom = false,
+			},
+		},
+		iOtherBuffPanel = {
+			Type = AuraPanel,
+			Name = "iOtherBuffPanel",
+			Location = { AnchorPoint("BOTTOMLEFT", 0, 0, "iPlayerBuffPanel", "BOTTOMRIGHT") },
+			Property = {
+				Filter = "HELPFUL",
+				RowCount = 6,
+				ColumnCount = 5,
+				MarginTop = 2,
+				ElementWidth = 16,
+				ElementHeight = 16,
+				TopToBottom = false,
 
-				CustomFilter = function(self, unit, index, filter)
-					local isEnemy = UnitCanAttack("player", unit)
-					local name, _, _, _, _, duration, _, caster, _, _, spellID = UnitAura(unit, index, filter)
-
-					if name and duration > 0 and (_Buff_List[spellID] or isEnemy or caster == "player") then
-						return true
-					end
+				CustomFilter = function (self, unit, index, filter)
+					local name, _, _, _, _, duration, _, caster = UnitAura(unit, index, filter)
+					return name and caster ~= "player"
 				end,
 			},
 		},
@@ -152,8 +171,9 @@ Config = {
 				RowCount = 6,
 				ColumnCount = 6,
 				MarginTop = 2,
-				ElementWidth = 24,
-				ElementHeight = 24,
+				ElementWidth = 16,
+				ElementHeight = 16,
+				TopToBottom = false,
 
 				CustomFilter = function (self, unit, index, filter)
 					local isFriend = not UnitCanAttack("player", unit)
@@ -163,6 +183,40 @@ Config = {
 						return true
 					end
 				end,
+			},
+		},
+		iOtherDebuffPanel = {
+			Type = AuraPanel,
+			Name = "iOtherDebuffPanel",
+			Location = { AnchorPoint("BOTTOMRIGHT", 0, 4, nil, "TOPRIGHT") },
+			Property = {
+				Filter = "HARMFUL",
+				RowCount = 6,
+				ColumnCount = 5,
+				MarginTop = 2,
+				ElementWidth = 16,
+				ElementHeight = 16,
+				TopToBottom = false,
+
+				CustomFilter = function (self, unit, index, filter)
+					local name, _, _, _, _, duration, _, caster = UnitAura(unit, index, filter)
+					return name and caster ~= "player"
+				end,
+			},
+		},
+		iPlayerDebuffPanel = {
+			Type = AuraPanel,
+			Name = "iPlayerDebuffPanel",
+			Location = { AnchorPoint("BOTTOMRIGHT", 0, 0, "iOtherDebuffPanel", "BOTTOMLEFT") },
+			Property = {
+				Filter = "HARMFUL|PLAYER",
+				HighLightPlayer = true,
+				RowCount = 3,
+				ColumnCount = 3,
+				MarginTop = 2,
+				ElementWidth = 24,
+				ElementHeight = 24,
+				TopToBottom = false,
 			},
 		},
 		iDebuffPanel_ToT = {
@@ -175,8 +229,9 @@ Config = {
 				RowCount = 6,
 				ColumnCount = 6,
 				MarginTop = 2,
-				ElementWidth = 24,
-				ElementHeight = 24,
+				ElementWidth = 16,
+				ElementHeight = 16,
+				TopToBottom = false,
 
 				CustomFilter = function (self, unit, index, filter)
 					local isFriend = not UnitCanAttack("player", unit)
@@ -253,8 +308,10 @@ Config = {
 				"iCastBar",
 				"HealthTextFrequent",
 				"HealthTextFrequent2",
-				"iBuffPanel",
-				"iDebuffPanel",
+				"iPlayerBuffPanel",
+				"iOtherBuffPanel",
+				"iOtherDebuffPanel",
+				"iPlayerDebuffPanel",
 				"QuestBossIcon",
 			},
 			Size = Size(200, 36),
@@ -346,7 +403,6 @@ Config = {
 
 	-- Class settings
 	Classes = {
-		DRUID = { "iEclipseBar" },
 		DEATHKNIGHT = { "iRuneBar" },
 		MONK = { "iStaggerBar" },
 	},
