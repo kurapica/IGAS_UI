@@ -72,7 +72,7 @@ Config = {
 			Type = iHiddenManaBar,
 			Direction = "south", Size = 6, Unit = "px",
 			Property = {
-				StatusBarColor = ColorType(0.3, 0.3, 1)
+				StatusBarColor = ColorType(0, 0, 1)
 			}
 		},
 		iClassPower = {

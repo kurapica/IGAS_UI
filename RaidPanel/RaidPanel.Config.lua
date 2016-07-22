@@ -18,7 +18,7 @@ end
 
 Config = {
 	-- Status bar texture
-	STATUSBAR_TEXTURE_PATH = [[Interface\Tooltips\UI-Tooltip-Background]],
+	STATUSBAR_TEXTURE_PATH = [[Interface\Addons\IGAS_UI\Resource\healthtex.tga]],
 
 	-- Color settings
 	--- Default border color

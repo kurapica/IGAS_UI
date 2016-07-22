@@ -226,7 +226,7 @@ class "iClassPower"
 		self.__NumBar = numBar
 
 		for i = 1, numBar do
-			self[i]:SetStatusBarColor(PLAYER_COLOR.r, PLAYER_COLOR.g, PLAYER_COLOR.b)
+			self[i].StatusBarColor = PowerBarColor[self.ClassPowerType]
 			self[i].Width = width
 			self[i]:SetPoint("LEFT", 1 + (width + self.HSpacing) * (i - 1), 0)
 			self[i].Activated = false

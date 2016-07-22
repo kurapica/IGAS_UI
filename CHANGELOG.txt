@@ -1,3 +1,6 @@
+2016/7/22 v69
+	1. Replace the status bar's texture, make it looks a little better.
+
 2016/07/22 v68
 	1. Fix the hidden mana bar's background color
 
