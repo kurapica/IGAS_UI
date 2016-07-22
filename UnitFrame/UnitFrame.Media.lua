@@ -35,7 +35,6 @@ Media = {
 	CASTBAR_COLOR = ColorType(0, 0, 0.8),
 }
 
-PowerBarColor =
 PowerBarColor = {}
 PowerBarColor["MANA"] = { r = 0.00, g = 0.00, b = 1.00 }
 PowerBarColor["RAGE"] = { r = 1.00, g = 0.00, b = 0.00, fullPowerAnim=true }
