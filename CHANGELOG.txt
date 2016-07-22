@@ -1,3 +1,6 @@
+2016/07/22 v68
+	1. Fix the hidden mana bar's background color
+
 2016/07/22 v67
 	1. Fix bugs of the spell cooldown line and auto popup action bar system.
 
