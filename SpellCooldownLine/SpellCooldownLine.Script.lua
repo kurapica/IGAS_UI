@@ -530,7 +530,7 @@ function btnHandler:OnReceiveDrag()
     local type, index, subType, data = GetCursorInfo()
 
     if type == "spell" and index and subType then
-        data = tonumber(GetSpellLink(index, subType):match("spell:(%d+)"))
+        data = tonumber(data) or tonumber(GetSpellLink(index, subType):match("spell:(%d+)"))
         Log(1, "SPELL ID %d", data)
 
         if not _SpellList[data] then

@@ -414,7 +414,3 @@ function cboItemClass:OnValueChanged(key)
 		cboItemSubClass:AddItem(i, subCls[i])
 	end
 end
-
-function cboItemSubClass:OnValueChanged(key, text)
-	print(key, text)
-end

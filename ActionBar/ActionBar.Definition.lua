@@ -1419,7 +1419,7 @@ class "AutoActionTask"
 			local index = C_ToyBox.GetToyFromIndex(i)
 			if index > 0 then
 				local item = C_ToyBox.GetToyInfo(index)
-				if PlayerHasToy(item) then
+				if item and PlayerHasToy(item) then
 					if not onlyFavourite or C_ToyBox.GetIsFavorite(item) then
 						if not filter or filter(item, index) then
 							yield("item", item)
@@ -1608,7 +1608,7 @@ class "AutoActionTask"
 		elseif self.Type == AutoActionTaskType.BattlePet then
 			return Task.ThreadCall(task, self, getBattlePet, "PET_JOURNAL_LIST_UPDATE", "PET_JOURNAL_PET_DELETED")
 		elseif self.Type == AutoActionTaskType.Mount then
-			return Task.ThreadCall(task, self, getMount, "COMPANION_LEARNED", "COMPANION_UNLEARNED", "MOUNT_JOURNAL_USABILITY_CHANGED")
+			return Task.ThreadCall(task, self, getMount, "COMPANION_LEARNED", "COMPANION_UNLEARNED", "MOUNT_JOURNAL_USABILITY_CHANGED", "COMPANION_UPDATE")
 		elseif self.Type == AutoActionTaskType.EquipSet then
 			return Task.ThreadCall(task, self, getEquipSet, "EQUIPMENT_SETS_CHANGED")
 		end

@@ -1,3 +1,6 @@
+2016/07/22 v67
+	1. Fix bugs of the spell cooldown line and auto popup action bar system.
+
 2016/07/21 v66
 	1. Update for wow 7.0, reset the player settings.
 
