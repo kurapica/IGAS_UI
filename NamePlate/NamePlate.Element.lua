@@ -1,4 +1,4 @@
-IGAS:NewAddon "IGAS_UI.UnitFrame"
+IGAS:NewAddon "IGAS_UI.NamePlate"
 
 --==========================
 -- Interfaces
@@ -55,45 +55,36 @@ endinterface "iBorder"
 -- Elements
 --==========================
 class "iHealthBar"
-	inherit "HealthBarFrequent"
+	inherit "HealthBar"
 	extend "iBorder" "iStatusBarStyle"
 
+	_DefaultColor = ColorType(1, 1, 1)
+
 	function Refresh(self, ...)
-		if self.Unit == "target" then
-			local classification = UnitClassification("target")
-			if classification == "worldboss" or classification == "elite" then
-				self.Back.BackdropBorderColor = Media.ELITE_BORDER_COLOR
-			elseif classification == "rareelite" or classification == "rare" then
-				self.Back.BackdropBorderColor = Media.RARE_BORDER_COLOR
+		local unit = self.Unit
+		if unit then
+			if UnitIsTapDenied(unit) then
+				return self:SetStatusBarColor(0.5, 0.5, 0.5)
+			end
+
+			if not UnitIsPlayer(unit) then
+				self:SetStatusBarColor(UnitSelectionColor(unit))
 			else
-				self.Back.BackdropBorderColor = Media.DEFAULT_BORDER_COLOR
+				self.StatusBarColor = RAID_CLASS_COLORS[select(2, UnitClass(unit))] or _DefaultColor
 			end
 		end
 		return Super.Refresh(self, ...)
 	end
-
-	------------------------------------------------------
-	-- Constructor
-	------------------------------------------------------
-	function iHealthBar(self, name, parent, ...)
-		Super(self, name, parent, ...)
-
-		self.UseClassColor = true
-	end
 endclass "iHealthBar"
 
 class "iPowerBar"
-	inherit "PowerBarFrequent"
+	inherit "PowerBar"
 	extend "iBorder" "iStatusBarStyle"
 endclass "iPowerBar"
 
-class "iHiddenManaBar"
-	inherit "HiddenManaBar"
-	extend "iBorder" "iStatusBarStyle"
-endclass "iHiddenManaBar"
-
 class "iCastBar"
 	inherit "CastBar"
+	extend "iBorder"
 
 	function SetUpCooldownStatus(self, status)
 		self.__CastBar = status
@@ -102,6 +93,81 @@ class "iCastBar"
 		status.StatusBarColor = Media.CASTBAR_COLOR
 	end
 endclass "iCastBar"
+
+class "iAuraPanel"
+	inherit "AuraPanel"
+
+	------------------------------------------------------
+	-- Method
+	------------------------------------------------------
+	function Refresh(self)
+		local unit = self.Unit
+
+		local filter
+
+		if unit then
+			if UnitIsUnit("player", unit) then
+				filter = "HELPFUL|INCLUDE_NAME_PLATE_ONLY"
+			else
+				local reaction = UnitReaction("player", unit)
+				if reaction and reaction <= 4 then
+				-- Reaction 4 is neutral and less than 4 becomes increasingly more hostile
+					filter = "HARMFUL|INCLUDE_NAME_PLATE_ONLY"
+				end
+			end
+		end
+
+		if filter then
+			self.Filter = filter
+			self.HasFilter = true
+		else
+			self.HasFilter = false
+		end
+
+		return Super.Refresh(self)
+	end
+
+	function CustomFilter(self, unit, index, filter)
+		if not self.HasFilter then return false end
+
+		if UnitIsUnit("player", unit) then
+			local name, _, _, _, _, duration, _, caster, _, _, spellID = UnitAura(unit, index, filter)
+			if name and duration > 0 then return true end
+		else
+			return true
+		end
+	end
+
+	------------------------------------------------------
+	-- Event Handler
+	------------------------------------------------------
+
+	------------------------------------------------------
+	-- Constructor
+	------------------------------------------------------
+    function iAuraPanel(self, name, parent, ...)
+		Super(self, name, parent, ...)
+
+		self.ColumnCount = 3
+		self.RowCount = 2
+		self.ElementWidth = 24
+		self.ElementHeight = 24
+		self.Orientation = Orientation.HORIZONTAL
+		self.TopToBottom = false
+		self.LeftToRight = false
+    end
+endclass "iAuraPanel"
+
+class "iNameLabel"
+	inherit "NameLabel"
+	function Refresh(self)
+		if self.Unit and UnitIsUnit("player", self.Unit) then
+			self.Visible = false
+		else
+			return Super.Refresh(self)
+		end
+	end
+endclass "iNameLabel"
 
 class "iClassPowerButton"
 	inherit "StatusBar"
@@ -403,22 +469,6 @@ class "iRuneBar"
 		Type = Number,
 	}
 endclass "iRuneBar"
-
-class "iPlayerPowerText"
-	inherit "PowerTextFrequent"
-
-	function Refresh(self)
-		local powerType = self.Unit and UnitPowerType(self.Unit) or 0
-
-		if powerType == 0 or powerType == "MANA" then
-			self.ShowPercent = true
-		else
-			self.ShowPercent = false
-		end
-
-		return Super.Refresh(self)
-	end
-endclass "iPlayerPowerText"
 
 class "iStaggerBar"
 	inherit "StatusBar"

@@ -13,7 +13,7 @@
 	<Include file = "InfoBar\InfoBar.xml"/>
 	<Include file = "RaidPanel\RaidPanel.xml"/>
 	<Include file = "UnitFrame\UnitFrame.xml"/>
-	<!--Include file = "NamePlate\NamePlate.xml"/-->
+	<Include file = "NamePlate\NamePlate.xml"/>
 	<Script file = "Minimap\Minimap.lua"/>
 	<Script file = "ChatFrame\ChatFrame.lua"/>
 	<Script file = "QuestMover\QuestMover.lua"/>

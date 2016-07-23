@@ -3,109 +3,74 @@
 -----------------------------------------
 IGAS:NewAddon "IGAS_UI.NamePlate"
 
-_Interval = 0.2
-_MaxNamePlate = 0
+local _ClassPowerBar
+local _RuneBar
+local _StaggerBar
+local _TotemBar
+local _BarSize = 6
 
 ------------------------------------------------------
 -- Module Script Handler
 ------------------------------------------------------
-_InChecking_Mode = false
-
 function OnLoad(self)
-	self:RegisterEvent("PLAYER_TARGET_CHANGED")
-	self:ActiveThread("OnEvent")
+	if _G.NamePlateDriverFrame then
+		_G.NamePlateDriverFrame:UnregisterAllEvents()
+
+		_G.ClassNameplateBarRogueDruidFrame:UnregisterAllEvents()
+		_G.ClassNameplateBarWarlockFrame:UnregisterAllEvents()
+		_G.ClassNameplateBarPaladinFrame:UnregisterAllEvents()
+		_G.ClassNameplateBarWindwalkerMonkFrame:UnregisterAllEvents()
+		_G.ClassNameplateBrewmasterBarFrame:UnregisterAllEvents()
+		_G.ClassNameplateBarMageFrame:UnregisterAllEvents()
+		_G.DeathKnightResourceOverlayFrame:UnregisterAllEvents()
+
+		_G.ClassNameplateManaBarFrame:UnregisterAllEvents()
+		_G.NamePlateTargetResourceFrame:UnregisterAllEvents()
+		_G.NamePlatePlayerResourceFrame:UnregisterAllEvents()
+
+		_G.InterfaceOptionsNamesPanelUnitNameplatesMakeLarger.setFunc = function() end
+	end
+
+	self:RegisterEvent("NAME_PLATE_CREATED")
+	self:RegisterEvent("NAME_PLATE_UNIT_ADDED")
+	self:RegisterEvent("NAME_PLATE_UNIT_REMOVED")
 end
 
-function OnEnable(self)
-	_Scan.Visible = true
+function NAME_PLATE_CREATED(self, base)
+	base.NamePlateMask = iNamePlateUnitFrame("iNamePlateMask", base)
 end
 
-function PLAYER_TARGET_CHANGED(self)
-	if _InChecking_Mode then return end
+function NAME_PLATE_UNIT_ADDED(self, unit)
+	local base = C_NamePlate.GetNamePlateForUnit(unit)
+	if UnitIsUnit("player", unit) then
+		unit = "player"
+		_ClassPowerBar = _ClassPowerBar or iClassPower("IGAS_UI_NamePlate_ClassPowerBar")
+		base.NamePlateMask:AddElement(_ClassPowerBar, "south", _BarSize, "px")
 
-	_InChecking_Mode = true
+		_TotemBar = _TotemBar or TotemBar("IGAS_UI_NamePlate_TotemBar")
+		base.NamePlateMask:AddElement(_TotemBar)
+		_TotemBar:SetPoint("TOP", base.NamePlateMask, "BOTTOM", 0, -14)
 
-	while UnitExists('target') do
-		Threading.Sleep(0.1)
-
-		local plate
-
-		for i = 1, #NamePlateArray do
-			plate = NamePlateArray[i].Parent
-
-			if plate.Visible and plate.Alpha > 0.9 then
-				TargetDebuffPanel.Parent = plate
-				TargetDebuffPanel:SetPoint("BOTTOM", plate, "TOP")
-				TargetDebuffPanel.Visible = true
-				TargetDebuffPanel:Refresh()
-
-				_InChecking_Mode = false
-
-				return
-			end
+		if select(2, UnitClass("player")) == "DEATHKNIGHT" then
+			_RuneBar = _RuneBar or iRuneBar("IGAS_UI_NamePlate_RuneBar")
+			base.NamePlateMask:AddElement(_RuneBar, "south", _BarSize, "px")
+		end
+		if select(2, UnitClass("player")) == "MONK" then
+			_StaggerBar = _StaggerBar or iStaggerBar("IGAS_UI_NamePlate_StaggerBar")
+			base.NamePlateMask:AddElement(_StaggerBar, "south", _BarSize, "px")
 		end
 	end
-
-	TargetDebuffPanel.Visible = false
-	_InChecking_Mode = false
+	base.NamePlateMask.Unit = unit
+	base.NamePlateMask:UpdateElements()
 end
 
-------------------------------------------------------
--- Widget Script Handler
-------------------------------------------------------
-function _Scan:OnUpdate(elapsed)
-	self.__OnUpdateTimer = (self.__OnUpdateTimer or 0) + elapsed
-
-	if self.__OnUpdateTimer > _Interval then
-		self.__OnUpdateTimer = 0
-
-		if GetCVarBool("nameplateShowEnemies") or GetCVarBool("nameplateShowFriends") then
-			if _MaxNamePlate == 0 then
-				return CheckWorldFrame()
-			else
-				return CheckG()
-			end
-		end
+function NAME_PLATE_UNIT_REMOVED(self, unit)
+	local base = C_NamePlate.GetNamePlateForUnit(unit)
+	base.NamePlateMask.Unit = nil
+	if UnitIsUnit("player", unit) then
+		if _ClassPowerBar then base.NamePlateMask:RemoveElement(_ClassPowerBar, true) end
+		if _RuneBar then base.NamePlateMask:RemoveElement(_RuneBar, true) end
+		if _StaggerBar then base.NamePlateMask:RemoveElement(_StaggerBar, true) end
+		if _TotemBar then base.NamePlateMask:RemoveElement(_TotemBar, true) end
 	end
-end
-
-function TargetDebuffPanel:OnHide()
-	if UnitExists('target') then
-		_M:ThreadCall(PLAYER_TARGET_CHANGED)
-	end
-end
-
-------------------------------------------------------
--- Helper Function
-------------------------------------------------------
-function CheckWorldFrame()
-	local name, index
-	for k, v in ipairs{_G.WorldFrame:GetChildren()} do
-		name = v:GetName()
-
-		if name and name:match("NamePlate%d+") then
-			index = tonumber(name:match("NamePlate(%d+)"))
-
-			if index then
-				BuildNamePlate(_G["NamePlate" .. index])
-
-				if index > _MaxNamePlate then
-					_MaxNamePlate = index
-				end
-			end
-		end
-	end
-end
-
-function CheckG()
-	-- Keep it simple
-	while rawget(_G, "NamePlate" .. (_MaxNamePlate + 1)) do
-		_MaxNamePlate = _MaxNamePlate + 1
-
-		BuildNamePlate(_G["NamePlate" .. _MaxNamePlate])
-	end
-end
-
-function BuildNamePlate(self)
-	NamePlateMask("NamePlateMask", self)
 end
