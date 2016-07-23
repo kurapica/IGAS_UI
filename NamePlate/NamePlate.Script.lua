@@ -53,6 +53,7 @@ function NAME_PLATE_UNIT_ADDED(self, unit)
 
 		if select(2, UnitClass("player")) == "DEATHKNIGHT" then
 			_RuneBar = _RuneBar or iRuneBar("IGAS_UI_NamePlate_RuneBar")
+			_RuneBar.Visible = true
 			base.NamePlateMask:AddElement(_RuneBar, "south", _BarSize, "px")
 		end
 		if select(2, UnitClass("player")) == "MONK" then
@@ -69,8 +70,8 @@ function NAME_PLATE_UNIT_REMOVED(self, unit)
 	base.NamePlateMask.Unit = nil
 	if UnitIsUnit("player", unit) then
 		if _ClassPowerBar then base.NamePlateMask:RemoveElement(_ClassPowerBar, true) end
-		if _RuneBar then base.NamePlateMask:RemoveElement(_RuneBar, true) end
-		if _StaggerBar then base.NamePlateMask:RemoveElement(_StaggerBar, true) end
-		if _TotemBar then base.NamePlateMask:RemoveElement(_TotemBar, true) end
+		if _RuneBar then base.NamePlateMask:RemoveElement(_RuneBar, true) _RuneBar:ClearAllPoints() _RuneBar.Visible = false end
+		if _StaggerBar then base.NamePlateMask:RemoveElement(_StaggerBar, true) _StaggerBar:ClearAllPoints() end
+		if _TotemBar then base.NamePlateMask:RemoveElement(_TotemBar, true) _TotemBar:ClearAllPoints() end
 	end
 end

@@ -1,3 +1,6 @@
+2016/7/23 v72
+	1. Fix the rune bar would be shown on non-player's nameplate.
+
 2016/7/23 v71
 	1. Active the name plate module.
 
