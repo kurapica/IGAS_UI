@@ -132,7 +132,7 @@ class "iAuraPanel"
 
 		if UnitIsUnit("player", unit) then
 			local name, _, _, _, _, duration, _, caster, _, _, spellID = UnitAura(unit, index, filter)
-			if name and duration > 0 then return true end
+			if name and duration > 0 and duration <= 60 then return true end
 		else
 			return true
 		end

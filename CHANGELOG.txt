@@ -1,3 +1,6 @@
+2016/7/24 v74
+	1. Only display buff/defuff that duration less than 1 min on nameplates.
+
 2016/7/24 v73
 	1. Make the rune bar not flash when it appears.
 
