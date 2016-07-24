@@ -53,8 +53,8 @@ function NAME_PLATE_UNIT_ADDED(self, unit)
 
 		if select(2, UnitClass("player")) == "DEATHKNIGHT" then
 			_RuneBar = _RuneBar or iRuneBar("IGAS_UI_NamePlate_RuneBar")
-			_RuneBar.Visible = true
 			base.NamePlateMask:AddElement(_RuneBar, "south", _BarSize, "px")
+			_RuneBar.Visible = true
 		end
 		if select(2, UnitClass("player")) == "MONK" then
 			_StaggerBar = _StaggerBar or iStaggerBar("IGAS_UI_NamePlate_StaggerBar")

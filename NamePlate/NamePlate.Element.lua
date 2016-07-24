@@ -203,13 +203,17 @@ class "iClassPowerButton"
 	local function AnimIn_OnPlay(self)
 		self.Parent.Alpha = 0
 		local width, height = self.Parent.Parent:GetSize()
-		self.Parent:SetSize(width*1.04, height*2)
+		if width > 0 and height > 0 then
+			self.Parent:SetSize(width*1.04, height*2)
+		end
 	end
 
 	local function AnimIn_OnFinished(self)
 		self.Parent.Alpha = 1
 		local width, height = self.Parent.Parent:GetSize()
-		self.Parent:SetSize(width*1.04, height*2)
+		if width > 0 and height > 0 then
+			self.Parent:SetSize(width*1.04, height*2)
+		end
 	end
 
 	local function AnimOut_OnPlay(self)

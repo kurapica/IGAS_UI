@@ -1,3 +1,6 @@
+2016/7/24 v73
+	1. Make the rune bar not flash when it appears.
+
 2016/7/23 v72
 	1. Fix the rune bar would be shown on non-player's nameplate.
 
