@@ -8,6 +8,7 @@ local _RuneBar
 local _StaggerBar
 local _TotemBar
 local _BarSize = 6
+local _PlayerNamePlate
 
 ------------------------------------------------------
 -- Module Script Handler
@@ -42,36 +43,75 @@ end
 
 function NAME_PLATE_UNIT_ADDED(self, unit)
 	local base = C_NamePlate.GetNamePlateForUnit(unit)
-	if UnitIsUnit("player", unit) then
-		unit = "player"
-		_ClassPowerBar = _ClassPowerBar or iClassPower("IGAS_UI_NamePlate_ClassPowerBar")
-		base.NamePlateMask:AddElement(_ClassPowerBar, "south", _BarSize, "px")
+	if UnitIsUnit("player", unit) then unit = "player" end
 
-		_TotemBar = _TotemBar or TotemBar("IGAS_UI_NamePlate_TotemBar")
-		base.NamePlateMask:AddElement(_TotemBar)
-		_TotemBar:SetPoint("TOP", base.NamePlateMask, "BOTTOM", 0, -14)
-
-		if select(2, UnitClass("player")) == "DEATHKNIGHT" then
-			_RuneBar = _RuneBar or iRuneBar("IGAS_UI_NamePlate_RuneBar")
-			base.NamePlateMask:AddElement(_RuneBar, "south", _BarSize, "px")
-			_RuneBar.Visible = true
-		end
-		if select(2, UnitClass("player")) == "MONK" then
-			_StaggerBar = _StaggerBar or iStaggerBar("IGAS_UI_NamePlate_StaggerBar")
-			base.NamePlateMask:AddElement(_StaggerBar, "south", _BarSize, "px")
-		end
-	end
 	base.NamePlateMask.Unit = unit
+
+	if unit == "player" then InstallClassPower(base.NamePlateMask) end
+
 	base.NamePlateMask:UpdateElements()
 end
 
 function NAME_PLATE_UNIT_REMOVED(self, unit)
 	local base = C_NamePlate.GetNamePlateForUnit(unit)
+	UninstallClassPower(base.NamePlateMask)
 	base.NamePlateMask.Unit = nil
-	if UnitIsUnit("player", unit) then
-		if _ClassPowerBar then base.NamePlateMask:RemoveElement(_ClassPowerBar, true) end
-		if _RuneBar then base.NamePlateMask:RemoveElement(_RuneBar, true) _RuneBar:ClearAllPoints() _RuneBar.Visible = false end
-		if _StaggerBar then base.NamePlateMask:RemoveElement(_StaggerBar, true) _StaggerBar:ClearAllPoints() end
-		if _TotemBar then base.NamePlateMask:RemoveElement(_TotemBar, true) _TotemBar:ClearAllPoints() end
+end
+
+function InstallClassPower(self)
+	if _PlayerNamePlate == self then return end
+	if _PlayerNamePlate then UninstallClassPower(_PlayerNamePlate) end
+	_PlayerNamePlate = self
+
+	-- Common class power
+	_ClassPowerBar = _ClassPowerBar or iClassPower("IGAS_UI_NamePlate_ClassPowerBar")
+	self:AddElement(_ClassPowerBar, "south", _BarSize, "px")
+	_ClassPowerBar.Unit = "player"
+
+	-- Totem bar
+	_TotemBar = _TotemBar or TotemBar("IGAS_UI_NamePlate_TotemBar")
+	self:AddElement(_TotemBar)
+	_TotemBar:SetPoint("TOP", self, "BOTTOM", 0, -14)
+	_TotemBar.Unit = "player"
+
+	-- Rune bar
+	if select(2, UnitClass("player")) == "DEATHKNIGHT" then
+		_RuneBar = _RuneBar or iRuneBar("IGAS_UI_NamePlate_RuneBar")
+		self:AddElement(_RuneBar, "south", _BarSize, "px")
+		_RuneBar.Visible = true
+		_RuneBar.Unit = "player"
+	end
+
+	-- Stagger bar
+	if select(2, UnitClass("player")) == "MONK" then
+		_StaggerBar = _StaggerBar or iStaggerBar("IGAS_UI_NamePlate_StaggerBar")
+		self:AddElement(_StaggerBar, "south", _BarSize, "px")
+		_StaggerBar.Unit = "player"
+	end
+end
+
+function UninstallClassPower(self)
+	if _PlayerNamePlate ~= self then return end
+	_PlayerNamePlate = nil
+
+	if _ClassPowerBar then
+		self:RemoveElement(_ClassPowerBar, true)
+		_ClassPowerBar.Unit = nil
+		_ClassPowerBar:ClearAllPoints()
+	end
+	if _RuneBar then
+		self:RemoveElement(_RuneBar, true)
+		_RuneBar:ClearAllPoints()
+		_RuneBar.Visible = false
+	end
+	if _StaggerBar then
+		self:RemoveElement(_StaggerBar, true)
+		_StaggerBar.Unit = nil
+		_StaggerBar:ClearAllPoints()
+	end
+	if _TotemBar then
+		self:RemoveElement(_TotemBar, true)
+		_TotemBar.Unit = nil
+		_TotemBar:ClearAllPoints()
 	end
 end

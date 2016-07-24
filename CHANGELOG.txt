@@ -1,3 +1,6 @@
+2016/7/24 v75
+	1. Add some safeguard to make sure the class power don't disappear.
+
 2016/7/24 v74
 	1. Only display buff/defuff that duration less than 1 min on nameplates.
 
