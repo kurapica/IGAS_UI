@@ -55,7 +55,7 @@ endinterface "iBorder"
 -- Elements
 --==========================
 class "iHealthBar"
-	inherit "HealthBar"
+	inherit "HealthBarFrequent"
 	extend "iBorder" "iStatusBarStyle"
 
 	_DefaultColor = ColorType(1, 1, 1)
@@ -78,19 +78,218 @@ class "iHealthBar"
 endclass "iHealthBar"
 
 class "iPowerBar"
-	inherit "PowerBar"
+	inherit "PowerBarFrequent"
 	extend "iBorder" "iStatusBarStyle"
 endclass "iPowerBar"
 
 class "iCastBar"
-	inherit "CastBar"
+	inherit "Frame"
+	extend "IFCast" "IFCooldownStatus"
 	extend "iBorder"
 
+	_BackDrop = {
+	    edgeFile = [[Interface\ChatFrame\CHATFRAMEBACKGROUND]],
+	    edgeSize = 2,
+	}
+
 	function SetUpCooldownStatus(self, status)
-		self.__CastBar = status
-		Super.SetUpCooldownStatus(self, status)
+		status:ClearAllPoints()
+		status:SetAllPoints()
 		status.StatusBarTexturePath = Media.STATUSBAR_TEXTURE_PATH
 		status.StatusBarColor = Media.CASTBAR_COLOR
+		status.MinMaxValue = MinMax(1, 100)
+		status.Layer = "BORDER"
+	end
+
+	function Start(self, spell, rank, lineID, spellID)
+		local name, _, text, texture, startTime, endTime, _, _, notInterruptible = UnitCastingInfo(self.Unit)
+
+		if not name then
+			self.Alpha = 0
+			return
+		end
+
+		startTime = startTime / 1000
+		endTime = endTime / 1000
+
+		self.Icon.Width = self.Icon.Height
+		self.Duration = endTime - startTime
+		self.EndTime = endTime
+		self.Icon.Texture.TexturePath = texture
+		self.NameBack.SpellName.Text = name
+		self.LineID = lineID
+
+		if notInterruptible then
+			self.Icon.BackdropBorderColor = Media.CASTBAR_BORDER_NONINTERRUPTIBLE_COLOR
+		else
+			self.Icon.BackdropBorderColor = Media.CASTBAR_BORDER_NORMAL_COLOR
+		end
+
+		-- Init
+		self.DelayTime = 0
+		self.LatencyWorld = 0
+		self.IFCooldownStatusReverse = true
+
+		self:OnCooldownUpdate(startTime, self.Duration)
+
+		self.Alpha = 1
+	end
+
+	function Fail(self, spell, rank, lineID, spellID)
+		if not lineID or lineID == self.LineID then
+			self:OnCooldownUpdate()
+			self.Alpha = 0
+			self.Duration = 0
+			self.LineID = nil
+		end
+	end
+
+	function Stop(self, spell, rank, lineID, spellID)
+		if not lineID or lineID == self.LineID then
+			self:OnCooldownUpdate()
+			self.Alpha = 0
+			self.Duration = 0
+			self.LineID = nil
+		end
+	end
+
+	function Interrupt(self, spell, rank, lineID, spellID)
+		if not lineID or lineID == self.LineID then
+			self:OnCooldownUpdate()
+			self.Alpha = 0
+			self.Duration = 0
+			self.LineID = nil
+		end
+	end
+
+	function Interruptible(self)
+		self.Icon.BackdropBorderColor = Media.CASTBAR_BORDER_NORMAL_COLOR
+	end
+
+	function UnInterruptible(self)
+		self.Icon.BackdropBorderColor = Media.CASTBAR_BORDER_NONINTERRUPTIBLE_COLOR
+	end
+
+	function Delay(self, spell, rank, lineID, spellID)
+		local name, _, text, texture, startTime, endTime = UnitCastingInfo(self.Unit)
+
+		if not startTime or not endTime then return end
+
+		startTime = startTime / 1000
+		endTime = endTime / 1000
+
+		local duration = endTime - startTime
+
+		-- Update
+		self.LatencyWorld = 0
+		self.EndTime = self.EndTime or endTime
+		self.DelayTime = endTime - self.EndTime
+		self.Duration = duration
+
+		self:OnCooldownUpdate(startTime, self.Duration)
+	end
+
+	function ChannelStart(self, spell, rank, lineID, spellID)
+		local name, _, text, texture, startTime, endTime, _, notInterruptible = UnitChannelInfo(self.Unit)
+
+		if not name then
+			self.Alpha = 0
+			self.Duration = 0
+			return
+		end
+
+		startTime = startTime / 1000
+		endTime = endTime / 1000
+
+		self.Icon.Width = self.Icon.Height
+		self.Duration = endTime - startTime
+		self.EndTime = endTime
+		self.Icon.Texture.TexturePath = texture
+		self.NameBack.SpellName.Text = name
+
+		if notInterruptible then
+			self.Icon.BackdropBorderColor = Media.CASTBAR_BORDER_NONINTERRUPTIBLE_COLOR
+		else
+			self.Icon.BackdropBorderColor = Media.CASTBAR_BORDER_NORMAL_COLOR
+		end
+
+		-- Init
+		self.DelayTime = 0
+		self.LatencyWorld = 0
+		self.IFCooldownStatusReverse = false
+
+		self:OnCooldownUpdate(startTime, self.Duration)
+
+		self.Alpha = 1
+	end
+
+	function ChannelUpdate(self, spell, rank, lineID, spellID)
+		local name, _, text, texture, startTime, endTime = UnitChannelInfo(self.Unit)
+
+		if not name or not startTime or not endTime then
+			self:OnCooldownUpdate()
+			self.Alpha = 0
+			return
+		end
+
+		startTime = startTime / 1000
+		endTime = endTime / 1000
+
+		local duration = endTime - startTime
+
+		-- Update
+		self.LatencyWorld = 0
+		self.EndTime = self.EndTime or endTime
+		self.DelayTime = endTime - self.EndTime
+		self.Duration = duration
+		self:OnCooldownUpdate(startTime, self.Duration)
+	end
+
+	function ChannelStop(self, spell, rank, lineID, spellID)
+		self:OnCooldownUpdate()
+		self.Alpha = 0
+		self.Duration = 0
+	end
+
+	------------------------------------------------------
+	-- Event Handler
+	------------------------------------------------------
+	local function OnHide(self)
+		self:OnCooldownUpdate()
+		self.Alpha = 0
+	end
+
+	------------------------------------------------------
+	-- Constructor
+	------------------------------------------------------
+	function iCastBar(self, ...)
+		Super(self, ...)
+
+		local bgColor = Texture("Bg", self, "BACKGROUND")
+		bgColor:SetTexture(0, 0, 0, 1)
+		bgColor:SetAllPoints()
+
+		local icon = Frame("Icon", self)
+		icon.FrameStrata = "LOW"
+		icon.Backdrop = _BackDrop
+		icon.BackdropBorderColor = Media.CASTBAR_BORDER_NORMAL_COLOR
+		icon:SetPoint("BOTTOMRIGHT", self, "BOTTOMLEFT")
+		icon:SetSize(32, 32)
+
+		-- Icon
+		local iconTxt = Texture("Texture", icon, "BACKGROUND")
+		iconTxt:SetAllPoints()
+
+		local nameBack = Frame("NameBack", self)
+		nameBack:SetAllPoints()
+
+		-- SpellName
+		local text = FontString("SpellName", nameBack, "OVERLAY")
+		text:SetVertexColor(1, 1, 1)
+		text.FontObject = Media.NAME_FONT
+		text:SetPoint("CENTER", self, "BOTTOM")
+
+		self.OnHide = self.OnHide + OnHide
 	end
 endclass "iCastBar"
 
@@ -148,24 +347,100 @@ class "iAuraPanel"
     function iAuraPanel(self, name, parent, ...)
 		Super(self, name, parent, ...)
 
-		self.ColumnCount = 3
-		self.RowCount = 2
+		self.ColumnCount = 4
+		self.RowCount = 3
 		self.ElementWidth = 24
 		self.ElementHeight = 24
 		self.Orientation = Orientation.HORIZONTAL
 		self.TopToBottom = false
-		self.LeftToRight = false
+		self.LeftToRight = true
     end
 endclass "iAuraPanel"
 
 class "iNameLabel"
-	inherit "NameLabel"
+	inherit "Frame"
+	extend "IFUnitName" "IFFaction" "IFUnitLevel"
+
+	local function parseColor(str, r, g, b)
+		local color = ("\124cff%.2x%.2x%.2x"):format(r * 255, g * 255, b * 255)
+		return color .. str .. "|r"
+	end
+
 	function Refresh(self)
-		if self.Unit and UnitIsUnit("player", self.Unit) then
+		local unit = self.Unit
+		if unit and UnitIsUnit("player", unit) then
 			self.Visible = false
 		else
-			return Super.Refresh(self)
+			-- Parse Level
+			local value = unit and UnitLevel(unit)
+			local lvlText
+
+			if value and value > 0 then
+				if UnitIsWildBattlePet(unit) or UnitIsBattlePetCompanion(unit) then
+					local petLevel = UnitBattlePetLevel(unit)
+
+					lvlText = parseColor(self.LevelFormat:format(petLevel), 1.0, 0.82, 0.0)
+				else
+					if UnitCanAttack("player", unit) then
+						local color = GetQuestDifficultyColor(value)
+						lvlText = parseColor(self.LevelFormat:format(value), color.r, color.g, color.b)
+					else
+						lvlText = parseColor(self.LevelFormat:format(value), 1.0, 0.82, 0.0)
+					end
+				end
+			else
+				lvlText = parseColor(self.LevelFormat:format("???") , 1.0, 0.82, 0.0)
+			end
+
+			-- Parse Name
+			local nameText
+
+			if unit then
+				local name = GetUnitName(unit, self.WithServerName) or unit
+				if self.UseTapColor and UnitIsTapDenied(unit) then
+					nameText = parseColor(name, 0.5, 0.5, 0.5)
+				elseif self.UseSelectionColor and not UnitIsPlayer(unit) then
+					nameText = parseColor(name, UnitSelectionColor(unit))
+				elseif self.UseClassColor then
+					local color = RAID_CLASS_COLORS[select(2, UnitClass(unit))]
+					if color then
+						nameText = parseColor(name, color.r, color.g, color.b)
+					else
+						nameText = parseColor(name, 1, 1, 1)
+					end
+				else
+					nameText = parseColor(name, 1, 1, 1)
+				end
+			else
+				nameText = parseColor(L"Unknown", 1, 1, 1)
+			end
+
+			self.Label.Text = lvlText .. " " .. nameText
+			self.Visible = true
 		end
+	end
+
+	__Handler__( Refresh )
+	property "LevelFormat" { Type = String, Default = "%s" }
+
+	__Handler__(Refresh)
+	property "WithServerName" { Type = Boolean }
+
+	__Handler__( Refresh )
+	property "UseTapColor" { Type = Boolean }
+
+	__Handler__( Refresh )
+	property "UseSelectionColor" { Type = Boolean }
+
+	__Handler__( Refresh )
+	property "UseClassColor" { Type = Boolean }
+
+	function iNameLabel(self, ...)
+		Super(self, ...)
+
+		local label = FontString("Label", self, "ARTWORK")
+		label:SetPoint("BOTTOM")
+		label.FontObject = Media.NAME_FONT
 	end
 endclass "iNameLabel"
 
@@ -173,92 +448,20 @@ class "iClassPowerButton"
 	inherit "StatusBar"
 	extend "iBorder" "iStatusBarStyle"
 
-	------------------------------------------------------
+	--------------------------------
 	-- Property
-	------------------------------------------------------
+	--------------------------------
 	-- Activated
 	property "Activated" {
-		Field = "__Activated",
-		Set = function(self, value)
-			if self.Activated ~= value then
-				self.__Activated = value
-
-				if value then
-					self.Glow.AnimOut.Playing = false
-
-					self.Glow.AnimIn.Playing = true
-				else
-					self.Glow.AnimIn.Playing = false
-
-					self.Glow.AnimOut.Playing = true
-				end
+		Handler = function(self, value)
+			if value then
+				self.Back.BackdropBorderColor = Media.ACTIVED_BORDER_COLOR
+			else
+				self.Back.BackdropBorderColor = Media.DEFAULT_BORDER_COLOR
 			end
 		end,
 		Type = Boolean,
 	}
-
-	------------------------------------------------------
-	-- Script Handler
-	------------------------------------------------------
-	local function AnimIn_OnPlay(self)
-		self.Parent.Alpha = 0
-		local width, height = self.Parent.Parent:GetSize()
-		if width > 0 and height > 0 then
-			self.Parent:SetSize(width*1.04, height*2)
-		end
-	end
-
-	local function AnimIn_OnFinished(self)
-		self.Parent.Alpha = 1
-		local width, height = self.Parent.Parent:GetSize()
-		if width > 0 and height > 0 then
-			self.Parent:SetSize(width*1.04, height*2)
-		end
-	end
-
-	local function AnimOut_OnPlay(self)
-		self.Parent.Alpha = 1
-	end
-
-	local function AnimOut_OnFinished(self)
-		self.Parent.Alpha = 0
-	end
-
-	------------------------------------------------------
-	-- Constructor
-	------------------------------------------------------
-	function iClassPowerButton(self, name, parent, ...)
-		Super(self, name, parent, ...)
-
-		local glow = Texture("Glow", self, "ARTWORK")
-		glow.Alpha = 0
-		glow.TexturePath = [[Interface\SpellActivationOverlay\IconAlert]]
-		--glow:SetTexCoord(0.00781250, 0.50781250, 0.27734375, 0.52734375)
-		glow:SetTexCoord(0.13, 0.395, 0.27734375, 0.52734375)
-		glow:SetPoint("CENTER")
-
-		local animIn = AnimationGroup("AnimIn", glow)
-
-		local alpha = Alpha("Alpha", animIn)
-		alpha.Order = 1
-		alpha.Duration = 0.2
-		alpha.FromAlpha = 0
-		alpha.ToAlpha = 1
-
-		animIn.OnPlay = AnimIn_OnPlay
-		animIn.OnFinished = AnimIn_OnFinished
-
-		local animOut = AnimationGroup("AnimOut", glow)
-
-		alpha = Alpha("Alpha", animOut)
-		alpha.Order = 1
-		alpha.Duration = 0.2
-		alpha.FromAlpha = 1
-		alpha.ToAlpha = 0
-
-		animOut.OnPlay = AnimOut_OnPlay
-		animOut.OnFinished = AnimOut_OnFinished
-	end
 endclass "iClassPowerButton"
 
 class "iClassPower"
@@ -465,7 +668,7 @@ class "iRuneBar"
 
 				self:AddWidget(btnRune)
 
-				self:SetWidgetLeftWidth(btnRune, margin + (i-1)*pct, "pct", pct-1, "pct")
+				self:SetWidgetLeftWidth(btnRune, margin + (i-1)*pct, "pct", pct-2, "pct")
 
 				self[i] = btnRune
 			end

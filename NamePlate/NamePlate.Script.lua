@@ -3,12 +3,24 @@
 -----------------------------------------
 IGAS:NewAddon "IGAS_UI.NamePlate"
 
+local _BaseNamePlateWidth = 110
+local _BaseNamePlateHeight = 45
+
+local _ClassMainPowerBar
 local _ClassPowerBar
 local _RuneBar
 local _StaggerBar
 local _TotemBar
+
+local _MainPowerBarSize = 2
 local _BarSize = 6
+
 local _PlayerNamePlate
+
+local _VerticalScale
+local _HorizontalScale
+
+local _ArrayMask = System.Collections.List()
 
 ------------------------------------------------------
 -- Module Script Handler
@@ -29,7 +41,7 @@ function OnLoad(self)
 		_G.NamePlateTargetResourceFrame:UnregisterAllEvents()
 		_G.NamePlatePlayerResourceFrame:UnregisterAllEvents()
 
-		_G.InterfaceOptionsNamesPanelUnitNameplatesMakeLarger.setFunc = function() end
+		_G.NamePlateDriverFrame.UpdateNamePlateOptions = UpdateNamePlateOptions
 	end
 
 	self:RegisterEvent("NAME_PLATE_CREATED")
@@ -37,8 +49,15 @@ function OnLoad(self)
 	self:RegisterEvent("NAME_PLATE_UNIT_REMOVED")
 end
 
+function OnEnable(self)
+	UpdateNamePlateOptions()
+end
+
 function NAME_PLATE_CREATED(self, base)
 	base.NamePlateMask = iNamePlateUnitFrame("iNamePlateMask", base)
+	base.NamePlateMask:ApplyFrameOptions(_VerticalScale, _HorizontalScale)
+	_ArrayMask:Insert(base.NamePlateMask)
+	Debug("NamePlate %d created", #_ArrayMask)
 end
 
 function NAME_PLATE_UNIT_ADDED(self, unit)
@@ -63,6 +82,14 @@ function InstallClassPower(self)
 	if _PlayerNamePlate then UninstallClassPower(_PlayerNamePlate) end
 	_PlayerNamePlate = self
 
+	self:SuspendLayout()
+
+	-- Main class power
+	_ClassMainPowerBar = _ClassMainPowerBar or iPowerBar("IGAS_UI_NamePlate_MainPowerBar")
+	self:InsertElement("iHealthBar", _ClassMainPowerBar, "south", _MainPowerBarSize * _VerticalScale, "px")
+	_ClassMainPowerBar.Unit = "player"
+	_ClassMainPowerBar.Visible = true
+
 	-- Common class power
 	_ClassPowerBar = _ClassPowerBar or iClassPower("IGAS_UI_NamePlate_ClassPowerBar")
 	self:AddElement(_ClassPowerBar, "south", _BarSize, "px")
@@ -71,7 +98,8 @@ function InstallClassPower(self)
 	-- Totem bar
 	_TotemBar = _TotemBar or TotemBar("IGAS_UI_NamePlate_TotemBar")
 	self:AddElement(_TotemBar)
-	_TotemBar:SetPoint("TOP", self, "BOTTOM", 0, -14)
+	-- Consider the cast bar
+	_TotemBar:SetPoint("TOP", self, "BOTTOM", 0, -(6 + 8 * _VerticalScale))
 	_TotemBar.Unit = "player"
 
 	-- Rune bar
@@ -88,11 +116,22 @@ function InstallClassPower(self)
 		self:AddElement(_StaggerBar, "south", _BarSize, "px")
 		_StaggerBar.Unit = "player"
 	end
+
+	self:ResumeLayout()
 end
 
 function UninstallClassPower(self)
 	if _PlayerNamePlate ~= self then return end
 	_PlayerNamePlate = nil
+
+	self:SuspendLayout()
+
+	if _ClassMainPowerBar then
+		self:RemoveElement(_ClassMainPowerBar, true)
+		_ClassMainPowerBar.Unit = nil
+		_ClassMainPowerBar:ClearAllPoints()
+		_ClassMainPowerBar.Visible = false
+	end
 
 	if _ClassPowerBar then
 		self:RemoveElement(_ClassPowerBar, true)
@@ -114,4 +153,33 @@ function UninstallClassPower(self)
 		_TotemBar.Unit = nil
 		_TotemBar:ClearAllPoints()
 	end
+
+	self:ResumeLayout()
+end
+
+function UpdateNamePlateOptions()
+	_VerticalScale = tonumber(GetCVar("NamePlateVerticalScale")) or 1
+	_HorizontalScale = tonumber(GetCVar("NamePlateHorizontalScale")) or 1
+
+	if _VerticalScale < 1 then _VerticalScale = 1 end
+	if _HorizontalScale < 1 then _HorizontalScale = 1 end
+
+	local zeroBasedScale = _VerticalScale - 1.0
+	local clampedZeroBasedScale = Saturate(zeroBasedScale)
+
+	Task.NoCombatCall(function()
+		C_NamePlate.SetNamePlateOtherSize(_BaseNamePlateWidth * _HorizontalScale, _BaseNamePlateHeight * Lerp(1.0, 1.25, zeroBasedScale))
+		C_NamePlate.SetNamePlateSelfSize(_BaseNamePlateWidth * _HorizontalScale * Lerp(1.1, 1.0, clampedZeroBasedScale), _BaseNamePlateHeight)
+
+		local font = Media.NAME_FONT.Font
+		font.height = math.min(Media.BASE_NAME_FONT_HEIGHT * _VerticalScale, Media.MAX_NAME_FONT_HEIGHT)
+		Media.NAME_FONT.Font = font
+
+		local np = _PlayerNamePlate
+		if np then UninstallClassPower(np) end
+
+		_ArrayMask:Each(iNamePlateUnitFrame.ApplyFrameOptions, _VerticalScale, _HorizontalScale)
+
+		if np then InstallClassPower(np) end
+	end)
 end

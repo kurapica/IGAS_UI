@@ -441,3 +441,5 @@ L["Down"] = "下"
 L["Please input the unit id"] = "請輸入單體ID"
 L["Are you sure to delete the unit id"] = "是否確認刪除該單體ID"
 L["Auto layout"] = "自動布局"
+
+L["Unknown"] = "未知目標"

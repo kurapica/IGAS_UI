@@ -93,13 +93,298 @@ class "iHiddenManaBar"
 endclass "iHiddenManaBar"
 
 class "iCastBar"
-	inherit "CastBar"
+	inherit "Frame"
+	extend "IFCast" "IFCooldownLabel" "IFCooldownStatus"
+
+	_BackDrop = {
+	    edgeFile = [[Interface\ChatFrame\CHATFRAMEBACKGROUND]],
+	    edgeSize = 2,
+	}
+
+	_DELAY_TEMPLATE = FontColor.RED .. "(%.1f)" .. FontColor.CLOSE
+
+	-- Update SafeZone
+	local function Status_OnValueChanged(self, value)
+		local parent = self.Parent
+
+		if parent.Unit ~= "player" then
+			return
+		end
+
+		local _, _, _, latencyWorld = GetNetStats()
+
+		if latencyWorld == parent.LatencyWorld then
+			-- well, GetNetStats update every 30s, so no need to go on
+			return
+		end
+
+		parent.LatencyWorld = latencyWorld
+
+		if latencyWorld > 0 and parent.Duration and parent.Duration > 0 then
+			parent.SafeZone.Visible = true
+
+			local pct = latencyWorld / parent.Duration / 1000
+
+			if pct > 1 then pct = 1 end
+
+			parent.SafeZone.Width = self.Width * pct
+		else
+			parent.SafeZone.Visible = false
+		end
+	end
+
+	------------------------------------------------------
+	-- Event
+	------------------------------------------------------
+
+	------------------------------------------------------
+	-- Method
+	------------------------------------------------------
+	function SetUpCooldownLabel(self, label)
+		label:SetPoint("RIGHT")
+		label.JustifyH = "RIGHT"
+		label.FontObject = "TextStatusBarText"
+	end
 
 	function SetUpCooldownStatus(self, status)
-		self.__CastBar = status
-		Super.SetUpCooldownStatus(self, status)
+		status:SetPoint("TOPLEFT", self.Icon, "TOPRIGHT")
+		status:SetPoint("BOTTOMRIGHT")
 		status.StatusBarTexturePath = Media.STATUSBAR_TEXTURE_PATH
 		status.StatusBarColor = Media.CASTBAR_COLOR
+		status.MinMaxValue = MinMax(1, 100)
+		status.Layer = "BORDER"
+
+		status.OnValueChanged = status.OnValueChanged + Status_OnValueChanged
+	end
+
+	function Start(self, spell, rank, lineID, spellID)
+		local name, _, text, texture, startTime, endTime, _, _, notInterruptible = UnitCastingInfo(self.Unit)
+
+		if not name then
+			self.Alpha = 0
+			return
+		end
+
+		startTime = startTime / 1000
+		endTime = endTime / 1000
+
+		self.Duration = endTime - startTime
+		self.EndTime = endTime
+		self.Icon.Texture.TexturePath = texture
+		self.NameBack.SpellName.Text = name
+		self.LineID = lineID
+
+		if notInterruptible then
+			self.Icon.BackdropBorderColor = Media.CASTBAR_BORDER_NONINTERRUPTIBLE_COLOR
+		else
+			self.Icon.BackdropBorderColor = Media.CASTBAR_BORDER_NORMAL_COLOR
+		end
+
+		-- Init
+		self.DelayTime = 0
+		self.LatencyWorld = 0
+		self.IFCooldownStatusReverse = true
+
+		-- SafeZone
+		self.SafeZone:ClearAllPoints()
+		self.SafeZone:SetPoint("TOP")
+		self.SafeZone:SetPoint("BOTTOM")
+		self.SafeZone:SetPoint("RIGHT")
+		self.SafeZone.Visible = false
+
+		self:OnCooldownUpdate(startTime, self.Duration)
+
+		self.Alpha = 1
+	end
+
+	function Fail(self, spell, rank, lineID, spellID)
+		if not lineID or lineID == self.LineID then
+			self:OnCooldownUpdate()
+			self.Alpha = 0
+			self.Duration = 0
+			self.LineID = nil
+		end
+	end
+
+	function Stop(self, spell, rank, lineID, spellID)
+		if not lineID or lineID == self.LineID then
+			self:OnCooldownUpdate()
+			self.Alpha = 0
+			self.Duration = 0
+			self.LineID = nil
+		end
+	end
+
+	function Interrupt(self, spell, rank, lineID, spellID)
+		if not lineID or lineID == self.LineID then
+			self:OnCooldownUpdate()
+			self.Alpha = 0
+			self.Duration = 0
+			self.LineID = nil
+		end
+	end
+
+	function Interruptible(self)
+		self.Icon.BackdropBorderColor = Media.CASTBAR_BORDER_NORMAL_COLOR
+	end
+
+	function UnInterruptible(self)
+		self.Icon.BackdropBorderColor = Media.CASTBAR_BORDER_NONINTERRUPTIBLE_COLOR
+	end
+
+	function Delay(self, spell, rank, lineID, spellID)
+		local name, _, text, texture, startTime, endTime = UnitCastingInfo(self.Unit)
+
+		if not startTime or not endTime then return end
+
+		startTime = startTime / 1000
+		endTime = endTime / 1000
+
+		local duration = endTime - startTime
+
+		-- Update
+		self.LatencyWorld = 0
+		self.EndTime = self.EndTime or endTime
+		self.DelayTime = endTime - self.EndTime
+		self.Duration = duration
+		self.NameBack.SpellName.Text = name .. self.DelayFormatString:format(self.DelayTime)
+
+		self:OnCooldownUpdate(startTime, self.Duration)
+	end
+
+	function ChannelStart(self, spell, rank, lineID, spellID)
+		local name, _, text, texture, startTime, endTime, _, notInterruptible = UnitChannelInfo(self.Unit)
+
+		if not name then
+			self.Alpha = 0
+			self.Duration = 0
+			return
+		end
+
+		startTime = startTime / 1000
+		endTime = endTime / 1000
+
+		self.Duration = endTime - startTime
+		self.EndTime = endTime
+		self.Icon.Texture.TexturePath = texture
+		self.NameBack.SpellName.Text = name
+
+		if notInterruptible then
+			self.Icon.BackdropBorderColor = Media.CASTBAR_BORDER_NONINTERRUPTIBLE_COLOR
+		else
+			self.Icon.BackdropBorderColor = Media.CASTBAR_BORDER_NORMAL_COLOR
+		end
+
+		-- Init
+		self.DelayTime = 0
+		self.LatencyWorld = 0
+		self.IFCooldownStatusReverse = false
+
+		-- SafeZone
+		self.SafeZone:ClearAllPoints()
+		self.SafeZone:SetPoint("TOP")
+		self.SafeZone:SetPoint("BOTTOM")
+		self.SafeZone:SetPoint("LEFT", self.Icon, "RIGHT")
+		self.SafeZone.Visible = false
+
+		self:OnCooldownUpdate(startTime, self.Duration)
+
+		self.Alpha = 1
+	end
+
+	function ChannelUpdate(self, spell, rank, lineID, spellID)
+		local name, _, text, texture, startTime, endTime = UnitChannelInfo(self.Unit)
+
+		if not name or not startTime or not endTime then
+			self:OnCooldownUpdate()
+			self.Alpha = 0
+			return
+		end
+
+		startTime = startTime / 1000
+		endTime = endTime / 1000
+
+		local duration = endTime - startTime
+
+		-- Update
+		self.LatencyWorld = 0
+		self.EndTime = self.EndTime or endTime
+		self.DelayTime = endTime - self.EndTime
+		self.Duration = duration
+		if self.DelayTime > 0 then
+			self.NameBack.SpellName.Text = name .. self.DelayFormatString:format(self.DelayTime)
+		end
+		self:OnCooldownUpdate(startTime, self.Duration)
+	end
+
+	function ChannelStop(self, spell, rank, lineID, spellID)
+		self:OnCooldownUpdate()
+		self.Alpha = 0
+		self.Duration = 0
+	end
+
+	------------------------------------------------------
+	-- Property
+	------------------------------------------------------
+	__Doc__[[The delay time format string like "%.1f"]]
+	property "DelayFormatString" { Type = String, Default = _DELAY_TEMPLATE }
+
+	------------------------------------------------------
+	-- Event Handler
+	------------------------------------------------------
+	local function OnSizeChanged(self)
+		if self.Height > 0 then
+			self.Icon.Width = self.Height
+			self.NameBack.SpellName:SetFont(self.NameBack.SpellName:GetFont(), self.Height * 4 / 7, "OUTLINE")
+		end
+	end
+
+	local function OnHide(self)
+		self:OnCooldownUpdate()
+		self.Alpha = 0
+	end
+
+	------------------------------------------------------
+	-- Constructor
+	------------------------------------------------------
+	function iCastBar(self, name, parent, ...)
+		Super(self, name, parent, ...)
+
+		self.Height = 16
+		self.Width = 200
+
+		self.IFCooldownLabelUseDecimal = true
+		self.IFCooldownLabelAutoColor = false
+
+		-- Icon
+		local icon = Frame("Icon", self)
+		icon.FrameStrata = "LOW"
+		icon.Backdrop = _BackDrop
+		icon.BackdropBorderColor = Media.CASTBAR_BORDER_NORMAL_COLOR
+		icon:SetPoint("TOPLEFT")
+		icon:SetPoint("BOTTOMLEFT")
+		icon.Width = self.Height
+
+		-- Icon
+		local iconTxt = Texture("Texture", icon, "BACKGROUND")
+		iconTxt:SetAllPoints()
+
+		local nameBack = Frame("NameBack", self)
+		nameBack:SetAllPoints()
+
+		-- SpellName
+		local text = FontString("SpellName", nameBack, "OVERLAY", "TextStatusBarText")
+		text:SetPoint("LEFT", icon, "RIGHT")
+		text.JustifyH = "LEFT"
+		text:SetFont(text:GetFont(), self.Height * 4 / 7, "OUTLINE")
+
+		-- SafeZone
+		local safeZone = Texture("SafeZone", self, "ARTWORK")
+		safeZone.Color = ColorType(1, 0, 0)
+		safeZone.Visible = false
+
+		self.OnSizeChanged = self.OnSizeChanged + OnSizeChanged
+		self.OnHide = self.OnHide + OnHide
 	end
 endclass "iCastBar"
 
@@ -112,87 +397,15 @@ class "iClassPowerButton"
 	------------------------------------------------------
 	-- Activated
 	property "Activated" {
-		Field = "__Activated",
-		Set = function(self, value)
-			if self.Activated ~= value then
-				self.__Activated = value
-
-				if value then
-					self.Glow.AnimOut.Playing = false
-
-					self.Glow.AnimIn.Playing = true
-				else
-					self.Glow.AnimIn.Playing = false
-
-					self.Glow.AnimOut.Playing = true
-				end
+		Handler = function(self, value)
+			if value then
+				self.Back.BackdropBorderColor = Media.ACTIVED_BORDER_COLOR
+			else
+				self.Back.BackdropBorderColor = Media.DEFAULT_BORDER_COLOR
 			end
 		end,
 		Type = Boolean,
 	}
-
-	------------------------------------------------------
-	-- Script Handler
-	------------------------------------------------------
-	local function AnimIn_OnPlay(self)
-		self.Parent.Alpha = 0
-		local width, height = self.Parent.Parent:GetSize()
-		if width > 0 and height > 0 then
-			self.Parent:SetSize(width*1.04, height*2)
-		end
-	end
-
-	local function AnimIn_OnFinished(self)
-		self.Parent.Alpha = 1
-		local width, height = self.Parent.Parent:GetSize()
-		if width > 0 and height > 0 then
-			self.Parent:SetSize(width*1.04, height*2)
-		end
-	end
-
-	local function AnimOut_OnPlay(self)
-		self.Parent.Alpha = 1
-	end
-
-	local function AnimOut_OnFinished(self)
-		self.Parent.Alpha = 0
-	end
-
-	------------------------------------------------------
-	-- Constructor
-	------------------------------------------------------
-	function iClassPowerButton(self, name, parent, ...)
-		Super(self, name, parent, ...)
-
-		local glow = Texture("Glow", self, "ARTWORK")
-		glow.Alpha = 0
-		glow.TexturePath = [[Interface\SpellActivationOverlay\IconAlert]]
-		--glow:SetTexCoord(0.00781250, 0.50781250, 0.27734375, 0.52734375)
-		glow:SetTexCoord(0.13, 0.395, 0.27734375, 0.52734375)
-		glow:SetPoint("CENTER")
-
-		local animIn = AnimationGroup("AnimIn", glow)
-
-		local alpha = Alpha("Alpha", animIn)
-		alpha.Order = 1
-		alpha.Duration = 0.2
-		alpha.FromAlpha = 0
-		alpha.ToAlpha = 1
-
-		animIn.OnPlay = AnimIn_OnPlay
-		animIn.OnFinished = AnimIn_OnFinished
-
-		local animOut = AnimationGroup("AnimOut", glow)
-
-		alpha = Alpha("Alpha", animOut)
-		alpha.Order = 1
-		alpha.Duration = 0.2
-		alpha.FromAlpha = 1
-		alpha.ToAlpha = 0
-
-		animOut.OnPlay = AnimOut_OnPlay
-		animOut.OnFinished = AnimOut_OnFinished
-	end
 endclass "iClassPowerButton"
 
 class "iClassPower"

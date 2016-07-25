@@ -16,9 +16,9 @@ Log = Logger(_Name)
 
 Log.LogLevel = 2
 
-Log:SetPrefix(1, FontColor.Gray .. "[".. _Name .."]" .. FontColor.Normal, "Debug")
-Log:SetPrefix(2, FontColor.Green .. "[".. _Name .."]" .. FontColor.Normal, "Info")
-Log:SetPrefix(3, FontColor.Red .. "[".. _Name .."]" .. FontColor.Normal, "Warn")
+Debug = Log:SetPrefix(1, FontColor.Gray .. "[".. _Name .."]" .. FontColor.Normal, true)
+Info = Log:SetPrefix(2, FontColor.Green .. "[".. _Name .."]" .. FontColor.Normal, true)
+Warn = Log:SetPrefix(3, FontColor.Red .. "[".. _Name .."]" .. FontColor.Normal, true)
 
 Log:AddHandler(print)
 

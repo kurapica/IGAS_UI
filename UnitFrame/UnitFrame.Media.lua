@@ -24,6 +24,7 @@ Media = {
 	-- Color settings
 	--- Default border color
 	DEFAULT_BORDER_COLOR = ColorType(0, 0, 0),
+	ACTIVED_BORDER_COLOR = ColorType(1, 1, 1),
 
 	--- Elite target border color
 	ELITE_BORDER_COLOR = ColorType(1, 0.84, 0),
@@ -33,4 +34,6 @@ Media = {
 
 	--- Cast bar color
 	CASTBAR_COLOR = ColorType(0, 0, 0.8),
+	CASTBAR_BORDER_NORMAL_COLOR = ColorType(1, 1, 1),
+	CASTBAR_BORDER_NONINTERRUPTIBLE_COLOR = ColorType(0.77, 0.12 , 0.23),
 }

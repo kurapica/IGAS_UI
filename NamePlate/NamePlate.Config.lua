@@ -2,11 +2,26 @@ IGAS:NewAddon "IGAS_UI.NamePlate"
 
 Config = {
 	-- DockLayout settings for UnitFrame
-	PANEL_VSPACING = 1,
+	PANEL_VSPACING = 2,
 	PANEL_HSPACING = 0,
 
 	-- Element settings
 	Elements = {
+		{
+			Type = iHealthBar,
+			Direction = "south", Size = 6, Unit = "px",
+		},
+		{
+			Type = iNameLabel,
+			Direction = "south", Size = 16, Unit = "px",
+			Property = {
+				LevelFormat = "%s",
+				WithServerName = false,
+				UseTapColor = true,
+				UseSelectionColor = true,
+				UseClassColor = true,
+			},
+		},
 		{
 			Type = iCastBar,
 			Location = {
@@ -14,34 +29,16 @@ Config = {
 				AnchorPoint("TOPRIGHT", 0, -4, nil, "BOTTOMRIGHT"),
 			},
 			Property = {
-				Height = 8,
+				Height = 6,
 			},
-		},
-		{
-			Type = iPowerBar,
-			Direction = "south", Size = 2, Unit = "px",
-		},
-		{
-			Type = iHealthBar,
-			Direction = "south", Size = 6, Unit = "px",
-		},
-		{
-			Type = Frame,
-			Name = "SeperatePanel",
-			Direction = "south", Size = 1, Unit = "px",
-		},
-		{
-			Type = iNameLabel,
-			Direction = "south", Size = 16, Unit = "px",
-			Property = {
-				UseTapColor = true,
-				UseSelectionColor = true,
-				UseClassColor = true,
-				Font = {
-					path = _G.UNIT_NAME_FONT,
-					height = 16,
-				}
-			},
+			ApplyFrameOptions = function(self, verticalScale, horizontalScale)
+				local height = math.min(6 * verticalScale, 10)
+				self.Height = height
+
+				self.Icon:ClearAllPoints()
+				self.Icon:SetPoint("BOTTOMRIGHT", self, "BOTTOMLEFT", -2, 0)
+				self.Icon:SetPoint("TOPRIGHT", self.Parent.iHealthBar, "TOPLEFT", -2, 0)
+			end,
 		},
 		{
 			Type = Frame,
@@ -51,7 +48,18 @@ Config = {
 		{
 			Type = iAuraPanel,
 			Location = {
-				AnchorPoint("BOTTOM", 0, 0, "RestPanel", "BOTTOM")
+				AnchorPoint("BOTTOM", 0, 0, "RestPanel")
+			},
+			ApplyFrameOptions = function(self, verticalScale, horizontalScale)
+				local size = 24 * math.min(verticalScale, horizontalScale)
+				self.ElementWidth = size
+				self.ElementHeight = size
+			end,
+		},
+		{
+			Type = RaidTargetIcon,
+			Location = {
+				AnchorPoint("LEFT", 2, 0, "iHealthBar", "RIGHT")
 			},
 		},
 	}

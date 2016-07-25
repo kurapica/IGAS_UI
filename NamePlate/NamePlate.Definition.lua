@@ -32,38 +32,11 @@ class "iNamePlateUnitFrame"
 		self:Each("Refresh")
 	end
 
-	------------------------------------------------------
-	-- Property
-	------------------------------------------------------
-	property "Unit" { Type = String,
-		Handler = function(self, unit)
-			self:Each("Unit", unit)
-		end
-	}
+	function ApplyFrameOptions(self, verticalScale, horizontalScale)
+		verticalScale = verticalScale or 1.0
+		horizontalScale = horizontalScale or 1.0
 
-	------------------------------------------------------
-	-- Event Handler
-	------------------------------------------------------
-	local function OnShow(self)
-		self:UpdateElements()
-	end
-
-	------------------------------------------------------
-	-- Constructor
-	------------------------------------------------------
-	function iNamePlateUnitFrame(self, ...)
-		Super(self, ...)
-
-		self:SetAllPoints()
-
-		self.Layout = DockLayoutPanel
-		self.AutoLayout = true
-		self.MouseEnabled = false
-
-		self.Panel.VSpacing = Config.PANEL_VSPACING or 0
-		self.Panel.HSpacing = Config.PANEL_HSPACING or 0
-
-		self.OnShow = self.OnShow + OnShow
+		self:SuspendLayout()
 
 		-- Apply Config
 		for _, set in ipairs(Config.Elements) do
@@ -71,10 +44,38 @@ class "iNamePlateUnitFrame"
 
 			-- Create element
 			if set.Name then
-				self:AddElement(set.Name, set.Type, set.Direction, set.Size, set.Unit)
+				if set.Direction then
+					local size = set.Size
+
+					if set.Unit == "px" then
+						if set.Direction == "south" or set.Direction == "north" then
+							size = size * verticalScale
+						else
+							size = size * horizontalScale
+						end
+					end
+
+					self:AddElement(set.Name, set.Type, set.Direction, size, set.Unit)
+				else
+					self:AddElement(set.Name, set.Type)
+				end
 				obj = self:GetElement(set.Name)
 			else
-				self:AddElement(set.Type, set.Direction, set.Size, set.Unit)
+				if set.Direction then
+					local size = set.Size
+
+					if set.Unit == "px" then
+						if set.Direction == "south" or set.Direction == "north" then
+							size = size * verticalScale
+						else
+							size = size * horizontalScale
+						end
+					end
+
+					self:AddElement(set.Type, set.Direction, size, set.Unit)
+				else
+					self:AddElement(set.Type)
+				end
 				obj = self:GetElement(set.Type)
 			end
 
@@ -97,7 +98,52 @@ class "iNamePlateUnitFrame"
 			if set.Property then
 				pcall(obj, set.Property)
 			end
+
+			-- Apply Frame Options
+			if set.ApplyFrameOptions then
+				pcall(set.ApplyFrameOptions, obj, verticalScale, horizontalScale)
+			end
 		end
+
+		self:ResumeLayout()
+	end
+
+	------------------------------------------------------
+	-- Property
+	------------------------------------------------------
+	property "Unit" { Type = String,
+		Handler = function(self, unit)
+			self:Each("Unit", unit)
+		end
+	}
+
+	------------------------------------------------------
+	-- Event Handler
+	------------------------------------------------------
+	local abs = math.abs
+
+	local function OnShow(self)
+		self:UpdateElements()
+	end
+
+	------------------------------------------------------
+	-- Constructor
+	------------------------------------------------------
+	function iNamePlateUnitFrame(self, ...)
+		Super(self, ...)
+
+		self:SetPoint("BOTTOMLEFT")
+		self:SetPoint("BOTTOMRIGHT")
+		self.Height = 300  -- Make sure it can contains everything
+
+		self.Layout = DockLayoutPanel
+		self.AutoLayout = true
+		self.MouseEnabled = false
+
+		self.Panel.VSpacing = Config.PANEL_VSPACING or 0
+		self.Panel.HSpacing = Config.PANEL_HSPACING or 0
+
+		self.OnShow = self.OnShow + OnShow
 	end
 
 	------------------------------------------------------
