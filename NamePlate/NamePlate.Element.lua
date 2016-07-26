@@ -286,7 +286,7 @@ class "iCastBar"
 		-- SpellName
 		local text = FontString("SpellName", nameBack, "OVERLAY")
 		text:SetVertexColor(1, 1, 1)
-		text.FontObject = Media.NAME_FONT
+		text.FontObject = Media.CAST_FONT
 		text:SetPoint("CENTER", self, "BOTTOM")
 
 		self.OnHide = self.OnHide + OnHide

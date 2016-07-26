@@ -1,3 +1,6 @@
+2016/7/26 v77
+	1. Change the font for the cast bar of the nameplate.
+
 2016/7/26 v76
 	1. Now the nameplate module works with the 'Show bigger nameplate' option.
 	2. Fix the memory increment with IGAS-v100.

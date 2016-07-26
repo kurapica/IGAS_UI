@@ -24,7 +24,10 @@ Media = {
 			height = 16,
 		},
 	},
+	CAST_FONT = Font("IGAS_UI_NamePlate_CastFont"),
 
 	BASE_NAME_FONT_HEIGHT = 14,
 	MAX_NAME_FONT_HEIGHT = 20,
 }
+
+Media.CAST_FONT:CopyFontObject(NAMEPLATE_SPELLCAST_FONT)
