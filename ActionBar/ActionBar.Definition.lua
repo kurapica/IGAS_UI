@@ -1365,51 +1365,98 @@ class "AutoActionTask"
 	}
 
 	local yield = coroutine.yield
+	local resume = coroutine.resume
+	local running = coroutine.running
 	local tpairs = Threading.Iterator
+
+	local NUM_BAG_FRAMES = _G.NUM_BAG_FRAMES
+	local _ContainerItemList = {}
+	local _ContainerItemCache = {}
+	local _ContainerTaskStart = 1
+	local _ContainerTaskEnd = 0
+	local _ContainerItemChangeTask = {}
+	local _ItemMark = 0
+	local _ScanTaskStarted = false
+
+	local function ScanContainerItems()
+		while true do
+			if InCombatLockdown() then Task.Event("PLAYER_REGEN_ENABLED") end
+
+			local index = 0
+			local itemChanged = false
+			_ItemMark = _ItemMark + 1
+
+			for bag = 0, NUM_BAG_FRAMES do
+				for slot = 1, GetContainerNumSlots(bag) do
+					local itemID = GetContainerItemID(bag, slot)
+					if itemID and GetItemSpell(itemID) and _ContainerItemCache[itemID] ~= _ItemMark then
+						-- Cache the item with mark
+						_ContainerItemCache[itemID] = _ItemMark
+
+						index = index + 1
+
+						if _ContainerItemList[index] ~= itemID then
+							-- Item list changed
+							itemChanged = true
+							_ContainerItemList[index] = itemID
+						end
+					end
+				end
+			end
+
+			for i = #_ContainerItemList, index+1, -1 do
+				itemChanged = true
+				_ContainerItemList[i] = nil
+			end
+
+			if itemChanged then
+				Debug("Container items changed, start updating")
+
+				local startp, endp = _ContainerTaskStart, _ContainerTaskEnd
+				_ContainerTaskStart = _ContainerTaskEnd + 1
+				for i = startp, endp do
+					local th = _ContainerItemChangeTask[i]
+					_ContainerItemChangeTask[i] = nil
+					resume(th)
+				end
+			else
+				Debug("Container items nochange")
+			end
+
+			Task.Wait("BAG_NEW_ITEMS_UPDATED", "BAG_UPDATE")
+			Task.Delay(0.1) --Use delay to block too many BAG_UPDATE at a same time
+		end
+	end
 
 	local function getItem(self)
 		local filter = self.Filter
 		local itemCls = self.ItemClass
 		local itemSubCls = self.ItemSubClass
-		local generated = {}
 
 		if self.UseReverseOrder then
-			for bag = _G.NUM_BAG_FRAMES, 0, -1 do
-				for slot = GetContainerNumSlots(bag), 1, -1  do
-					local link = GetContainerItemID(bag, slot)
-					if link and GetItemSpell(link) then
-						local pass = true
-						if itemCls then
-							local cls, subclass = select(12, GetItemInfo(link))
-							pass = itemCls == cls and (not itemSubCls or subclass == itemSubCls)
-						end
-						if pass and not generated[link] and (not filter or filter(link, bag, slot)) then
-							generated[link] = true
-							yield("item", link)
-						end
-					end
+			for i = #_ContainerItemList, 1, -1 do
+				local itemID = _ContainerItemList[i]
+				local pass = true
+				if itemCls then
+					local cls, subclass = select(12, GetItemInfo(itemID))
+					pass = itemCls == cls and (not itemSubCls or subclass == itemSubCls)
+				end
+				if pass and (not filter or filter(itemID)) then
+					yield("item", itemID)
 				end
 			end
 		else
-			for bag = 0, _G.NUM_BAG_FRAMES do
-				for slot = 1, GetContainerNumSlots(bag) do
-					local link = GetContainerItemID(bag, slot)
-					if link and GetItemSpell(link) then
-						local pass = true
-						if itemCls then
-							local cls, subclass = select(12, GetItemInfo(link))
-							pass = itemCls == cls and (not itemSubCls or subclass == itemSubCls)
-						end
-						if pass and not generated[link] and (not filter or filter(link, bag, slot)) then
-							generated[link] = true
-							yield("item", link)
-						end
-					end
+			for _, itemID in ipairs(_ContainerItemList) do
+				local pass = true
+				if itemCls then
+					local cls, subclass = select(12, GetItemInfo(itemID))
+					pass = itemCls == cls and (not itemSubCls or subclass == itemSubCls)
+				end
+				if pass and (not filter or filter(itemID)) then
+					yield("item", itemID)
 				end
 			end
 		end
-
-		generated = nil
 	end
 
 	local function getToy(self)
@@ -1477,89 +1524,114 @@ class "AutoActionTask"
 		end
 	end
 
-	local function task(self, iter, ...)
-		local mark = self.TaskMark
+	local function generateByTask(self, iter)
 		local roots = self.Roots
+		local rIdx = 1
+		local root = roots[rIdx]
+		if not root then return true end
+		local btn = root
+		local cnt = 0
+		local autoGen = self.AutoGenerate and not root.FreeMode
+		local maxAction = autoGen and self.MaxAction or 24
 
-		while self.TaskMark and mark == self.TaskMark do
-			if InCombatLockdown() then Task.Event("PLAYER_REGEN_ENABLED") end
-			if not self.TaskMark or mark ~= self.TaskMark then break end
-
-			local rIdx = 1
-			local root = roots[rIdx]
-			if not root then break end
-			local btn = root
-			local cnt = 0
-			local autoGen = self.AutoGenerate and not root.FreeMode
-			local maxAction = autoGen and self.MaxAction or 24
-
-			Log(1, "Process auto-gen [%s] %s @pid %d", self.Type, self.Name, mark)
-
-			for ty, target, detail in tpairs(iter), self do
-				while root do
-					if cnt < maxAction then
-						if cnt > 0 then
-							if not btn.Branch then
-								if autoGen then
-									root:GenerateBranch(cnt)
-									btn.Branch.Visible = btn.Visible
-									btn = btn.Branch
-									btn:SetAction(ty, target, detail)
-									cnt = cnt + 1
-									break
-								end
-							else
+		for ty, target, detail in tpairs(iter), self do
+			while root do
+				if cnt < maxAction then
+					if cnt > 0 then
+						if not btn.Branch then
+							if autoGen then
+								root:GenerateBranch(cnt)
+								btn.Branch.Visible = btn.Visible
 								btn = btn.Branch
 								btn:SetAction(ty, target, detail)
 								cnt = cnt + 1
 								break
 							end
 						else
+							btn = btn.Branch
 							btn:SetAction(ty, target, detail)
 							cnt = cnt + 1
 							break
 						end
-					end
-					rIdx = rIdx + 1
-					root = roots[rIdx]
-					if root then
-						btn = root
-						cnt = 0
-						autoGen = self.AutoGenerate and not root.FreeMode
-						maxAction = autoGen and self.MaxAction or 24
+					else
+						btn:SetAction(ty, target, detail)
+						cnt = cnt + 1
+						break
 					end
 				end
+				rIdx = rIdx + 1
+				root = roots[rIdx]
+				if root then
+					btn = root
+					cnt = 0
+					autoGen = self.AutoGenerate and not root.FreeMode
+					maxAction = autoGen and self.MaxAction or 24
+				end
 			end
+		end
+
+		if autoGen then
+			root = btn.Root
+			root:GenerateBranch(cnt > 1 and cnt - 1 or 1)
+			if cnt <= 1 then root.Branch:SetAction(nil) end
+			if cnt <= 0 then root:SetAction(nil) end
+		else
+			btn = btn.Branch
+			while btn do
+				btn:SetAction(nil)
+				btn = btn.Branch
+			end
+		end
+
+		-- Clear
+		for rIdx = rIdx + 1, #self.Roots do
+			root = roots[rIdx]
+			autoGen = self.AutoGenerate and not root.FreeMode
 
 			if autoGen then
-				root = btn.Root
-				root:GenerateBranch(cnt > 1 and cnt - 1 or 1)
-				if cnt <= 1 then root.Branch:SetAction(nil) end
-				if cnt <= 0 then root:SetAction(nil) end
+				root:GenerateBranch(1)
+				root.Branch:SetAction(nil)
+				root:SetAction(nil)
 			else
-				btn = btn.Branch
-				while btn do
-					btn:SetAction(nil)
-					btn = btn.Branch
-				end
-			end
-
-			-- Clear
-			for rIdx = rIdx + 1, #self.Roots do
-				root = roots[rIdx]
-				autoGen = self.AutoGenerate and not root.FreeMode
-
-				if autoGen then
-					root:GenerateBranch(1)
-					root.Branch:SetAction(nil)
+				while root do
 					root:SetAction(nil)
-				else
-					while root do
-						root:SetAction(nil)
-						root = root.Branch
-					end
+					root = root.Branch
 				end
 			end
+		end
+	end
+
+	local function itemTask(self, iter)
+		local mark = self.TaskMark
+		local thread = running()
+
+		while self.TaskMark and mark == self.TaskMark do
+			if InCombatLockdown() then Task.Event("PLAYER_REGEN_ENABLED") end
+			if not self.TaskMark or mark ~= self.TaskMark then break end
+
+			Log(1, "Process auto-gen [%s] %s @pid %d", self.Type, self.Name, mark)
+
+			if generateByTask(self, iter) then break end
+
+			_ContainerTaskEnd = _ContainerTaskEnd + 1
+			_ContainerItemChangeTask[_ContainerTaskEnd] = thread
+
+			yield() -- Wait until item list changed
+		end
+
+		Log(1, "Stop auto-gen [%s] %s @pid %d", self.Type, self.Name, mark)
+	end
+
+	local function task(self, iter, ...)
+		local mark = self.TaskMark
+
+		while self.TaskMark and mark == self.TaskMark do
+			if InCombatLockdown() then Task.Event("PLAYER_REGEN_ENABLED") end
+			if not self.TaskMark or mark ~= self.TaskMark then break end
+
+			Log(1, "Process auto-gen [%s] %s @pid %d", self.Type, self.Name, mark)
+
+			if generateByTask(self, iter) then break end
 
 			Task.Wait(...)
 			Task.Delay(0.1) --Use delay to block too many BAG_UPDATE at a same time
@@ -1602,7 +1674,8 @@ class "AutoActionTask"
 		self.TaskMark = self.TaskMark or 0
 
 		if self.Type == AutoActionTaskType.Item then
-			return Task.ThreadCall(task, self, getItem, "BAG_NEW_ITEMS_UPDATED", "BAG_UPDATE")
+			if not _ScanTaskStarted then _ScanTaskStarted = true Task.ThreadCall(ScanContainerItems) end
+			return Task.ThreadCall(itemTask, self, getItem)
 		elseif self.Type == AutoActionTaskType.Toy then
 			return Task.ThreadCall(task, self, getToy, "TOYS_UPDATED")
 		elseif self.Type == AutoActionTaskType.BattlePet then

@@ -5,9 +5,7 @@ IGAS:NewAddon "IGAS_UI.ActionBar"
 
 _FilterCodeItem = [[
 -- itemID : the item's id
--- bag : the bag
--- slot : the slot
-local itemID, bag, slot = ...
+local itemID = ...
 
 -- return true to generate a button for the action
 return true

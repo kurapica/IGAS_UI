@@ -1,3 +1,6 @@
+2016/7/26 v78
+	1. Change the mechanism of the container items's refresh for auto-generated popup action bars, reduce the cost of the system.
+
 2016/7/26 v77
 	1. Change the font for the cast bar of the nameplate.
 
