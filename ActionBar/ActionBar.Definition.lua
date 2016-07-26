@@ -1038,8 +1038,21 @@ class "IActionButton"
 	end
 
 	local function OnCooldownUpdate(self, start, duration)
-		if duration and duration < 1.6 and _ActionBarHideGlobalCD.ENABLE then
-			return true
+		if start and duration and _ActionBarHideGlobalCD.ENABLE then
+			if duration >= 1.6 then
+				-- Record the end time for check
+				self._CooldownStopTime = start + duration
+			else
+				-- maybe GCD or active spell
+				if self._CooldownStopTime and self._CooldownStopTime > GetTime() then
+					-- Active spell
+					self._CooldownStopTime = false
+					return
+				else
+					self._CooldownStopTime = false
+					return true
+				end
+			end
 		end
 	end
 
