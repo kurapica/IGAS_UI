@@ -96,6 +96,7 @@ class "iHealthBar"
 								if self.isTanking and not isTanking then
 									self.LoseAggro.Playing = true
 								end
+								self.isTanking = isTanking
 							end
 						end
 						return self:SetStatusBarColor(GetThreatStatusColor(status))
