@@ -55,25 +55,83 @@ endinterface "iBorder"
 -- Elements
 --==========================
 class "iHealthBar"
-	inherit "HealthBarFrequent"
+	inherit "StatusBar"
+	extend "IFHealthFrequent" "IFFaction" "IFTarget" "IFThreat"
 	extend "iBorder" "iStatusBarStyle"
 
 	_DefaultColor = ColorType(1, 1, 1)
 
+	local function IsPlayerEffectivelyTank()
+		local assignedRole = UnitGroupRolesAssigned("player")
+		if assignedRole == "NONE" then
+			local spec = GetSpecialization()
+			return spec and GetSpecializationRole(spec) == "TANK"
+		end
+
+		return assignedRole == "TANK"
+	end
+
 	function Refresh(self, ...)
+		IFHealthFrequent.Refresh(self)
+
 		local unit = self.Unit
 		if unit then
+			if UnitIsUnit(unit, "target") then
+				self.Back.BackdropBorderColor = Media.ACTIVED_BORDER_COLOR
+			else
+				self.Back.BackdropBorderColor = Media.DEFAULT_BORDER_COLOR
+			end
+
 			if UnitIsTapDenied(unit) then
 				return self:SetStatusBarColor(0.5, 0.5, 0.5)
 			end
 
 			if not UnitIsPlayer(unit) then
-				self:SetStatusBarColor(UnitSelectionColor(unit))
+				if UnitCanAttack("player", unit) then
+					local status = UnitThreatSituation("player", unit)
+					if status and status > 0 then
+						if IsPlayerEffectivelyTank() then
+							local isTanking = UnitDetailedThreatSituation("player", unit)
+							if self.isTanking ~= isTanking then
+								if self.isTanking and not isTanking then
+									self.LoseAggro.Playing = true
+								end
+							end
+						end
+						return self:SetStatusBarColor(GetThreatStatusColor(status))
+					end
+				end
+
+				return self:SetStatusBarColor(UnitSelectionColor(unit))
 			else
+				local status = UnitThreatSituation(unit)
+				if status and status > 0 then
+					return self:SetStatusBarColor(GetThreatStatusColor(status))
+				end
+
 				self.StatusBarColor = RAID_CLASS_COLORS[select(2, UnitClass(unit))] or _DefaultColor
 			end
 		end
-		return Super.Refresh(self, ...)
+	end
+
+	function iHealthBar(self, ...)
+		Super(self, ...)
+
+		self.FrameStrata = "LOW"
+
+		local animLoseAggro = AnimationGroup("LoseAggro", self)
+
+		local alpha = Alpha("Alpha1", animLoseAggro)
+		alpha.Order = 1
+		alpha.Duration = 0.3
+		alpha.FromAlpha = 1
+		alpha.ToAlpha = 0
+
+		alpha = Alpha("Alpha2", animLoseAggro)
+		alpha.Order = 2
+		alpha.Duration = 0.3
+		alpha.FromAlpha = 1
+		alpha.ToAlpha = 0
 	end
 endclass "iHealthBar"
 

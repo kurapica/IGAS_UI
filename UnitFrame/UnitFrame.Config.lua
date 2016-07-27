@@ -156,6 +156,8 @@ Config = {
 				MarginTop = 2,
 				ElementWidth = 16,
 				ElementHeight = 16,
+				HSpacing = 1,
+				VSpacing = 1,
 				TopToBottom = false,
 
 				CustomFilter = function (self, unit, index, filter)
