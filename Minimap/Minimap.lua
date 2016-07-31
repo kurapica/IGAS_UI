@@ -11,6 +11,65 @@ _THIN_BORDER = {
     edgeSize = 1,
 }
 
+local locked = true
+local mask
+local maskBuffFrame
+
+Toggle = {
+	Message = L"Lock Minimap",
+	Get = function()
+		return locked
+	end,
+	Set = function (value)
+		locked = value
+
+		if locked then
+			if mask then mask:Hide() end
+			if maskBuffFrame then maskBuffFrame:Hide() end
+		else
+			if not mask then
+				mask = Mask("IGAS_UI_Minimap_Mask", Minimap)
+				mask.AsMove = true
+				mask.AsResize = true
+				mask.OnMoveFinished = function()
+					_DB.Location = Minimap.Location
+				end
+				mask.OnResizeFinished = function()
+					_DB.Location = Minimap.Location
+					_DB.Size = Minimap.Size
+					local zoom = Minimap.Zoom
+					if zoom > 0 then
+						Minimap.Zoom = 0
+						Minimap.Zoom = zoom
+					else
+						Minimap.Zoom = 1
+						Minimap.Zoom = 0
+					end
+				end
+			end
+
+			if not maskBuffFrame then
+				maskBuffFrame = Mask("IGAS_UI_BuffFrame_Mask", IGAS.BuffFrame)
+				maskBuffFrame.AsMove = true
+				maskBuffFrame.OnMoveFinished = function()
+					if not _DB.MoveBuffFrame then
+						_DB.MoveBuffFrame = true
+						BuffFrame:SetMovable(true)
+						BuffFrame:SetUserPlaced(true)
+					end
+					_DB.BuffFrameLocation = BuffFrame.Location
+				end
+			end
+
+			mask:Show()
+			maskBuffFrame:Show()
+		end
+
+		Toggle.Update()
+	end,
+	Update = function() end,
+}
+
 function BuildBorder(self)
 	self.Backdrop = _THIN_BORDER
 	self.BackdropBorderColor = _PLAYER_COLOR
@@ -18,6 +77,36 @@ end
 
 function OnLoad(self)
 	self:SecureHook("TimeManager_LoadUI")
+
+	_DB = _Addon._DB.Minimap or {}
+	_Addon._DB.Minimap = _DB
+
+	if _DB.Location then
+		Minimap.Location = _DB.Location
+	end
+
+	if _DB.Size then
+		Minimap.Size = _DB.Size
+		local zoom = Minimap.Zoom
+		if zoom > 0 then
+			Minimap.Zoom = 0
+			Minimap.Zoom = zoom
+		else
+			Minimap.Zoom = 1
+			Minimap.Zoom = 0
+		end
+	end
+
+	if _DB.MoveBuffFrame then
+		BuffFrame:SetMovable(true)
+		BuffFrame:SetUserPlaced(true)
+
+		if _DB.BuffFrameLocation then
+			BuffFrame.Location = _DB.BuffFrameLocation
+		end
+
+		BuffFrame_OnEvent(BuffFrame, "UNIT_AURA", "player")
+	end
 end
 
 function TimeManager_LoadUI()
@@ -49,6 +138,9 @@ function TimeManager_LoadUI()
 	end)
 end
 
+-----------------------------
+-- Init
+-----------------------------
 Minimap = IGAS.Minimap
 
 Minimap.MouseWheelEnabled = true
@@ -105,3 +197,19 @@ GameTimeFrame.NormalFontObject = TextStatusBarTextLarge
 GameTimeFrame:ClearAllPoints()
 GameTimeFrame:SetPoint("TOPRIGHT")
 GameTimeFrame:SetSize(30, 30)
+
+-- GarrisonLandingPageMinimapButton
+GarrisonLandingPageMinimapButton:ClearAllPoints()
+GarrisonLandingPageMinimapButton:SetPoint("CENTER", Minimap, "BOTTOMLEFT")
+
+-- MiniMapInstanceDifficulty
+MiniMapInstanceDifficulty:ClearAllPoints()
+MiniMapInstanceDifficulty:SetPoint("TOPLEFT", Minimap, "TOPLEFT", -6, 4)
+
+-- GuildInstanceDifficulty
+GuildInstanceDifficulty:ClearAllPoints()
+GuildInstanceDifficulty:SetPoint("TOPLEFT", Minimap, "TOPLEFT", -6, 4)
+
+-- MiniMapChallengeMode
+MiniMapChallengeMode:ClearAllPoints()
+MiniMapChallengeMode:SetPoint("TOPLEFT", Minimap, "TOPLEFT", 0, 0)

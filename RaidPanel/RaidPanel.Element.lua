@@ -14,65 +14,23 @@ AuraCountFont = Font("IGAS_AuraCountFont")
 AuraCountFont:CopyFontObject("NumberFontNormal")
 
 --==========================
--- Interfaces
+-- Elements
 --==========================
-interface "iStatusBarStyle"
-	_BACK_MULTI = 0.2
-	_BACK_ALPHA = 0.8
+class "iHealthBar"
+	inherit "HealthBarFrequent"
+	extend "iStatusBarStyle""iBorder"
+	extend "IFTarget"
 
 	------------------------------------------------------
 	-- Method
 	------------------------------------------------------
-	local oldSetStatusBarColor = StatusBar.SetStatusBarColor
-
-	local function SetStatusBarColor(self, r, g, b, a)
-	    if r then
-	        oldSetStatusBarColor(self, r, g, b)
-
-	        self.Bg:SetVertexColor(r * _BACK_MULTI, g * _BACK_MULTI, b * _BACK_MULTI, _BACK_ALPHA)
-	    end
+	function SetTargetState(self, isTarget)
+		if isTarget then
+			self.Back.BackdropBorderColor = Media.ACTIVED_BORDER_COLOR
+		else
+			self.Back.BackdropBorderColor = Media.DEFAULT_BORDER_COLOR
+		end
 	end
-
-	------------------------------------------------------
-	-- Initialize
-	------------------------------------------------------
-    function iStatusBarStyle(self)
-		self.StatusBarTexturePath = Config.STATUSBAR_TEXTURE_PATH
-
-		local bgColor = Texture("Bg", self, "BACKGROUND")
-		bgColor:SetTexture(1, 1, 1, 1)
-		bgColor:SetAllPoints()
-		self.Bg = bgColor	-- For quick access
-
-		self.SetStatusBarColor = SetStatusBarColor
-    end
-endinterface "iStatusBarStyle"
-
-interface "iBorder"
-	THIN_BORDER = {
-	    edgeFile = "Interface\\Buttons\\WHITE8x8",
-	    edgeSize = 1,
-	}
-
-	------------------------------------------------------
-	-- Initialize
-	------------------------------------------------------
-    function iBorder(self)
-		local bg = Frame("Back", self)
-		bg.FrameStrata = "BACKGROUND"
-		bg:SetPoint("TOPLEFT", -1, 1)
-		bg:SetPoint("BOTTOMRIGHT", 1, -1)
-		bg.Backdrop = THIN_BORDER
-		bg.BackdropBorderColor = Config.DEFAULT_BORDER_COLOR
-    end
-endinterface "iBorder"
-
---==========================
--- Elements
---==========================
-class "iHealthBar"
-	inherit "HealthBar"
-	extend "iStatusBarStyle""iBorder"
 
 	------------------------------------------------------
 	-- Constructor
@@ -89,47 +47,35 @@ class "iHealthBar"
 	end
 endclass "iHealthBar"
 
-class "iPowerBar"
-	inherit "PowerBar"
-	extend "iStatusBarStyle""iBorder"
-endclass "iPowerBar"
-
 class "iNameLabel"
-	inherit "NameLabel"
-	extend "IFThreat"
+	inherit "FontString"
+	extend "IFUnitName" "IFFaction" "IFThreat"
 
-	_TARGET_TEMPLATE = FontColor.RED .. ">>" .. FontColor.CLOSE .. "%s" .. FontColor.RED .. "<<" .. FontColor.CLOSE
-
-	local sSetText = Super.SetText
-
-	local function UpdateText(self)
-		if self.ThreatLevel >= 2 then
-			sSetText(self, _TARGET_TEMPLATE:format(self.__iNameLabelText or ""))
-		else
-			sSetText(self, self.__iNameLabelText)
-		end
+	local function OnHide(self)
+		self.ThreatMarkLeft.Visible = false
+		self.ThreatMarkRight.Visible = false
 	end
 
 	------------------------------------------------------
 	-- Method
 	------------------------------------------------------
-	function SetText(self, text)
-		self.__iNameLabelText = text or ""
-		return UpdateText(self)
+	function SetUnitName(self, name)
+		self:SetText(name)
 	end
 
-	------------------------------------------------------
-	-- Property
-	------------------------------------------------------
-	-- ThreatLevel
-	property "ThreatLevel" {
-		Set = function(self, value)
-			self.__iNameLabelThreatLevel = value
-			return UpdateText(self)
-		end,
-		Field = "__iNameLabelThreatLevel",
-		Type = Number,
-	}
+	function UpdateFaction(self)
+		self:SetTextColor(self:GetFactionColor())
+	end
+
+	function SetThreatLevel(self, lvl)
+		if lvl >= 2 and not UnitCanAttack("player", self.Unit) then
+			self.ThreatMarkLeft.Visible = true
+			self.ThreatMarkRight.Visible = true
+		else
+			self.ThreatMarkLeft.Visible = false
+			self.ThreatMarkRight.Visible = false
+		end
+	end
 
 	------------------------------------------------------
 	-- Constructor
@@ -138,9 +84,30 @@ class "iNameLabel"
 		Super(self, ...)
 
 		self.UseClassColor = true
+		self.UseSelectionColor = false
+		self.UseTapColor = false
 		self.DrawLayer = "BORDER"
+		self.JustifyV = "MIDDLE"
+		self.JustifyH = "CENTER"
 
-		self:SetWordWrap(false)
+		self:SetWordWrap(true)
+
+		self.OnHide = self.OnHide + OnHide
+
+		-- Threat mark
+		local threatMarkLeft = FontString("ThreatMarkLeft", self.Parent)
+		threatMarkLeft.Visible = false
+		threatMarkLeft:SetPoint("RIGHT", self, "LEFT")
+		threatMarkLeft:SetTextColor(1, 0, 0)
+		threatMarkLeft.Text = ">>"
+		self.ThreatMarkLeft = threatMarkLeft
+
+		local threatMarkRight = FontString("ThreatMarkRight", self.Parent)
+		threatMarkRight.Visible = false
+		threatMarkRight:SetPoint("LEFT", self, "RIGHT")
+		threatMarkRight:SetTextColor(1, 0, 0)
+		threatMarkRight.Text = "<<"
+		self.ThreatMarkRight = threatMarkRight
 	end
 endclass "iNameLabel"
 
@@ -150,10 +117,24 @@ class "iBuffPanel"
 	------------------------------------------------------
 	-- Method
 	------------------------------------------------------
-	function CustomFilter(self, unit, index, filter)
-		local name, rank, texture, count, dtype, duration, expires, caster, isStealable, shouldConsolidate, spellID, canApplyAura, isBossDebuff = UnitAura(unit, index, filter)
+	function UpdateAuras(self)
+		local unit = self.Unit
 
-		if name and UnitCanAttack("player", unit) then return true end
+		if unit then
+			if UnitCanAttack("player", unit) then
+				self.Filter = "HELPFUL"
+			else
+				self.Filter = "HELPFUL|PLAYER"
+			end
+		end
+
+		return Super.UpdateAuras(self)
+	end
+
+	function CustomFilter(self, unit, index, filter)
+		if filter == "HELPFUL" then return true end
+
+		local name, rank, texture, count, dtype, duration, expires, caster, isStealable, shouldConsolidate, spellID, canApplyAura, isBossDebuff = UnitAura(unit, index, filter)
 
 		if name and caster == "player" and ((count > 0 and duration > 0) or ((_Buff_List[spellID] or _IGASUI_HELPFUL_SPELL[spellID] or _IGASUI_HELPFUL_SPELL[name]) and duration > 0 and duration < 31)) then
 			return true
@@ -191,10 +172,24 @@ class "iDebuffPanel"
 	------------------------------------------------------
 	-- Method
 	------------------------------------------------------
+	function UpdateAuras(self)
+		local unit = self.Unit
+
+		if unit then
+			if UnitCanAttack("player", unit) then
+				self.Filter = "HARMFUL|PLAYER"
+			else
+				self.Filter = "HARMFUL"
+			end
+		end
+
+		return Super.UpdateAuras(self)
+	end
+
 	function CustomFilter(self, unit, index, filter)
 		local name, rank, texture, count, dtype, duration, expires, caster, isStealable, shouldConsolidate, spellID = UnitAura(unit, index, filter)
 
-		if UnitCanAttack("player", unit) then return caster == "player" end
+		if filter ~= "HARMFUL" then return caster == "player" end
 
 		if _DebuffBlackList[spellID] then return false end
 
@@ -241,36 +236,3 @@ class "iDebuffPanel"
     end
 endclass "iDebuffPanel"
 
-class "iTarget"
-	inherit "VirtualUIObject"
-	extend "IFTarget"
-
-	------------------------------------------------------
-	-- Property
-	------------------------------------------------------
-	-- IsTarget
-	property "IsTarget" {
-		Field = "__IsTarget",
-		Set = function(self, value)
-			if self.IsTarget ~= value then
-				self.__IsTarget = value
-				if not self.TargetBack then self.TargetBack = self.Parent.Parent.iHealthBar.Back end
-				if value then
-					self.TargetBack.BackdropBorderColor = Config.TARGET_BORDER_COLOR
-				else
-					self.TargetBack.BackdropBorderColor = Config.DEFAULT_BORDER_COLOR
-				end
-			end
-		end,
-		Type = Boolean,
-	}
-
-	------------------------------------------------------
-	-- Constructor
-	------------------------------------------------------
-	function iTarget(self, name, parent, ...)
-		Super(self, name, parent, ...)
-
-		self.TargetBack = false
-	end
-endclass "iTarget"

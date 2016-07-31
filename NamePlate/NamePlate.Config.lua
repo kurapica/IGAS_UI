@@ -2,7 +2,7 @@ IGAS:NewAddon "IGAS_UI.NamePlate"
 
 Config = {
 	-- DockLayout settings for UnitFrame
-	PANEL_VSPACING = 2,
+	PANEL_VSPACING = 3,
 	PANEL_HSPACING = 0,
 
 	-- Element settings

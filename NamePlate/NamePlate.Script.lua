@@ -7,6 +7,7 @@ local _BaseNamePlateWidth = 110
 local _BaseNamePlateHeight = 45
 
 local _ClassMainPowerBar
+local _ClassMainPowerText
 local _ClassPowerBar
 local _RuneBar
 local _StaggerBar
@@ -85,10 +86,16 @@ function InstallClassPower(self)
 	self:SuspendLayout()
 
 	-- Main class power
-	_ClassMainPowerBar = _ClassMainPowerBar or iPowerBar("IGAS_UI_NamePlate_MainPowerBar")
+	_ClassMainPowerBar = _ClassMainPowerBar or iPowerBarFrequent("IGAS_UI_NamePlate_MainPowerBar")
 	self:InsertElement("iHealthBar", _ClassMainPowerBar, "south", _MainPowerBarSize * _VerticalScale, "px")
 	_ClassMainPowerBar.Unit = "player"
 	_ClassMainPowerBar.Visible = true
+
+	_ClassMainPowerText = _ClassMainPowerText or iPlayerPowerText("IGAS_UI_NamePlate_MainPowerText")
+	self:AddElement(_ClassMainPowerText)
+	_ClassMainPowerText:SetPoint("TOP", _ClassMainPowerBar)
+	_ClassMainPowerText.Unit = "player"
+	_ClassMainPowerText.Visible = true
 
 	-- Common class power
 	_ClassPowerBar = _ClassPowerBar or iClassPower("IGAS_UI_NamePlate_ClassPowerBar")
@@ -133,6 +140,12 @@ function UninstallClassPower(self)
 		_ClassMainPowerBar.Visible = false
 	end
 
+	if _ClassMainPowerText then
+		self:RemoveElement(_ClassMainPowerText, true)
+		_ClassMainPowerText.Unit = nil
+		_ClassMainPowerText.Visible = false
+	end
+
 	if _ClassPowerBar then
 		self:RemoveElement(_ClassPowerBar, true)
 		_ClassPowerBar.Unit = nil
@@ -171,9 +184,9 @@ function UpdateNamePlateOptions()
 		C_NamePlate.SetNamePlateOtherSize(_BaseNamePlateWidth * _HorizontalScale, _BaseNamePlateHeight * Lerp(1.0, 1.25, zeroBasedScale))
 		C_NamePlate.SetNamePlateSelfSize(_BaseNamePlateWidth * _HorizontalScale * Lerp(1.1, 1.0, clampedZeroBasedScale), _BaseNamePlateHeight)
 
-		local font = Media.NAME_FONT.Font
-		font.height = math.min(Media.BASE_NAME_FONT_HEIGHT * _VerticalScale, Media.MAX_NAME_FONT_HEIGHT)
-		Media.NAME_FONT.Font = font
+		local font = NAME_FONT.Font
+		font.height = math.min(BASE_NAME_FONT_HEIGHT * _VerticalScale, MAX_NAME_FONT_HEIGHT)
+		NAME_FONT.Font = font
 
 		local np = _PlayerNamePlate
 		if np then UninstallClassPower(np) end

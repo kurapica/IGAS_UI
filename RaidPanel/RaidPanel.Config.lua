@@ -17,16 +17,6 @@ local function newIndex()
 end
 
 Config = {
-	-- Status bar texture
-	STATUSBAR_TEXTURE_PATH = [[Interface\Addons\IGAS_UI\Resource\healthtex.tga]],
-
-	-- Color settings
-	--- Default border color
-	DEFAULT_BORDER_COLOR = ColorType(0, 0, 0),
-
-	--- RaidPanel's target border color
-	TARGET_BORDER_COLOR = ColorType(1, 1, 1),
-
 	-- UnitFrame settings
 	UNITFRAME_VSPACING = 1,
 	UNITFRAME_HSPACING = 1,
@@ -79,8 +69,8 @@ Config = {
 		iNameLabel = {
 			Type = iNameLabel,
 			Location = {
-				AnchorPoint("TOPLEFT", 2, -2),
-				AnchorPoint("TOPRIGHT", -2, -2),
+				AnchorPoint("TOPLEFT", 14, -2, "iHealthBar"),
+				AnchorPoint("BOTTOMRIGHT", -14, 2, "iHealthBar"),
 			},
 			Locale = L"Name indicator",
 			Index = newIndex(),
@@ -136,7 +126,7 @@ Config = {
 		},
 		RaidTargetIcon = {
 			Type = RaidTargetIcon,
-			Location = { AnchorPoint("CENTER", 0, 0, "TOP") },
+			Location = { AnchorPoint("CENTER", 0, 0, nil, "TOP") },
 			Locale = L"Raid/Group target indicator",
 			Index = newIndex(),
 		},
@@ -150,11 +140,6 @@ Config = {
 			Type = ReadyCheckIcon,
 			Location = { AnchorPoint("BOTTOM") },
 			Locale = L"ReadyCheck indicator",
-			Index = newIndex(),
-		},
-		iTarget = {
-			Type = iTarget,
-			Locale = L"Target indicator",
 			Index = newIndex(),
 		},
 	},
@@ -179,14 +164,12 @@ Config = {
 			"RaidTargetIcon",
 			"ResurrectIcon",
 			"ReadyCheckIcon",
-			"iTarget",
 		},
 		Pet = {
 			"iHealthBar",
 			"iNameLabel",
 			"iBuffPanel",
 			"iDebuffPanel",
-			"iTarget",
 		},
 		Dead = {
 			"iHealthBar",
@@ -195,7 +178,6 @@ Config = {
 			"RangeChecker",
 			"RoleIcon_Dead",
 			"ResurrectIcon",
-			"iTarget",
 		},
 		UnitWatch = {
 			"iHealthBar",

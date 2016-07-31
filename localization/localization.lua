@@ -4,6 +4,19 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/07/31 v82 : </lime>
+</p><br/>
+<p>
+    1. You can unlock the minimap and move/resize it.
+</p>
+<p>
+    2. the namepalteN units can be displayed in the unit watch panel with correct health updating.
+</p>
+<p>
+    3. Update for IGAS v101 version.
+</p>
+<br/><br/>
+<p>
 <lime>2016/07/04 v63 : </lime>
 </p><br/>
 <p>

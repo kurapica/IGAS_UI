@@ -7,6 +7,9 @@
 	<!-- Init -->
 	<Script file = "IGAS_UI.lua"/>
 
+	<!-- Share -->
+	<Script file = "Resource\ShareFeatures.lua"/>
+
 	<!-- Modules -->
 	<Include file = "SpellCooldownLine\SpellCooldownLine.xml"/>
 	<Include file = "ActionBar\ActionBar.xml"/>

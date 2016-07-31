@@ -7,6 +7,19 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/07/31 v82 : </lime>
+</p><br/>
+<p>
+    1. 你可以解锁小地图，并且移动和调整其大小。
+</p>
+<p>
+    2. 姓名版相关的nameplateN，可以被团队面板的单体监视面板使用，能正常更新其信息。
+</p>
+<p>
+    3. 对应IGASv101版本。
+</p>
+<br/><br/>
+<p>
 <lime>2016/07/04 v63 : </lime>
 </p><br/>
 <p>
@@ -445,3 +458,5 @@ L["Are you sure to delete the unit id"] = "是否确认删除该单体ID"
 L["Auto layout"] = "自动布局"
 
 L["Unknown"] = "未知目标"
+
+L["Lock Minimap"] = "锁定小地图"

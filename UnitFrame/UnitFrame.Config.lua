@@ -3,6 +3,16 @@ IGAS:NewAddon "IGAS_UI.UnitFrame"
 import "System.Widget"
 import "System.Widget.Unit"
 
+-- Need show buff list
+_Buff_List = {
+	-- [spellId] = true,
+}
+
+-- Need show debuff list
+_Debuff_List = {
+	-- [spellId] = true,
+}
+
 --==========================
 -- Config for UnitFrame
 --==========================
@@ -45,8 +55,8 @@ Config = {
 			Type = LevelLabel,
 			Location = { AnchorPoint("RIGHT", -4, 0, "NameLabel", "LEFT") },
 		},
-		iPowerBar = {
-			Type = iPowerBar,
+		iPowerBarFrequent = {
+			Type = iPowerBarFrequent,
 			Direction = "south", Size = 6, Unit = "px",
 			Property = { Smoothing = true },
 		},
@@ -105,7 +115,7 @@ Config = {
 		},
 		iPlayerPowerText = {
 			Type = iPlayerPowerText,
-			Location = { AnchorPoint("RIGHT", -4, 0, "iPowerBar", "LEFT") },
+			Location = { AnchorPoint("RIGHT", -4, 0, "iPowerBarFrequent", "LEFT") },
 		},
 		iStaggerBar = {
 			Type = iStaggerBar,
@@ -272,7 +282,7 @@ Config = {
 				"NameLabel",
 				"LevelLabel",
 				"iHiddenManaBar",
-				"iPowerBar",
+				"iPowerBarFrequent",
 				"iCastBar",
 				"HealthTextFrequent",
 				"HealthTextFrequent2",
@@ -292,7 +302,7 @@ Config = {
 				"iHealthBar",
 				"NameLabel",
 				"LevelLabel",
-				"iPowerBar",
+				"iPowerBarFrequent",
 				"iCastBar",
 				"HealthTextFrequent",
 				"HealthTextFrequent2",
@@ -309,7 +319,7 @@ Config = {
 				"iHealthBar",
 				"NameLabel_Target",
 				"LevelLabel",
-				"iPowerBar",
+				"iPowerBarFrequent",
 				"iCastBar",
 				"HealthTextFrequent",
 				"HealthTextFrequent2",
@@ -354,7 +364,7 @@ Config = {
 				"iHealthBar",
 				"NameLabel",
 				"LevelLabel",
-				"iPowerBar",
+				"iPowerBarFrequent",
 				"iCastBar",
 				"HealthTextFrequent",
 				"HealthTextFrequent2",
@@ -373,7 +383,7 @@ Config = {
 				"iHealthBar",
 				"NameLabel",
 				"LevelLabel",
-				"iPowerBar",
+				"iPowerBarFrequent",
 				"iCastBar",
 				"HealthTextFrequent",
 				"HealthTextFrequent2",
