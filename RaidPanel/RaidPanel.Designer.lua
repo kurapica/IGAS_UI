@@ -39,6 +39,7 @@ raidUnitWatchPanel:SetPoint("BOTTOMLEFT", raidPanel, "TOPLEFT")
 raidUnitWatchPanel.ElementPrefix = "iUnitWatchFrame"
 raidUnitWatchPanel.AutoSize = true
 raidUnitWatchPanel.AutoPosition = true
+raidUnitWatchPanel.TopToBottom = false
 
 -- withPanel
 withPanel = Frame("IGASUI_Withpanel", SpellBookFrame)

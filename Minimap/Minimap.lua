@@ -122,7 +122,7 @@ function TimeManager_LoadUI()
 				    end
 				end
 
-				BuildBorder(TimeManagerClockButton)
+				--BuildBorder(TimeManagerClockButton)
 
 				TimeManagerClockTicker:ClearAllPoints()
 				TimeManagerClockTicker:SetPoint("CENTER")
@@ -130,7 +130,7 @@ function TimeManager_LoadUI()
 				TimeManagerClockButton:SetSize(TimeManagerClockTicker:GetStringWidth()+4, TimeManagerClockTicker:GetStringHeight() + 4)
 
 				TimeManagerClockButton:ClearAllPoints()
-				TimeManagerClockButton:SetPoint("BOTTOMRIGHT", Minimap, "BOTTOMRIGHT")
+				TimeManagerClockButton:SetPoint("BOTTOMRIGHT", Minimap, "BOTTOMRIGHT", 0, 4)
 
 				return
 			end
@@ -213,3 +213,7 @@ GuildInstanceDifficulty:SetPoint("TOPLEFT", Minimap, "TOPLEFT", -6, 4)
 -- MiniMapChallengeMode
 MiniMapChallengeMode:ClearAllPoints()
 MiniMapChallengeMode:SetPoint("TOPLEFT", Minimap, "TOPLEFT", 0, 0)
+
+-- QueueStatusMinimapButton
+QueueStatusMinimapButton:ClearAllPoints()
+QueueStatusMinimapButton:SetPoint("CENTER", Minimap, "BOTTOMLEFT", 0, 30)

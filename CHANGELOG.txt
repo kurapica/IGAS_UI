@@ -1,3 +1,6 @@
+2016/7/31 v83
+	1. The unit watch panel now generate frames from bottom to top.
+
 2016/7/31 v82
 	1. Minimap can be moved and resized.
 	2. nameplateN id can be used in unit watch panel without problem.
