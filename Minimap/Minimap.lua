@@ -36,6 +36,11 @@ Toggle = {
 				end
 				mask.OnResizeFinished = function()
 					_DB.Location = Minimap.Location
+					local width, height = Minimap:GetSize()
+					local size = math.min(width, height)
+					Minimap:SetSize(size, size)
+					mask:Hide()
+					mask:Show()
 					_DB.Size = Minimap.Size
 					local zoom = Minimap.Zoom
 					if zoom > 0 then
@@ -86,7 +91,9 @@ function OnLoad(self)
 	end
 
 	if _DB.Size then
-		Minimap.Size = _DB.Size
+		local width, height = _DB.Size.width, _DB.Size.height
+		local size = math.min(width, height)
+		Minimap:SetSize(size, size)
 		local zoom = Minimap.Zoom
 		if zoom > 0 then
 			Minimap.Zoom = 0

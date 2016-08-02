@@ -1,3 +1,6 @@
+2016/8/01 v84
+	1. Fix the minimap resize display error.
+
 2016/7/31 v83
 	1. The unit watch panel now generate frames from bottom to top.
 
