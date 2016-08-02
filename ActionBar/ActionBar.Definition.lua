@@ -397,7 +397,8 @@ class "IActionButton"
 		if col <= 1 then col = 1 end
 		if row > ceil(_MaxBrother / col) then row = ceil(_MaxBrother / col) end
 
-		if self.Header == self and not self.FreeMode then
+		--if self.Header == self and not self.FreeMode then
+		if self.Header == self then
 			if force or self.RowCount ~= row or self.ColCount ~= col then
 				local w, h, marginX, marginY, index, brother, last = self.Width, self.Height, self.MarginX, self.MarginY, 1, self
 				local tail
@@ -817,8 +818,11 @@ class "IActionButton"
 			self.IFMovable = value
 			self.IFResizable = value
 
-			if self.Header == self and not value then
+			if not value then
 				self:SetSize(36, 36)
+			end
+
+			if self.Header == self then
 				self:GenerateBrother(nil, nil, true)
 			end
 			if self.Root == self and not value then
@@ -1056,6 +1060,14 @@ class "IActionButton"
 		end
 	end
 
+	local function OnSizeChanged(self)
+		local width, height = self:GetSize()
+		if math.abs(width-height) > 0.1 then
+			local size = math.min(width, height)
+			self:SetSize(size, size)
+		end
+	end
+
 	------------------------------------------------------
 	-- Method
 	------------------------------------------------------
@@ -1071,6 +1083,9 @@ class "IActionButton"
     function IActionButton(self, name, parent, ...)
 		Super(self, name, parent, ...)
 
+		self.Height = 36
+		self.Width = 36
+
 		self.IFMovable = false
 		self.IFResizable = false
 		self.ShowGrid = true
@@ -1082,6 +1097,7 @@ class "IActionButton"
 		self.OnEnter = self.OnEnter + OnEnter
 		self.OnMouseDown = self.OnMouseDown + OnMouseDown
 		self.OnCooldownUpdate = self.OnCooldownUpdate + OnCooldownUpdate
+		self.OnSizeChanged = self.OnSizeChanged + OnSizeChanged
 
 		-- callback from RestrictedEnvironment, maybe add some mechanism solve this later
 		IGAS:GetUI(self).IActionHandler_UpdateExpansion = IActionHandler_UpdateExpansion

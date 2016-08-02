@@ -39,8 +39,6 @@ Toggle = {
 					local width, height = Minimap:GetSize()
 					local size = math.min(width, height)
 					Minimap:SetSize(size, size)
-					mask:Hide()
-					mask:Show()
 					_DB.Size = Minimap.Size
 					local zoom = Minimap.Zoom
 					if zoom > 0 then
