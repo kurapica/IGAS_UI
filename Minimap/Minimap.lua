@@ -82,6 +82,7 @@ end
 
 function OnLoad(self)
 	self:SecureHook("TimeManager_LoadUI")
+	self:SecureHook("UIParent_UpdateTopFramePositions")
 
 	_DB = _Addon._DB.Minimap or {}
 	_Addon._DB.Minimap = _DB
@@ -143,6 +144,16 @@ function TimeManager_LoadUI()
 			end
 		end
 	end)
+end
+
+function UIParent_UpdateTopFramePositions()
+	if _DB.MoveBuffFrame then
+		Task.NoCombatCall(function()
+			if _DB.BuffFrameLocation then
+				BuffFrame.Location = _DB.BuffFrameLocation
+			end
+		end)
+	end
 end
 
 -----------------------------
