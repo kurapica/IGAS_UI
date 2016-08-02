@@ -165,6 +165,10 @@ function OnLoad(self)
 	_ActionBarGlobalStyle.HideGlobalCD = _ActionBarHideGlobalCD
 	_MenuNoGCD.Checked = _ActionBarHideGlobalCD.ENABLE
 
+	-- Auto-gen item black list
+	_AutoGenItemBlackList = _DBChar.AutoGenItemBlackList or {}
+	_DBChar.AutoGenItemBlackList = _AutoGenItemBlackList
+
 	-- Register system events
 	self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
 	self:RegisterEvent("PLAYER_LOGOUT")
@@ -1296,12 +1300,40 @@ function _MenuNoGCD:OnCheckChanged()
 end
 
 function IGAS.GameTooltip:OnTooltipSetItem()
-	local item = self:GetItem()
-	if item then
-		local itemCls, itemSubCls = select(6, GetItemInfo(item))
+	local item, link = self:GetItem()
+	if link then
+		link = tonumber(link:match("Hitem:(%d+)"))
+		local itemCls, itemSubCls = select(6, GetItemInfo(link))
+
 		if itemCls and itemSubCls then
 			self:AddLine("    ")
-			self:AddLine(itemCls .. "-" .. itemSubCls)
+			self:AddDoubleLine(itemCls .. "-" .. itemSubCls, "ID: " .. link)
 		end
 	end
+end
+
+function _MenuSowAutoGenBlackList:OnClick()
+	_AutoGenBlackListForm:Show()
+end
+
+function _AutoGenBlackListForm:OnShow()
+	_AutoGenBlackListList:Clear()
+
+	for item in pairs(_AutoGenItemBlackList) do
+		_AutoGenBlackListList:AddItem(item, GetItemInfo(item), GetItemIcon(item))
+	end
+end
+
+function _AutoGenBlackListForm:OnHide()
+	_AutoGenBlackListList:Clear()
+	AutoActionTask.RestartAllTaskByType(AutoActionTask.AutoActionTaskType.Item)
+end
+
+function _AutoGenBlackListList:OnItemDoubleClick(key)
+	_AutoGenItemBlackList[key] = nil
+	self:RemoveItem(key)
+end
+
+function _AutoGenBlackListList:OnGameTooltipShow(gametooltip, key)
+	gametooltip:SetHyperlink(select(2, GetItemInfo(key)))
 end

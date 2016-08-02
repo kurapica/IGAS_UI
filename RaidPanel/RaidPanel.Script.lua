@@ -858,6 +858,14 @@ function frmUnitList:OnHide()
 	end
 end
 
+function IGAS.GameTooltip:OnTooltipSetSpell()
+	local name, rank, id = self:GetSpell()
+	if id then
+		self:AddLine("    ")
+		self:AddLine("ID: " .. tostring(id))
+	end
+end
+
 --------------------
 -- Tool function
 --------------------

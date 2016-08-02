@@ -4,6 +4,13 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/08/02 v88 : </lime>
+</p><br/>
+<p>
+    1. Use alt+right-mouse on a auto-gen item button to add the item into the black list, so it won't be generated.
+</p>
+<br/><br/>
+<p>
 <lime>2016/07/31 v82 : </lime>
 </p><br/>
 <p>

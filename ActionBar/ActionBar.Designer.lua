@@ -175,3 +175,19 @@ _MenuCDLabel = _Menu:AddMenuButton(L"Global Style", L"Use cooldown label")
 
 _MenuCDLabelToggle = _MenuCDLabel:AddMenuButton(L"Enable")
 _MenuCDLabelToggle:ActiveThread("OnClick")
+
+_MenuSowAutoGenBlackList = _Menu:AddMenuButton(L"Global Style", L"Show item black list")
+
+-----------------------------------
+-- Auto-gen Item Black List
+-----------------------------------
+_AutoGenBlackListForm = Form("IGAS_UI_AutoGen_Black_List")
+_AutoGenBlackListForm.Caption = L"Auto-gen item black list"
+_AutoGenBlackListForm.Message = L"Double click to remove"
+_AutoGenBlackListForm:SetSize(300, 400)
+_AutoGenBlackListForm:Hide()
+
+_AutoGenBlackListList = List("List", _AutoGenBlackListForm)
+_AutoGenBlackListList:SetPoint("TOPLEFT", 4, -26)
+_AutoGenBlackListList:SetPoint("BOTTOMRIGHT", -4, 26)
+_AutoGenBlackListList.ShowTooltip = true

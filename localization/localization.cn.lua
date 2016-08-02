@@ -7,6 +7,13 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/08/02 v88 : </lime>
+</p><br/>
+<p>
+    1. 使用ALt+鼠标右键点击自动生成的物品按钮，可以将物品加入黑名单，不再被自动生成。
+</p>
+<br/><br/>
+<p>
 <lime>2016/07/31 v82 : </lime>
 </p><br/>
 <p>
@@ -460,3 +467,6 @@ L["Auto layout"] = "自动布局"
 L["Unknown"] = "未知目标"
 
 L["Lock Minimap"] = "锁定小地图"
+
+L["Show item black list"] = "显示物品黑名单"
+L["Auto-gen item black list"] = "自动生成物品黑名单"
