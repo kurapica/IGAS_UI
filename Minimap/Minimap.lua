@@ -59,8 +59,8 @@ Toggle = {
 				maskBuffFrame.OnMoveFinished = function()
 					if not _DB.MoveBuffFrame then
 						_DB.MoveBuffFrame = true
-						BuffFrame:SetMovable(true)
-						BuffFrame:SetUserPlaced(true)
+						--BuffFrame:SetMovable(true)
+						--BuffFrame:SetUserPlaced(true)
 					end
 					_DB.BuffFrameLocation = BuffFrame.Location
 				end
@@ -105,8 +105,8 @@ function OnLoad(self)
 	end
 
 	if _DB.MoveBuffFrame then
-		BuffFrame:SetMovable(true)
-		BuffFrame:SetUserPlaced(true)
+		--BuffFrame:SetMovable(true)
+		--BuffFrame:SetUserPlaced(true)
 
 		if _DB.BuffFrameLocation then
 			BuffFrame.Location = _DB.BuffFrameLocation

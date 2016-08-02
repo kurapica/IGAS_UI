@@ -1,3 +1,6 @@
+2016/8/02 v85
+	1. Fix the buff frame don't display in correct position.
+
 2016/8/01 v84
 	1. Fix the minimap resize display error.
 
