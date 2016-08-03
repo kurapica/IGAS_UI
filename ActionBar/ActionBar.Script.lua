@@ -1303,11 +1303,13 @@ function IGAS.GameTooltip:OnTooltipSetItem()
 	local item, link = self:GetItem()
 	if link then
 		link = tonumber(link:match("Hitem:(%d+)"))
-		local itemCls, itemSubCls = select(6, GetItemInfo(link))
+		if link then
+			local itemCls, itemSubCls = select(6, GetItemInfo(link))
 
-		if itemCls and itemSubCls then
-			self:AddLine("    ")
-			self:AddDoubleLine(itemCls .. "-" .. itemSubCls, "ID: " .. link)
+			if itemCls and itemSubCls then
+				self:AddLine("    ")
+				self:AddDoubleLine(itemCls .. "-" .. itemSubCls, "ID: " .. link)
+			end
 		end
 	end
 end

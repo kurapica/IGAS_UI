@@ -1,3 +1,6 @@
+2016/8/3 v90
+	1. Fix error for adding information on GameTooltip with recipes.
+
 2016/8/03 v89
 	1. Change the action button's style, fix the icon border, it'll looks more better.
 
