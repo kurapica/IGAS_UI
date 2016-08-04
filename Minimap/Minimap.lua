@@ -55,11 +55,6 @@ Toggle = {
 				maskBuffFrame = Mask("IGAS_UI_BuffFrame_Mask", IGAS.BuffFrame)
 				maskBuffFrame.AsMove = true
 				maskBuffFrame.OnMoveFinished = function()
-					if not _DB.MoveBuffFrame then
-						_DB.MoveBuffFrame = true
-						--BuffFrame:SetMovable(true)
-						--BuffFrame:SetUserPlaced(true)
-					end
 					_DB.BuffFrameLocation = BuffFrame.Location
 				end
 			end
@@ -103,15 +98,9 @@ function OnLoad(self)
 		end
 	end
 
-	if _DB.MoveBuffFrame then
-		--BuffFrame:SetMovable(true)
-		--BuffFrame:SetUserPlaced(true)
-
-		if _DB.BuffFrameLocation then
-			BuffFrame.Location = _DB.BuffFrameLocation
-		end
-
-		BuffFrame_OnEvent(BuffFrame, "UNIT_AURA", "player")
+	_DB.MoveBuffFrame = nil
+	if _DB.BuffFrameLocation then
+		BuffFrame.Location = _DB.BuffFrameLocation
 	end
 end
 
@@ -145,11 +134,9 @@ function TimeManager_LoadUI()
 end
 
 function UIParent_UpdateTopFramePositions()
-	if _DB.MoveBuffFrame then
+	if _DB.BuffFrameLocation then
 		Task.NoCombatCall(function()
-			if _DB.BuffFrameLocation then
-				BuffFrame.Location = _DB.BuffFrameLocation
-			end
+			BuffFrame.Location = _DB.BuffFrameLocation
 		end)
 	end
 end

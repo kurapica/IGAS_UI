@@ -1,3 +1,7 @@
+2016/8/4 v92
+	1. Fix can't right-click to cancel the buff.
+	2. Apply a border to the buff icons.
+
 2016/8/4 v91
 	1. Fix the tip show double times for some items and talents.
 

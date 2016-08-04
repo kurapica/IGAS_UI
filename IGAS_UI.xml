@@ -20,6 +20,7 @@
 	<Script file = "Minimap\Minimap.lua"/>
 	<Script file = "ChatFrame\ChatFrame.lua"/>
 	<Script file = "QuestMover\QuestMover.lua"/>
+	<Script file = "BuffFrameStyle\BuffFrameStyle.lua"/>
 
 	<!-- Manager -->
 	<Script file = "Manager.Designer.lua"/>
