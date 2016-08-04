@@ -858,7 +858,12 @@ function frmUnitList:OnHide()
 	end
 end
 
+local _prev = GetTime()
+
 function IGAS.GameTooltip:OnTooltipSetSpell()
+	if GetTime() == _prev then return end
+	_prev = GetTime()
+
 	local name, rank, id = self:GetSpell()
 	if id then
 		self:AddLine("    ")

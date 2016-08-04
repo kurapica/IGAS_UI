@@ -1299,7 +1299,12 @@ function _MenuNoGCD:OnCheckChanged()
 	_ActionBarHideGlobalCD.ENABLE = self.Checked
 end
 
+local _prev = GetTime()
+
 function IGAS.GameTooltip:OnTooltipSetItem()
+	if GetTime() == _prev then return end
+	_prev = GetTime()
+
 	local item, link = self:GetItem()
 	if link then
 		link = tonumber(link:match("Hitem:(%d+)"))
