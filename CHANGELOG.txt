@@ -1,3 +1,6 @@
+2016/8/14 v95
+	1. Add a condition for container view system, modify the save format, reset the view system's settings.
+
 2016/8/14 v94
 	1. Fix label name when edit the item in the view mananger's treeview.
 

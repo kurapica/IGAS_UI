@@ -17,111 +17,139 @@ _BackColor = ColorType(0, 0, 0, 1)
 -- Item Conditions
 _ItemConditions = {
 	{
+		ID = 100001,
 		Name = L"Any",
 		Desc = L"No check, you should only use this for the last container of one view",
 		Condition = "true",
 	},
 	{
+		ID = 100002,
 		Name = L"Backpack",
 		Desc = L"The slot is in the backpack",
 		Condition = "(bag == 0)",
 	},
 	{
+		ID = 100003,
 		Name = L"Container1",
 		Desc = L"The slot is in the 1st container(from the right)",
 		Condition = "(bag == 1)",
 	},
 	{
+		ID = 100004,
 		Name = L"Container2",
 		Desc = L"The slot is in the 2nd container(from the right)",
 		Condition = "(bag == 2)",
 	},
 	{
+		ID = 100005,
 		Name = L"Container3",
 		Desc = L"The slot is in the 3rd container(from the right)",
 		Condition = "(bag == 3)",
 	},
 	{
+		ID = 100006,
 		Name = L"Container4",
 		Desc = L"The slot is in the 4th container(from the right)",
 		Condition = "(bag == 4)",
 	},
 	{
+		ID = 100007,
 		Name = L"HasItem",
 		Desc = L"The slot has item",
 		Condition = "itemID",
 	},
 	{
+		ID = 100008,
 		Name = L"Readable",
 		Desc = L"The slot has item, and the item is a readable item such as books or scrolls",
 		Condition = "readable",
 	},
 	{
+		ID = 100009,
 		Name = L"Lootable",
 		Desc = L"The slot has item, and the item is a temporary container containing items that can be looted",
 		Condition = "lootable",
 	},
 	{
+		ID = 100010,
 		Name = L"HasNoValue",
 		Desc = L"The slot has item, and the item has no sale price",
 		Condition = "hasNoValue",
 	},
 	{
+		ID = 100011,
 		Name = L"IsQuestItem",
 		Desc = L"The slot has item, and the item is a quest item",
 		Condition = "(questId or isQuest)",
 	},
 	{
+		ID = 100012,
 		Name = L"IsEquipItem",
 		Desc = L"The slot has item, and the item is an equipment",
 		Condition = "(equipSlot and equipSlot~='')",
 	},
 	{
+		ID = 100013,
 		Name = L"IsStackableItem",
 		Desc = L"The slot has item, and the item is stackable",
 		Condition = "(maxStack and maxStack > 1)"
 	},
 	{
+		ID = 100014,
+		Name = L"IsUsableItem",
+		Desc = L"The slot has item, and the item can be used by right-click.",
+		Condition = "itemSpell",
+	},
+	{
+		ID = 200001,
 		Name = _G["RARITY"] .. "-" .. _G["ITEM_QUALITY0_DESC"],
 		Desc = L"The slot has item, and the item is poor(color gray)",
 		Condition = "(quality == LE_ITEM_QUALITY_POOR)"
 	},
 	{
+		ID = 200002,
 		Name = _G["RARITY"] .. "-" .. _G["ITEM_QUALITY1_DESC"],
 		Desc = L"The slot has item, and the item is common(color white)",
 		Condition = "(quality == LE_ITEM_QUALITY_COMMON)"
 	},
 	{
+		ID = 200003,
 		Name = _G["RARITY"] .. "-" .. _G["ITEM_QUALITY2_DESC"],
 		Desc = L"The slot has item, and the item is uncommon(color green)",
 		Condition = "(quality == LE_ITEM_QUALITY_UNCOMMON)"
 	},
 	{
+		ID = 200004,
 		Name = _G["RARITY"] .. "-" .. _G["ITEM_QUALITY3_DESC"],
 		Desc = L"The slot has item, and the item is rare(color blue)",
 		Condition = "(quality == LE_ITEM_QUALITY_RARE)"
 	},
 	{
+		ID = 200005,
 		Name = _G["RARITY"] .. "-" .. _G["ITEM_QUALITY4_DESC"],
 		Desc = L"The slot has item, and the item is epic(color purple)",
 		Condition = "(quality == LE_ITEM_QUALITY_EPIC)"
 	},
 	{
+		ID = 200006,
 		Name = _G["RARITY"] .. "-" .. _G["ITEM_QUALITY5_DESC"],
 		Desc = L"The slot has item, and the item is legendary(color orange)",
 		Condition = "(quality == LE_ITEM_QUALITY_LEGENDARY)"
 	},
 	{
+		ID = 200007,
 		Name = _G["RARITY"] .. "-" .. _G["ITEM_QUALITY6_DESC"],
 		Desc = L"The slot has item, and the item is artifact(color golden yellow)",
 		Condition = "(quality == LE_ITEM_QUALITY_ARTIFACT)"
 	},
 	{
+		ID = 200008,
 		Name = _G["RARITY"] .. "-" .. _G["ITEM_QUALITY7_DESC"],
 		Desc = L"The slot has item, and the item is heirloom(color light yellow)",
 		Condition = "(quality == LE_ITEM_QUALITY_HEIRLOOM)"
 	},
 	{
+		ID = 200009,
 		Name = _G["RARITY"] .. "-" .. _G["ITEM_QUALITY8_DESC"],
 		Desc = L"The slot has item, and the item is wow token(color light yellow)",
 		Condition = "(quality == LE_ITEM_QUALITY_WOW_TOKEN)"
@@ -130,9 +158,12 @@ _ItemConditions = {
 
 local i = 0
 local itemCls = GetItemClassInfo(i)
+local _ID
 
 while itemCls and #itemCls > 0 do
+	_ID = 300000 + i * 1000
 	tinsert(_ItemConditions, {
+		ID = _ID,
 		Name = itemCls,
 		Desc = L"The slot has item, and the item's class is " .. itemCls,
 		Condition = ("(cls == %q)"):format(itemCls)
@@ -142,7 +173,9 @@ while itemCls and #itemCls > 0 do
 	local itemSubCls = GetItemSubClassInfo(i, j)
 
 	while itemSubCls and #itemSubCls > 0 do
+		_ID = _ID + 1
 		tinsert(_ItemConditions, {
+			ID = _ID,
 			Name = itemCls .. "-" .. itemSubCls,
 			Desc = L"The slot has item, and the item's sub-class is " .. itemSubCls,
 			Condition = ("(cls == %q and subclass == %q)"):format(itemCls, itemSubCls),
@@ -154,6 +187,10 @@ while itemCls and #itemCls > 0 do
 
 	i = i + 1
 	itemCls = GetItemClassInfo(i)
+end
+
+for i, v in ipairs(_ItemConditions) do
+	_ItemConditions[v.ID] = v
 end
 
 -- Widget Classes
@@ -305,15 +342,18 @@ class "ContainerView"
 				local GetContainerItemInfo = GetContainerItemInfo
 				local GetContainerItemQuestInfo = GetContainerItemQuestInfo
 				local GetItemInfo = GetItemInfo
+				local GetItemSpell = GetItemSpell
 
 				for bag = 0, _G.NUM_BAG_FRAMES do
 					for slot = 1, GetContainerNumSlots(bag) do
 						local _, count, _, quality, readable, lootable, link, _, hasNoValue, itemID = GetContainerItemInfo(bag, slot)
 						local isQuest, questId, isActive = GetContainerItemQuestInfo(bag, slot)
 						local name, iLevel, reqLevel, cls, subclass, maxStack, equipSlot, vendorPrice
+						local itemSpell
 
 						if itemID then
 							name, _, _, iLevel, reqLevel, cls, subclass, maxStack, equipSlot, _, vendorPrice = GetItemInfo(itemID)
+							itemSpell = GetItemSpell(itemID)
 						end
 
 						%s

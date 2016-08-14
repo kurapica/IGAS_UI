@@ -35,8 +35,8 @@ HTML_RESULT = [[
 local conditions = {}
 for i, v in ipairs(_ItemConditions) do
 	local text = "<p>"
-	text = text .. HTML_HREF_TEMPLATE:format(-i, L"[not]")
-	text = text .. HTML_HREF_TEMPLATE:format(i, "[" .. v.Name .. "]")
+	text = text .. HTML_HREF_TEMPLATE:format(-v.ID, L"[not]")
+	text = text .. HTML_HREF_TEMPLATE:format(v.ID, "[" .. v.Name .. "]")
 	text = text .. " - " .. v.Desc .. "</p><br/>"
 
 	tinsert(conditions, text)
@@ -62,26 +62,29 @@ function OnLoad(self)
 	self:SecureHook("CloseAllBags")
 
 	-- DB
-	-- _DB.ContainerDB = nil
+	if _DB.ContainerDB and (not _DB.ContainerDB.SaveFormatVer or _DB.ContainerDB.SaveFormatVer < 1) then
+		_DB.ContainerDB = nil
+	end
 	_ContainerDB = _DB.ContainerDB or {
+		SaveFormatVer = 1,
 		ViewConfigs = {
 			{
 				Name = L"Default",
 				ContainerRules = {
-					{ {2} }, -- Backpack
-					{ {3} }, -- Container1
-					{ {4} }, -- Container2
-					{ {5} }, -- Container3
-					{ {6} }, -- Container4
+					{ {100002} }, -- Backpack
+					{ {100003} }, -- Container1
+					{ {100004} }, -- Container2
+					{ {100005} }, -- Container3
+					{ {100006} }, -- Container4
 				},
 			},
 			{
 				Name = L"All-In-One",
 				ContainerRules = {
-					{ {1} }, -- Any
+					{ {100001} }, -- Any
 				},
 			},
-		}
+		},
 	}
 	_DB.ContainerDB = _ContainerDB
 
@@ -289,6 +292,8 @@ function htmlCondition:OnShow()
 end
 
 function htmlRule:OnHyperlinkClick(v)
+	Debug("Remove condition %s", v)
+
 	v = tonumber(v)
 	local data = self.Node.MetaData.Data
 	for i, j in ipairs(data) do
@@ -302,6 +307,8 @@ function htmlRule:OnHyperlinkClick(v)
 end
 
 function htmlCondition:OnHyperlinkClick(v)
+	Debug("Add condition %s", v)
+
 	v = tonumber(v)
 	local data = htmlRule.Node.MetaData.Data
 
