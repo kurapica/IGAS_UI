@@ -4,6 +4,16 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/08/14 v93 : </lime>
+</p><br/>
+<p>
+    1. You can modify the anchor point for every elements with the menu, so they'll fit to any resolution.
+</p>
+<p>
+    2. Container View System is added, you can use the view manager to control how you display the slot in the bags.
+</p>
+<br/><br/>
+<p>
 <lime>2016/08/02 v88 : </lime>
 </p><br/>
 <p>

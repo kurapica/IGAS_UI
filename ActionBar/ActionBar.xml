@@ -3,5 +3,4 @@
 	<Script file = "ActionBar.Designer.lua"/>
 	<Script file = "ActionBar.AutoPopupList.lua"/>
 	<Script file = "ActionBar.Script.lua"/>
-	<Script file = "Style.lua"/>
 </Ui>

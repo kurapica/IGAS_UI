@@ -76,6 +76,7 @@ class "iRaidUnitFrame"
 
 		self.Panel.VSpacing = Config.UNITFRAME_VSPACING
 		self.Panel.HSpacing = Config.UNITFRAME_HSPACING
+		self.Panel.FrameLevel = 0
 	end
 endclass "iRaidUnitFrame"
 

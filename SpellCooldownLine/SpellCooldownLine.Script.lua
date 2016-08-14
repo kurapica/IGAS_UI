@@ -526,6 +526,19 @@ function btnHandler:OnMouseUp(button)
     end
 end
 
+function btnHandler:OnEnter()
+    if not SpellBookFrame.Visible and not CursorHasItem() then
+        _Menu.Visible = true
+    end
+end
+
+function _MenuModifyAnchorPoints:OnClick(self)
+    IGAS:ManageAnchorPoint(btnHandler, nil, true)
+
+    _DBChar.SpellCooldownHandlerLocation = btnHandler.Location
+    UpdateLine()
+end
+
 function btnHandler:OnReceiveDrag()
     local type, index, subType, data = GetCursorInfo()
 

@@ -1313,7 +1313,7 @@ function IGAS.GameTooltip:OnTooltipSetItem()
 
 			if itemCls and itemSubCls then
 				self:AddLine("    ")
-				self:AddDoubleLine(itemCls .. "-" .. itemSubCls, "ID: " .. link)
+				self:AddDoubleLine(itemCls .. "-" .. itemSubCls, "ID: " .. link, 1, 1, 1, 1, 1, 1)
 			end
 		end
 	end
@@ -1343,4 +1343,10 @@ end
 
 function _AutoGenBlackListList:OnGameTooltipShow(gametooltip, key)
 	gametooltip:SetHyperlink(select(2, GetItemInfo(key)))
+end
+
+function _MenuModifyAnchorPoints:OnClick()
+	local btn = _Menu.Parent
+	_Menu:Hide()
+	IGAS:ManageAnchorPoint(btn, nil, true)
 end

@@ -1,3 +1,7 @@
+2016/8/14 v93
+	1. You can modify anchor points for all elements, used for auto-fit for any resolution.
+	2. Container View system added.
+
 2016/8/4 v92
 	1. Fix can't right-click to cancel the buff.
 	2. Apply a border to the buff icons.

@@ -8,11 +8,14 @@ Media = {
 	STATUSBAR_TEXTURE_PATH = [[Interface\Addons\IGAS_UI\Resource\healthtex.tga]],
 	--STATUSBAR_TEXTURE_PATH2 = [[Interface\Addons\IGAS_UI\Resource\powertex.tga]],
 
+	--BORDER_TEXTURE_PATH = [[Interface\Common\WhiteIconFrame]],
+	BORDER_TEXTURE_PATH = [[Interface\Addons\IGAS_UI\Resource\border.tga]],
+
 	-- Color settings
-	--- Default border color
 	DEFAULT_BORDER_COLOR = ColorType(0, 0, 0),
 	ACTIVED_BORDER_COLOR = ColorType(1, 1, 1),
 	WARN_BORDER_COLOR = ColorType(1, 0, 0),
+	PLAYER_CLASS_COLOR = RAID_CLASS_COLORS[select(2, UnitClass("player"))],
 
 	--- Elite target border color
 	ELITE_BORDER_COLOR = ColorType(1, 0.84, 0),
@@ -25,6 +28,11 @@ Media = {
 	NAMEPLATE_CASTBAR_COLOR = ColorType(0.25, 0.78, 0.92),
 	CASTBAR_BORDER_NORMAL_COLOR = ColorType(1, 1, 1),
 	CASTBAR_BORDER_NONINTERRUPTIBLE_COLOR = ColorType(0.77, 0.12 , 0.23),
+
+	DEFAULT_BACKDROP = {
+	    edgeFile = "Interface\\Buttons\\WHITE8x8",
+	    edgeSize = 1,
+	}
 }
 
 --==========================
@@ -60,11 +68,6 @@ interface "iStatusBarStyle"
 endinterface "iStatusBarStyle"
 
 interface "iBorder"
-	THIN_BORDER = {
-	    edgeFile = "Interface\\Buttons\\WHITE8x8",
-	    edgeSize = 1,
-	}
-
 	------------------------------------------------------
 	-- Initialize
 	------------------------------------------------------
@@ -73,10 +76,71 @@ interface "iBorder"
 		bg.FrameStrata = "BACKGROUND"
 		bg:SetPoint("TOPLEFT", -1, 1)
 		bg:SetPoint("BOTTOMRIGHT", 1, -1)
-		bg.Backdrop = THIN_BORDER
+		bg.Backdrop = Media.DEFAULT_BACKDROP
 		bg.BackdropBorderColor = Media.DEFAULT_BORDER_COLOR
     end
 endinterface "iBorder"
+
+-----------------------------------------------
+--- IFStyle
+-- @type interface
+-- @name IFStyle
+-----------------------------------------------
+interface "IFStyle"
+	_PUSH_COLOR = ColorType(1 - Media.PLAYER_CLASS_COLOR.r, 1-Media.PLAYER_CLASS_COLOR.g, 1-Media.PLAYER_CLASS_COLOR.b)
+
+	_BackDrop = {
+	    edgeFile = [[Interface\ChatFrame\CHATFRAMEBACKGROUND]],
+	    edgeSize = 2,
+	}
+
+	_IconLoc = {
+		AnchorPoint("TOPLEFT", 2, -2),
+		AnchorPoint("BOTTOMRIGHT", -2, 2),
+	}
+
+	_BorderLoc = {
+		AnchorPoint("TOPLEFT", -12, 12),
+		AnchorPoint("BOTTOMRIGHT", 12, -12),
+	}
+
+	local function OnSizeChanged(self)
+		local size = math.min(self.Width, self.Height)
+		local border = math.max(2, math.ceil(size/24))
+
+		self:GetChild("Icon").Location = {
+			AnchorPoint("TOPLEFT", border, -border),
+			AnchorPoint("BOTTOMRIGHT", -border, border),
+		}
+
+		if self:GetChild("HotKey") then self:GetChild("HotKey").Location = { AnchorPoint("TOPRIGHT", -border, -border) } end
+		self:GetChild("Count").Location = { AnchorPoint("BOTTOMRIGHT", -border, border) }
+		self:GetChild("Name").Location = { AnchorPoint("BOTTOM", 0, border) }
+
+		border = math.floor(12 * size / 32)
+		self:GetChild("Border").Location = {
+			AnchorPoint("TOPLEFT", -border, border),
+			AnchorPoint("BOTTOMRIGHT", border, -border),
+		}
+	end
+
+    function IFStyle(self)
+    	self.UseBlizzardArt = false
+
+		self.NormalTexturePath = Media.BORDER_TEXTURE_PATH
+		self.NormalTexture:ClearAllPoints()
+		self.NormalTexture:SetAllPoints()
+		self.NormalTexture.VertexColor = Media.PLAYER_CLASS_COLOR
+
+		self.PushedTexturePath = Media.BORDER_TEXTURE_PATH
+		self.PushedTexture.VertexColor = _PUSH_COLOR
+
+		self:GetChild("Icon").Location = _IconLoc
+		self:GetChild("Border").Location = _BorderLoc
+
+		self.OnSizeChanged = self.OnSizeChanged + OnSizeChanged
+    end
+endinterface "IFStyle"
 
 --==========================
 -- Elements

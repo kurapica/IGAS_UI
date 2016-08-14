@@ -20,6 +20,7 @@ end
 raidPanel = iUnitPanel("IGAS_UI_RAIDPANEL")
 raidPanel:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 0, -300)
 raidPanel.ElementPrefix = "iRaidUnitFrame"
+raidPanel.FrameLevel = 0
 
 raidPanelMask = Mask("Mask", raidPanel)
 raidPanelMask.AsMove = true
@@ -27,12 +28,14 @@ raidPanelMask.AsMove = true
 raidPetPanel = iPetUnitPanel("IGAS_UI_RAIDPETPANEL")
 raidPetPanel:SetPoint("TOPLEFT", raidPanel, "BOTTOMLEFT")
 raidPetPanel.ElementPrefix = "iRaidPetUnitFrame"
+raidPetPanel.FrameLevel = 0
 
 raidDeadPanel = iUnitPanel("IGAS_UI_DEADPANEL")
 raidDeadPanel:SetPoint("TOPLEFT", raidPetPanel, "BOTTOMLEFT")
 raidDeadPanel.Stype = "Dead"
 raidDeadPanel.ElementPrefix = "iRaidDeadUnitFrame"
 raidDeadPanel.ShowDeadOnly = true
+raidDeadPanel.FrameLevel = 0
 
 raidUnitWatchPanel = iUnitWatchPanel("IGAS_UI_UNITWATCHPANEL")
 raidUnitWatchPanel:SetPoint("BOTTOMLEFT", raidPanel, "TOPLEFT")
@@ -40,6 +43,7 @@ raidUnitWatchPanel.ElementPrefix = "iUnitWatchFrame"
 raidUnitWatchPanel.AutoSize = true
 raidUnitWatchPanel.AutoPosition = true
 raidUnitWatchPanel.TopToBottom = false
+raidUnitWatchPanel.FrameLevel = 0
 
 -- withPanel
 withPanel = Frame("IGASUI_Withpanel", SpellBookFrame)
@@ -408,6 +412,9 @@ mnuRaidPanelDebuffRightMouseRemove.IsCheckButton = true
 
 mnuRaidPanelDebuffShowTooltip = raidPanelConfig:AddMenuButton(L"Element Settings", L"Show buff/debuff tootip")
 mnuRaidPanelDebuffShowTooltip.IsCheckButton = true
+
+mnuRaidPanelModifyAnchors = raidPanelConfig:AddMenuButton(L"Element Settings", L"Modify AnchorPoints")
+mnuRaidPanelModifyAnchors:ActiveThread("OnClick")
 
 -- Unit List
 frmUnitList = Form("IGAS_UI_UNITLIST") {

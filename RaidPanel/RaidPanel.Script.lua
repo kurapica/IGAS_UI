@@ -22,11 +22,9 @@ Toggle = {
 		if value then
 			raidPanelMask.Visible = false
 			raidPanelConfig.Visible = false
-		else
-			if not InCombatLockdown() then
-				raidPanelMask.Visible = true
-				raidPanelConfig.Visible = true
-			end
+		elseif not InCombatLockdown() then
+			raidPanelMask.Visible = true
+			raidPanelConfig.Visible = true
 		end
 	end,
 	Update = function() end,
@@ -43,8 +41,10 @@ _Addon.OnSlashCmd = _Addon.OnSlashCmd + function(self, option, info)
 
 		if info == "unlock" then
 			raidPanelMask.Visible = true
+			raidPanelConfig.Visible = true
 		elseif info == "lock" then
 			raidPanelMask.Visible = false
+			raidPanelConfig.Visible = false
 		else
 			Log(2, "/iu rp unlock - unlock the raid panel.")
 			Log(2, "/iu rp lock - lock the raid panel.")
@@ -796,6 +796,12 @@ function mnuRaidUnitwatchAutoLayout:OnCheckChanged()
 	end
 end
 
+function mnuRaidPanelModifyAnchors:OnClick()
+	IGAS:ManageAnchorPoint(raidPanel, nil, true)
+
+	_DBChar[_LoadingConfig].Location = raidPanel.Location
+end
+
 function btnAdd:OnClick()
 	local unit = IGAS:MsgBox(L"Please input the unit id", "ic")
 
@@ -867,7 +873,7 @@ function IGAS.GameTooltip:OnTooltipSetSpell()
 	local name, rank, id = self:GetSpell()
 	if id then
 		self:AddLine("    ")
-		self:AddLine("ID: " .. tostring(id))
+		self:AddLine("ID: " .. tostring(id), 1, 1, 1)
 	end
 end
 

@@ -10,6 +10,9 @@ _Menu.Visible = false
 _MenuAutoHide = _Menu:AddMenuButton(L"Auto Hide")
 _MenuAutoHide:ActiveThread("OnClick")
 
+_MenuModifyAnchorPoints = _Menu:AddMenuButton(L"Modify AnchorPoints")
+_MenuModifyAnchorPoints:ActiveThread("OnClick")
+
 --==========================
 -- Generate unit frames based on Config.Units
 --==========================

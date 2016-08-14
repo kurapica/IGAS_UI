@@ -202,20 +202,32 @@ function _MenuAutoHide:OnClick()
 	end
 end
 
+function _MenuModifyAnchorPoints:OnClick()
+	local unitf = _Menu.Parent
+	local unit = unitf.Unit or unitf.OldUnit
+
+	IGAS:ManageAnchorPoint(unitf, nil, true)
+
+	_DB[unit] = _DB[unit] or {}
+	_DB[unit].Location = unitf.Location
+end
+
 --------------------
 -- Script Handler
 --------------------
 function arUnit:OnPositionChanged(i)
-	if arUnit[i].Unit then
-		_DB[arUnit[i].Unit] = _DB[arUnit[i].Unit] or {}
-		_DB[arUnit[i].Unit].Location = arUnit[i].Location
+	local unit = arUnit[i].Unit or arUnit[i].OldUnit
+	if unit then
+		_DB[unit] = _DB[unit] or {}
+		_DB[unit].Location = arUnit[i].Location
 	end
 end
 
 function arUnit:OnSizeChanged(i)
-	if arUnit[i].Unit then
-		_DB[arUnit[i].Unit] = _DB[arUnit[i].Unit] or {}
-		_DB[arUnit[i].Unit].Size = arUnit[i].Size
+	local unit = arUnit[i].Unit or arUnit[i].OldUnit
+	if unit then
+		_DB[unit] = _DB[unit] or {}
+		_DB[unit].Size = arUnit[i].Size
 	end
 end
 

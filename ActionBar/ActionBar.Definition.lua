@@ -16,6 +16,7 @@ _IGASUI_ACTIONBAR_GROUP = "IActionButton"
 class "IActionButton"
 	inherit "ActionButton"
 	extend "IFMovable" "IFResizable"
+	extend "IFStyle"
 
 	_MaxBrother = 12
 	_TempActionBrother = {}
@@ -580,6 +581,19 @@ class "IActionButton"
 	property "ColCount" { Type = Number, Default = 1 }
 	property "BranchCount" { Type = Number }
 
+	property "Icon" {
+		Get = function(self)
+			return self:GetChild("Icon").TexturePath
+		end,
+		Set = function(self, value)
+			self:GetChild("Icon").TexturePath = value
+			if value then
+				self:GetChild("Icon"):SetTexCoord(0.06, 0.94, 0.06, 0.94)
+			end
+		end,
+		Type = String+Number,
+	}
+
 	property "Visible" {
 		Get = function(self)
 			return self:IsShown() and true or false
@@ -1110,6 +1124,7 @@ class "IActionButton"
     function IActionButton(self, name, parent, ...)
 		Super(self, name, parent, ...)
 
+		self.FrameLevel = 2
 		self.Height = 36
 		self.Width = 36
 
@@ -1198,23 +1213,27 @@ class "IHeader"
 	local function OnMouseDown(self, button)
 		self.__MouseDown = GetTime()
 		if button == "LeftButton" and not self.Checked and not InCombatLockdown() then
-			self:ThreadCall(function(self)
-				local parent = self.Parent
+			local parent = self.Parent
+			local _orgLocation = parent.Location
+
+			Task.ThreadCall(function()
 				local e = parent:GetEffectiveScale()
 				local x, y
 
-				Threading.Sleep(_ClickCheckTime)
+				Task.Delay(_ClickCheckTime)
 
 				while IsMouseButtonDown("LeftButton") and not InCombatLockdown() do
 					x, y = GetCursorPosition()
-					x, y = x / e, y /e
-					x = x + self.Width / 2
-					y = y - self.Height / 2
-					parent:ClearAllPoints()
-					parent:SetPoint("TOPLEFT", IGAS.UIParent, "BOTTOMLEFT", x, y)
+					x = x + self.Width * e / 2
+					y = y - self.Height * e / 2
 
-					Threading.Sleep(0.1)
+					parent:ClearAllPoints()
+					parent:SetPoint("TOPLEFT", IGAS.UIParent, "BOTTOMLEFT", x / e , y /e)
+
+					Task.Next()
 				end
+
+				parent:UpdateWithAnchorSetting(_orgLocation)
 
 				return self:Fire("OnPositionChanged")
 			end)

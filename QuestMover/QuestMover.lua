@@ -2,6 +2,7 @@ IGAS:NewAddon "IGAS_UI.QuestMover"
 
 local locked = true
 local mask
+local menu
 
 Toggle = {
 	Message = L"Lock Quest Tracker",
@@ -14,11 +15,12 @@ Toggle = {
 		if locked then
 			if mask then
 				mask:Hide()
+				menu:Hide()
 				Task.NoCombatCall(RefreshMiniButtonPos)
 			end
 		elseif _G["ObjectiveTrackerFrame"] then
 			if not mask then
-				mask = Mask("IGAS_UI_ObjectiveTracker_Mask", IGAS.ObjectiveTrackerFrame)
+				mask = Mask("IGAS_UI_ObjectiveTracker_Mask", ObjectiveTrackerFrame)
 				mask.AsMove = true
 				mask.AsResize = true
 				mask.OnMoveFinished = function()
@@ -39,9 +41,30 @@ Toggle = {
 					_DB.Location = ObjectiveTrackerFrame.Location
 					_DB.Size = ObjectiveTrackerFrame.Size
 				end
+				menu = DropDownList("IGAS_UI_ObjectiveTracker_Menu", ObjectiveTrackerFrame)
+				menu.ShowOnCursor = false
+				menu.AutoHide = false
+				menu.Visible = false
+				menu:SetPoint("TOP", mask, "BOTTOM")
+
+				_MenuModifyAnchorPoints = menu:AddMenuButton(L"Modify AnchorPoints")
+				_MenuModifyAnchorPoints:ActiveThread("OnClick")
+				_MenuModifyAnchorPoints.OnClick = function(self)
+					if not _DB.ENABLE then
+						_DB.ENABLE = true
+						ObjectiveTrackerFrame:SetMovable(true)
+						ObjectiveTrackerFrame:SetUserPlaced(true)
+					end
+
+					IGAS:ManageAnchorPoint(ObjectiveTrackerFrame, nil, true)
+
+					_DB.Location = ObjectiveTrackerFrame.Location
+					Task.NoCombatCall(RefreshMiniButtonPos)
+				end
 			end
 
 			mask:Show()
+			menu:Show()
 		end
 
 		Toggle.Update()

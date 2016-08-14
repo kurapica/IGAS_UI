@@ -34,6 +34,14 @@ btnHandler.Resizable = true
 btnHandler.MouseEnabled = true
 btnHandler.MouseWheelEnabled = true
 
+_Menu = DropDownList("Menu", btnHandler)
+_Menu.Visible = false
+_Menu.ShowOnCursor = false
+_Menu:SetPoint("TOPLEFT", btnHandler, "TOPRIGHT")
+
+_MenuModifyAnchorPoints = _Menu:AddMenuButton(L"Modify AnchorPoints")
+_MenuModifyAnchorPoints:ActiveThread("OnClick")
+
 -- Sizer
 sizer_se = Button("Sizer_se", btnHandler)
 sizer_se.Width = 16

@@ -178,6 +178,9 @@ _MenuCDLabelToggle:ActiveThread("OnClick")
 
 _MenuSowAutoGenBlackList = _Menu:AddMenuButton(L"Global Style", L"Show item black list")
 
+_MenuModifyAnchorPoints = _Menu:AddMenuButton(L"Bar Style", L"Modify AnchorPoints")
+_MenuModifyAnchorPoints:ActiveThread("OnClick")
+
 -----------------------------------
 -- Auto-gen Item Black List
 -----------------------------------

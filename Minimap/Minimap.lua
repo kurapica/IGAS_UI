@@ -5,15 +5,18 @@ IGAS:NewAddon "IGAS_UI.MiniMap"
 
 import "System.Widget"
 
-_PLAYER_COLOR = RAID_CLASS_COLORS[select(2, UnitClass("player"))]
 _THIN_BORDER = {
     edgeFile = "Interface\\Buttons\\WHITE8x8",
     edgeSize = 1,
 }
 
+Minimap = IGAS.Minimap
+
 local locked = true
 local mask
 local maskBuffFrame
+local mnuMinimap
+local mnuBuffFrame
 
 Toggle = {
 	Message = L"Lock Minimap",
@@ -24,8 +27,8 @@ Toggle = {
 		locked = value
 
 		if locked then
-			if mask then mask:Hide() end
-			if maskBuffFrame then maskBuffFrame:Hide() end
+			if mask then mask:Hide() mnuMinimap:Hide() end
+			if maskBuffFrame then maskBuffFrame:Hide() mnuBuffFrame:Hide() end
 		else
 			if not mask then
 				mask = Mask("IGAS_UI_Minimap_Mask", Minimap)
@@ -49,18 +52,46 @@ Toggle = {
 						Minimap.Zoom = 0
 					end
 				end
+
+				mnuMinimap = DropDownList("IGAS_UI_Minimap_Menu", Minimap)
+				mnuMinimap.ShowOnCursor = false
+				mnuMinimap.AutoHide = false
+				mnuMinimap.Visible = false
+				mnuMinimap:SetPoint("TOP", mask, "BOTTOM")
+
+				local modify = mnuMinimap:AddMenuButton(L"Modify AnchorPoints")
+				modify:ActiveThread("OnClick")
+				modify.OnClick = function(self)
+					IGAS:ManageAnchorPoint(Minimap, UIParent, true)
+					_DB.Location = Minimap.Location
+				end
 			end
 
 			if not maskBuffFrame then
-				maskBuffFrame = Mask("IGAS_UI_BuffFrame_Mask", IGAS.BuffFrame)
+				maskBuffFrame = Mask("IGAS_UI_BuffFrame_Mask", BuffFrame)
 				maskBuffFrame.AsMove = true
 				maskBuffFrame.OnMoveFinished = function()
+					_DB.BuffFrameLocation = BuffFrame.Location
+				end
+
+				mnuBuffFrame = DropDownList("IGAS_UI_BuffFrame_Menu", BuffFrame)
+				mnuBuffFrame.ShowOnCursor = false
+				mnuBuffFrame.AutoHide = false
+				mnuBuffFrame.Visible = false
+				mnuBuffFrame:SetPoint("TOP", maskBuffFrame, "BOTTOM")
+
+				local modify = mnuBuffFrame:AddMenuButton(L"Modify AnchorPoints")
+				modify:ActiveThread("OnClick")
+				modify.OnClick = function(self)
+					IGAS:ManageAnchorPoint(BuffFrame, UIParent, true)
 					_DB.BuffFrameLocation = BuffFrame.Location
 				end
 			end
 
 			mask:Show()
+			mnuMinimap:Show()
 			maskBuffFrame:Show()
+			mnuBuffFrame:Show()
 		end
 
 		Toggle.Update()
@@ -70,7 +101,7 @@ Toggle = {
 
 function BuildBorder(self)
 	self.Backdrop = _THIN_BORDER
-	self.BackdropBorderColor = _PLAYER_COLOR
+	self.BackdropBorderColor = Media.PLAYER_CLASS_COLOR
 end
 
 function OnLoad(self)
@@ -144,7 +175,6 @@ end
 -----------------------------
 -- Init
 -----------------------------
-Minimap = IGAS.Minimap
 
 Minimap.MouseWheelEnabled = true
 

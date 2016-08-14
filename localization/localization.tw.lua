@@ -7,6 +7,16 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/08/14 v93 : </lime>
+</p><br/>
+<p>
+    1. 你可以通過菜單修改所有元素的錨點，以此確保界面在所有分辨率下工作正常。
+</p>
+<p>
+    2. 背包視圖模塊增加，你可以通過視圖管理器進行配置。
+</p>
+<br/><br/>
+<p>
 <lime>2016/08/02 v88 : </lime>
 </p><br/>
 <p>
@@ -468,3 +478,57 @@ L["Lock Minimap"] = "鎖定小地圖"
 
 L["Show item black list"] = "顯示物品黑名單"
 L["Auto-gen item black list"] = "自動生成物品黑名單"
+
+L["Modify AnchorPoints"] = "修改錨點"
+
+L["Lock Container Frame"] = "鎖定背包面板"
+L["Show the view manager"] = "顯示視圖管理器"
+L["Container View Rule Manager"] = "背包視圖規則管理器"
+L["Container"] = "容器"
+L["Rule"] = "規則"
+L["Please input the container view's name"] = "請輸入背包視圖的名稱"
+L["Do you want delete the container view?"] = "你確定刪除該背包視圖？"
+L["Do you want delete the container?"] = "你確定刪除該容器？"
+L["Do you want delete the contianer rule?"] = "你確定刪除該容器規則？"
+L["[not]"] = "[非]"
+
+L["Any"] = "任意"
+L["No check, you should only use this for the last container of one view"] = "無檢查，你應當僅用于視圖的最後一個容器"
+L["Backpack"] = "背包"
+L["The slot is in the backpack"] = "物品槽在出生背包中"
+L["Container1"] = "擴展背包1"
+L["The slot is in the 1st container(from the right)"] = "物品槽在擴展背包1中(從右往左數)"
+L["Container2"] = "擴展背包2"
+L["The slot is in the 2nd container(from the right)"] = "物品槽在擴展背包2中(從右往左數)"
+L["Container3"] = "擴展背包3"
+L["The slot is in the 3rd container(from the right)"] = "物品槽在擴展背包3中(從右往左數)"
+L["Container4"] = "擴展背包4"
+L["The slot is in the 4th container(from the right)"] = "物品槽在擴展背包4中(從右往左數)"
+L["HasItem"] = "含有物品"
+L["The slot has item"] = "物品槽中有物品存在"
+L["Readable"] = "可讀"
+L["The slot has item, and the item is a readable item such as books or scrolls"] = "物品槽中有物品存在，並且該物品可讀，比如書籍或者卷軸"
+L["Lootable"] = "可拾取"
+L["The slot has item, and the item is a temporary container containing items that can be looted"] = "物品槽中有物品存在，並且該物品是可以被拾取的容器"
+L["HasNoValue"] = "無價值"
+L["The slot has item, and the item has no sale price"] = "物品槽中有物品存在，並且該物品沒有價值(不可銷售)"
+L["IsQuestItem"] = "任務"
+L["The slot has item, and the item is a quest item"] = "物品槽中有物品存在，並且該物品是任務物品"
+L["IsEquipItem"] = "裝備"
+L["The slot has item, and the item is an equipment"] = "物品槽中有物品存在，並且該物品是裝備物品"
+L["IsStackableItem"] = "可堆疊"
+L["The slot has item, and the item is stackable"] = "物品槽中有物品存在，並且該物品是可堆疊的"
+L["The slot has item, and the item is poor(color gray)"] = "物品槽中有物品存在，並且該物品是粗糙的(灰色)"
+L["The slot has item, and the item is common(color white)"] = "物品槽中有物品存在，並且該物品是普通的(白色)"
+L["The slot has item, and the item is uncommon(color green)"] = "物品槽中有物品存在，並且該物品是優秀的(綠色)"
+L["The slot has item, and the item is rare(color blue)"] = "物品槽中有物品存在，並且該物品是精良的(藍色)"
+L["The slot has item, and the item is epic(color purple)"] = "物品槽中有物品存在，並且該物品是史詩的(紫色)"
+L["The slot has item, and the item is legendary(color orange)"] = "物品槽中有物品存在，並且該物品是傳說的(橙色)"
+L["The slot has item, and the item is artifact(color golden yellow)"] = "物品槽中有物品存在，並且該物品是神器的(暗金色)"
+L["The slot has item, and the item is heirloom(color light yellow)"] = "物品槽中有物品存在，並且該物品是傳家寶(淡金色)"
+L["The slot has item, and the item is wow token(color light yellow)"] = "物品槽中有物品存在，並且該物品是魔獸徽章的(淡金色)"
+L["The slot has item, and the item's class is "] = "物品槽中有物品存在，並且該物品的類型是"
+L["The slot has item, and the item's sub-class is "] = "物品槽中有物品存在，並且該物品的子類型是"
+L["Default"] = "默認"
+L["All-In-One"] = "整合"
+L[" and "] = " 并且 "
