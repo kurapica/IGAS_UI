@@ -200,6 +200,7 @@ class "ContainerButton"
 
 	BAG_ITEM_QUALITY_COLORS = System.Reflector.Clone(BAG_ITEM_QUALITY_COLORS, true)
 	LE_ITEM_QUALITY_COMMON = _G.LE_ITEM_QUALITY_COMMON
+	BAG_ITEM_QUALITY_COLORS[0] = ColorType(0.4, 0.4, 0.4)
 
 	-- Block parent's UpdateAction
 	function UpdateAction(self) end
@@ -213,11 +214,7 @@ class "ContainerButton"
 				self.NormalTexturePath = Media.BORDER_TEXTURE_PATH
 			end
 
-			if val >= LE_ITEM_QUALITY_COMMON and BAG_ITEM_QUALITY_COLORS[val] then
-				self.NormalTexture.VertexColor = BAG_ITEM_QUALITY_COLORS[val]
-			else
-				self.NormalTexture.VertexColor = Media.PLAYER_CLASS_COLOR
-			end
+			self.NormalTexture.VertexColor = BAG_ITEM_QUALITY_COLORS[val] or Media.PLAYER_CLASS_COLOR
 		else
 			self.NormalTexturePath = Media.BORDER_TEXTURE_PATH
 			self.NormalTexture.VertexColor = Media.PLAYER_CLASS_COLOR

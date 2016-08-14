@@ -1,3 +1,6 @@
+2016/8/14 v96
+	1. Add border color for poor item
+
 2016/8/14 v95
 	1. Add a condition for container view system, modify the save format, reset the view system's settings.
 
