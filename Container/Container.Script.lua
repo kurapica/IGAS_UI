@@ -223,15 +223,40 @@ function viewRuleTree:OnNodeFunctionClick(func, node)
 	if func == "X" then
 		if node.Level == 1 then
 			if IGAS:MsgBox(L"Do you want delete the container view?", "n") then
+				if self.SelectedNode and self.SelectedNode.Level == 3 and self.SelectedNode.Parent.Parent == node then
+					self.SelectedNode = nil
+					viewRuleTree:OnNodeSelected(nil)
+				end
+
 				node:Dispose()
 			end
 		elseif node.Level == 2 then
+			local index = node.Index
+			local parent = node.Parent
 			if IGAS:MsgBox(L"Do you want delete the container?", "n") then
+				if self.SelectedNode and self.SelectedNode.Level == 3 and self.SelectedNode.Parent == node then
+					self.SelectedNode = nil
+					viewRuleTree:OnNodeSelected(nil)
+				end
+
 				node:Dispose()
 			end
+			for i = index, parent.ChildNodeCount do
+				parent:GetNode(i).Text = L"Container" .. i
+			end
 		elseif node.Level == 3 then
+			local index = node.Index
+			local parent = node.Parent
 			if IGAS:MsgBox(L"Do you want delete the contianer rule?", "n") then
+				if self.SelectedNode and self.SelectedNode == node then
+					self.SelectedNode = nil
+					viewRuleTree:OnNodeSelected(nil)
+				end
+
 				node:Dispose()
+			end
+			for i = index, parent.ChildNodeCount do
+				parent:GetNode(i).Text = L"Rule" .. i
 			end
 		end
 	elseif func == "+" then
@@ -246,7 +271,7 @@ function viewRuleTree:OnNodeFunctionClick(func, node)
 end
 
 function viewRuleTree:OnNodeSelected(node)
-	if node.Level == 3 then
+	if node and node.Level == 3 then
 		htmlCondition.Visible = true
 		htmlRule.Visible = true
 		htmlRule.Node = node
@@ -254,6 +279,8 @@ function viewRuleTree:OnNodeSelected(node)
 	else
 		htmlCondition.Visible = false
 		htmlRule.Visible = false
+		htmlRule.Node = nil
+		htmlRule.Text = ""
 	end
 end
 
