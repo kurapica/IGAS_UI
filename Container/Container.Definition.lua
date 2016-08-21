@@ -7,6 +7,16 @@ import "System"
 import "System.Widget"
 import "System.Widget.Action"
 
+BANK_CONTAINER = _G.BANK_CONTAINER
+REAGENTBANK_CONTAINER = _G.REAGENTBANK_CONTAINER
+NUM_BANKBAGSLOTS = _G.NUM_BANKBAGSLOTS
+BAG_ITEM_QUALITY_COLORS = System.Reflector.Clone(BAG_ITEM_QUALITY_COLORS, true)
+LE_ITEM_QUALITY_COMMON = _G.LE_ITEM_QUALITY_COMMON
+BAG_ITEM_QUALITY_COLORS[0] = ColorType(0.4, 0.4, 0.4)
+for i, v in ipairs(BAG_ITEM_QUALITY_COLORS) do
+	BAG_ITEM_QUALITY_COLORS[i] = ColorType(v)
+end
+
 _Backdrop = {
 	bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
 	edgeFile = "Interface\\Buttons\\WHITE8x8",
@@ -17,6 +27,12 @@ _BackColor = ColorType(0, 0, 0, 1)
 -- Item Conditions
 _ItemConditions = {
 	{
+		ID = 100000,
+		Name = L"InItemList",
+		Desc = L"The slot has item, and the item is in the list (choose the view to show the item list panel, drag the item to it will add the item, click the link in the panel will remove it)",
+		Condition = "(itemID and itemList[itemID])",
+	},
+	{
 		ID = 100001,
 		Name = L"Any",
 		Desc = L"No check, you should only use this for the last container of one view",
@@ -24,33 +40,129 @@ _ItemConditions = {
 	},
 	{
 		ID = 100002,
+		BagOnly = true,
 		Name = L"Backpack",
 		Desc = L"The slot is in the backpack",
 		Condition = "(bag == 0)",
+		RequireBag = { 0 },
+		DenyBag = { 1, 2, 3, 4 },
 	},
 	{
 		ID = 100003,
+		BagOnly = true,
 		Name = L"Container1",
 		Desc = L"The slot is in the 1st container(from the right)",
 		Condition = "(bag == 1)",
+		RequireBag = { 1 },
+		DenyBag = { 0, 2, 3, 4 },
 	},
 	{
 		ID = 100004,
+		BagOnly = true,
 		Name = L"Container2",
 		Desc = L"The slot is in the 2nd container(from the right)",
 		Condition = "(bag == 2)",
+		RequireBag = { 2 },
+		DenyBag = { 0, 1, 3, 4 },
 	},
 	{
 		ID = 100005,
+		BagOnly = true,
 		Name = L"Container3",
 		Desc = L"The slot is in the 3rd container(from the right)",
 		Condition = "(bag == 3)",
+		RequireBag = { 3 },
+		DenyBag = { 0, 1, 2, 4 },
 	},
 	{
 		ID = 100006,
+		BagOnly = true,
 		Name = L"Container4",
 		Desc = L"The slot is in the 4th container(from the right)",
 		Condition = "(bag == 4)",
+		RequireBag = { 4 },
+		DenyBag = { 0, 1, 2, 3 },
+	},
+	{
+		ID = 110001,
+		BankOnly = true,
+		Name = L"Bank",
+		Desc = L"The slot is in the bank",
+		Condition = ("(bag == %d)"):format(_G.BANK_CONTAINER),
+		RequireBag = { _G.BANK_CONTAINER },
+		DenyBag = { _G.REAGENTBANK_CONTAINER, 5, 6, 7, 8, 9, 10, 11 },
+	},
+	{
+		ID = 110002,
+		BankOnly = true,
+		Name = L"ReagentBank",
+		Desc = L"The slot is in the reagent bank",
+		Condition = ("(bag == %d)"):format(_G.REAGENTBANK_CONTAINER),
+		RequireBag = { _G.REAGENTBANK_CONTAINER },
+		DenyBag = { _G.BANK_CONTAINER, 5, 6, 7, 8, 9, 10, 11 },
+	},
+	{
+		ID = 110003,
+		BankOnly = true,
+		Name = L"BankBag1",
+		Desc = L"The slot is in the 1st bank bag",
+		Condition = "(bag == 5)",
+		RequireBag = { 5 },
+		DenyBag = { _G.BANK_CONTAINER, _G.REAGENTBANK_CONTAINER, 6, 7, 8, 9, 10, 11 },
+	},
+	{
+		ID = 110004,
+		BankOnly = true,
+		Name = L"BankBag2",
+		Desc = L"The slot is in the 2nd bank bag",
+		Condition = "(bag == 6)",
+		RequireBag = { 6 },
+		DenyBag = { _G.BANK_CONTAINER, _G.REAGENTBANK_CONTAINER, 5, 7, 8, 9, 10, 11 },
+	},
+	{
+		ID = 110005,
+		BankOnly = true,
+		Name = L"BankBag3",
+		Desc = L"The slot is in the 3rd bank bag",
+		Condition = "(bag == 7)",
+		RequireBag = { 7 },
+		DenyBag = { _G.BANK_CONTAINER, _G.REAGENTBANK_CONTAINER, 5, 6, 8, 9, 10, 11 },
+	},
+	{
+		ID = 110006,
+		BankOnly = true,
+		Name = L"BankBag4",
+		Desc = L"The slot is in the 4th bank bag",
+		Condition = "(bag == 8)",
+		RequireBag = { 8 },
+		DenyBag = { _G.BANK_CONTAINER, _G.REAGENTBANK_CONTAINER, 5, 6, 7, 9, 10, 11 },
+	},
+	{
+		ID = 110007,
+		BankOnly = true,
+		Name = L"BankBag5",
+		Desc = L"The slot is in the 5th bank bag",
+		Condition = "(bag == 9)",
+		RequireBag = { 9 },
+		DenyBag = { _G.BANK_CONTAINER, _G.REAGENTBANK_CONTAINER, 5, 6, 7, 8, 10, 11 },
+	},
+	{
+		ID = 110008,
+		BankOnly = true,
+		Name = L"BankBag6",
+		Desc = L"The slot is in the 6th bank bag",
+		Condition = "(bag == 10)",
+		RequireBag = { 10 },
+		DenyBag = { _G.BANK_CONTAINER, _G.REAGENTBANK_CONTAINER, 5, 6, 7, 8, 9, 11 },
+	},
+	{
+		ID = 110009,
+		BankOnly = true,
+		Name = L"BankBag7",
+		Desc = L"The slot is in the 7th bank bag",
+		Condition = "(bag == 11)",
+		RequireBag = { 11 },
+		DenyBag = { _G.BANK_CONTAINER, _G.REAGENTBANK_CONTAINER, 5, 6, 7, 8, 9, 10 },
 	},
 	{
 		ID = 100007,
@@ -92,7 +204,7 @@ _ItemConditions = {
 		ID = 100013,
 		Name = L"IsStackableItem",
 		Desc = L"The slot has item, and the item is stackable",
-		Condition = "(maxStack and maxStack > 1)"
+		Condition = "(maxStack and maxStack > 1)",
 	},
 	{
 		ID = 100014,
@@ -101,58 +213,65 @@ _ItemConditions = {
 		Condition = "itemSpell",
 	},
 	{
+		ID = 100015,
+		BagOnly = true,
+		Name = L"IsNewItem",
+		Desc = L"The slot has item, and the item is newly added.",
+		Condition = "isNewItem",
+	},
+	{
 		ID = 200001,
 		Name = _G["RARITY"] .. "-" .. _G["ITEM_QUALITY0_DESC"],
 		Desc = L"The slot has item, and the item is poor(color gray)",
-		Condition = "(quality == LE_ITEM_QUALITY_POOR)"
+		Condition = "(quality == LE_ITEM_QUALITY_POOR)",
 	},
 	{
 		ID = 200002,
 		Name = _G["RARITY"] .. "-" .. _G["ITEM_QUALITY1_DESC"],
 		Desc = L"The slot has item, and the item is common(color white)",
-		Condition = "(quality == LE_ITEM_QUALITY_COMMON)"
+		Condition = "(quality == LE_ITEM_QUALITY_COMMON)",
 	},
 	{
 		ID = 200003,
 		Name = _G["RARITY"] .. "-" .. _G["ITEM_QUALITY2_DESC"],
 		Desc = L"The slot has item, and the item is uncommon(color green)",
-		Condition = "(quality == LE_ITEM_QUALITY_UNCOMMON)"
+		Condition = "(quality == LE_ITEM_QUALITY_UNCOMMON)",
 	},
 	{
 		ID = 200004,
 		Name = _G["RARITY"] .. "-" .. _G["ITEM_QUALITY3_DESC"],
 		Desc = L"The slot has item, and the item is rare(color blue)",
-		Condition = "(quality == LE_ITEM_QUALITY_RARE)"
+		Condition = "(quality == LE_ITEM_QUALITY_RARE)",
 	},
 	{
 		ID = 200005,
 		Name = _G["RARITY"] .. "-" .. _G["ITEM_QUALITY4_DESC"],
 		Desc = L"The slot has item, and the item is epic(color purple)",
-		Condition = "(quality == LE_ITEM_QUALITY_EPIC)"
+		Condition = "(quality == LE_ITEM_QUALITY_EPIC)",
 	},
 	{
 		ID = 200006,
 		Name = _G["RARITY"] .. "-" .. _G["ITEM_QUALITY5_DESC"],
 		Desc = L"The slot has item, and the item is legendary(color orange)",
-		Condition = "(quality == LE_ITEM_QUALITY_LEGENDARY)"
+		Condition = "(quality == LE_ITEM_QUALITY_LEGENDARY)",
 	},
 	{
 		ID = 200007,
 		Name = _G["RARITY"] .. "-" .. _G["ITEM_QUALITY6_DESC"],
 		Desc = L"The slot has item, and the item is artifact(color golden yellow)",
-		Condition = "(quality == LE_ITEM_QUALITY_ARTIFACT)"
+		Condition = "(quality == LE_ITEM_QUALITY_ARTIFACT)",
 	},
 	{
 		ID = 200008,
 		Name = _G["RARITY"] .. "-" .. _G["ITEM_QUALITY7_DESC"],
 		Desc = L"The slot has item, and the item is heirloom(color light yellow)",
-		Condition = "(quality == LE_ITEM_QUALITY_HEIRLOOM)"
+		Condition = "(quality == LE_ITEM_QUALITY_HEIRLOOM)",
 	},
 	{
 		ID = 200009,
 		Name = _G["RARITY"] .. "-" .. _G["ITEM_QUALITY8_DESC"],
 		Desc = L"The slot has item, and the item is wow token(color light yellow)",
-		Condition = "(quality == LE_ITEM_QUALITY_WOW_TOKEN)"
+		Condition = "(quality == LE_ITEM_QUALITY_WOW_TOKEN)",
 	},
 }
 
@@ -166,7 +285,7 @@ while itemCls and #itemCls > 0 do
 		ID = _ID,
 		Name = itemCls,
 		Desc = L"The slot has item, and the item's class is " .. itemCls,
-		Condition = ("(cls == %q)"):format(itemCls)
+		Condition = ("(cls == %q)"):format(itemCls),
 	})
 
 	local j = 0
@@ -194,13 +313,74 @@ for i, v in ipairs(_ItemConditions) do
 end
 
 -- Widget Classes
-class "ContainerButton"
+class "BagButton"
 	inherit "ItemButton"
 	extend "IFStyle"
 
-	BAG_ITEM_QUALITY_COLORS = System.Reflector.Clone(BAG_ITEM_QUALITY_COLORS, true)
-	LE_ITEM_QUALITY_COMMON = _G.LE_ITEM_QUALITY_COMMON
-	BAG_ITEM_QUALITY_COLORS[0] = ColorType(0.4, 0.4, 0.4)
+	-- Block parent's UpdateAction
+	function UpdateAction(self) end
+
+	property "Icon" {
+		Get = function(self)
+			return self:GetChild("Icon").TexturePath
+		end,
+		Set = function(self, value)
+			self:GetChild("Icon").TexturePath = value
+			if value then
+				self:GetChild("Icon"):SetTexCoord(0.06, 0.94, 0.06, 0.94)
+			end
+		end,
+		Type = String + Number,
+	}
+
+	function BagButton(self, ...)
+		Super(self, ...)
+
+		self.ShowGrid = true
+		self.GameTooltipAnchor = "ANCHOR_RIGHT"
+	end
+endclass "BagButton"
+
+class "BagPanel"
+	inherit "SecureFrame"
+	extend "IFSecurePanel"
+
+	local function OnElementRemove(self, btn)
+		btn:SetAction(nil)
+	end
+
+	local function OnElementAdd(self, btn)
+	end
+
+	function BagPanel(self, name, ...)
+		Super(self, name, ...)
+
+		self.ElementType = BagButton
+		self.ElementPrefix = name .. "_Button"
+
+		self.RowCount = 1
+		self.ColumnCount = 12
+		self.ElementWidth = 36
+		self.ElementHeight = 36
+
+		self.Orientation = Orientation.HORIZONTAL
+		self.HSpacing = 2
+		self.VSpacing = 2
+		self.KeepMaxSize = true
+
+		self.MarginTop = 1
+		self.MarginBottom = 1
+		self.MarginLeft = 1
+		self.MarginRight = 1
+
+		self.OnElementRemove = self.OnElementRemove + OnElementRemove
+		self.OnElementAdd = self.OnElementAdd + OnElementAdd
+	end
+endclass "BagPanel"
+
+class "ContainerButton"
+	inherit "ItemButton"
+	extend "IFStyle"
 
 	-- Block parent's UpdateAction
 	function UpdateAction(self) end
@@ -273,8 +453,13 @@ class "Container"
 		self.ElementType = ContainerButton
 		self.ElementPrefix = name .. "_IButton"
 
-		self.RowCount = 20
-		self.ColumnCount = 12
+		if self.Parent.Parent.IsBank then
+			self.RowCount = 27
+			self.ColumnCount = 14
+		else
+			self.RowCount = 20
+			self.ColumnCount = 12
+		end
 		self.ElementWidth = 36
 		self.ElementHeight = 36
 
@@ -300,23 +485,43 @@ class "ContainerView"
 
 	local tconcat = table.concat
 
-	local function buildRules(containerRules)
+	local function buildContainerRules(containerRules, itemList, isBank)
 		if not containerRules or #containerRules == 0 then return nil end
 
 		local codes = {}
+		local bags = {}
 
 		for i, containerRule in ipairs(containerRules) do
 			if containerRule and #containerRule > 0 then
 				for j, rules in ipairs(containerRule) do
 					if rules and #rules > 0 then
 						local cond = {}
+						local requireBag = false
 
 						for k, rule in ipairs(rules) do
 							if rule > 0 then
+								if not bags.RequireAll and _ItemConditions[rule].RequireBag then
+									requireBag = true
+									for i, v in ipairs(_ItemConditions[rule].RequireBag) do
+										bags[v] = true
+									end
+								end
+
 								tinsert(cond, _ItemConditions[rule].Condition)
 							else
+								if not bags.RequireAll and _ItemConditions[math.abs(rule)].DenyBag then
+									requireBag = true
+									for i, v in ipairs(_ItemConditions[math.abs(rule)].DenyBag) do
+										bags[v] = true
+									end
+								end
+
 								tinsert(cond, "not " .. _ItemConditions[math.abs(rule)].Condition)
 							end
+						end
+
+						if not requireBag then
+							bags.RequireAll = true
 						end
 
 						cond = tconcat(cond, " and ")
@@ -327,30 +532,49 @@ class "ContainerView"
 			end
 		end
 
-		if #codes > 0 then tinsert(codes, " end") end
+		if #codes == 0 then
+			return function() end
+		else
+			tinsert(codes, " end")
+		end
 
 		codes = tconcat(codes, "") or "if true then return end"
 
-		Debug(codes)
+		local containerList
+
+		if bags.RequireAll then
+			if isBank then
+				containerList = { BANK_CONTAINER, REAGENTBANK_CONTAINER, 5, 6, 7, 8, 9, 10, 11 }
+			else
+				containerList = { 0, 1, 2, 3, 4 }
+			end
+		else
+			containerList = {}
+			for k in pairs(bags) do if tonumber(k) then tinsert(containerList, k) end end
+			table.sort(containerList)
+		end
 
 		codes = ([[
+			local containerList, itemList = ...
 			return function()
 				local yield = coroutine.yield
 				local GetContainerItemInfo = GetContainerItemInfo
 				local GetContainerItemQuestInfo = GetContainerItemQuestInfo
 				local GetItemInfo = GetItemInfo
 				local GetItemSpell = GetItemSpell
+				local IsNewItem =  C_NewItems.IsNewItem
 
-				for bag = 0, _G.NUM_BAG_FRAMES do
+				for _, bag in ipairs(containerList) do
 					for slot = 1, GetContainerNumSlots(bag) do
 						local _, count, _, quality, readable, lootable, link, _, hasNoValue, itemID = GetContainerItemInfo(bag, slot)
 						local isQuest, questId, isActive = GetContainerItemQuestInfo(bag, slot)
 						local name, iLevel, reqLevel, cls, subclass, maxStack, equipSlot, vendorPrice
-						local itemSpell
+						local itemSpell, isNewItem
 
 						if itemID then
 							name, _, _, iLevel, reqLevel, cls, subclass, maxStack, equipSlot, _, vendorPrice = GetItemInfo(itemID)
 							itemSpell = GetItemSpell(itemID)
+							isNewItem = (bag >= 0 and bag <= 4) and IsNewItem(bag, slot)
 						end
 
 						%s
@@ -359,12 +583,101 @@ class "ContainerView"
 			end
 		]]):format(codes)
 
-		return loadstring(codes)()
+		return loadstring(codes)(containerList, itemList or {})
+	end
+
+	local function refreshContainer(self)
+		self.TaskMark = (self.TaskMark or 0) + 1
+
+		local taskMark = self.TaskMark
+		local dispatch = self.Dispatch
+		local count = self.RuleCount or 0
+		local containerCnt = {}
+		if not dispatch or count == 0 then return end
+
+		while self.TaskMark == taskMark do
+			if InCombatLockdown() then Task.Event("PLAYER_REGEN_ENABLED") end
+			while InCombatLockdown() do Task.Delay(0.1) end
+			if self.TaskMark ~= taskMark then break end
+
+			Debug("Process refreshContainer @pid %d for %s", taskMark, self.Name)
+
+			for i = 1, count do containerCnt[i] = 0 end
+
+			for id, bag, slot in tpairs(dispatch) do
+				containerCnt[id] = containerCnt[id] + 1
+				local ele = self[id].Element[containerCnt[id]]
+				if ele.ActionTarget ~= bag or ele.ActionDetail ~= slot then
+					ele:SetAction("bagslot", bag, slot)
+				end
+			end
+
+			for i = 1, count do
+				self[i].Count = containerCnt[i]
+			end
+
+			Task.Event("BAG_UPDATE_DELAYED")
+			Task.Continue()
+		end
+
+		Debug("Stop refreshContainer @pid %d for %s", taskMark, self.Name)
+	end
+
+	local function refreshBank(self)
+		self.TaskMark = (self.TaskMark or 0) + 1
+
+		local taskMark = self.TaskMark
+		local dispatch = self.Dispatch
+		local count = self.RuleCount or 0
+		local containerCnt = {}
+		local firstRun = true
+		if not dispatch or count == 0 then return end
+
+		while self.TaskMark == taskMark do
+			if firstRun then
+				firstRun = true
+				if not self.Parent.Visible then
+					Task.Wait("BANKFRAME_OPENED")
+				end
+			else
+				Task.Wait("BANKFRAME_OPENED")
+			end
+
+			while self.TaskMark == taskMark do
+				-- should hide the bank frame if in combat
+				if InCombatLockdown() then break end
+				if self.TaskMark ~= taskMark then break end
+
+				Debug("Process refreshBank @pid %d for %s", taskMark, self.Name)
+
+				for i = 1, count do containerCnt[i] = 0 end
+
+				for id, bag, slot in tpairs(dispatch) do
+					containerCnt[id] = containerCnt[id] + 1
+					local ele = self[id].Element[containerCnt[id]]
+					if ele.ActionTarget ~= bag or ele.ActionDetail ~= slot then
+						ele:SetAction("bagslot", bag, slot)
+					end
+				end
+
+				for i = 1, count do
+					self[i].Count = containerCnt[i]
+				end
+
+				local ret = Task.Wait("BANKFRAME_CLOSED", "BAG_UPDATE_DELAYED", "PLAYERBANKSLOTS_CHANGED", "PLAYERBANKBAGSLOTS_CHANGED", "PLAYERREAGENTBANKSLOTS_CHANGED")
+
+				if ret == "BANKFRAME_CLOSED" then break end
+				Task.Next() -- Skip more events in the same time
+			end
+			if self.TaskMark ~= taskMark then break end
+		end
+
+		Debug("Stop refreshBank @pid %d for %s", taskMark, self.Name)
 	end
 
 	__Delegate__(Task.NoCombatCall)
-	function ApplyContainerRules(self, containerRules)
-		local dispatch = buildRules(containerRules)
+	function ApplyContainerRules(self, containerRules, itemList, isBank)
+		local dispatch = buildContainerRules(containerRules, itemList, isBank)
 
 		local count = containerRules and #containerRules or 0
 		local i = 1
@@ -395,39 +708,24 @@ class "ContainerView"
 			container = self:GetChild(self.ElementPrefix .. i)
 		end
 
-		self.TaskMark = (self.TaskMark or 0) + 1
+		self.IsBank = isBank
+		self.RuleCount = count
+		self.Dispatch = dispatch
 
 		if dispatch then
-			Task.ThreadCall(function()
-				local taskMark = self.TaskMark
-				local containerCnt = {}
+			self:StartRefresh()
+		end
+	end
 
-				while self.TaskMark == taskMark do
-					if InCombatLockdown() then Task.Event("PLAYER_REGEN_ENABLED") end
-					if self.TaskMark ~= taskMark then break end
+	function StopRefresh(self)
+		self.TaskMark = (self.TaskMark or 0) + 1
+	end
 
-					Debug("Process @pid %d for %s", taskMark, self.Name)
-
-					for i = 1, count do containerCnt[i] = 0 end
-
-					for id, bag, slot in tpairs(dispatch) do
-						containerCnt[id] = containerCnt[id] + 1
-						local ele = self[id].Element[containerCnt[id]]
-						if ele.ActionTarget ~= bag or ele.ActionDetail ~= slot then
-							ele:SetAction("bagslot", bag, slot)
-						end
-					end
-
-					for i = 1, count do
-						self[i].Count = containerCnt[i]
-					end
-
-					Task.Event("BAG_UPDATE_DELAYED")
-					Task.Continue()
-				end
-
-				Debug("Stop @pid %d for %s", taskMark, self.Name)
-			end)
+	function StartRefresh(self)
+		if self.IsBank then
+			return Task.ThreadCall(refreshBank, self)
+		else
+			return Task.ThreadCall(refreshContainer, self)
 		end
 	end
 
@@ -454,7 +752,11 @@ class "ViewButton"
 			self.Checked = value
 
 			if value then
-				_ContainerDB.SelectedView = self.Text
+				if self.Parent.IsBank then
+					_ContainerDB.SelectedBankView = self.Text
+				else
+					_ContainerDB.SelectedView = self.Text
+				end
 			end
 		end
 	end
@@ -492,6 +794,7 @@ class "ContainerHeader"
 	extend "IFSecurePanel"
 
 	local function OnElementRemove(self, viewBtn)
+		viewBtn.ContainerView:StopRefresh()
 		viewBtn.ContainerView:ApplyContainerRules(nil)
 		viewBtn.Visible = false
 		self:SetFrameRef("ViewBtn", viewBtn)
@@ -510,17 +813,65 @@ class "ContainerHeader"
 		]]
 	end
 
+	local function GenerateBankSlots(bagPanel)
+		if bagPanel.Visible then
+			local num = GetNumBankSlots()
+			for i = 1, num do bagPanel.Element[i]:SetAction("bag", i + 4) end
+			if num < NUM_BANKBAGSLOTS then
+				_G.BankFrame.nextSlotCost = GetBankSlotCost(num)
+
+				num = num + 1
+				bagPanel.Element[num].MacroText = "/click BankFramePurchaseButton"
+				bagPanel.Element[num].CustomTooltip = _G.BANKSLOTPURCHASE
+				bagPanel.Element[num].CustomTexture = [[Interface\PaperDollInfoFrame\Character-Plus]]
+				bagPanel.Element[num]:Refresh()
+			end
+
+			num = num + 1
+
+			if not IsReagentBankUnlocked() then
+				bagPanel.Element[num].MacroText = "/click ReagentBankFrameUnlockInfoPurchaseButton"
+				bagPanel.Element[num].CustomTooltip = _G.BANKSLOTPURCHASE
+				bagPanel.Element[num].CustomTexture = [[Interface\PaperDollInfoFrame\Character-Plus]]
+				bagPanel.Element[num]:Refresh()
+			else
+				bagPanel.Element[num].Custom = function()
+					if not InCombatLockdown() then
+						PlaySound("igMainMenuOption")
+						DepositReagentBank()
+					end
+				end
+				bagPanel.Element[num].CustomTooltip = _G.REAGENTBANK_DEPOSIT
+				bagPanel.Element[num].CustomTexture = 644387
+				bagPanel.Element[num]:Refresh()
+			end
+
+			if num < NUM_BANKBAGSLOTS or not IsReagentBankUnlocked() then
+				Task.ThreadCall(function()
+					if Task.Wait("BANKFRAME_CLOSED", "REAGENTBANK_PURCHASED", "PLAYERBANKBAGSLOTS_CHANGED") ~= "BANKFRAME_CLOSED" then
+						return Task.NextCall(Task.NoCombatCall, GenerateBankSlots, bagPanel)
+					end
+				end)
+			end
+		end
+	end
+
+	property "IsBank" { Type = Boolean }
+
 	function ApplyConfig(self, configs)
 		self.Count = #configs
 
 		for i, config in ipairs(configs) do
 			self.Element[i].Text = config.Name
-			self.Element[i].ContainerView:ApplyContainerRules(config.ContainerRules)
+			self.Element[i].ContainerView:ApplyContainerRules(config.ContainerRules, config.ItemList, self.IsBank)
 		end
 	end
 
-	function ContainerHeader(self, name, ...)
-		Super(self, name, ...)
+	function ContainerHeader(self, name, parent, isBank)
+		Super(self, name, parent, "SecureHandlerStateTemplate")
+
+		self.IsBank = isBank
+		self.Visible = false
 
 		self:Execute[[
 			ViewManager = self
@@ -547,10 +898,17 @@ class "ContainerHeader"
 		self.ElementType = ViewButton
 		self.ElementPrefix = name .. "_View"
 
-		self.RowCount = 5
-		self.ColumnCount = 4
-		self.ElementWidth = 106
-		self.ElementHeight = 24
+		if isBank then
+			self.RowCount = 6
+			self.ColumnCount = 5
+			self.ElementWidth = 95
+			self.ElementHeight = 24
+		else
+			self.RowCount = 6
+			self.ColumnCount = 4
+			self.ElementWidth = 100
+			self.ElementHeight = 24
+		end
 
 		self.Orientation = Orientation.HORIZONTAL
 		self.TopToBottom = true
@@ -562,10 +920,12 @@ class "ContainerHeader"
 		self.MarginTop = 2
 		self.MarginBottom = 30
 		self.MarginLeft = 4
-		self.MarginRight = 26
+		self.MarginRight = 52
 
 		self.OnElementAdd = self.OnElementAdd + OnElementAdd
 		self.OnElementRemove = self.OnElementRemove + OnElementRemove
+
+		Mask("Mask", self).AsMove = true
 
 		-- Search Box
 		local searchBox = EditBox("SearchBox", self, "BagSearchBoxTemplate")
@@ -576,8 +936,248 @@ class "ContainerHeader"
 		searchBox.Right:Hide()
 		searchBox.Middle:Hide()
 
+		-- Sort btn
+		local sortBtn = SecureButton(name .. "SortButton", self)
+		sortBtn:SetSize(28, 26)
+		sortBtn:SetPoint("BOTTOMRIGHT", -2, 4)
+		sortBtn.NormalTexture = Texture("Normal", sortBtn)
+		sortBtn.NormalTexture:SetAllPoints()
+		sortBtn.NormalTexture:SetAtlas("bags-button-autosort-up")
+		sortBtn.PushedTexture = Texture("Push", sortBtn)
+		sortBtn.PushedTexture:SetAllPoints()
+		sortBtn.PushedTexture:SetAtlas("bags-button-autosort-down")
+		sortBtn.HighlightTexturePath = [[Interface\Buttons\ButtonHilight-Square]]
+		sortBtn.HighlightTexture.BlendMode = "ADD"
+
+		if isBank then
+			sortBtn.PreClick = function()
+				_G.BankFrame.activeTabIndex = 2
+			end
+			sortBtn.OnEnter = function(self)
+				_G.GameTooltip:SetOwner(self)
+				_G.GameTooltip:SetText(_G.BAG_CLEANUP_REAGENT_BANK)
+				_G.GameTooltip:Show()
+			end
+			sortBtn.OnLeave = function(self)
+				_G.GameTooltip:Hide()
+			end
+			sortBtn:SetAttribute("type", "macro")
+			sortBtn:SetAttribute("macrotext", "/click BankItemAutoSortButton")
+
+			sortBtn = SecureButton(name .. "SortButton2", self)
+			sortBtn:SetSize(28, 26)
+			sortBtn:SetPoint("BOTTOMRIGHT", -30, 4)
+			sortBtn.NormalTexture = Texture("Normal", sortBtn)
+			sortBtn.NormalTexture:SetAllPoints()
+			sortBtn.NormalTexture:SetAtlas("bags-button-autosort-up")
+			sortBtn.PushedTexture = Texture("Push", sortBtn)
+			sortBtn.PushedTexture:SetAllPoints()
+			sortBtn.PushedTexture:SetAtlas("bags-button-autosort-down")
+			sortBtn.HighlightTexturePath = [[Interface\Buttons\ButtonHilight-Square]]
+			sortBtn.HighlightTexture.BlendMode = "ADD"
+
+			sortBtn.PreClick = function()
+				_G.BankFrame.activeTabIndex = 1
+			end
+			sortBtn.OnEnter = function(self)
+				_G.GameTooltip:SetOwner(self)
+				_G.GameTooltip:SetText(_G.BAG_CLEANUP_BANK)
+				_G.GameTooltip:Show()
+			end
+			sortBtn.OnLeave = function(self)
+				_G.GameTooltip:Hide()
+			end
+			sortBtn:SetAttribute("type", "macro")
+			sortBtn:SetAttribute("macrotext", "/click BankItemAutoSortButton")
+		else
+			sortBtn.OnEnter = function(self)
+				_G.GameTooltip:SetOwner(self)
+				_G.GameTooltip:SetText(_G.BAG_CLEANUP_BAGS)
+				_G.GameTooltip:Show()
+			end
+			sortBtn.OnLeave = function(self)
+				_G.GameTooltip:Hide()
+			end
+			sortBtn:SetAttribute("type", "macro")
+			sortBtn:SetAttribute("macrotext", "/click BagItemAutoSortButton")
+		end
+
 		-- money frame
-		local moneyFrame = CreateFrame("Frame", "IGAS_UI_MoneyFrame", self, "SmallMoneyFrameTemplate")
-		moneyFrame:SetPoint("BOTTOMRIGHT", -2, 8)
+		local moneyFrame = CreateFrame("Frame", name .. "_MoneyFrame", self, "SmallMoneyFrameTemplate")
+		moneyFrame:SetPoint("BOTTOMRIGHT", sortBtn, "BOTTOMLEFT", -4, 4)
+
+		-- Setting
+		local btnContainerSetting = Button("Setting", self)
+		btnContainerSetting:SetPoint("TOPRIGHT", -2, -2)
+		btnContainerSetting:SetSize(50, 24)
+
+		btnContainerSetting.OnClick = function()
+			if not InCombatLockdown() then
+				headerMenu.Header = self
+				headerMenu.Visible = true
+			end
+		end
+
+		local lblContainerSetting = FontString("Label", btnContainerSetting)
+		lblContainerSetting.Text = "?"
+		lblContainerSetting.FontObject = GameFontHighlight
+		lblContainerSetting:SetPoint("RIGHT", -4, 0)
+
+		local animContainerSetting = AnimationGroup("AutoSwap", btnContainerSetting)
+		animContainerSetting.ToFinalAlpha = false
+		animContainerSetting.Looping = "REPEAT"
+
+		local alphaContainer = Alpha("Alpha", animContainerSetting)
+
+		alphaContainer.Order = 1
+		alphaContainer.StartDelay = 2
+		alphaContainer.Duration = 1
+		alphaContainer.FromAlpha = 1
+		alphaContainer.ToAlpha = 0
+
+		-- Toggle Container Bag
+		local btnToggleContainer = Button("Toggle", self)
+		btnToggleContainer:SetPoint("CENTER", self, "BOTTOM")
+		btnToggleContainer:SetSize(32, 32)
+		btnToggleContainer.NormalTexturePath = [[Interface\PaperDollInfoFrame\StatSortArrows]]
+		btnToggleContainer.NormalTexture:SetTexCoord(0, 1, 0.5, 1)
+		btnToggleContainer.NormalTexture:SetVertexColor(1, 1, 1)
+		btnToggleContainer.NormalTexture:ClearAllPoints()
+		btnToggleContainer.NormalTexture:SetPoint("CENTER", 0, 0)
+		btnToggleContainer.NormalTexture:SetSize(16, 16)
+		btnToggleContainer.FrameStrata = "HIGH"
+
+		local bagPanel = BagPanel(name .. "_BagPanel", self)
+		bagPanel:SetPoint("BOTTOMLEFT", 4, 32)
+		bagPanel.Visible = false
+
+		local animToggleContainer = AnimationGroup("AnimAlert", btnToggleContainer.NormalTexture)
+		animToggleContainer.Looping = "REPEAT"
+
+		local transToggleContainer1 = Translation("Trans1", animToggleContainer)
+		transToggleContainer1.Order = 1
+		transToggleContainer1.Duration = 0.1
+		transToggleContainer1:SetOffset(0, 8)
+
+		local transToggleContainer2 = Translation("Trans2", animToggleContainer)
+		transToggleContainer2.Order = 2
+		transToggleContainer2.Duration = 1
+		transToggleContainer2:SetOffset(0, -8)
+
+		self.OnShow = self.OnShow + function()
+			animContainerSetting.Playing = true
+			animToggleContainer.Playing = true
+			animToggleContainer.Count = 0
+		end
+
+		self.OnHide = self.OnHide + function()
+			animContainerSetting.Playing = false
+			animToggleContainer.Playing = false
+		end
+
+		alphaContainer.OnFinished = function(this, requested)
+			if not requested then
+				if lblContainerSetting.Text == "?" then
+					lblContainerSetting.Text = lblContainerSetting.OldText or "?"
+				else
+					lblContainerSetting.OldText = lblContainerSetting.Text
+					lblContainerSetting.Text = "?"
+				end
+			end
+		end
+
+		transToggleContainer2.OnFinished = function()
+			animToggleContainer.Count = (animToggleContainer.Count or 0) + 1
+
+			if animToggleContainer.Count >= 5 then
+				animToggleContainer.Playing = false
+			end
+		end
+
+		btnToggleContainer.OnClick = function()
+			if not InCombatLockdown() then
+				if bagPanel.Visible then
+					bagPanel.Visible = false
+					for i = 1, bagPanel.Count do bagPanel.Element[i]:SetAction(nil) end
+					self.MarginBottom = 30
+					btnToggleContainer.NormalTexture:SetPoint("CENTER", 0, 0)
+					btnToggleContainer.NormalTexture:SetTexCoord(0, 1, 0.5, 1)
+					transToggleContainer1:SetOffset(0, 8)
+					transToggleContainer2:SetOffset(0, -8)
+				else
+					self.MarginBottom = 72
+					bagPanel.Visible = true
+					if self.IsBank then
+						GenerateBankSlots(bagPanel)
+					else
+						for i = 0, 4 do bagPanel.Element[i+1]:SetAction("bag", i) end
+					end
+					btnToggleContainer.NormalTexture:SetPoint("CENTER", 0, 4)
+					btnToggleContainer.NormalTexture:SetTexCoord(0, 1, 0, 0.5)
+					transToggleContainer1:SetOffset(0, -8)
+					transToggleContainer2:SetOffset(0, 8)
+				end
+			end
+		end
+
+		if self.IsBank then
+			Task.ThreadCall(function()
+				while true do
+					Task.Event("BANKFRAME_OPENED")
+
+					while true do
+						local _, tarFamily = GetContainerNumFreeSlots(0)
+						local sFree, sTotal, free, total, bagFamily = 0, 0
+
+						sFree = sFree + GetContainerNumFreeSlots(BANK_CONTAINER)
+						sTotal = sTotal + GetContainerNumSlots(BANK_CONTAINER)
+
+						local numSlots = GetNumBankSlots()
+
+						for i = 1, numSlots do
+							free, bagFamily = GetContainerNumFreeSlots(i + 4)
+							total = GetContainerNumSlots(i + 4)
+
+							if bagFamily == tarFamily then
+								sFree = sFree + free
+								sTotal = sTotal + total
+							end
+						end
+
+						if sFree < math.min(10, sTotal/4) then
+							lblContainerSetting.Text = ("(%s/%s)"):format(FontColor.RED .. (sTotal-sFree) .. FontColor.CLOSE, sTotal)
+						else
+							lblContainerSetting.Text = ("(%s/%s)"):format(sTotal-sFree, sTotal)
+						end
+
+						if Task.Wait("BANKFRAME_CLOSED", "BAG_UPDATE_DELAYED", "PLAYERBANKSLOTS_CHANGED", "PLAYERBANKBAGSLOTS_CHANGED") == "BANKFRAME_CLOSED" then break end
+					end
+				end
+			end)
+		else
+			Task.ThreadCall(function()
+				local _, tarFamily = GetContainerNumFreeSlots(0)
+
+				while true do
+					local sFree, sTotal, free, total, bagFamily = 0, 0
+					for i = 0, 4 do
+						free, bagFamily = GetContainerNumFreeSlots(i)
+						total = GetContainerNumSlots(i)
+						if bagFamily == tarFamily then
+							sFree = sFree + free
+							sTotal = sTotal + total
+						end
+					end
+
+					if sFree < math.min(10, sTotal/4) then
+						lblContainerSetting.Text = ("(%s/%s)"):format(FontColor.RED .. (sTotal-sFree) .. FontColor.CLOSE, sTotal)
+					else
+						lblContainerSetting.Text = ("(%s/%s)"):format(sTotal-sFree, sTotal)
+					end
+
+					Task.Event("BAG_UPDATE_DELAYED")
+				end
+			end)
+		end
 	end
 endclass "ContainerHeader"

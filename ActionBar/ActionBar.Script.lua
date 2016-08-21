@@ -671,6 +671,10 @@ function UpdateBlzMainMenuBar()
 			_BagSlotBar.Scale = 1
 			_BagSlotBar.Expansion = false
 		end
+
+		if _Addon:GetModule("Container") then
+			_BagSlotBar.Visible = false
+		end
 	else
 		-- CharacterBag
 		if _BagSlotBar then
@@ -890,6 +894,13 @@ function _Menu:OnShow()
 
 	-- Delete
 	_MenuDelete.Enabled = notBagSlotBar and header~=_HeadList[1]
+
+	-- Auto Gen
+	_MenuAutoGenerate.Enabled = notBagSlotBar
+
+	-- MenuBar
+	_MenuBarSave.Enabled = notBagSlotBar
+	_MenuBarLoad.Enabled = notBagSlotBar
 end
 
 function _MenuClose:OnClick()

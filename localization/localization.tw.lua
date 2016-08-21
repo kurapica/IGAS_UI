@@ -7,6 +7,19 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/08/22 v97 : </lime>
+</p><br/>
+<p>
+    1. 銀行視圖系統追加，工作方式類似背包視圖系統。
+</p>
+<p>
+    2. 背包位可以顯示在銀行和背包視圖上，通過壹個三角形按鍵進行切換。
+</p>
+<p>
+    3. 排序按鈕增加。
+</p>
+<br/><br/>
+<p>
 <lime>2016/08/14 v93 : </lime>
 </p><br/>
 <p>
@@ -534,3 +547,28 @@ L["The slot has item, and the item's sub-class is "] = "物品槽中有物品存
 L["Default"] = "默認"
 L["All-In-One"] = "整合"
 L[" and "] = " 并且 "
+L["Reagent"] = "材料"
+L["Drag item to the right panel"] = "拖拽物品到右側的面板"
+
+L["InItemList"] = "物品列表中"
+L["The slot has item, and the item is in the list (choose the view to show the item list panel, drag the item to it will add the item, click the link in the panel will remove it)"] = "物品槽中有物品存在，並且該物品屬于物品列表(選擇視圖來顯示物品列表面板，拖拽物品進入來添加，點擊物品鏈接來移除)"
+L["Bank"] = "銀行"
+L["The slot is in the bank"] = "物品槽在銀行中"
+L["ReagentBank"] = "材料銀行"
+L["The slot is in the reagent bank"] = "物品槽在材料銀行中"
+L["BankBag1"] = "銀行擴展背包1"
+L["The slot is in the 1st bank bag"] = "物品槽在銀行擴展背包1中"
+L["BankBag2"] = "銀行擴展背包2"
+L["The slot is in the 2nd bank bag"] = "物品槽在銀行擴展背包2中"
+L["BankBag3"] = "銀行擴展背包3"
+L["The slot is in the 3rd bank bag"] = "物品槽在銀行擴展背包3中"
+L["BankBag4"] = "銀行擴展背包4"
+L["The slot is in the 4th bank bag"] = "物品槽在銀行擴展背包4中"
+L["BankBag5"] = "銀行擴展背包5"
+L["The slot is in the 5th bank bag"] = "物品槽在銀行擴展背包5中"
+L["BankBag6"] = "銀行擴展背包6"
+L["The slot is in the 6th bank bag"] = "物品槽在銀行擴展背包6中"
+L["BankBag7"] = "銀行擴展背包7"
+L["The slot is in the 7th bank bag"] = "物品槽在銀行擴展背包7中"
+L["IsNewItem"] = "新物品"
+L["The slot has item, and the item is newly added."] = "物品槽中有物品存在，並且該物品是新加入的"

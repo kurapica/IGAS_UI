@@ -3,9 +3,21 @@
 -----------------------------------------
 IGAS:NewAddon "IGAS_UI.Container"
 
+--------------------------
+-- Header Menu
+--------------------------
+headerMenu = DropDownList("IGAS_UI_Container_Menu")
+
+mnuModifyAnchor = headerMenu:AddMenuButton(L"Modify AnchorPoints")
+mnuModifyAnchor:ActiveThread("OnClick")
+
+mnuShowRuleManager = headerMenu:AddMenuButton(L"Show the view manager")
+
+--------------------------
+-- Container
+--------------------------
 _ContainerHeader = ContainerHeader("IGAS_UI_ContainerHeader")
 _ContainerHeader:SetPoint("TOPRIGHT", - 140, -100)
-_ContainerHeader.Visible = false
 
 _ToggleButton = CreateFrame("CheckButton", "IGAS_UI_ContainerToggle", UIParent, "SecureActionButtonTemplate")
 _ToggleButton:Hide()
@@ -19,28 +31,23 @@ _ToggleButton.CloseBag = function() PlaySound("igBackPackClose") end
 SetOverrideBindingClick(_ToggleButton, true, GetBindingKey("OPENALLBAGS") or "B", "IGAS_UI_ContainerToggle", "LeftButton")
 --SetOverrideBindingClick(_ToggleButton, true, "SHIFT-" .. (GetBindingKey("OPENALLBAGS") or "B"), "IGAS_UI_ContainerToggle", "LeftButton")
 
--- Setting
-btnSetting = Button("Setting", _ContainerHeader)
-btnSetting:SetPoint("TOPRIGHT", -2, -2)
-btnSetting:SetSize(24, 24)
-btnSetting:SetNormalFontObject(GameFontHighlight)
-btnSetting.Text = "?"
+--------------------------
+-- Bank
+--------------------------
+_BankHeader = ContainerHeader("IGAS_UI_BankHeader", UIParent, true)
+_BankHeader:SetPoint("TOPLEFT", 10, -100)
+_BankHeader.Visible = false
 
---------------------------
--- Mask
---------------------------
-containerFrameMask = Mask("Mask", _ContainerHeader)
-containerFrameMask.AsMove = true
+_BankHeader:RegisterStateDriver("autohide", "[combat]hide;nohide")
+_BankHeader:SetAttribute("_onstate-autohide", [[
+	if newstate == "hide" then
+		self:Hide()
+	end
+]])
 
 --------------------------
 -- Menu
 --------------------------
-containerConfig = DropDownList("Menu", _ContainerHeader)
-
-mnuModifyAnchor = containerConfig:AddMenuButton(L"Modify AnchorPoints")
-mnuModifyAnchor:ActiveThread("OnClick")
-
-mnuShowRuleManager = containerConfig:AddMenuButton(L"Show the view manager")
 
 --------------------------
 -- View Rule manager
@@ -59,19 +66,21 @@ viewRuleTree.Style = "Classic"
 viewRuleTree:ActiveThread("OnNodeFunctionClick")
 
 btnAdd = NormalButton("Add2Tree", viewRuleManager)
-btnAdd:SetPoint("TOP", viewRuleTree, "BOTTOM")
-btnAdd:SetPoint("BOTTOM", 0, 2)
-btnAdd.Width = 100
+btnAdd:SetPoint("BOTTOMLEFT", viewRuleTree, "TOPLEFT")
+btnAdd:SetSize(32, 24)
 btnAdd.Text = "+"
 btnAdd.Style = "Classic"
 btnAdd:ActiveThread("OnClick")
+btnAdd.FrameStrata = "HIGH"
 
 htmlRule = HTMLViewer("HtmlRule", viewRuleManager)
 htmlRule:SetPoint("TOPLEFT", viewRuleTree, "TOPRIGHT", 4, 0)
 htmlRule:SetPoint("RIGHT", -4, 0)
 htmlRule.Height = 100
 htmlRule:ActiveThread("OnHyperlinkClick")
+htmlRule:ActiveThread("OnReceiveDrag")
 htmlRule.Visible = false
+htmlRule:RegisterForDrag("LeftButton", "RightButton")
 
 htmlCondition = HTMLViewer("HtmlCondition", viewRuleManager)
 htmlCondition:SetPoint("TOPLEFT", htmlRule, "BOTTOMLEFT")

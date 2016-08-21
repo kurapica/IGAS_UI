@@ -4,6 +4,19 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/08/22 v97 : </lime>
+</p><br/>
+<p>
+    1. Bank view system added, works like the container view system.
+</p>
+<p>
+    2. Bag slots for the container view and bank view are added, you can toggle them with a triangle button.
+</p>
+<p>
+    3. Sort button added for the bank and container view.
+</p>
+<br/><br/>
+<p>
 <lime>2016/08/14 v93 : </lime>
 </p><br/>
 <p>

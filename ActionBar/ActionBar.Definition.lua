@@ -1457,6 +1457,7 @@ class "AutoActionTask"
 	local function ScanContainerItems()
 		while true do
 			if InCombatLockdown() then Task.Event("PLAYER_REGEN_ENABLED") end
+			while InCombatLockdown() do Task.Delay(0.1) end
 
 			local index = 0
 			local itemChanged = false
@@ -1687,6 +1688,7 @@ class "AutoActionTask"
 
 		while self.TaskMark and mark == self.TaskMark do
 			if InCombatLockdown() then Task.Event("PLAYER_REGEN_ENABLED") end
+			while InCombatLockdown() do Task.Delay(0.1) end
 			if not self.TaskMark or mark ~= self.TaskMark then break end
 
 			Log(1, "Process auto-gen [%s] %s @pid %d", self.Type, self.Name, mark)
@@ -1707,6 +1709,7 @@ class "AutoActionTask"
 
 		while self.TaskMark and mark == self.TaskMark do
 			if InCombatLockdown() then Task.Event("PLAYER_REGEN_ENABLED") end
+			while InCombatLockdown() do Task.Delay(0.1) end
 			if not self.TaskMark or mark ~= self.TaskMark then break end
 
 			Log(1, "Process auto-gen [%s] %s @pid %d", self.Type, self.Name, mark)

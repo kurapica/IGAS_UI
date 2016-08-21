@@ -1,3 +1,6 @@
+2016/08/22 v97
+	1. Bank view system added, works like the container view system.
+
 2016/8/14 v96
 	1. Add border color for poor item
 

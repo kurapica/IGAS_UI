@@ -6,13 +6,15 @@ IGAS:NewAddon "IGAS_UI.Container"
 Toggle = {
 	Message = L"Lock Container Frame",
 	Get = function()
-		return not containerFrameMask.Visible
+		return not _ContainerHeader.Mask.Visible
 	end,
 	Set = function (value)
 		if value then
-			containerFrameMask.Visible = false
+			_ContainerHeader.Mask.Visible = false
+			_BankHeader.Mask.Visible = false
 		elseif not InCombatLockdown() then
-			containerFrameMask.Visible = true
+			_ContainerHeader.Mask.Visible = true
+			_BankHeader.Mask.Visible = true
 		end
 	end,
 	Update = function() end,
@@ -34,15 +36,31 @@ HTML_RESULT = [[
 
 local conditions = {}
 for i, v in ipairs(_ItemConditions) do
-	local text = "<p>"
-	text = text .. HTML_HREF_TEMPLATE:format(-v.ID, L"[not]")
-	text = text .. HTML_HREF_TEMPLATE:format(v.ID, "[" .. v.Name .. "]")
-	text = text .. " - " .. v.Desc .. "</p><br/>"
+	if not v.BankOnly then
+		local text = "<p>"
+		text = text .. HTML_HREF_TEMPLATE:format(-v.ID, L"[not]")
+		text = text .. HTML_HREF_TEMPLATE:format(v.ID, "[" .. v.Name .. "]")
+		text = text .. " - " .. v.Desc .. "</p><br/>"
 
-	tinsert(conditions, text)
+		tinsert(conditions, text)
+	end
 end
 
-local conditionHtml = HTML_TEMPLATE:format(table.concat( conditions, ""))
+local cndContainerHtml = HTML_TEMPLATE:format(table.concat( conditions, ""))
+
+conditions = {}
+for i, v in ipairs(_ItemConditions) do
+	if not v.BagOnly then
+		local text = "<p>"
+		text = text .. HTML_HREF_TEMPLATE:format(-v.ID, L"[not]")
+		text = text .. HTML_HREF_TEMPLATE:format(v.ID, "[" .. v.Name .. "]")
+		text = text .. " - " .. v.Desc .. "</p><br/>"
+
+		tinsert(conditions, text)
+	end
+end
+
+local cndBankHtml = HTML_TEMPLATE:format(table.concat( conditions, ""))
 conditions = nil
 
 -------------------------------
@@ -50,13 +68,18 @@ conditions = nil
 -------------------------------
 function OnLoad(self)
 	self:RegisterEvent("PLAYER_REGEN_DISABLED")
-	self:RegisterEvent("PLAYER_REGEN_ENABLED")
+	self:RegisterEvent("BANKFRAME_OPENED")
+	self:RegisterEvent("BANKFRAME_CLOSED")
 
 	for i = 1, 13 do
 		if _G["ContainerFrame" .. i] then
 			_G["ContainerFrame" .. i]:UnregisterAllEvents()
 		end
 	end
+
+	BankFrame:UnregisterAllEvents()
+	BankSlotsFrame:UnregisterAllEvents()
+	ReagentBankFrame:UnregisterAllEvents()
 
 	self:SecureHook("OpenAllBags")
 	self:SecureHook("CloseAllBags")
@@ -88,9 +111,29 @@ function OnLoad(self)
 	}
 	_DB.ContainerDB = _ContainerDB
 
+	-- Bank Config
+	_ContainerDB.BankViewConfigs = _ContainerDB.BankViewConfigs or {
+		{
+			Name = L"Default",
+			ContainerRules = {
+				{ {-110002} },
+			},
+		},
+		{
+			Name = L"Reagent",
+			ContainerRules = {
+				{ {110002} }, -- ReagentBank
+			},
+		},
+	}
+
 	-- Location
 	if _ContainerDB.Location then
 		_ContainerHeader.Location = _ContainerDB.Location
+	end
+
+	if _ContainerDB.BankLocation then
+		_BankHeader.Location = _ContainerDB.BankLocation
 	end
 end
 
@@ -103,6 +146,18 @@ function OnEnable(self)
 			if _ContainerHeader.Element[i].Text == _ContainerDB.SelectedView then
 				_ContainerHeader.Element[i].ContainerView:Show()
 				_ContainerHeader.Element[i]:SetAttribute("viewactive", true)
+				break
+			end
+		end
+	end
+
+	_BankHeader:ApplyConfig(_ContainerDB.BankViewConfigs)
+
+	if _ContainerDB.SelectedBankView then
+		for i = 1, _BankHeader.Count do
+			if _BankHeader.Element[i].Text == _ContainerDB.SelectedBankView then
+				_BankHeader.Element[i].ContainerView:Show()
+				_BankHeader.Element[i]:SetAttribute("viewactive", true)
 				break
 			end
 		end
@@ -122,63 +177,86 @@ end
 function CloseAllBags()
 	if not InCombatLockdown() then
 		_ContainerHeader.Visible = false
+		if _BankHeader.Visible then
+			CloseBankFrame()
+			_BankHeader.Visible = false
+		end
 	end
 end
 
 function PLAYER_REGEN_DISABLED(self)
-	btnSetting.Visible = false
 	viewRuleManager.Visible = false
 
-	if containerFrameMask.Visible then
-		containerFrameMask.Visible = false
+	if _ContainerHeader.Mask.Visible then
+		_ContainerHeader.Mask.Visible = false
+		_BankHeader.Mask.Visible = false
 
 		_ContainerHeader:StopMovingOrSizing()
 		_ContainerHeader.Movable = false
+
+		_BankHeader:StopMovingOrSizing()
+		_BankHeader.Movable = false
 	end
 end
 
-function PLAYER_REGEN_ENABLED(self)
-	btnSetting.Visible = true
+function BANKFRAME_OPENED(self)
+	if not InCombatLockdown() then
+		_BankHeader.Visible = true
+	end
+end
+
+function BANKFRAME_CLOSED(self)
+	if not InCombatLockdown() then
+		_BankHeader.Visible = false
+	end
 end
 
 -------------------------------
 -- UI Handlers
 -------------------------------
-function containerFrameMask:OnShow()
+function _ContainerHeader.Mask:OnShow()
 	Toggle.Update()
 end
 
-function containerFrameMask:OnHide()
+function _ContainerHeader.Mask:OnHide()
 	Toggle.Update()
-end
-
-function btnSetting:OnClick()
-	if not InCombatLockdown() then
-		containerConfig.Visible = true
-	end
 end
 
 function mnuShowRuleManager:OnClick()
 	viewRuleManager.Visible = true
 end
 
-function containerFrameMask:OnMoveFinished()
+function _ContainerHeader.Mask:OnMoveFinished()
 	_ContainerDB.Location = _ContainerHeader.Location
 end
 
-function mnuModifyAnchor:OnClick()
-	IGAS:ManageAnchorPoint(_ContainerHeader, nil, true)
+function _BankHeader.Mask:OnMoveFinished()
+	_ContainerDB.BankLocation = _BankHeader.Location
+end
 
-	_ContainerDB.Location = _ContainerHeader.Location
+function mnuModifyAnchor:OnClick()
+	if headerMenu.Header == _ContainerHeader then
+		IGAS:ManageAnchorPoint(_ContainerHeader, nil, true)
+
+		_ContainerDB.Location = _ContainerHeader.Location
+	else
+		IGAS:ManageAnchorPoint(_BankHeader, nil, true)
+
+		_ContainerDB.Location = _BankHeader.Location
+	end
 end
 
 function viewRuleManager:OnShow()
 	htmlRule.Text = ""
 
 	local tree = {}
+	local viewconfigs = headerMenu.Header == _ContainerHeader and _ContainerDB.ViewConfigs or
+						headerMenu.Header == _BankHeader and _ContainerDB.BankViewConfigs
 
-	for i, config in ipairs(_ContainerDB.ViewConfigs) do
-		local node = { Text = config.Name, FunctionName = "X,+", Childs = {} }
+	if not viewconfigs then return self:Hide() end
+
+	for i, config in ipairs(viewconfigs) do
+		local node = { Text = config.Name, FunctionName = "X,+", Childs = {}, Data = System.Reflector.Clone(config.ItemList) }
 		for j, containerRule in ipairs(config.ContainerRules) do
 			local cnode = { Text = L"Container" .. j, FunctionName = "X,+", Childs = {} }
 
@@ -277,9 +355,19 @@ function viewRuleTree:OnNodeSelected(node)
 	if node and node.Level == 3 then
 		htmlCondition.Visible = true
 		htmlRule.Visible = true
+		htmlRule.Height = 100
 		htmlRule.Node = node
 		htmlRule.Text = buildResult(node.MetaData.Data)
+		viewRuleManager.Message = ""
+	elseif node and node.Level == 1 then
+		viewRuleManager.Message = L"Drag item to the right panel"
+		htmlCondition.Visible = false
+		htmlRule.Visible = true
+		htmlRule.Height = viewRuleTree.Height
+		htmlRule.Node = node
+		htmlRule.Text = buildItemList(node.MetaData.Data)
 	else
+		viewRuleManager.Message = ""
 		htmlCondition.Visible = false
 		htmlRule.Visible = false
 		htmlRule.Node = nil
@@ -288,20 +376,52 @@ function viewRuleTree:OnNodeSelected(node)
 end
 
 function htmlCondition:OnShow()
-	self.Text = conditionHtml
+	if headerMenu.Header == _ContainerHeader then
+		self.Text = cndContainerHtml
+	elseif headerMenu.Header == _BankHeader then
+		self.Text = cndBankHtml
+	end
+end
+
+function htmlRule:OnReceiveDrag()
+	local type, index, subType, data = GetCursorInfo()
+
+	if type == "item" and tonumber(index) then
+		Debug("Receive item %s", index)
+
+		if self.Node.Level == 1 then
+			data = self.Node.MetaData.Data or {}
+			self.Node.MetaData.Data = data
+
+			data[tonumber(index)] = true
+
+			Task.Next()
+			self.Text = buildItemList(data)
+		end
+
+		ClearCursor()
+	end
 end
 
 function htmlRule:OnHyperlinkClick(v)
 	Debug("Remove condition %s", v)
 
 	v = tonumber(v)
-	local data = self.Node.MetaData.Data
-	for i, j in ipairs(data) do
-		if j == v then
-			tremove(data, i)
-			Task.Next()
-			htmlRule.Text = buildResult(data)
-			return
+
+	if self.Node.Level == 1 then
+		self.Node.MetaData.Data[v] = nil
+
+		Task.Next()
+		htmlRule.Text = buildItemList(self.Node.MetaData.Data)
+	elseif self.Node.Level == 3 then
+		local data = self.Node.MetaData.Data
+		for i, j in ipairs(data) do
+			if j == v then
+				tremove(data, i)
+				Task.Next()
+				htmlRule.Text = buildResult(data)
+				return
+			end
 		end
 	end
 end
@@ -321,6 +441,18 @@ function htmlCondition:OnHyperlinkClick(v)
 	htmlRule.Text = buildResult(data)
 end
 
+function htmlRule:OnHyperlinkEnter(v)
+	if self.Node.Level == 1 then
+		_G.GameTooltip:SetOwner(self, "ANCHOR_CURSOR")
+		_G.GameTooltip:SetHyperlink(select(2, GetItemInfo(v)))
+		_G.GameTooltip:Show()
+	end
+end
+
+function htmlRule:OnHyperlinkLeave(v)
+	_G.GameTooltip:Hide()
+end
+
 function btnApply:OnClick()
 	local config = {}
 
@@ -330,6 +462,7 @@ function btnApply:OnClick()
 
 		view.Name = node.Text
 		view.ContainerRules = {}
+		view.ItemList = node.MetaData.Data
 
 		for j = 1, node.ChildNodeCount do
 			local container = {}
@@ -356,8 +489,13 @@ function btnApply:OnClick()
 
 	viewRuleManager.Visible = false
 
-	_ContainerDB.ViewConfigs = config
-	_ContainerHeader:ApplyConfig(config)
+	if headerMenu.Header == _ContainerHeader then
+		_ContainerDB.ViewConfigs = config
+		_ContainerHeader:ApplyConfig(config)
+	elseif headerMenu.Header == _BankHeader then
+		_ContainerDB.BankViewConfigs = config
+		_BankHeader:ApplyConfig(config)
+	end
 end
 
 -------------------------------
@@ -375,4 +513,20 @@ function buildResult(data)
 		end
 	end
 	return HTML_TEMPLATE:format(HTML_RESULT:format(table.concat( text, L" and " )))
+end
+
+function buildItemList(itemlist)
+	local text = {}
+	if itemlist then
+		for item in pairs(itemlist) do
+			local name, link, quality = GetItemInfo(item)
+			if not name then
+				name, link, quality = GetItemInfo(item)
+			end
+			if name then
+				tinsert(text, HTML_HREF_TEMPLATE:format(item, BAG_ITEM_QUALITY_COLORS[quality].code .. "[" .. GetItemInfo(item) .. "]" .. FontColor.CLOSE ))
+			end
+		end
+	end
+	return HTML_TEMPLATE:format(HTML_RESULT:format(table.concat( text, ", " )))
 end
