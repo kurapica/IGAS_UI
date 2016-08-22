@@ -572,3 +572,6 @@ L["BankBag7"] = "銀行擴展背包7"
 L["The slot is in the 7th bank bag"] = "物品槽在銀行擴展背包7中"
 L["IsNewItem"] = "新物品"
 L["The slot has item, and the item is newly added."] = "物品槽中有物品存在，並且該物品是新加入的"
+
+L["IsEquipSet"] = "裝備配置方案中"
+L["The slot has item, and the item is in a equip set."] = "物品槽中有物品存在，並且該物品屬於某個裝備配置方案"

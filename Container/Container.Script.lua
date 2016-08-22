@@ -70,6 +70,7 @@ function OnLoad(self)
 	self:RegisterEvent("PLAYER_REGEN_DISABLED")
 	self:RegisterEvent("BANKFRAME_OPENED")
 	self:RegisterEvent("BANKFRAME_CLOSED")
+	self:RegisterEvent("PLAYER_LEVEL_UP")
 
 	for i = 1, 13 do
 		if _G["ContainerFrame" .. i] then
@@ -214,6 +215,18 @@ function BANKFRAME_CLOSED(self)
 	end
 end
 
+function PLAYER_LEVEL_UP(self)
+	for i = 1, _ContainerHeader.Count do
+		local view = _ContainerHeader.Element[i].ContainerView
+
+		local j = 1
+		while view:GetChild(view.ElementPrefix .. j) do
+			view:GetChild(view.ElementPrefix .. j):Each("UpdateAction")
+			j = j + 1
+		end
+	end
+end
+
 -------------------------------
 -- UI Handlers
 -------------------------------
@@ -235,6 +248,12 @@ end
 
 function _BankHeader.Mask:OnMoveFinished()
 	_ContainerDB.BankLocation = _BankHeader.Location
+end
+
+function _BankHeader:OnHide()
+	if not InCombatLockdown() then
+		CloseBankFrame()
+	end
 end
 
 function mnuModifyAnchor:OnClick()

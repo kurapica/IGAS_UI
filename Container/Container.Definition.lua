@@ -17,6 +17,8 @@ for i, v in ipairs(BAG_ITEM_QUALITY_COLORS) do
 	BAG_ITEM_QUALITY_COLORS[i] = ColorType(v)
 end
 
+_GameTooltip = _G.GameTooltip
+
 _Backdrop = {
 	bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
 	edgeFile = "Interface\\Buttons\\WHITE8x8",
@@ -198,7 +200,7 @@ _ItemConditions = {
 		ID = 100012,
 		Name = L"IsEquipItem",
 		Desc = L"The slot has item, and the item is an equipment",
-		Condition = "(equipSlot and equipSlot~='')",
+		Condition = "(equipSlot and equipSlot~='' and equipSlot~='INVTYPE_BAG')",
 	},
 	{
 		ID = 100013,
@@ -218,6 +220,13 @@ _ItemConditions = {
 		Name = L"IsNewItem",
 		Desc = L"The slot has item, and the item is newly added.",
 		Condition = "isNewItem",
+	},
+	{
+		ID = 100016,
+		BagOnly = true,
+		Name = L"IsEquipSet",
+		Desc = L"The slot has item, and the item is in a equip set.",
+		Condition = "GetContainerItemEquipmentSetInfo(bag, slot)"
 	},
 	{
 		ID = 200001,
@@ -389,15 +398,17 @@ class "ContainerButton"
 			local itemId = GetContainerItemID(bag, slot)
 			if itemId then
 				local _, _, quality, iLevel, _, _, _, _, equipSlot = GetItemInfo(itemId)
-				if (equipSlot and equipSlot ~= "") then
-					self.iLevel.Text = BAG_ITEM_QUALITY_COLORS[quality].code .. tostring(iLevel) .. "|r"
-				else
-					self.iLevel.Text = ""
+				if equipSlot and equipSlot~='' and equipSlot~='INVTYPE_BAG' then
+					_GameTooltip:SetOwner(self)
+					_GameTooltip:SetBagItem(bag, slot)
+					local iLvl = _G["GameTooltipTextLeft2"]:GetText()
+					iLvl = iLvl and tonumber(iLvl:match("%d+$")) or iLevel
+					self.iLevel.Text = BAG_ITEM_QUALITY_COLORS[quality].code .. tostring(iLvl) .. "|r"
+					return _GameTooltip:Hide()
 				end
 			end
-		else
-			self.iLevel.Text = ""
 		end
+		self.iLevel.Text = ""
 	end
 
 	__Handler__(function(self, val)
@@ -974,12 +985,12 @@ class "ContainerHeader"
 				_G.BankFrame.activeTabIndex = 2
 			end
 			sortBtn.OnEnter = function(self)
-				_G.GameTooltip:SetOwner(self)
-				_G.GameTooltip:SetText(_G.BAG_CLEANUP_REAGENT_BANK)
-				_G.GameTooltip:Show()
+				_GameTooltip:SetOwner(self)
+				_GameTooltip:SetText(_G.BAG_CLEANUP_REAGENT_BANK)
+				_GameTooltip:Show()
 			end
 			sortBtn.OnLeave = function(self)
-				_G.GameTooltip:Hide()
+				_GameTooltip:Hide()
 			end
 			sortBtn:SetAttribute("type", "macro")
 			sortBtn:SetAttribute("macrotext", "/click BankItemAutoSortButton")
@@ -1000,23 +1011,23 @@ class "ContainerHeader"
 				_G.BankFrame.activeTabIndex = 1
 			end
 			sortBtn.OnEnter = function(self)
-				_G.GameTooltip:SetOwner(self)
-				_G.GameTooltip:SetText(_G.BAG_CLEANUP_BANK)
-				_G.GameTooltip:Show()
+				_GameTooltip:SetOwner(self)
+				_GameTooltip:SetText(_G.BAG_CLEANUP_BANK)
+				_GameTooltip:Show()
 			end
 			sortBtn.OnLeave = function(self)
-				_G.GameTooltip:Hide()
+				_GameTooltip:Hide()
 			end
 			sortBtn:SetAttribute("type", "macro")
 			sortBtn:SetAttribute("macrotext", "/click BankItemAutoSortButton")
 		else
 			sortBtn.OnEnter = function(self)
-				_G.GameTooltip:SetOwner(self)
-				_G.GameTooltip:SetText(_G.BAG_CLEANUP_BAGS)
-				_G.GameTooltip:Show()
+				_GameTooltip:SetOwner(self)
+				_GameTooltip:SetText(_G.BAG_CLEANUP_BAGS)
+				_GameTooltip:Show()
 			end
 			sortBtn.OnLeave = function(self)
-				_G.GameTooltip:Hide()
+				_GameTooltip:Hide()
 			end
 			sortBtn:SetAttribute("type", "macro")
 			sortBtn:SetAttribute("macrotext", "/click BagItemAutoSortButton")

@@ -1,3 +1,7 @@
+2016/08/23 v100
+	1. Fix the item level by using info form gametooltip.
+	2. Add equipsetitem rule for container view, so you can seperate them from others.
+
 2016/08/22 v99
 	1. Add item level for equipment in the container buttons.
 	2. Add seperate for containers in one view.
