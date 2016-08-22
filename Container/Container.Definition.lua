@@ -1156,9 +1156,8 @@ class "ContainerHeader"
 			end)
 		else
 			Task.ThreadCall(function()
-				local _, tarFamily = GetContainerNumFreeSlots(0)
-
 				while true do
+					local _, tarFamily = GetContainerNumFreeSlots(0)
 					local sFree, sTotal, free, total, bagFamily = 0, 0
 					for i = 0, 4 do
 						free, bagFamily = GetContainerNumFreeSlots(i)

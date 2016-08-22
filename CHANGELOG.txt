@@ -1,3 +1,7 @@
+2016/08/22 v98
+	1. Esc will close the container and bank correctly.
+	2. Fix the used/total info of the container display 0/0.
+
 2016/08/22 v97
 	1. Bank view system added, works like the container view system.
 

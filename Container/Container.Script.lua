@@ -162,6 +162,9 @@ function OnEnable(self)
 			end
 		end
 	end
+
+	tinsert(UISpecialFrames,"IGAS_UI_ContainerHeader")
+	tinsert(UISpecialFrames,"IGAS_UI_BankHeader")
 end
 
 function OpenAllBags()
