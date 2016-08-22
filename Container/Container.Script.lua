@@ -259,7 +259,7 @@ function viewRuleManager:OnShow()
 	if not viewconfigs then return self:Hide() end
 
 	for i, config in ipairs(viewconfigs) do
-		local node = { Text = config.Name, FunctionName = "X,+", Childs = {}, Data = System.Reflector.Clone(config.ItemList) }
+		local node = { Text = config.Name, FunctionName = "R,X,+", Childs = {}, Data = System.Reflector.Clone(config.ItemList) }
 		for j, containerRule in ipairs(config.ContainerRules) do
 			local cnode = { Text = L"Container" .. j, FunctionName = "X,+", Childs = {} }
 
@@ -350,6 +350,22 @@ function viewRuleTree:OnNodeFunctionClick(func, node)
 		elseif node.Level == 2 then
 			node = node:AddNode{ Text = L"Rule" .. (node.ChildNodeCount+1), FunctionName = "X", Data = {} }
 			return node:Select()
+		end
+	elseif func == "R" then
+		local name = IGAS:MsgBox(L["Please input the container view's name"], "ic")
+
+		if type(name) == "string" then
+			name = strtrim(name)
+
+			local cnode = viewRuleTree
+
+			for i = 1, cnode.ChildNodeCount do
+				if cnode:GetNode(i).Text == name then
+					return cnode:GetNode(i):Select()
+				end
+			end
+
+			node.Text = name
 		end
 	end
 end

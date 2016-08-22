@@ -383,7 +383,22 @@ class "ContainerButton"
 	extend "IFStyle"
 
 	-- Block parent's UpdateAction
-	function UpdateAction(self) end
+	function UpdateAction(self)
+		local bag, slot = self.ActionTarget, self.ActionDetail
+		if bag and slot then
+			local itemId = GetContainerItemID(bag, slot)
+			if itemId then
+				local _, _, quality, iLevel, _, _, _, _, equipSlot = GetItemInfo(itemId)
+				if (equipSlot and equipSlot ~= "") then
+					self.iLevel.Text = BAG_ITEM_QUALITY_COLORS[quality].code .. tostring(iLevel) .. "|r"
+				else
+					self.iLevel.Text = ""
+				end
+			end
+		else
+			self.iLevel.Text = ""
+		end
+	end
 
 	__Handler__(function(self, val)
 		if val then
@@ -419,6 +434,11 @@ class "ContainerButton"
 		Super(self, ...)
 
 		self.ShowGrid = false
+
+		local lvl = FontString("iLevel", self, "OVERLAY", "GameFontNormalLarge")
+		lvl.JustifyH = "Center"
+		lvl.Height = 10
+		lvl:SetPoint("TOPLEFT", 4, -4)
 	end
 endclass "ContainerButton"
 
@@ -447,7 +467,7 @@ class "Container"
 		if id == 1 then
 			self:SetPoint("TOPLEFT", self.Parent.Parent, "BOTTOMLEFT", 2, -8)
 		else
-			self:SetPoint("TOPLEFT", self.Parent:GetChild(prev .. (id-1)), "BOTTOMLEFT")
+			self:SetPoint("TOPLEFT", self.Parent:GetChild(prev .. (id-1)), "BOTTOMLEFT", 0, -8)
 		end
 
 		self.ElementType = ContainerButton

@@ -1,3 +1,8 @@
+2016/08/22 v99
+	1. Add item level for equipment in the container buttons.
+	2. Add seperate for containers in one view.
+	3. You can use R in the view manager to change the name.
+
 2016/08/22 v98
 	1. Esc will close the container and bank correctly.
 	2. Fix the used/total info of the container display 0/0.
