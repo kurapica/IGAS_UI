@@ -401,7 +401,12 @@ class "ContainerButton"
 				if equipSlot and equipSlot~='' and equipSlot~='INVTYPE_BAG' then
 					_GameTooltip:SetOwner(self)
 					_GameTooltip:SetBagItem(bag, slot)
-					local iLvl = _G["GameTooltipTextLeft2"]:GetText()
+					local i = 3
+					local iLvl = _G["GameTooltipTextLeft2"] and _G["GameTooltipTextLeft2"]:GetText()
+					while i <= 5 and iLvl and not tonumber(iLvl:match("%d+$")) do
+						iLvl = _G["GameTooltipTextLeft"..i] and _G["GameTooltipTextLeft"..i]:GetText()
+						i = i + 1
+					end
 					iLvl = iLvl and tonumber(iLvl:match("%d+$")) or iLevel
 					self.iLevel.Text = BAG_ITEM_QUALITY_COLORS[quality].code .. tostring(iLvl) .. "|r"
 					return _GameTooltip:Hide()
