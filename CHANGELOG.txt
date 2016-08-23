@@ -1,3 +1,6 @@
+2016/08/23 v102
+	1. Fix container bag still shown when the container view module is actived.
+
 2016/08/23 v101
 	1. Fix for dynamic item level.
 

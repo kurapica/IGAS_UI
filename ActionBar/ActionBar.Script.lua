@@ -674,6 +674,7 @@ function UpdateBlzMainMenuBar()
 
 		if _Addon:GetModule("Container") then
 			_BagSlotBar.Visible = false
+			_BagSlotBar.Expansion = false
 		end
 	else
 		-- CharacterBag
