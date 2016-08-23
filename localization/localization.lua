@@ -4,6 +4,13 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/08/24 v103 : </lime>
+</p><br/>
+<p>
+    1. 'IsUnknownAppearance' rule added for container view to only show the items with unknow appearance that can be added to your wardrobe.
+</p>
+<br/><br/>
+<p>
 <lime>2016/08/22 v97 : </lime>
 </p><br/>
 <p>

@@ -16,6 +16,7 @@ BAG_ITEM_QUALITY_COLORS[0] = ColorType(0.4, 0.4, 0.4)
 for i, v in ipairs(BAG_ITEM_QUALITY_COLORS) do
 	BAG_ITEM_QUALITY_COLORS[i] = ColorType(v)
 end
+TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN = _G.TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN
 
 _GameTooltip = _G.GameTooltip
 
@@ -227,6 +228,12 @@ _ItemConditions = {
 		Name = L"IsEquipSet",
 		Desc = L"The slot has item, and the item is in a equip set.",
 		Condition = "GetContainerItemEquipmentSetInfo(bag, slot)"
+	},
+	{
+		ID = 100017,
+		Name = L"IsUnknownAppearance",
+		Desc = L"The slot has item, and the item has unknown appearance",
+		Condition = "(equipSlot and equipSlot~='' and equipSlot~='INVTYPE_BAG' and isUnknownAppearance(itemID))",
 	},
 	{
 		ID = 200001,
@@ -521,6 +528,24 @@ class "ContainerView"
 
 	local tconcat = table.concat
 
+	local function isUnknownAppearance(item)
+		_GameTooltip:SetOwner(UIParent)
+		_GameTooltip:SetItemByID(item)
+		local i = 4
+		local t = _G["GameTooltipTextLeft"..i]
+
+		while t and t:IsShown() do
+			if t:GetText() == TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN then
+				_GameTooltip:Hide()
+				return true
+			end
+
+			i = i + 1
+			t = _G["GameTooltipTextLeft"..i]
+		end
+		_GameTooltip:Hide()
+	end
+
 	local function buildContainerRules(containerRules, itemList, isBank)
 		if not containerRules or #containerRules == 0 then return nil end
 
@@ -591,7 +616,7 @@ class "ContainerView"
 		end
 
 		codes = ([[
-			local containerList, itemList = ...
+			local isUnknownAppearance, containerList, itemList = ...
 			return function()
 				local yield = coroutine.yield
 				local GetContainerItemInfo = GetContainerItemInfo
@@ -619,7 +644,7 @@ class "ContainerView"
 			end
 		]]):format(codes)
 
-		return loadstring(codes)(containerList, itemList or {})
+		return loadstring(codes)(isUnknownAppearance, containerList, itemList or {})
 	end
 
 	local function refreshContainer(self)

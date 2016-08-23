@@ -7,6 +7,13 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/08/24 v103 : </lime>
+</p><br/>
+<p>
+    1. '未收藏外观'规则被加入背包视图系统，可以用来只显示具有未收藏外形的装备，以便加入你的收藏。
+</p>
+<br/><br/>
+<p>
 <lime>2016/08/22 v97 : </lime>
 </p><br/>
 <p>
@@ -577,3 +584,6 @@ L["The slot has item, and the item is newly added."] = "物品槽中有物品存
 
 L["IsEquipSet"] = "装备配置方案中"
 L["The slot has item, and the item is in a equip set."] = "物品槽中有物品存在，并且该物品属于某个装备配置方案"
+
+L["IsUnknownAppearance"] = "未收藏外观"
+L["The slot has item, and the item has unknown appearance"] = "物品槽中有物品存在，并且该物品具有未收藏外观"

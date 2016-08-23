@@ -1,3 +1,6 @@
+2016/08/24 v103
+	1. 'IsUnknownAppearance' rule added for container view to only show the items with unknow appearance that can be added to your wardrobe.
+
 2016/08/23 v102
 	1. Fix container bag still shown when the container view module is actived.
 

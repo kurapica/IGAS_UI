@@ -6,6 +6,12 @@ L["Change Log"] = "更新日誌"
 L["ChangeLog"] = [[
 <html>
 <body>
+<lime>2016/08/24 v103 : </lime>
+</p><br/>
+<p>
+    1. '未收藏外觀'規則被加入背包視圖系統，僅用於顯示具有未收藏外觀的裝備，以便加入你的收藏。
+</p>
+<br/><br/>
 <p>
 <lime>2016/08/22 v97 : </lime>
 </p><br/>
@@ -575,3 +581,6 @@ L["The slot has item, and the item is newly added."] = "物品槽中有物品存
 
 L["IsEquipSet"] = "裝備配置方案中"
 L["The slot has item, and the item is in a equip set."] = "物品槽中有物品存在，並且該物品屬於某個裝備配置方案"
+
+L["IsUnknownAppearance"] = "未收藏外觀"
+L["The slot has item, and the item has unknown appearance"] = "物品槽中有物品存在，並且該物品具有未收藏外觀"
