@@ -697,6 +697,9 @@ class "ContainerView"
 
 			Task.Wait("BAG_UPDATE_DELAYED", ...)
 			Task.Next()
+			while self.StartSort and math.abs(self.StartSort - GetTime()) < 2 do
+				Task.Delay(0.1)
+			end
 		end
 
 		Debug("Stop refreshContainer @pid %d for %s", taskMark, self.Name)
@@ -747,6 +750,9 @@ class "ContainerView"
 
 				if ret == "BANKFRAME_CLOSED" then break end
 				Task.Next() -- Skip more events in the same time
+				while self.StartSort and math.abs(self.StartSort - GetTime()) < 2 do
+					Task.Delay(0.1)
+				end
 			end
 			if self.TaskMark ~= taskMark then break end
 		end
@@ -1040,6 +1046,7 @@ class "ContainerHeader"
 		if isBank then
 			sortBtn.PreClick = function()
 				_G.BankFrame.activeTabIndex = 2
+				self.StartSort = GetTime()
 			end
 			sortBtn.OnEnter = function(self)
 				_GameTooltip:SetOwner(self)
@@ -1066,6 +1073,7 @@ class "ContainerHeader"
 
 			sortBtn.PreClick = function()
 				_G.BankFrame.activeTabIndex = 1
+				self.StartSort = GetTime()
 			end
 			sortBtn.OnEnter = function(self)
 				_GameTooltip:SetOwner(self)
@@ -1078,6 +1086,9 @@ class "ContainerHeader"
 			sortBtn:SetAttribute("type", "macro")
 			sortBtn:SetAttribute("macrotext", "/click BankItemAutoSortButton")
 		else
+			sortBtn.PreClick = function()
+				self.StartSort = GetTime()
+			end
 			sortBtn.OnEnter = function(self)
 				_GameTooltip:SetOwner(self)
 				_GameTooltip:SetText(_G.BAG_CLEANUP_BAGS)

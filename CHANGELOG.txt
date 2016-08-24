@@ -1,3 +1,6 @@
+2016/08/24 v106
+	1. Fix the lag when sort items in the bank and container.
+
 2016/08/24 v105
 	1. Change the equip set would update the container view.
 
