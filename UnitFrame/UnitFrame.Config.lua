@@ -89,7 +89,7 @@ Config = {
 			Type = iClassPower,
 			Location = {
 				AnchorPoint("BOTTOMLEFT", 0, 4, nil, "TOPLEFT"),
-				AnchorPoint("BOTTOMRIGHT", 0, 4, nil, "TOPRIGHT"),
+				AnchorPoint("BOTTOMRIGHT", -1, 4, nil, "TOPRIGHT"),
 			},
 			Property = { Height = 6 },
 		},

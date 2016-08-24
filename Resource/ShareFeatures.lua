@@ -265,8 +265,15 @@ class "iClassPower"
 
 		for i = 1, numBar do
 			self[i].StatusBarColor = PowerBarColor[self.PowerType]
-			self[i].Width = width
+			self[i]:ClearAllPoints()
+			self[i]:SetPoint("TOP")
+			self[i]:SetPoint("BOTTOM")
 			self[i]:SetPoint("LEFT", 1 + (width + self.HSpacing) * (i - 1), 0)
+			if i == numBar then
+				self[i]:SetPoint("RIGHT", -1, 0)
+			else
+				self[i].Width = width
+			end
 			self[i].Activated = false
 			self[i]:Show()
 
