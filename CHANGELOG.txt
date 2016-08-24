@@ -1,3 +1,6 @@
+2016/08/24 v108
+	1.soul-fragments is added for demon-hunter as class power.
+
 2016/08/24 v107
 	1. Fix player can't enter the game with too many container views.
 

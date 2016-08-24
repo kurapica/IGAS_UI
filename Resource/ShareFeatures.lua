@@ -81,11 +81,6 @@ interface "iBorder"
     end
 endinterface "iBorder"
 
------------------------------------------------
---- IFStyle
--- @type interface
--- @name IFStyle
------------------------------------------------
 interface "IFStyle"
 	_PUSH_COLOR = ColorType(1 - Media.PLAYER_CLASS_COLOR.r, 1-Media.PLAYER_CLASS_COLOR.g, 1-Media.PLAYER_CLASS_COLOR.b)
 
@@ -142,6 +137,42 @@ interface "IFStyle"
     end
 endinterface "IFStyle"
 
+interface "IFSoulFragment"
+	local min = math.min
+
+	SPEC_DEMONHUNTER_VENGENCE = 2
+	SOULFRAGMENT = 203981
+	SOULFRAGMENTNAME = GetSpellInfo(SOULFRAGMENT)
+
+	PowerBarColor[SOULFRAGMENT] = RAID_CLASS_COLORS.DEMONHUNTER
+
+	local function PLAYER_SPECIALIZATION_CHANGED(self)
+		if GetSpecialization() == SPEC_DEMONHUNTER_VENGENCE then
+			self:RegisterUnitEvent("UNIT_AURA", "player")
+			self:SetClassPowerVisible(true)
+			self:SetClassPowerType(SOULFRAGMENT)
+			self:SetUnitClassPower(min((select(4, UnitAura("player", SOULFRAGMENTNAME))) or 0, 5), 5)
+		else
+			self:SetClassPowerVisible(false)
+			self:UnregisterEvent("UNIT_AURA")
+		end
+	end
+
+	local function UNIT_AURA(self)
+		self:SetUnitClassPower(min((select(4, UnitAura("player", SOULFRAGMENTNAME))) or 0, 5), 5)
+	end
+
+	function IFSoulFragment(self)
+		if select(2, UnitClass("player")) == "DEMONHUNTER" then
+			self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
+			self.PLAYER_SPECIALIZATION_CHANGED = PLAYER_SPECIALIZATION_CHANGED
+			self.UNIT_AURA = UNIT_AURA
+
+			PLAYER_SPECIALIZATION_CHANGED(self)
+		end
+	end
+endinterface "IFSoulFragment"
+
 --==========================
 -- Elements
 --==========================
@@ -197,6 +228,7 @@ endclass "iClassPowerButton"
 class "iClassPower"
 	inherit "Frame"
 	extend "IFClassPower"
+	extend "IFSoulFragment"
 
 	_MaxPower = 8
 
