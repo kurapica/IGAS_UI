@@ -665,6 +665,15 @@ class "ContainerView"
 		return loadstring(codes)(isUnknownAppearance, containerList, itemList or {}), evts
 	end
 
+	local function OnShow(self)
+		self.FirstShown = true
+		self.OnShow = self.OnShow - OnShow
+
+		if self.Dispatch then
+			return self:StartRefresh()
+		end
+	end
+
 	local function refreshContainer(self, ...)
 		self.TaskMark = (self.TaskMark or 0) + 1
 
@@ -798,7 +807,7 @@ class "ContainerView"
 		self.Dispatch = dispatch
 		self.RequireEvents = evts
 
-		if dispatch then
+		if dispatch and self.FirstShown then
 			self:StartRefresh()
 		end
 	end
@@ -825,6 +834,7 @@ class "ContainerView"
 
 	function ContainerView(self, name, ...)
 		Super(self, name, ...)
+		self.Visible = false
 
 		self.ElementPrefix = name .. "_Container"
 
@@ -835,6 +845,9 @@ class "ContainerView"
 		self.BackdropColor = _BackColor
 
 		self.FrameLevel = 3
+
+		self.FirstShown = false
+		self.OnShow = self.OnShow + OnShow
 	end
 endclass "ContainerView"
 
@@ -871,7 +884,6 @@ class "ViewButton"
 		self.ContainerView = ContainerView(name .. "Panel", self.Parent)
 		self.ContainerView:SetPoint("TOPLEFT", self.Parent, "BOTTOMLEFT")
 		self.ContainerView:SetPoint("TOPRIGHT", self.Parent, "BOTTOMRIGHT")
-		self.ContainerView.Visible = false
 
 		self:SetFrameRef("ContainerView", self.ContainerView)
 		self:SetFrameRef("ViewManager", self.Parent)

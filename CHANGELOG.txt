@@ -1,3 +1,6 @@
+2016/08/24 v107
+	1. Fix player can't enter the game with too many container views.
+
 2016/08/24 v106
 	1. Fix the lag when sort items in the bank and container.
 
