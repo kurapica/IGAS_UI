@@ -557,6 +557,12 @@ class "IActionButton"
 		return self:SetAction(kind, ...)
 	end
 
+	function SetUpCooldownIndicator(self, indicator)
+		indicator:SetHideCountdownNumbers(true)
+		indicator:SetPoint("TOPLEFT", 2, -2)
+		indicator:SetPoint("BOTTOMRIGHT", -2, 2)
+	end
+
 	------------------------------------------------------
 	-- Static Property
 	------------------------------------------------------

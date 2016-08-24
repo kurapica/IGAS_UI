@@ -1,3 +1,6 @@
+2016/08/24 v104
+	1. Fix the cooldown size of the action buttons.
+
 2016/08/24 v103
 	1. 'IsUnknownAppearance' rule added for container view to only show the items with unknow appearance that can be added to your wardrobe.
 
