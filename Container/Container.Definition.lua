@@ -227,7 +227,8 @@ _ItemConditions = {
 		BagOnly = true,
 		Name = L"IsEquipSet",
 		Desc = L"The slot has item, and the item is in a equip set.",
-		Condition = "GetContainerItemEquipmentSetInfo(bag, slot)"
+		Condition = "GetContainerItemEquipmentSetInfo(bag, slot)",
+		RequireEvent = { "EQUIPMENT_SETS_CHANGED" },
 	},
 	{
 		ID = 100017,
@@ -551,6 +552,7 @@ class "ContainerView"
 
 		local codes = {}
 		local bags = {}
+		local evts = {}
 
 		for i, containerRule in ipairs(containerRules) do
 			if containerRule and #containerRule > 0 then
@@ -560,6 +562,14 @@ class "ContainerView"
 						local requireBag = false
 
 						for k, rule in ipairs(rules) do
+							if _ItemConditions[math.abs(rule)].RequireEvent then
+								for i, v in ipairs(_ItemConditions[math.abs(rule)].RequireEvent) do
+									if not evts[v] then
+										tinsert(evts, v)
+										evts[v] = true
+									end
+								end
+							end
 							if rule > 0 then
 								if not bags.RequireAll and _ItemConditions[rule].RequireBag then
 									requireBag = true
@@ -615,6 +625,14 @@ class "ContainerView"
 			table.sort(containerList)
 		end
 
+		for k in pairs(evts) do
+			if type(k) == "string" then
+				evts[k] = nil
+			end
+		end
+
+		if #evts == 0 then evts = nil end
+
 		codes = ([[
 			local isUnknownAppearance, containerList, itemList = ...
 			return function()
@@ -644,10 +662,10 @@ class "ContainerView"
 			end
 		]]):format(codes)
 
-		return loadstring(codes)(isUnknownAppearance, containerList, itemList or {})
+		return loadstring(codes)(isUnknownAppearance, containerList, itemList or {}), evts
 	end
 
-	local function refreshContainer(self)
+	local function refreshContainer(self, ...)
 		self.TaskMark = (self.TaskMark or 0) + 1
 
 		local taskMark = self.TaskMark
@@ -677,14 +695,14 @@ class "ContainerView"
 				self[i].Count = containerCnt[i]
 			end
 
-			Task.Event("BAG_UPDATE_DELAYED")
-			Task.Continue()
+			Task.Wait("BAG_UPDATE_DELAYED", ...)
+			Task.Next()
 		end
 
 		Debug("Stop refreshContainer @pid %d for %s", taskMark, self.Name)
 	end
 
-	local function refreshBank(self)
+	local function refreshBank(self, ...)
 		self.TaskMark = (self.TaskMark or 0) + 1
 
 		local taskMark = self.TaskMark
@@ -725,7 +743,7 @@ class "ContainerView"
 					self[i].Count = containerCnt[i]
 				end
 
-				local ret = Task.Wait("BANKFRAME_CLOSED", "BAG_UPDATE_DELAYED", "PLAYERBANKSLOTS_CHANGED", "PLAYERBANKBAGSLOTS_CHANGED", "PLAYERREAGENTBANKSLOTS_CHANGED")
+				local ret = Task.Wait("BANKFRAME_CLOSED", "BAG_UPDATE_DELAYED", "PLAYERBANKSLOTS_CHANGED", "PLAYERBANKBAGSLOTS_CHANGED", "PLAYERREAGENTBANKSLOTS_CHANGED", ...)
 
 				if ret == "BANKFRAME_CLOSED" then break end
 				Task.Next() -- Skip more events in the same time
@@ -738,7 +756,7 @@ class "ContainerView"
 
 	__Delegate__(Task.NoCombatCall)
 	function ApplyContainerRules(self, containerRules, itemList, isBank)
-		local dispatch = buildContainerRules(containerRules, itemList, isBank)
+		local dispatch, evts = buildContainerRules(containerRules, itemList, isBank)
 
 		local count = containerRules and #containerRules or 0
 		local i = 1
@@ -772,6 +790,7 @@ class "ContainerView"
 		self.IsBank = isBank
 		self.RuleCount = count
 		self.Dispatch = dispatch
+		self.RequireEvents = evts
 
 		if dispatch then
 			self:StartRefresh()
@@ -783,10 +802,18 @@ class "ContainerView"
 	end
 
 	function StartRefresh(self)
-		if self.IsBank then
-			return Task.ThreadCall(refreshBank, self)
+		if self.RequireEvents then
+			if self.IsBank then
+				return Task.ThreadCall(refreshBank, self, unpack(self.RequireEvents))
+			else
+				return Task.ThreadCall(refreshContainer, self, unpack(self.RequireEvents))
+			end
 		else
-			return Task.ThreadCall(refreshContainer, self)
+			if self.IsBank then
+				return Task.ThreadCall(refreshBank, self)
+			else
+				return Task.ThreadCall(refreshContainer, self)
+			end
 		end
 	end
 

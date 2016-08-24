@@ -1,3 +1,6 @@
+2016/08/24 v105
+	1. Change the equip set would update the container view.
+
 2016/08/24 v104
 	1. Fix the cooldown size of the action buttons.
 
