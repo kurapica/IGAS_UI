@@ -147,7 +147,7 @@ interface "IFSoulFragment"
 	PowerBarColor[SOULFRAGMENT] = RAID_CLASS_COLORS.DEMONHUNTER
 
 	local function PLAYER_SPECIALIZATION_CHANGED(self)
-		if GetSpecialization() == SPEC_DEMONHUNTER_VENGENCE then
+		if self.Unit == "player" and GetSpecialization() == SPEC_DEMONHUNTER_VENGENCE then
 			self:RegisterUnitEvent("UNIT_AURA", "player")
 			self:SetClassPowerVisible(true)
 			self:SetClassPowerType(SOULFRAGMENT)
@@ -169,6 +169,9 @@ interface "IFSoulFragment"
 			self.UNIT_AURA = UNIT_AURA
 
 			PLAYER_SPECIALIZATION_CHANGED(self)
+
+			self.OnUnitChanged = self.OnUnitChanged + PLAYER_SPECIALIZATION_CHANGED
+			self.OnForceRefresh = self.OnForceRefresh + PLAYER_SPECIALIZATION_CHANGED
 		end
 	end
 endinterface "IFSoulFragment"
