@@ -170,3 +170,27 @@ function mround(v)
 	if v < 0 then return -f end
 	return f
 end
+
+local _prev = GetTime()
+local _DefaultColor = ColorType(1, 1, 1)
+
+function SetUnitAura(self, unit, index, filter)
+	if not unit or not index then return end
+
+	if GetTime() == _prev then return end
+	_prev = GetTime()
+
+	local name, rank, texture, count, dtype, duration, expires, caster, isStealable, shouldConsolidate, spellID, canApplyAura, isBossDebuff = UnitAura(unit, index, filter)
+
+	if name then
+		self:AddLine("    ")
+		local casterName = caster and GetUnitName(caster)
+		local casterCls = caster and RAID_CLASS_COLORS[select(2, UnitClass(caster))] or _DefaultColor
+		self:AddDoubleLine("ID: " .. tostring(spellID), casterName or "", 1, 1, 1, casterCls.r, casterCls.g, casterCls.b)
+
+		self:Show()
+	end
+end
+
+_Addon:SecureHook(_G.GameTooltip, "SetUnitAura", SetUnitAura)
+_Addon:SecureHook(IGAS.GameTooltip, "SetUnitAura", SetUnitAura)
