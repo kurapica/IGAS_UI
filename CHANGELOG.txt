@@ -1,3 +1,6 @@
+2016/08/27 v112
+	1. Add IsBindOnEquip(UnBind) rule for container view sytem.
+
 2016/08/24 v111
 	1. Add info for aura icons on unitframes.
 

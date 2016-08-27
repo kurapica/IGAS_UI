@@ -17,6 +17,7 @@ for i, v in ipairs(BAG_ITEM_QUALITY_COLORS) do
 	BAG_ITEM_QUALITY_COLORS[i] = ColorType(v)
 end
 TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN = _G.TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN
+ITEM_BIND_ON_EQUIP = _G.ITEM_BIND_ON_EQUIP
 
 _GameTooltip = _G.GameTooltip
 
@@ -234,7 +235,15 @@ _ItemConditions = {
 		ID = 100017,
 		Name = L"IsUnknownAppearance",
 		Desc = L"The slot has item, and the item has unknown appearance",
-		Condition = "(equipSlot and equipSlot~='' and equipSlot~='INVTYPE_BAG' and isUnknownAppearance(itemID))",
+		Condition = "isUnknownAppearance",
+		RequireTooltip = { isUnknownAppearance = _G.TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN },
+	},
+	{
+		ID = 100018,
+		Name = L"IsBindOnEquip(UnBind)",
+		Desc = L"The slot has item, and the item is a BOE equipment(unbind)",
+		Condition = "isBOE",
+		RequireTooltip = { isBOE = _G.ITEM_BIND_ON_EQUIP },
 	},
 	{
 		ID = 200001,
@@ -529,30 +538,13 @@ class "ContainerView"
 
 	local tconcat = table.concat
 
-	local function isUnknownAppearance(item)
-		_GameTooltip:SetOwner(UIParent)
-		_GameTooltip:SetItemByID(item)
-		local i = 4
-		local t = _G["GameTooltipTextLeft"..i]
-
-		while t and t:IsShown() do
-			if t:GetText() == TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN then
-				_GameTooltip:Hide()
-				return true
-			end
-
-			i = i + 1
-			t = _G["GameTooltipTextLeft"..i]
-		end
-		_GameTooltip:Hide()
-	end
-
 	local function buildContainerRules(containerRules, itemList, isBank)
 		if not containerRules or #containerRules == 0 then return nil end
 
 		local codes = {}
 		local bags = {}
 		local evts = {}
+		local tips = {}
 
 		for i, containerRule in ipairs(containerRules) do
 			if containerRule and #containerRule > 0 then
@@ -568,6 +560,11 @@ class "ContainerView"
 										tinsert(evts, v)
 										evts[v] = true
 									end
+								end
+							end
+							if _ItemConditions[math.abs(rule)].RequireTooltip then
+								for k, v in pairs(_ItemConditions[math.abs(rule)].RequireTooltip) do
+									tips[k] = v
 								end
 							end
 							if rule > 0 then
@@ -633,8 +630,45 @@ class "ContainerView"
 
 		if #evts == 0 then evts = nil end
 
+		local additonVar = ""
+		local additionCode = ""
+		if next(tips) then
+			additonVar = {}
+			additionCode = {}
+
+			local vars = {}
+			for k, v in pairs(tips) do
+				tinsert(additonVar, k)
+				tinsert(additionCode, ([[if t:GetText() == %q then %s = true end]]):format(v, k))
+			end
+
+			additonVar = "local " .. table.concat(additonVar, ", ")
+			additionCode = ([[
+				if equipSlot and equipSlot~='' and equipSlot~='INVTYPE_BAG' then
+					GameTooltip:SetOwner(UIParent)
+					if bag == BANK_CONTAINER then
+						GameTooltip:SetInventoryItem("player", BankButtonIDToInvSlotID(slot))
+					elseif bag == REAGENTBANK_CONTAINER then
+						GameTooltip:SetInventoryItem("player", ReagentBankButtonIDToInvSlotID(slot))
+					else
+						GameTooltip:SetBagItem(bag, slot)
+					end
+					local i = 1
+					local t = _G["GameTooltipTextLeft"..i]
+
+					while t and t:IsShown() do
+						%s
+
+						i = i + 1
+						t = _G["GameTooltipTextLeft"..i]
+					end
+					GameTooltip:Hide()
+				end
+			]]):format(table.concat(additionCode, "\n"))
+		end
+
 		codes = ([[
-			local isUnknownAppearance, containerList, itemList = ...
+			local containerList, itemList = ...
 			return function()
 				local yield = coroutine.yield
 				local GetContainerItemInfo = GetContainerItemInfo
@@ -642,6 +676,11 @@ class "ContainerView"
 				local GetItemInfo = GetItemInfo
 				local GetItemSpell = GetItemSpell
 				local IsNewItem =  C_NewItems.IsNewItem
+				local BANK_CONTAINER = BANK_CONTAINER
+				local REAGENTBANK_CONTAINER = REAGENTBANK_CONTAINER
+				local GameTooltip = GameTooltip
+				local BankButtonIDToInvSlotID = BankButtonIDToInvSlotID
+				local ReagentBankButtonIDToInvSlotID = ReagentBankButtonIDToInvSlotID
 
 				for _, bag in ipairs(containerList) do
 					for slot = 1, GetContainerNumSlots(bag) do
@@ -649,6 +688,7 @@ class "ContainerView"
 						local isQuest, questId, isActive = GetContainerItemQuestInfo(bag, slot)
 						local name, iLevel, reqLevel, cls, subclass, maxStack, equipSlot, vendorPrice
 						local itemSpell, isNewItem
+						%s
 
 						if itemID then
 							name, _, _, iLevel, reqLevel, cls, subclass, maxStack, equipSlot, _, vendorPrice = GetItemInfo(itemID)
@@ -657,12 +697,14 @@ class "ContainerView"
 						end
 
 						%s
+
+						%s
 					end
 				end
 			end
-		]]):format(codes)
+		]]):format(additonVar, additionCode, codes)
 
-		return loadstring(codes)(isUnknownAppearance, containerList, itemList or {}), evts
+		return loadstring(codes)(containerList, itemList or {}), evts
 	end
 
 	local function OnShow(self)

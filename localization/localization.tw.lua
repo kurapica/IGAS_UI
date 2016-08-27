@@ -584,3 +584,6 @@ L["The slot has item, and the item is in a equip set."] = "物品槽中有物品
 
 L["IsUnknownAppearance"] = "未收藏外觀"
 L["The slot has item, and the item has unknown appearance"] = "物品槽中有物品存在，並且該物品具有未收藏外觀"
+
+L["IsBindOnEquip(UnBind)"] = "裝備時綁定(未綁定)"
+L["The slot has item, and the item is a BOE equipment(unbind)"] = "物品槽中有物品存在，並且該物品是裝綁並且未綁定的裝備"
