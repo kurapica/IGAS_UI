@@ -38,11 +38,20 @@ class "iHealthBar"
 	function iHealthBar(self, name, parent, ...)
 		Super(self, name, parent, ...)
 
-		self.UseDebuffColor = true
+		local _db = _DBChar[GetSpecialization() or 1]
 
-		if _DBChar[GetSpecialization() or 1].ElementUseClassColor then
+		if _db.ElementUseDebuffColor then
+			self.UseDebuffColor = true
+		end
+
+		if _db.ElementUseClassColor then
 			self.UseClassColor = true
 		end
+
+		if _db.ElementUseSmoothColor then
+			self.UseSmoothColor = true
+		end
+
 		self.FrameLevel = self.FrameLevel + 1
 	end
 endclass "iHealthBar"

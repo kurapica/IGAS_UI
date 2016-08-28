@@ -6,6 +6,17 @@ L["Change Log"] = "更新日誌"
 L["ChangeLog"] = [[
 <html>
 <body>
+<p>
+<lime>2016/08/28 v114 : </lime>
+</p><br/>
+<p>
+    1. '使用減益顔色'和'使用平滑顔色'選項已加入團隊面板菜單，無需再修改Config文件。
+</p>
+<p>
+    2. 修複player面板上的圖騰面板，圖騰現在可以被取消了。
+</p>
+<br/><br/>
+<p>
 <lime>2016/08/24 v103 : </lime>
 </p><br/>
 <p>
@@ -360,6 +371,8 @@ L["Width : "] = "寬度: "
 L["Height : "] = "高度: "
 L["Power Height : "] = "法力條高度: "
 L["Use Class Color"] = "使用職業色"
+L["Use Debuff Color"] = "使用減益顔色"
+L["Use Smoothing Color"] = "使用平滑顔色"
 
 L["Filter"] = "過濾"
 

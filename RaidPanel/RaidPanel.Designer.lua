@@ -92,11 +92,15 @@ mnuRaidPanelSetHeight = raidPanelConfig:AddMenuButton(L"Element Settings", "Heig
 mnuRaidPanelSetPowerHeight = raidPanelConfig:AddMenuButton(L"Element Settings", "PowerHeight")
 mnuRaidPanelSetAuraSize = raidPanelConfig:AddMenuButton(L"Element Settings", "AuraSize")
 mnuRaidPanelSetUseClassColor = raidPanelConfig:AddMenuButton(L"Element Settings", L"Use Class Color")
+mnuRaidPanelSetUseDebuffColor = raidPanelConfig:AddMenuButton(L"Element Settings", L"Use Debuff Color")
+mnuRaidPanelSetUseSmoothColor = raidPanelConfig:AddMenuButton(L"Element Settings", L"Use Smoothing Color")
 mnuRaidPanelSetWidth:ActiveThread("OnClick")
 mnuRaidPanelSetHeight:ActiveThread("OnClick")
 mnuRaidPanelSetPowerHeight:ActiveThread("OnClick")
 mnuRaidPanelSetAuraSize:ActiveThread("OnClick")
 mnuRaidPanelSetUseClassColor.IsCheckButton = true
+mnuRaidPanelSetUseDebuffColor.IsCheckButton = true
+mnuRaidPanelSetUseSmoothColor.IsCheckButton = true
 
 -- Activated
 mnuRaidPanelActivated = raidPanelConfig:AddMenuButton(L"Raid panel", L"Activated")

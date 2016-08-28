@@ -107,7 +107,7 @@ function InstallClassPower(self)
 	_ClassPowerBar.Unit = "player"
 
 	-- Totem bar
-	_TotemBar = _TotemBar or TotemBar("IGAS_UI_NamePlate_TotemBar")
+	_TotemBar = _TotemBar or iTotemBar("IGAS_UI_NamePlate_TotemBar")
 	self:AddElement(_TotemBar)
 	-- Consider the cast bar
 	_TotemBar:SetPoint("TOP", self, "BOTTOM", 0, -(6 + 8 * _VerticalScale))

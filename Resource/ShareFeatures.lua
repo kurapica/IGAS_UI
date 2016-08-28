@@ -935,7 +935,7 @@ class "iCastBar"
 		self:OnCooldownUpdate()
 		self.Alpha = 0
 	end
-	
+
 	------------------------------------------------------
 	-- Constructor
 	------------------------------------------------------
@@ -979,3 +979,43 @@ class "iCastBar"
 		self.OnHide = self.OnHide + OnHide
 	end
 endclass "iCastBar"
+
+class "iTotemBar"
+	inherit "TotemBar"
+
+	function iTotemBar(self, ...)
+		Super(self, ...)
+
+		for i = 1, self.Count do
+			local btn = self.Element[i]
+
+			btn.Backdrop = nil
+
+			local mask = Texture("Mask", btn)
+			mask:SetAllPoints()
+			mask.DrawLayer = "OVERLAY"
+			mask.TexturePath = Media.BORDER_TEXTURE_PATH
+			mask.VertexColor = Media.PLAYER_CLASS_COLOR
+		end
+	end
+endclass "iTotemBar"
+
+class "iSecureTotemBar"
+	inherit "SecureTotemBar"
+
+	function iSecureTotemBar(self, ...)
+		Super(self, ...)
+
+		for i = 1, self.Count do
+			local btn = self.Element[i]
+
+			btn.Backdrop = nil
+
+			local mask = Texture("Mask", btn)
+			mask:SetAllPoints()
+			mask.DrawLayer = "OVERLAY"
+			mask.TexturePath = Media.BORDER_TEXTURE_PATH
+			mask.VertexColor = Media.PLAYER_CLASS_COLOR
+		end
+	end
+endclass "iSecureTotemBar"

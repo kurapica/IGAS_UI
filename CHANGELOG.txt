@@ -1,3 +1,7 @@
+2016/08/28 v114
+	1. 'Use Debuff color' & 'Use Smoothing Color' is added to raid panel's menu.
+	2. Fix the totembar, totem can be canceled.
+
 2016/08/28 v113
 	1. Re-design the layout of the unitframes, the data is cleared.
 	2. Fix the lag when sort container, need new igas lib.

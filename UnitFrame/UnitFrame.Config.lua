@@ -101,8 +101,9 @@ Config = {
 			},
 			Property = { Height = 2 },
 		},
-		TotemBar = {
-			Type = TotemBar,
+		iSecureTotemBar = {
+			Type = iSecureTotemBar,
+			Name = "IGAS_UI_Player_SecureTotemBar",
 			Location = { AnchorPoint("BOTTOM", 0, 4, nil, "TOP") },
 		},
 		CombatIcon = {
@@ -290,7 +291,7 @@ Config = {
 				--"HealthTextFrequent",
 				"HealthTextFrequent2",
 				"iClassPower",
-				"TotemBar",
+				"iSecureTotemBar",
 				"CombatIcon",
 				"PvpIcon",
 				"iPlayerPowerText",

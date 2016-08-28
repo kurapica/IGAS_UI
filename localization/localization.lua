@@ -4,6 +4,16 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/08/28 v114 : </lime>
+</p><br/>
+<p>
+    1. 'Use Debuff Color' and 'Use Smoothing Color' is added to raidpanel's menu, so you don't need to change it in the config file.
+</p>
+<p>
+    2. Fix the totembar on the player, the totems can be canceled now.
+</p>
+<br/><br/>
+<p>
 <lime>2016/08/24 v103 : </lime>
 </p><br/>
 <p>
