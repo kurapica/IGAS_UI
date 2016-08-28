@@ -38,7 +38,7 @@ Config = {
 		},
 		NameLabel_Simple = {
 			Type = NameLabel,
-			Location = { AnchorPoint("RIGHT", -4, 0, "iHealthBar") },
+			Location = { AnchorPoint("BOTTOMRIGHT", -1, 4, "iHealthBar") },
 			Property = { UseClassColor = true },
 		},
 		NameLabel_Target = {
@@ -48,7 +48,7 @@ Config = {
 		},
 		NameLabel_Focus = {
 			Type = NameLabel,
-			Location = { AnchorPoint("TOPRIGHT", 0, 0, nil, "BOTTOMRIGHT") },
+			Location = { AnchorPoint("BOTTOMRIGHT", -1, 4, "iHealthBar") },
 			Property = { UseClassColor = true, UseTapColor = true },
 		},
 		LevelLabel = {
@@ -57,14 +57,14 @@ Config = {
 		},
 		iPowerBarFrequent = {
 			Type = iPowerBarFrequent,
-			Direction = "south", Size = 6, Unit = "px",
+			Direction = "south", Size = 2, Unit = "px",
 			Property = { Smoothing = true },
 		},
 		iCastBar = {
 			Type = iCastBar,
 			Location = {
-				AnchorPoint("TOPLEFT", 0, 0, "iHealthBar"),
-				AnchorPoint("BOTTOMRIGHT", 0, 0, "iHealthBar"),
+				AnchorPoint("TOPLEFT", 0, 0, "iPowerBarFrequent"),
+				AnchorPoint("BOTTOMRIGHT", 0, 0, "iPowerBarFrequent"),
 			},
 		},
 		HealthTextFrequent = {
@@ -80,7 +80,7 @@ Config = {
 		},
 		iHiddenManaBar = {
 			Type = iHiddenManaBar,
-			Direction = "south", Size = 6, Unit = "px",
+			Direction = "south", Size = 2, Unit = "px",
 			Property = {
 				StatusBarColor = ColorType(0, 0, 1)
 			}
@@ -91,7 +91,7 @@ Config = {
 				AnchorPoint("BOTTOMLEFT", 0, 4, nil, "TOPLEFT"),
 				AnchorPoint("BOTTOMRIGHT", -1, 4, nil, "TOPRIGHT"),
 			},
-			Property = { Height = 6 },
+			Property = { Height = 2 },
 		},
 		iRuneBar = {
 			Type = iRuneBar,
@@ -99,7 +99,7 @@ Config = {
 				AnchorPoint("BOTTOMLEFT", 0, 4, nil, "TOPLEFT"),
 				AnchorPoint("BOTTOMRIGHT", 0, 4, nil, "TOPRIGHT"),
 			},
-			Property = { Height = 6 },
+			Property = { Height = 2 },
 		},
 		TotemBar = {
 			Type = TotemBar,
@@ -115,7 +115,7 @@ Config = {
 		},
 		iPlayerPowerText = {
 			Type = iPlayerPowerText,
-			Location = { AnchorPoint("RIGHT", -4, 0, "iPowerBarFrequent", "LEFT") },
+			Location = { AnchorPoint("TOP", 0, 0, "iPowerBarFrequent", "TOP") },
 		},
 		iStaggerBar = {
 			Type = iStaggerBar,
@@ -123,17 +123,17 @@ Config = {
 				AnchorPoint("BOTTOMLEFT", 0, 4, nil, "TOPLEFT"),
 				AnchorPoint("BOTTOMRIGHT", 0, 4, nil, "TOPRIGHT"),
 			},
-			Property = { Height = 6 },
+			Property = { Height = 2 },
 		},
 		iBuffPanel = {
 			Type = AuraPanel,
 			Name = "iBuffPanel",
 			Location = { AnchorPoint("BOTTOMLEFT", 0, 4, nil, "TOPLEFT") },
 			Property = {
+				ElementType = iAuraIcon,
 				Filter = "HELPFUL",
-				HighLightPlayer = true,
 				RowCount = 6,
-				ColumnCount = 6,
+				ColumnCount = 3,
 				MarginTop = 2,
 				ElementWidth = 16,
 				ElementHeight = 16,
@@ -145,13 +145,15 @@ Config = {
 			Name = "iPlayerBuffPanel",
 			Location = { AnchorPoint("BOTTOMLEFT", 0, 4, nil, "TOPLEFT") },
 			Property = {
+				ElementType = iAuraIcon,
 				Filter = "HELPFUL|PLAYER",
-				HighLightPlayer = true,
 				RowCount = 3,
 				ColumnCount = 3,
 				MarginTop = 2,
 				ElementWidth = 24,
 				ElementHeight = 24,
+				HSpacing = 1,
+				VSpacing = 1,
 				TopToBottom = false,
 			},
 		},
@@ -160,6 +162,7 @@ Config = {
 			Name = "iOtherBuffPanel",
 			Location = { AnchorPoint("BOTTOMLEFT", 0, 0, "iPlayerBuffPanel", "BOTTOMRIGHT") },
 			Property = {
+				ElementType = iAuraIcon,
 				Filter = "HELPFUL",
 				RowCount = 6,
 				ColumnCount = 5,
@@ -181,8 +184,8 @@ Config = {
 			Name = "iDebuffPanel",
 			Location = { AnchorPoint("BOTTOMRIGHT", 0, 4, nil, "TOPRIGHT") },
 			Property = {
+				ElementType = iAuraIcon,
 				Filter = "HARMFUL",
-				HighLightPlayer = true,
 				RowCount = 6,
 				ColumnCount = 6,
 				MarginTop = 2,
@@ -205,6 +208,7 @@ Config = {
 			Name = "iOtherDebuffPanel",
 			Location = { AnchorPoint("BOTTOMRIGHT", 0, 4, nil, "TOPRIGHT") },
 			Property = {
+				ElementType = iAuraIcon,
 				Filter = "HARMFUL",
 				RowCount = 6,
 				ColumnCount = 5,
@@ -224,8 +228,8 @@ Config = {
 			Name = "iPlayerDebuffPanel",
 			Location = { AnchorPoint("BOTTOMRIGHT", 0, 0, "iOtherDebuffPanel", "BOTTOMLEFT") },
 			Property = {
+				ElementType = iAuraIcon,
 				Filter = "HARMFUL|PLAYER",
-				HighLightPlayer = true,
 				RowCount = 3,
 				ColumnCount = 3,
 				MarginTop = 2,
@@ -234,19 +238,18 @@ Config = {
 				TopToBottom = false,
 			},
 		},
-		iDebuffPanel_ToT = {
+		iDebuffPanel_Simple = {
 			Type = AuraPanel,
 			Name = "iDebuffPanel",
-			Location = { AnchorPoint("TOPRIGHT", 0, -4, nil, "BOTTOMRIGHT") },
+			Location = { AnchorPoint("TOPLEFT", 0, -4, nil, "BOTTOMLEFT") },
 			Property = {
+				ElementType = iAuraIcon,
 				Filter = "HARMFUL",
-				HighLightPlayer = true,
 				RowCount = 6,
 				ColumnCount = 6,
 				MarginTop = 2,
 				ElementWidth = 16,
 				ElementHeight = 16,
-				TopToBottom = false,
 
 				CustomFilter = function (self, unit, index, filter)
 					local isFriend = not UnitCanAttack("player", unit)
@@ -284,7 +287,7 @@ Config = {
 				"iHiddenManaBar",
 				"iPowerBarFrequent",
 				"iCastBar",
-				"HealthTextFrequent",
+				--"HealthTextFrequent",
 				"HealthTextFrequent2",
 				"iClassPower",
 				"TotemBar",
@@ -292,25 +295,25 @@ Config = {
 				"PvpIcon",
 				"iPlayerPowerText",
 			},
-			Size = Size(200, 36),
-			Location = { AnchorPoint("TOPLEFT", 40, 0) },
+			Size = Size(200, 14),
+			Location = { AnchorPoint("TOPRIGHT", -100, -100, nil, "CENTER") },
 		},
 		{
 			Unit = "pet",
 			HideFrame1 = "PetFrame",
 			Elements = {
 				"iHealthBar",
-				"NameLabel",
+				"NameLabel_Simple",
 				"LevelLabel",
 				"iPowerBarFrequent",
 				"iCastBar",
-				"HealthTextFrequent",
+				--"HealthTextFrequent",
 				"HealthTextFrequent2",
 				"iBuffPanel",
-				"iDebuffPanel",
+				"iDebuffPanel_Simple",
 			},
-			Size = Size(160, 24),
-			Location = { AnchorPoint("TOPLEFT", 180, -40) },
+			Size = Size(160, 10),
+			Location = { AnchorPoint("TOPRIGHT", -32, -32, "player", "BOTTOM") },
 		},
 		{
 			Unit = "target",
@@ -321,7 +324,7 @@ Config = {
 				"LevelLabel",
 				"iPowerBarFrequent",
 				"iCastBar",
-				"HealthTextFrequent",
+				--"HealthTextFrequent",
 				"HealthTextFrequent2",
 				"iPlayerBuffPanel",
 				"iOtherBuffPanel",
@@ -329,8 +332,8 @@ Config = {
 				"iPlayerDebuffPanel",
 				"QuestBossIcon",
 			},
-			Size = Size(200, 36),
-			Location = { AnchorPoint("TOPLEFT", 280, 0) },
+			Size = Size(200, 10),
+			Location = { AnchorPoint("TOPLEFT", 100, -100, nil, "CENTER") },
 		},
 		{
 			Unit = "targettarget",
@@ -338,10 +341,10 @@ Config = {
 				"iHealthBar",
 				"NameLabel_Simple",
 				"LevelLabel",
-				"iDebuffPanel_ToT",
+				"iDebuffPanel_Simple",
 			},
-			Size = Size(160, 24),
-			Location = { AnchorPoint("TOPLEFT", 420, -40) },
+			Size = Size(160, 4),
+			Location = { AnchorPoint("TOPLEFT", 32, -32, "target", "BOTTOM") },
 		},
 		{
 			Unit = "focus",
@@ -351,10 +354,10 @@ Config = {
 				"NameLabel_Focus",
 				"LevelLabel",
 				"iBuffPanel",
-				"iDebuffPanel",
+				"iDebuffPanel_Simple",
 			},
-			Size = Size(160, 24),
-			Location = { AnchorPoint("TOPLEFT", 20, -40) },
+			Size = Size(160, 4),
+			Location = { AnchorPoint("BOTTOMRIGHT", 0, 18, "player", "TOP") },
 		},
 		{
 			Unit = "boss%d",
@@ -366,14 +369,14 @@ Config = {
 				"LevelLabel",
 				"iPowerBarFrequent",
 				"iCastBar",
-				"HealthTextFrequent",
+				--"HealthTextFrequent",
 				"HealthTextFrequent2",
 				"iBuffPanel",
 				"iDebuffPanel",
 				"RaidTargetIcon",
 			},
-			Size = Size(200, 36),
-			Location = { AnchorPoint("TOPLEFT", 600, - 64) }, DX = 0, DY = -64
+			Size = Size(200, 10),
+			Location = { AnchorPoint("TOPLEFT", 300, - 60) }, DX = 0, DY = -60
 		},
 		{
 			Unit = "party%d",
@@ -381,16 +384,16 @@ Config = {
 			HideFrame1 = "PartyMemberFrame%d",
 			Elements = {
 				"iHealthBar",
-				"NameLabel",
+				"NameLabel_Simple",
 				"LevelLabel",
 				"iPowerBarFrequent",
 				"iCastBar",
-				"HealthTextFrequent",
+				--"HealthTextFrequent",
 				"HealthTextFrequent2",
-				"iDebuffPanel",
+				"iDebuffPanel_Simple",
 			},
-			Size = Size(200, 36),
-			Location = { AnchorPoint("TOPLEFT", 40, - 124) }, DX = 0, DY = -64
+			Size = Size(200, 10),
+			Location = { AnchorPoint("TOPLEFT", 40, - 60) }, DX = 0, DY = -60
 		},
 		{
 			Unit = "partypet%d",
@@ -400,8 +403,8 @@ Config = {
 				"NameLabel_Simple",
 				"LevelLabel",
 			},
-			Size = Size(160, 24),
-			Location = { AnchorPoint("BOTTOMLEFT", 0, 0, "party%d", "BOTTOMRIGHT") },
+			Size = Size(160, 4),
+			Location = { AnchorPoint("TOPLEFT", 0, -18, "party%d", "BOTTOM") },
 		},
 		{
 			Unit = "focustarget",
@@ -409,10 +412,10 @@ Config = {
 				"iHealthBar",
 				"NameLabel_Simple",
 				"LevelLabel",
-				"iDebuffPanel_ToT",
+				"iDebuffPanel_Simple",
 			},
-			Size = Size(160, 24),
-			Location = { AnchorPoint("TOPLEFT", 20, -70) },
+			Size = Size(160, 4),
+			Location = { AnchorPoint("RIGHT", -4, 0, "focus", "LEFT") },
 		},
 	},
 

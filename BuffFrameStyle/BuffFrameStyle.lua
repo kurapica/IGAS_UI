@@ -23,7 +23,7 @@ function BuildStyle(buff)
 		mask:SetAllPoints()
 		mask.DrawLayer = "OVERLAY"
 		mask.TexturePath = _BorderTexture
-		mask.VertexColor = Media.PLAYER_CLASS_COLOR
+		mask.VertexColor = Media.ACTIVED_BORDER_COLOR
 
 		local icon = _G[buff:GetName() .. "Icon"]
 		icon:ClearAllPoints()

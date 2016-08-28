@@ -13,8 +13,7 @@ local _RuneBar
 local _StaggerBar
 local _TotemBar
 
-local _MainPowerBarSize = 2
-local _BarSize = 6
+local _BarSize = Config.BAR_SIZE
 
 local _PlayerNamePlate
 
@@ -87,9 +86,14 @@ function InstallClassPower(self)
 
 	-- Main class power
 	_ClassMainPowerBar = _ClassMainPowerBar or iPowerBarFrequent("IGAS_UI_NamePlate_MainPowerBar")
-	self:InsertElement("iHealthBar", _ClassMainPowerBar, "south", _MainPowerBarSize * _VerticalScale, "px")
+	self:InsertElement("iHealthBar", _ClassMainPowerBar, "south", _BarSize * _VerticalScale, "px")
 	_ClassMainPowerBar.Unit = "player"
 	_ClassMainPowerBar.Visible = true
+	_ClassMainPowerBar.FrameStrata = "BACKGROUND"
+
+	local castBar = self:GetElement("iCastBar")
+	castBar:ClearAllPoints()
+	castBar:SetAllPoints(_ClassMainPowerBar)
 
 	_ClassMainPowerText = _ClassMainPowerText or iPlayerPowerText("IGAS_UI_NamePlate_MainPowerText")
 	self:AddElement(_ClassMainPowerText)
@@ -134,6 +138,8 @@ function UninstallClassPower(self)
 	self:SuspendLayout()
 
 	if _ClassMainPowerBar then
+		self:GetElement("iCastBar").Location = Config.Elements[3].Location
+
 		self:RemoveElement(_ClassMainPowerBar, true)
 		_ClassMainPowerBar.Unit = nil
 		_ClassMainPowerBar:ClearAllPoints()

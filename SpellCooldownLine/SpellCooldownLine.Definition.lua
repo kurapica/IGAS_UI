@@ -10,7 +10,7 @@ IGAS:NewAddon "IGAS_UI.SpellCooldownLine"
 -- @name SpellIcon
 -----------------------------------------------
 class "SpellIcon"
-    inherit "Texture"
+    inherit "Frame"
 
     _Full_Alpha = 0.8
 
@@ -111,21 +111,30 @@ class "SpellIcon"
     -- Spell
     property "Spell" {
         Handler = function(self, value)
-            self.TexturePath = value and GetSpellTexture(value)
+            self.Icon.TexturePath = value and GetSpellTexture(value)
+            if value then
+                self.Icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
+            end
         end,
         Type = StringNumber,
     }
     -- Item
     property "Item" {
         Handler = function(self, value)
-            self.TexturePath = value and GetItemIcon(value)
+            self.Icon.TexturePath = value and GetItemIcon(value)
+            if value then
+                self.Icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
+            end
         end,
         Type = StringNumber,
     }
     -- Buff
     property "Buff" {
         Handler = function(self, value)
-            self.TexturePath = value and GetSpellTexture(value)
+            self.Icon.TexturePath = value and GetSpellTexture(value)
+            if value then
+                self.Icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
+            end
         end,
         Type = StringNumber,
     }
@@ -157,12 +166,18 @@ class "SpellIcon"
     ------------------------------------------------------
     -- Constructor
     ------------------------------------------------------
-    function Constructor(self, name, parent, ...)
-        return Super.Constructor(self, name, parent, "OVERLAY")
-    end
-
     function SpellIcon(self, name, parent, ...)
         Super(self, name, parent, ...)
+
+        local icon = Texture("Icon", self, "BACKGROUND")
+        icon:SetPoint("TOPLEFT", self, "TOPLEFT", 2, -2)
+        icon:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -2, 2)
+
+        local mask = Texture("mask", self)
+        mask:SetAllPoints()
+        mask.DrawLayer = "OVERLAY"
+        mask.TexturePath = Media.BORDER_TEXTURE_PATH
+        mask.VertexColor = Media.PLAYER_CLASS_COLOR
 
         self.Width = parent.Width
         self.Height = parent.Height

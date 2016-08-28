@@ -4,12 +4,13 @@ Config = {
 	-- DockLayout settings for UnitFrame
 	PANEL_VSPACING = 3,
 	PANEL_HSPACING = 0,
+	BAR_SIZE = 2,
 
 	-- Element settings
 	Elements = {
 		{
 			Type = iHealthBar,
-			Direction = "south", Size = 6, Unit = "px",
+			Direction = "south", Size = 2, Unit = "px",
 		},
 		{
 			Type = iNameLabel,
@@ -28,16 +29,15 @@ Config = {
 				AnchorPoint("TOPLEFT", 0, -4, nil, "BOTTOMLEFT"),
 				AnchorPoint("TOPRIGHT", 0, -4, nil, "BOTTOMRIGHT"),
 			},
-			Property = {
-				Height = 6,
-			},
+			Property = { AsNamePlate = true },
 			ApplyFrameOptions = function(self, verticalScale, horizontalScale)
-				local height = math.min(6 * verticalScale, 10)
+				local height = math.min(Config.BAR_SIZE * verticalScale, 6)
 				self.Height = height
 
 				self.Icon:ClearAllPoints()
 				self.Icon:SetPoint("BOTTOMRIGHT", self, "BOTTOMLEFT", -2, 0)
-				self.Icon:SetPoint("TOPRIGHT", self.Parent.iHealthBar, "TOPLEFT", -2, 0)
+				self.Icon:SetPoint("TOPRIGHT", self.Parent.iNameLabel, "LEFT", -2, 0)
+				self.Icon.Width = 24
 			end,
 		},
 		{
@@ -49,6 +49,9 @@ Config = {
 			Type = iAuraPanel,
 			Location = {
 				AnchorPoint("BOTTOM", 0, 0, "RestPanel")
+			},
+			Property = {
+				ElementType = iAuraIcon,
 			},
 			ApplyFrameOptions = function(self, verticalScale, horizontalScale)
 				local size = 24 * math.min(verticalScale, horizontalScale)

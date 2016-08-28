@@ -747,10 +747,8 @@ class "ContainerView"
 			end
 
 			Task.Wait("BAG_UPDATE_DELAYED", ...)
+
 			Task.Next()
-			while self.StartSort and math.abs(self.StartSort - GetTime()) < 2 do
-				Task.Delay(0.1)
-			end
 		end
 
 		Debug("Stop refreshContainer @pid %d for %s", taskMark, self.Name)
@@ -800,10 +798,16 @@ class "ContainerView"
 				local ret = Task.Wait("BANKFRAME_CLOSED", "BAG_UPDATE_DELAYED", "PLAYERBANKSLOTS_CHANGED", "PLAYERBANKBAGSLOTS_CHANGED", "PLAYERREAGENTBANKSLOTS_CHANGED", ...)
 
 				if ret == "BANKFRAME_CLOSED" then break end
-				Task.Next() -- Skip more events in the same time
-				while self.StartSort and math.abs(self.StartSort - GetTime()) < 2 do
-					Task.Delay(0.1)
+				local startSort = self.Parent.StartSort
+				if startSort and math.abs(startSort - GetTime()) < 1 then
+					while self.TaskMark == taskMark do
+						ret = Task.Wait(2.5, "BANKFRAME_CLOSED", "BAG_UPDATE_DELAYED", "PLAYERBANKSLOTS_CHANGED", "PLAYERREAGENTBANKSLOTS_CHANGED")
+						if ret == "BANKFRAME_CLOSED" then break end
+						if not ret then break end
+					end
 				end
+				if ret == "BANKFRAME_CLOSED" then break end
+				Task.Next() -- Skip more events in the same time
 			end
 			if self.TaskMark ~= taskMark then break end
 		end

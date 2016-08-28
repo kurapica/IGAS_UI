@@ -24,7 +24,7 @@ Media = {
 	RARE_BORDER_COLOR = ColorType(0.75, 0.75, 0.75),
 
 	--- Cast bar color
-	CASTBAR_COLOR = ColorType(0, 0, 0.8),
+	CASTBAR_COLOR = ColorType(0.25, 0.78, 0.92),
 	NAMEPLATE_CASTBAR_COLOR = ColorType(0.25, 0.78, 0.92),
 	CASTBAR_BORDER_NORMAL_COLOR = ColorType(1, 1, 1),
 	CASTBAR_BORDER_NONINTERRUPTIBLE_COLOR = ColorType(0.77, 0.12 , 0.23),
@@ -182,20 +182,92 @@ endinterface "IFSoulFragment"
 class "iPowerBarFrequent"
 	inherit "PowerBarFrequent"
 	extend "iBorder" "iStatusBarStyle"
+
+	function iPowerBarFrequent(self, ...)
+		Super(self, ...)
+
+		self.FrameStrata = "BACKGROUND"
+	end
 endclass "iPowerBarFrequent"
 
 class "iPowerBar"
 	inherit "PowerBar"
 	extend "iStatusBarStyle""iBorder"
+
+	function iPowerBar(self, ...)
+		Super(self, ...)
+
+		self.FrameStrata = "BACKGROUND"
+	end
 endclass "iPowerBar"
 
 class "iHiddenManaBar"
 	inherit "HiddenManaBar"
 	extend "iBorder" "iStatusBarStyle"
+
+	function iHiddenManaBar(self, ...)
+		Super(self, ...)
+
+		self.FrameStrata = "BACKGROUND"
+	end
 endclass "iHiddenManaBar"
 
 class "iPlayerPowerText"
-	inherit "PowerTextFrequent"
+	inherit "StatusText"
+	extend "IFPowerFrequent"
+
+	local abs = math.abs
+
+	local function formatValue(self, value)
+		if abs(value) >= 10^9 then
+			return self.ValueFormat:format(value / 10^9) .. "b"
+		elseif abs(value) >= 10^6 then
+			return self.ValueFormat:format(value / 10^6) .. "m"
+		elseif abs(value) >= 10^4 then
+			return self.ValueFormat:format(value / 10^3) .. "k"
+		else
+			return tostring(value)
+		end
+	end
+
+	local function RefreshStatus(self)
+		if self.Value and self.Value ~= self.Max then
+			if self.ShowPercent and self.Max then
+				if self.Max > 0 then
+					if self.Value > self.Max then
+						self.Text = self.PercentFormat:format(100)
+					else
+						self.Text = self.PercentFormat:format(self.Value * 100 / self.Max)
+					end
+				else
+					self.Text = self.PercentFormat:format(0)
+				end
+			else
+				self.Text = formatValue(self, self.Value)
+			end
+
+			if self.Text == "0" then
+				self.Text = " "
+			end
+		else
+			self.Text = " "
+		end
+	end
+
+	function SetUnitPower(self, value, max)
+		self.Max = max or 100
+		self.Value = value or 0
+		return RefreshStatus(self)
+	end
+
+	__Handler__ ( RefreshStatus )
+	property "ValueFormat" { Type = String, Default = "%.2f" }
+
+	__Handler__ ( RefreshStatus )
+	property "ShowPercent" { Type = Boolean }
+
+	__Handler__ ( RefreshStatus )
+	property "PercentFormat" { Type = String, Default = "%d%%" }
 
 	function SetUnitPowerType(self, powerType)
 		if powerType == 0 or powerType == "MANA" then
@@ -203,8 +275,13 @@ class "iPlayerPowerText"
 		else
 			self.ShowPercent = false
 		end
+	end
 
-		-- return Super.SetUnitPowerType(self)
+	function iPlayerPowerText(self, ...)
+		Super(self, ...)
+
+		self.FontObject = IGAS.TextStatusBarText
+		self.DrawLayer = "OVERLAY"
 	end
 endclass "iPlayerPowerText"
 
@@ -455,3 +532,450 @@ class "iStaggerBar"
 		self:SetValue(value)
 	end
 endclass "iStaggerBar"
+
+class "iAuraIcon"
+	inherit "Frame"
+	extend "IFCooldownIndicator"
+
+	DebuffTypeColor = {}
+	DebuffTypeColor["none"] = { r = 0.80, g = 0, b = 0 }
+	DebuffTypeColor["Magic"]    = { r = 0.20, g = 0.60, b = 1.00 }
+	DebuffTypeColor["Curse"]    = { r = 0.60, g = 0.00, b = 1.00 }
+	DebuffTypeColor["Disease"]  = { r = 0.60, g = 0.40, b = 0 }
+	DebuffTypeColor["Poison"]   = { r = 0.00, g = 0.60, b = 0 }
+	DebuffTypeColor[""] = DebuffTypeColor["none"]
+
+	function SetUpCooldownIndicator(self, indicator)
+		indicator:SetHideCountdownNumbers(true)
+		indicator:SetPoint("TOPLEFT", 2, -2)
+		indicator:SetPoint("BOTTOMRIGHT", -2, 2)
+	end
+
+	function Refresh(self, unit, index, filter)
+		local name, rank, texture, count, dtype, duration, expires, caster, isStealable, shouldConsolidate, spellID, canApplyAura, isBossDebuff = UnitAura(unit, index, filter)
+
+		if name then
+			self.Index = index
+
+			-- Texture
+			self.Icon.TexturePath = texture
+			if texture then self.Icon:SetTexCoord(0.1, 0.9, 0.1, 0.9) end
+
+			-- Count
+			if count and count > 1 then
+				self.Count.Visible = true
+				self.Count.Text = tostring(count)
+			else
+				self.Count.Visible = false
+			end
+
+			-- Stealable
+			self.Stealable.Visible = not UnitIsUnit("player", unit) and isStealable
+
+			-- Debuff
+			if filter and not filter:find("HELPFUL") then
+				self.Mask.VertexColor = DebuffTypeColor[dtype] or DebuffTypeColor.none
+			else
+				self.Mask.VertexColor = Media.ACTIVED_BORDER_COLOR
+			end
+
+			-- Remain
+			self:OnCooldownUpdate(expires - duration, duration)
+
+			self.Visible = true
+		else
+			self.Visible = false
+		end
+	end
+
+	------------------------------------------------------
+	-- Event Handler
+	------------------------------------------------------
+	local function UpdateTooltip(self)
+		self = IGAS:GetWrapper(self)
+		IGAS.GameTooltip:SetUnitAura(self.Parent.Unit, self.Index, self.Parent.Filter)
+	end
+
+	local function OnEnter(self)
+		if self.Visible then
+			IGAS.GameTooltip:SetOwner(self, 'ANCHOR_BOTTOMRIGHT')
+			UpdateTooltip(self)
+		end
+	end
+
+	local function OnLeave(self)
+		IGAS.GameTooltip.Visible = false
+	end
+
+	------------------------------------------------------
+	-- Property
+	------------------------------------------------------
+	__Doc__[[The aura index]]
+	property "Index" { Type = Number }
+
+	__Doc__[[Whether show the tooltip of the aura]]
+	__Handler__( function(self, flag)
+		if flag then
+			self.OnEnter = self.OnEnter + OnEnter
+			self.OnLeave = self.OnLeave + OnLeave
+			self.MouseEnabled = true
+		else
+			self.OnEnter = self.OnEnter - OnEnter
+			self.OnLeave = self.OnLeave - OnLeave
+			self.MouseEnabled = false
+		end
+	end )
+	property "ShowTooltip" { Type = Boolean, Default = true }
+
+	function iAuraIcon(self, ...)
+		Super(self, ...)
+
+		self.MouseEnabled = true
+		self.MouseWheelEnabled = false
+
+		local icon = Texture("Icon", self, "BORDER")
+		icon:SetPoint("TOPLEFT", self, "TOPLEFT", 2, -2)
+		icon:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -2, 2)
+
+		local count = FontString("Count", self, "OVERLAY", "NumberFontNormal")
+		count:SetPoint("BOTTOMRIGHT", -1, 0)
+
+		local stealable = Texture("Stealable", self, "OVERLAY")
+		stealable.TexturePath = [[Interface\TargetingFrame\UI-TargetingFrame-Stealable]]
+		stealable.BlendMode = "ADD"
+		stealable:SetPoint("TOPLEFT", -3, 3)
+		stealable:SetPoint("BOTTOMRIGHT", 3, -3)
+
+		self.OnEnter = self.OnEnter + OnEnter
+		self.OnLeave = self.OnLeave + OnLeave
+
+		IGAS:GetUI(self).UpdateTooltip = UpdateTooltip
+
+		local mask = Texture("Mask", self)
+		mask:SetAllPoints()
+		mask.DrawLayer = "OVERLAY"
+		mask.TexturePath = Media.BORDER_TEXTURE_PATH
+		mask.VertexColor = Media.ACTIVED_BORDER_COLOR
+	end
+endclass "iAuraIcon"
+
+class "iCastBar"
+	inherit "Frame"
+	extend "IFCast" "IFCooldownLabel" "IFCooldownStatus"
+
+	_BackDrop = {
+	    edgeFile = [[Interface\ChatFrame\CHATFRAMEBACKGROUND]],
+	    edgeSize = 2,
+	}
+
+	_DELAY_TEMPLATE = FontColor.RED .. "(%.1f)" .. FontColor.CLOSE
+
+	-- Update SafeZone
+	local function Status_OnValueChanged(self, value)
+		local parent = self.Parent
+
+		if parent.Unit ~= "player" then
+			return
+		end
+
+		local _, _, _, latencyWorld = GetNetStats()
+
+		if latencyWorld == parent.LatencyWorld then
+			-- well, GetNetStats update every 30s, so no need to go on
+			return
+		end
+
+		parent.LatencyWorld = latencyWorld
+
+		if latencyWorld > 0 and parent.Duration and parent.Duration > 0 then
+			parent.SafeZone.Visible = true
+
+			local pct = latencyWorld / parent.Duration / 1000
+
+			if pct > 1 then pct = 1 end
+
+			parent.SafeZone.Width = self.Width * pct
+		else
+			parent.SafeZone.Visible = false
+		end
+	end
+
+	------------------------------------------------------
+	-- Event
+	------------------------------------------------------
+
+	------------------------------------------------------
+	-- Method
+	------------------------------------------------------
+	function SetUpCooldownLabel(self, label)
+		label:SetPoint("LEFT", self, "RIGHT")
+		label.JustifyH = "LEFT"
+		label.FontObject = TextStatusBarText
+	end
+
+	function SetUpCooldownStatus(self, status)
+		status:ClearAllPoints()
+		status:SetAllPoints()
+		status.StatusBarTexturePath = Media.STATUSBAR_TEXTURE_PATH
+		status.StatusBarColor = Media.CASTBAR_COLOR
+		status.MinMaxValue = MinMax(1, 100)
+		status.Layer = "BORDER"
+
+		status.OnValueChanged = status.OnValueChanged + Status_OnValueChanged
+	end
+
+	function Start(self, spell, rank, lineID, spellID)
+		local name, _, text, texture, startTime, endTime, _, _, notInterruptible = UnitCastingInfo(self.Unit)
+
+		if not name then
+			self.Alpha = 0
+			return
+		end
+
+		startTime = startTime / 1000
+		endTime = endTime / 1000
+
+		local pHeight
+		if self.AsNamePlate then
+			pHeight = self.Icon.Height
+		else
+			pHeight = math.max(24, self.Parent.Height)
+		end
+
+		if math.abs((self.Icon.Width or 0) - pHeight) > 1 then
+			if self.AsNamePlate then
+				self.Icon.Width = pHeight
+			else
+				self.Icon:SetSize(pHeight, pHeight)
+			end
+		end
+
+		self.Duration = endTime - startTime
+		self.EndTime = endTime
+		self.Icon.Texture.TexturePath = texture
+		if texture then self.Icon.Texture:SetTexCoord(0.1, 0.9, 0.1, 0.9) end
+		self.NameBack.SpellName.Text = name
+		self.LineID = lineID
+
+		if notInterruptible then
+			self.Icon.BackdropBorderColor = Media.CASTBAR_BORDER_NONINTERRUPTIBLE_COLOR
+		else
+			self.Icon.BackdropBorderColor = Media.CASTBAR_BORDER_NORMAL_COLOR
+		end
+
+		-- Init
+		self.DelayTime = 0
+		self.LatencyWorld = 0
+		self.IFCooldownStatusReverse = true
+
+		-- SafeZone
+		self.SafeZone:ClearAllPoints()
+		self.SafeZone:SetPoint("TOP")
+		self.SafeZone:SetPoint("BOTTOM")
+		self.SafeZone:SetPoint("RIGHT")
+		self.SafeZone.Visible = false
+
+		self:OnCooldownUpdate(startTime, self.Duration)
+
+		self.Alpha = 1
+	end
+
+	function Fail(self, spell, rank, lineID, spellID)
+		if not lineID or lineID == self.LineID then
+			self:OnCooldownUpdate()
+			self.Alpha = 0
+			self.Duration = 0
+			self.LineID = nil
+		end
+	end
+
+	function Stop(self, spell, rank, lineID, spellID)
+		if not lineID or lineID == self.LineID then
+			self:OnCooldownUpdate()
+			self.Alpha = 0
+			self.Duration = 0
+			self.LineID = nil
+		end
+	end
+
+	function Interrupt(self, spell, rank, lineID, spellID)
+		if not lineID or lineID == self.LineID then
+			self:OnCooldownUpdate()
+			self.Alpha = 0
+			self.Duration = 0
+			self.LineID = nil
+		end
+	end
+
+	function Interruptible(self)
+		self.Icon.BackdropBorderColor = Media.CASTBAR_BORDER_NORMAL_COLOR
+	end
+
+	function UnInterruptible(self)
+		self.Icon.BackdropBorderColor = Media.CASTBAR_BORDER_NONINTERRUPTIBLE_COLOR
+	end
+
+	function Delay(self, spell, rank, lineID, spellID)
+		local name, _, text, texture, startTime, endTime = UnitCastingInfo(self.Unit)
+
+		if not startTime or not endTime then return end
+
+		startTime = startTime / 1000
+		endTime = endTime / 1000
+
+		local duration = endTime - startTime
+
+		-- Update
+		self.LatencyWorld = 0
+		self.EndTime = self.EndTime or endTime
+		self.DelayTime = endTime - self.EndTime
+		self.Duration = duration
+		self.NameBack.SpellName.Text = name .. self.DelayFormatString:format(self.DelayTime)
+
+		self:OnCooldownUpdate(startTime, self.Duration)
+	end
+
+	function ChannelStart(self, spell, rank, lineID, spellID)
+		local name, _, text, texture, startTime, endTime, _, notInterruptible = UnitChannelInfo(self.Unit)
+
+		if not name then
+			self.Alpha = 0
+			self.Duration = 0
+			return
+		end
+
+		startTime = startTime / 1000
+		endTime = endTime / 1000
+
+		local pHeight
+		if self.AsNamePlate then
+			pHeight = self.Icon.Height
+		else
+			pHeight = math.max(24, self.Parent.Height)
+		end
+
+		if math.abs((self.Icon.Width or 0) - pHeight) > 1 then
+			if self.AsNamePlate then
+				self.Icon.Width = pHeight
+			else
+				self.Icon:SetSize(pHeight, pHeight)
+			end
+		end
+
+		self.Duration = endTime - startTime
+		self.EndTime = endTime
+		self.Icon.Texture.TexturePath = texture
+		if texture then self.Icon.Texture:SetTexCoord(0.1, 0.9, 0.1, 0.9) end
+		self.NameBack.SpellName.Text = name
+
+		if notInterruptible then
+			self.Icon.BackdropBorderColor = Media.CASTBAR_BORDER_NONINTERRUPTIBLE_COLOR
+		else
+			self.Icon.BackdropBorderColor = Media.CASTBAR_BORDER_NORMAL_COLOR
+		end
+
+		-- Init
+		self.DelayTime = 0
+		self.LatencyWorld = 0
+		self.IFCooldownStatusReverse = false
+
+		-- SafeZone
+		self.SafeZone:ClearAllPoints()
+		self.SafeZone:SetPoint("TOP")
+		self.SafeZone:SetPoint("BOTTOM")
+		self.SafeZone:SetPoint("LEFT", self.Icon, "RIGHT")
+		self.SafeZone.Visible = false
+
+		self:OnCooldownUpdate(startTime, self.Duration)
+
+		self.Alpha = 1
+	end
+
+	function ChannelUpdate(self, spell, rank, lineID, spellID)
+		local name, _, text, texture, startTime, endTime = UnitChannelInfo(self.Unit)
+
+		if not name or not startTime or not endTime then
+			self:OnCooldownUpdate()
+			self.Alpha = 0
+			return
+		end
+
+		startTime = startTime / 1000
+		endTime = endTime / 1000
+
+		local duration = endTime - startTime
+
+		-- Update
+		self.LatencyWorld = 0
+		self.EndTime = self.EndTime or endTime
+		self.DelayTime = endTime - self.EndTime
+		self.Duration = duration
+		if self.DelayTime > 0 then
+			self.NameBack.SpellName.Text = name .. self.DelayFormatString:format(self.DelayTime)
+		end
+		self:OnCooldownUpdate(startTime, self.Duration)
+	end
+
+	function ChannelStop(self, spell, rank, lineID, spellID)
+		self:OnCooldownUpdate()
+		self.Alpha = 0
+		self.Duration = 0
+	end
+
+	------------------------------------------------------
+	-- Property
+	------------------------------------------------------
+	property "DelayFormatString" { Type = String, Default = _DELAY_TEMPLATE }
+	property "AsNamePlate" { Type = Boolean }
+
+	------------------------------------------------------
+	-- Event Handler
+	------------------------------------------------------
+	local function OnHide(self)
+		self:OnCooldownUpdate()
+		self.Alpha = 0
+	end
+	
+	------------------------------------------------------
+	-- Constructor
+	------------------------------------------------------
+	function iCastBar(self, name, parent, ...)
+		Super(self, name, parent, ...)
+
+		self.IFCooldownLabelUseDecimal = true
+		self.IFCooldownLabelAutoColor = false
+		self.IFCooldownLabelAutoSize = false
+
+		local bgColor = Texture("Bg", self, "BACKGROUND")
+		bgColor:SetTexture(0, 0, 0, 1)
+		bgColor:SetAllPoints()
+
+		-- Icon
+		local icon = Frame("Icon", self)
+		icon.FrameStrata = "BACKGROUND"
+		icon.Backdrop = _BackDrop
+		icon.BackdropBorderColor = Media.CASTBAR_BORDER_NORMAL_COLOR
+		icon:SetPoint("RIGHT", self.Parent, "LEFT", -2, 0)
+		icon:SetSize(32, 32)
+
+		local iconTxt = Texture("Texture", icon, "BACKGROUND")
+		iconTxt:SetPoint("TOPLEFT", icon, "TOPLEFT", 2, -2)
+		iconTxt:SetPoint("BOTTOMRIGHT", icon, "BOTTOMRIGHT", -2, 2)
+
+		local nameBack = Frame("NameBack", self)
+		nameBack:SetAllPoints()
+
+		-- SpellName
+		local text = FontString("SpellName", nameBack, "OVERLAY")
+		text:SetVertexColor(1, 1, 1)
+		text.FontObject = GameFontHighlight
+		text:SetPoint("BOTTOM", self, "BOTTOM")
+
+		-- SafeZone
+		local safeZone = Texture("SafeZone", self, "ARTWORK")
+		safeZone.Color = ColorType(1, 0, 0)
+		safeZone.Visible = false
+
+		self.OnHide = self.OnHide + OnHide
+	end
+endclass "iCastBar"

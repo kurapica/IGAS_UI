@@ -144,12 +144,10 @@ function OnLoad(self)
 	_DB = _Addon._DB.UnitFrame or {}
 	_Addon._DB.UnitFrame = _DB
 
-	-- Convert old save data
-	for i = 1, #arUnit do
-		if _DB[i] then
-			_DB[arUnit[i].Unit] = _DB[i]
-			_DB[i] = nil
-		end
+	local ver = _Addon._DB.UnitFrameSaveVer or 0
+	if ver < 1 then
+		_Addon._DB.UnitFrameSaveVer = 1
+		wipe(_DB)
 	end
 
 	for i = 1, #arUnit do
@@ -236,7 +234,7 @@ function arUnit:OnEnter(i)
 		_Menu.Visible = false
 		_Menu:ClearAllPoints()
 		_Menu.Parent = arUnit[i]
-		_Menu:SetPoint("TOPLEFT", arUnit[i], "TOPRIGHT")
+		_Menu:SetPoint("TOPLEFT", arUnit[i], "BOTTOMLEFT")
 
 		-- Refresh
 		_MenuAutoHide.Enabled = arUnit[i].ToggleState
