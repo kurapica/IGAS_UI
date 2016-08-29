@@ -1,3 +1,6 @@
+2016/08/29 v115
+	1. Replace the icon of group roles.
+
 2016/08/28 v114
 	1. 'Use Debuff color' & 'Use Smoothing Color' is added to raid panel's menu.
 	2. Fix the totembar, totem can be canceled.
