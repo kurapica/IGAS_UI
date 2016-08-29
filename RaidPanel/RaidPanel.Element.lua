@@ -245,3 +245,59 @@ class "iDebuffPanel"
     end
 endclass "iDebuffPanel"
 
+class "iRoleIcon"
+	inherit "Texture"
+	extend "IFGroupRole" "IFCombat"
+
+	TANK_TEXTURE = [[Interface\Addons\IGAS_UI\Resource\tank.tga]]
+	HEALER_TEXTURE = [[Interface\Addons\IGAS_UI\Resource\healer.tga]]
+	DAMAGER_TEXTURE = [[Interface\Addons\IGAS_UI\Resource\dps.tga]]
+
+	local function refreshRole(self)
+		if self.InCombat == self.ShowInCombat and self.GroupRole ~= "NONE" then
+			if self.GroupRole == "TANK" then
+				self.TexturePath = TANK_TEXTURE
+			elseif self.GroupRole == "HEALER" then
+				self.TexturePath = HEALER_TEXTURE
+			else
+				self.TexturePath = DAMAGER_TEXTURE
+			end
+			self.Visible = true
+		else
+			self.Visible = false
+		end
+	end
+
+	------------------------------------------------------
+	-- Method
+	------------------------------------------------------
+	function SetCombatState(self, inCombat)
+		self.InCombat = inCombat
+		return refreshRole(self)
+	end
+
+	function SetGroupRole(self, role)
+		self.GroupRole = role
+		return refreshRole(self)
+	end
+
+	------------------------------------------------------
+	-- Property
+	------------------------------------------------------
+	__Handler__ (refreshRole)
+	property "ShowInCombat" { Type = Boolean }
+	property "InCombat" { Type = Boolean }
+	property "GroupRole" { Type = String }
+
+	------------------------------------------------------
+	-- Constructor
+	------------------------------------------------------
+	function iRoleIcon(self, name, parent, ...)
+		Super(self, name, parent, ...)
+
+		self.Height = 16
+		self.Width = 16
+
+		self.TexturePath = nil
+	end
+endclass "iRoleIcon"

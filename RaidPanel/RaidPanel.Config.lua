@@ -106,14 +106,14 @@ Config = {
 			Index = newIndex(),
 		},
 		RoleIcon = {
-			Type = RoleIcon,
+			Type = iRoleIcon,
 			Location = { AnchorPoint("TOPRIGHT") },
 			Property = { ShowInCombat = false },
 			Locale = L"Group Role indicator",
 			Index = newIndex(),
 		},
 		RoleIcon_Dead = {
-			Type = RoleIcon,
+			Type = iRoleIcon,
 			Location = { AnchorPoint("TOPRIGHT") },
 			Property = { ShowInCombat = true },
 		},
