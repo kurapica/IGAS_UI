@@ -37,7 +37,7 @@ Media = {
 	NumberFont = Font("IGAS_UI_NumberFont") {
 		Font = {
 			path = _G.DAMAGE_TEXT_FONT,
-			height = 14,
+			height = 13,
 			outline = "NORMAL",
 		}
 	},

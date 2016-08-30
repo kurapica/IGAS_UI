@@ -471,9 +471,8 @@ class "ContainerButton"
 
 		local lvl = FontString("iLevel", self, "OVERLAY")
 		lvl.FontObject = Media.NumberFont
-		lvl.JustifyH = "Center"
-		lvl.Height = 10
-		lvl:SetPoint("BOTTOM", 0, 6)
+		lvl.JustifyH = "LEFT"
+		lvl:SetPoint("BOTTOMLEFT", 4, 4)
 	end
 endclass "ContainerButton"
 
