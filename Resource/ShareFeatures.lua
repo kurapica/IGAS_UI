@@ -32,7 +32,15 @@ Media = {
 	DEFAULT_BACKDROP = {
 	    edgeFile = "Interface\\Buttons\\WHITE8x8",
 	    edgeSize = 1,
-	}
+	},
+
+	NumberFont = Font("IGAS_UI_NumberFont") {
+		Font = {
+			path = _G.DAMAGE_TEXT_FONT,
+			height = 14,
+			outline = "NORMAL",
+		}
+	},
 }
 
 --==========================
