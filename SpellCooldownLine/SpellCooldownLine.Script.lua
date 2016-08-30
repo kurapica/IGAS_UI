@@ -406,7 +406,6 @@ end
 
 function _RecycleIcon:OnInit(obj)
     obj.OnFinished = SpellIcon_OnFinished
-    Log(1, "RecycleIcon Init %s.", obj.Name)
 end
 
 function _RecycleIcon:OnPop(obj)

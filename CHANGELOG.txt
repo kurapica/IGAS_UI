@@ -1,3 +1,7 @@
+2016/08/30 v116
+	1. The container view system would load the container with a delay for each one, so it won't lag when you open it for the first time.
+	2. A default container view is added, you can't modify it, and it will loaded when you entering the game, so you can still use items when you entering the game in combat.
+
 2016/08/29 v115
 	1. Replace the icon of group roles.
 

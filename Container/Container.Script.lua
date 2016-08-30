@@ -20,6 +20,13 @@ Toggle = {
 	Update = function() end,
 }
 
+_DefaultContainerConfig = {
+	Name = _G.BACKPACK_TOOLTIP,
+	ContainerRules = {
+		{ {100001} }, -- Any
+	},
+}
+
 HTML_TEMPLATE = [[
 <html>
 <body>
@@ -102,12 +109,6 @@ function OnLoad(self)
 					{ {100006} }, -- Container4
 				},
 			},
-			{
-				Name = L"All-In-One",
-				ContainerRules = {
-					{ {100001} }, -- Any
-				},
-			},
 		},
 	}
 	_DB.ContainerDB = _ContainerDB
@@ -139,18 +140,40 @@ function OnLoad(self)
 end
 
 function OnEnable(self)
-	_ContainerHeader:ApplyConfig(_ContainerDB.ViewConfigs)
+	local configs = System.Reflector.Clone(_ContainerDB.ViewConfigs)
+	tinsert(configs, 1, _DefaultContainerConfig)
 
-	-- Open View
-	if _ContainerDB.SelectedView then
-		for i = 1, _ContainerHeader.Count do
-			if _ContainerHeader.Element[i].Text == _ContainerDB.SelectedView then
-				_ContainerHeader.Element[i].ContainerView:Show()
-				_ContainerHeader.Element[i]:SetAttribute("viewactive", true)
-				break
+	_ContainerHeader:ApplyConfig(configs)
+
+	_ContainerHeader.Element[1].ContainerView:Show()
+	_ContainerHeader.Element[1]:SetAttribute("viewactive", true)
+	_ContainerHeader.Element[1].ContainerView.LoadInstant = true
+	_ContainerHeader.Element[1].ContainerView:StartRefresh()
+
+	Task.ThreadCall(function()
+		local i = 1
+
+		while i <= _ContainerHeader.Count do
+			Task.Delay(10)
+
+			if InCombatLockdown() then Task.Event("PLAYER_REGEN_ENABLED") end
+			while InCombatLockdown() do Task.Delay(0.1) end
+
+			while i <= _ContainerHeader.Count and _ContainerHeader.Element[i].ContainerView.TaskMark do
+				i = i + 1
 			end
+
+			if i <= _ContainerHeader.Count then
+				Debug("[Container]Wakeup container %d", i)
+
+				_ContainerHeader.Element[i].ContainerView:StartRefresh()
+			end
+
+			i = i + 1
 		end
-	end
+
+		Debug("[Container]Auto wakeup finished")
+	end)
 
 	_BankHeader:ApplyConfig(_ContainerDB.BankViewConfigs)
 
@@ -529,10 +552,14 @@ function btnApply:OnClick()
 
 	if headerMenu.Header == _ContainerHeader then
 		_ContainerDB.ViewConfigs = config
-		_ContainerHeader:ApplyConfig(config)
+
+		local configs = System.Reflector.Clone(_ContainerDB.ViewConfigs)
+		tinsert(configs, 1, _DefaultContainerConfig)
+
+		_ContainerHeader:ApplyConfig(configs, true)
 	elseif headerMenu.Header == _BankHeader then
 		_ContainerDB.BankViewConfigs = config
-		_BankHeader:ApplyConfig(config)
+		_BankHeader:ApplyConfig(config, true)
 	end
 end
 

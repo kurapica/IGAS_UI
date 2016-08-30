@@ -4,6 +4,16 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/08/30 v116 : </lime>
+</p><br/>
+<p>
+    1. The cotnainer views would be automatically loaded with a delay with orders, so you won't suffer lag when you open them.
+</p>
+<p>
+    2. A default container view is added, it can't be modified, and will be loaded when you entering the game, if will fix the problem that you can't use items when you entering the game with combat state.
+</p>
+<br/><br/>
+<p>
 <lime>2016/08/28 v114 : </lime>
 </p><br/>
 <p>

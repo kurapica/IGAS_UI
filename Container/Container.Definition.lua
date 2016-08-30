@@ -12,10 +12,11 @@ REAGENTBANK_CONTAINER = _G.REAGENTBANK_CONTAINER
 NUM_BANKBAGSLOTS = _G.NUM_BANKBAGSLOTS
 BAG_ITEM_QUALITY_COLORS = System.Reflector.Clone(BAG_ITEM_QUALITY_COLORS, true)
 LE_ITEM_QUALITY_COMMON = _G.LE_ITEM_QUALITY_COMMON
-BAG_ITEM_QUALITY_COLORS[0] = ColorType(0.4, 0.4, 0.4)
 for i, v in ipairs(BAG_ITEM_QUALITY_COLORS) do
 	BAG_ITEM_QUALITY_COLORS[i] = ColorType(v)
 end
+BAG_ITEM_QUALITY_COLORS[0] = ColorType(0.4, 0.4, 0.4)
+BAG_ITEM_QUALITY_COLORS[1] = ColorType(1, 1, 1)
 TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN = _G.TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN
 ITEM_BIND_ON_EQUIP = _G.ITEM_BIND_ON_EQUIP
 
@@ -412,9 +413,9 @@ class "ContainerButton"
 	function UpdateAction(self)
 		local bag, slot = self.ActionTarget, self.ActionDetail
 		if bag and slot then
-			local itemId = GetContainerItemID(bag, slot)
+			local _, _, _, quality, _, _, _, _, _, itemId = GetContainerItemInfo(bag, slot)
 			if itemId then
-				local _, _, quality, iLevel, _, _, _, _, equipSlot = GetItemInfo(itemId)
+				local _, _, _, iLevel, _, _, _, _, equipSlot = GetItemInfo(itemId)
 				if equipSlot and equipSlot~='' and equipSlot~='INVTYPE_BAG' then
 					_GameTooltip:SetOwner(self)
 					_GameTooltip:SetBagItem(bag, slot)
@@ -708,10 +709,9 @@ class "ContainerView"
 	end
 
 	local function OnShow(self)
-		self.FirstShown = true
 		self.OnShow = self.OnShow - OnShow
 
-		if self.Dispatch then
+		if self.Dispatch and not self.TaskMark then
 			return self:StartRefresh()
 		end
 	end
@@ -723,6 +723,7 @@ class "ContainerView"
 		local dispatch = self.Dispatch
 		local count = self.RuleCount or 0
 		local containerCnt = {}
+		local configName = self.ConfigName
 		if not dispatch or count == 0 then return end
 
 		while self.TaskMark == taskMark do
@@ -730,28 +731,53 @@ class "ContainerView"
 			while InCombatLockdown() do Task.Delay(0.1) end
 			if self.TaskMark ~= taskMark then break end
 
-			Debug("Process refreshContainer @pid %d for %s", taskMark, self.Name)
-
 			for i = 1, count do containerCnt[i] = 0 end
+
+			local replaceCnt = 0
+			local chkCount = self.LoadInstant and 999 or self.FirstLoaded and 4 or 10
+			local restartGen = false
+			local st = GetTime()
+
+			Debug("Process refreshContainer @pid %d for %s step %d", taskMark, configName, chkCount)
 
 			for id, bag, slot in tpairs(dispatch) do
 				containerCnt[id] = containerCnt[id] + 1
 				local ele = self[id].Element[containerCnt[id]]
 				if ele.ActionTarget ~= bag or ele.ActionDetail ~= slot then
 					ele:SetAction("bagslot", bag, slot)
+
+					replaceCnt = replaceCnt + 1
+					if replaceCnt % chkCount == 0 then
+						Task.Next()
+
+						while InCombatLockdown() do
+							-- well, bad luck
+							local ret = Task.Wait(0.5, "PLAYER_REGEN_ENABLED", "BAG_UPDATE_DELAYED", ...)
+							if ret and ret ~= "PLAYER_REGEN_ENABLED" then
+								restartGen = true
+								break
+							end
+						end
+					end
 				end
 			end
 
-			for i = 1, count do
-				self[i].Count = containerCnt[i]
+			Debug("Finish refreshContainer @pid %d for %s cost %.2f", taskMark, configName, GetTime() - st)
+
+			if not restartGen then
+				self.FirstLoaded = false
+
+				for i = 1, count do
+					self[i].Count = containerCnt[i]
+				end
+
+				Task.Wait("BAG_UPDATE_DELAYED", ...)
+
+				Task.Next()
 			end
-
-			Task.Wait("BAG_UPDATE_DELAYED", ...)
-
-			Task.Next()
 		end
 
-		Debug("Stop refreshContainer @pid %d for %s", taskMark, self.Name)
+		Debug("Stop refreshContainer @pid %d for %s", taskMark, configName)
 	end
 
 	local function refreshBank(self, ...)
@@ -762,6 +788,7 @@ class "ContainerView"
 		local count = self.RuleCount or 0
 		local containerCnt = {}
 		local firstRun = true
+		local configName = self.ConfigName
 		if not dispatch or count == 0 then return end
 
 		while self.TaskMark == taskMark do
@@ -779,17 +806,38 @@ class "ContainerView"
 				if InCombatLockdown() then break end
 				if self.TaskMark ~= taskMark then break end
 
-				Debug("Process refreshBank @pid %d for %s", taskMark, self.Name)
-
 				for i = 1, count do containerCnt[i] = 0 end
+
+				local replaceCnt = 0
+				local chkCount = 14
+				local st = GetTime()
+
+				Debug("Process refreshBank @pid %d for %s step %d", taskMark, configName, chkCount)
 
 				for id, bag, slot in tpairs(dispatch) do
 					containerCnt[id] = containerCnt[id] + 1
 					local ele = self[id].Element[containerCnt[id]]
 					if ele.ActionTarget ~= bag or ele.ActionDetail ~= slot then
 						ele:SetAction("bagslot", bag, slot)
+
+						replaceCnt = replaceCnt + 1
+						if replaceCnt % chkCount == 0 then
+							Task.Next()
+
+							-- should hide the bank frame if in combat
+							if InCombatLockdown() then break end
+							if self.TaskMark ~= taskMark then break end
+						end
 					end
 				end
+
+				Debug("Finish refreshBank @pid %d for %s cost %.2f", taskMark, configName, GetTime() - st)
+
+				-- should hide the bank frame if in combat
+				if InCombatLockdown() then break end
+				if self.TaskMark ~= taskMark then break end
+
+				self.FirstLoaded = true
 
 				for i = 1, count do
 					self[i].Count = containerCnt[i]
@@ -812,11 +860,11 @@ class "ContainerView"
 			if self.TaskMark ~= taskMark then break end
 		end
 
-		Debug("Stop refreshBank @pid %d for %s", taskMark, self.Name)
+		Debug("Stop refreshBank @pid %d for %s", taskMark, configName)
 	end
 
 	__Delegate__(Task.NoCombatCall)
-	function ApplyContainerRules(self, containerRules, itemList, isBank)
+	function ApplyContainerRules(self, containerRules, itemList, isBank, force)
 		local dispatch, evts = buildContainerRules(containerRules, itemList, isBank)
 
 		local count = containerRules and #containerRules or 0
@@ -853,7 +901,7 @@ class "ContainerView"
 		self.Dispatch = dispatch
 		self.RequireEvents = evts
 
-		if dispatch and self.FirstShown then
+		if dispatch and force then
 			self:StartRefresh()
 		end
 	end
@@ -878,6 +926,9 @@ class "ContainerView"
 		end
 	end
 
+	property "LoadInstant" { Type = Boolean }
+	property "FirstLoaded" { Type = Boolean, Default = true }
+
 	function ContainerView(self, name, ...)
 		Super(self, name, ...)
 		self.Visible = false
@@ -892,7 +943,6 @@ class "ContainerView"
 
 		self.FrameLevel = 3
 
-		self.FirstShown = false
 		self.OnShow = self.OnShow + OnShow
 	end
 endclass "ContainerView"
@@ -1010,12 +1060,13 @@ class "ContainerHeader"
 
 	property "IsBank" { Type = Boolean }
 
-	function ApplyConfig(self, configs)
+	function ApplyConfig(self, configs, force)
 		self.Count = #configs
 
 		for i, config in ipairs(configs) do
 			self.Element[i].Text = config.Name
-			self.Element[i].ContainerView:ApplyContainerRules(config.ContainerRules, config.ItemList, self.IsBank)
+			self.Element[i].ContainerView.ConfigName = config.Name
+			self.Element[i].ContainerView:ApplyContainerRules(config.ContainerRules, config.ItemList, self.IsBank, force)
 		end
 	end
 
