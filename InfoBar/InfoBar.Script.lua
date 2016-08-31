@@ -329,8 +329,18 @@ function _Timer:OnTimer()
         coords = "(".."|c00786857"..format("%.2d,%.2d".."|r)  ",x*100,y*100)
     end
 
+    -- Artifact xp
+    local artifactXP = ""
+    if HasArtifactEquipped() then
+    	local itemID, altItemID, name, icon, totalXP, pointsSpent, quality, artifactAppearanceID, appearanceModID, itemAppearanceID, altItemAppearanceID, altOnTop = C_ArtifactUI.GetEquippedArtifactInfo();
+
+		local numPointsAvailableToSpend, xp, xpForNextPoint = MainMenuBar_GetNumArtifactTraitsPurchasableFromXP(pointsSpent, totalXP);
+
+		artifactXP = xp .. "/" .. xpForNextPoint.."  "
+	end
+
 	-- Refresh
-	_Text:SetText(fps..latency..ep..mail..coords..ticktack)
+	_Text:SetText(fps..latency..ep..artifactXP..mail..coords..ticktack)
 
 	if _Status.Hover then
 		UpdateGameTooltip()

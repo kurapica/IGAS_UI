@@ -654,6 +654,8 @@ function UpdateBlzMainMenuBar()
 
 			PetActionBarFrame:SetParent(_HiddenFrame)
 
+			ArtifactWatchBar:SetParent(_HiddenFrame)
+
 			if _MainBar then
 				_MainBar.ReplaceBlzMainAction = false
 			end
@@ -733,6 +735,8 @@ function UpdateBlzMainMenuBar()
 			PossessBarFrame:SetParent(MainMenuBar)
 
 			PetActionBarFrame:SetParent(MainMenuBar)
+
+			ArtifactWatchBar:SetParent(MainMenuBar)
 		end
 	end
 end

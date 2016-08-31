@@ -31,4 +31,4 @@ _Text = FontString("Status", _Status, "ARTWORK", "TextStatusBarTextLarge")
 _Text:SetPoint"CENTER"
 
 _Timer = Timer("RefreshTimer", _Status)
-_Timer.Interval = 1
+_Timer.Interval = 2
