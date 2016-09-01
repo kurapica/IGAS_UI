@@ -145,8 +145,12 @@ class "iBuffPanel"
 
 		local name, rank, texture, count, dtype, duration, expires, caster, isStealable, shouldConsolidate, spellID, canApplyAura, isBossDebuff = UnitAura(unit, index, filter)
 
-		if name and caster == "player" and ((count > 0 and duration > 0) or ((_Buff_List[spellID] or _IGASUI_HELPFUL_SPELL[spellID] or _IGASUI_HELPFUL_SPELL[name]) and duration > 0 and duration < 31)) then
-			return true
+		if name and caster == "player" then
+			if _Buff_List[spellID] then return true end
+			if count > 0 then return true end
+			if duration and (_IGASUI_HELPFUL_SPELL[spellID] or _IGASUI_HELPFUL_SPELL[name]) and duration > 0 and duration < 31 then
+				return true
+			end
 		end
 	end
 

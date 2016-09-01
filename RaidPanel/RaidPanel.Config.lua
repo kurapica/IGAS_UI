@@ -7,6 +7,7 @@ IGAS:NewAddon "IGAS_UI.RaidPanel"
 _Buff_List = {
 	-- [spellId] = true,
 	[155777] = true, -- [Druid][Germination]
+	[53563] = true,  -- [Paladin][Beacon of Light]
 }
 
 local index = 0

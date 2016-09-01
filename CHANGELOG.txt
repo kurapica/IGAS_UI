@@ -1,3 +1,6 @@
+2016/09/01 v119
+	1. The Beacon of Light would be shown in raid panel.
+
 2016/09/01 v118
 	1. Hide the artifact bar, use the info bar to display the artifact power.
 
