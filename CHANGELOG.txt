@@ -1,3 +1,6 @@
+2016/09/02 v120
+	1. Bless of paladin would be shown in the raid panel.
+
 2016/09/01 v119
 	1. The Beacon of Light would be shown in raid panel.
 
