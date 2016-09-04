@@ -20,7 +20,7 @@ BAG_ITEM_QUALITY_COLORS[1] = ColorType(1, 1, 1)
 TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN = _G.TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN
 ITEM_BIND_ON_EQUIP = _G.ITEM_BIND_ON_EQUIP
 
-_GameTooltip = _G.GameTooltip
+_GameTooltip = CreateFrame("GameTooltip", "IGAS_UI_Container_Tooltip", UIParent, "GameTooltipTemplate")
 
 _Backdrop = {
 	bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
@@ -420,9 +420,9 @@ class "ContainerButton"
 					_GameTooltip:SetOwner(self)
 					_GameTooltip:SetBagItem(bag, slot)
 					local i = 3
-					local iLvl = _G["GameTooltipTextLeft2"] and _G["GameTooltipTextLeft2"]:GetText()
+					local iLvl = _G["IGAS_UI_Container_TooltipTextLeft2"] and _G["IGAS_UI_Container_TooltipTextLeft2"]:GetText()
 					while i <= 5 and iLvl and not tonumber(iLvl:match("%d+$")) do
-						iLvl = _G["GameTooltipTextLeft"..i] and _G["GameTooltipTextLeft"..i]:GetText()
+						iLvl = _G["IGAS_UI_Container_TooltipTextLeft"..i] and _G["IGAS_UI_Container_TooltipTextLeft"..i]:GetText()
 						i = i + 1
 					end
 					iLvl = iLvl and tonumber(iLvl:match("%d+$")) or iLevel
@@ -655,13 +655,13 @@ class "ContainerView"
 						GameTooltip:SetBagItem(bag, slot)
 					end
 					local i = 1
-					local t = _G["GameTooltipTextLeft"..i]
+					local t = _G["IGAS_UI_Container_TooltipTextLeft"..i]
 
 					while t and t:IsShown() do
 						%s
 
 						i = i + 1
-						t = _G["GameTooltipTextLeft"..i]
+						t = _G["IGAS_UI_Container_TooltipTextLeft"..i]
 					end
 					GameTooltip:Hide()
 				end
@@ -679,7 +679,7 @@ class "ContainerView"
 				local IsNewItem =  C_NewItems.IsNewItem
 				local BANK_CONTAINER = BANK_CONTAINER
 				local REAGENTBANK_CONTAINER = REAGENTBANK_CONTAINER
-				local GameTooltip = GameTooltip
+				local GameTooltip = IGAS_UI_Container_Tooltip
 				local BankButtonIDToInvSlotID = BankButtonIDToInvSlotID
 				local ReagentBankButtonIDToInvSlotID = ReagentBankButtonIDToInvSlotID
 
