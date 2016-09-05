@@ -1,3 +1,6 @@
+2016/09/06 v122
+	1. An alert icon would be shown if the quest item has unknown appearance.
+
 2016/09/04 v121
 	1. Use a new GameTooltip to avoid hooking slow down the item's scan.
 

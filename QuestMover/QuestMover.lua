@@ -114,3 +114,61 @@ function RefreshMiniButtonPos()
 		end
 	end
 end
+
+-- Choose rewards
+TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN = _G.TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN
+
+GameTooltip = _G.GameTooltip
+
+QuestFrameRewardPanel = IGAS.QuestFrameRewardPanel
+QuestFrameRewardPanel:ActiveThread("OnShow")
+QuestFrameRewardPanel.OnShow = QuestFrameRewardPanel.OnShow + function()
+	Task.Delay(0.1)
+
+	for i = 1, GetNumQuestChoices() do
+		local ft = IGAS["QuestInfoRewardsFrameQuestInfoItem"..i].WarnTrans
+		if not ft then
+			ft = Texture("WarnTrans", IGAS["QuestInfoRewardsFrameQuestInfoItem"..i])
+			ft:SetPoint("TOPRIGHT", 0, 0)
+			ft:SetSize(24, 24)
+			ft.TexturePath = [[Interface\Addons\IGAS_UI\Resource\HelpIcon-ReportAbuse.blp]]
+		end
+		ft.Visible = false
+
+		GameTooltip:SetOwner(UIParent,"ANCHOR_TOPRIGHT")
+		GameTooltip:SetQuestItem("choice", i)
+		local _, link = GameTooltip:GetItem()
+		GameTooltip:Hide()
+
+		if link then
+			GameTooltip:SetOwner(UIParent,"ANCHOR_TOPRIGHT")
+			GameTooltip:SetHyperlink(link)
+
+			local j = 1
+			local t = _G["GameTooltipTextLeft"..j]
+
+			while t and t:IsShown() do
+				if t:GetText() == TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN then
+					ft.Visible = true
+					break
+				end
+
+				j = j + 1
+				t = _G["GameTooltipTextLeft"..j]
+			end
+			GameTooltip:Hide()
+		end
+	end
+end
+
+QuestFrameRewardPanel.OnHide = QuestFrameRewardPanel.OnHide + function()
+	local i = 1
+
+	while _G["QuestInfoRewardsFrameQuestInfoItem"..i] do
+		if IGAS["QuestInfoRewardsFrameQuestInfoItem"..i].WarnTrans then
+			IGAS["QuestInfoRewardsFrameQuestInfoItem"..i].WarnTrans.Visible = false
+		end
+
+		i = i + 1
+	end
+end
