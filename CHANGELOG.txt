@@ -1,3 +1,6 @@
+2016/09/09 v123
+	1. The Beacon of Faith would be shown in the raid panel.
+
 2016/09/06 v122
 	1. An alert icon would be shown if the quest item has unknown appearance.
 

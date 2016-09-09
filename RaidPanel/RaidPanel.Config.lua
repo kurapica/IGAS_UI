@@ -8,6 +8,7 @@ _Buff_List = {
 	-- [spellId] = true,
 	[155777] = true, -- [Druid][Germination]
 	[53563] = true,  -- [Paladin][Beacon of Light]
+	[156910] = true, -- [Paladin][Beacon of Faith]
 	[203528] = true, -- [Paladin][Greater Blessing of Might]
 	[203538] = true, -- [Paladin][Greater Blessing of Kings]
 	[203539] = true, -- [Paladin][Greater Blessing of Wisdom]
