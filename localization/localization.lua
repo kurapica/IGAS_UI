@@ -4,6 +4,13 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/09/13 v124 : </lime>
+</p><br/>
+<p>
+    1. All player's buff would be shown on the raidpanel, you can right-click to send them to black list, just like the debuffs.
+</p>
+<br/><br/>
+<p>
 <lime>2016/08/30 v116 : </lime>
 </p><br/>
 <p>

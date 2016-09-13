@@ -368,6 +368,49 @@ end
 
 raidPanelConfig:GetMenuButton(L"Dead panel", L"Filter", L"ROLE").DropDownList.MultiSelect = true
 
+-- Buff filter
+iBuffFilter = Form("IGAS_UI_IBuffFilter")
+iBuffFilter.Caption = L"Black list"
+iBuffFilter.Message = L"Double click to remove"
+iBuffFilter.Resizable = false
+iBuffFilter:SetSize(300, 400)
+iBuffFilter.Visible = false
+
+iBuffBlackList = List("BlackList", iBuffFilter)
+iBuffBlackList:SetPoint("TOPLEFT", 4, -26)
+iBuffBlackList:SetPoint("BOTTOMRIGHT", -4, 26)
+iBuffBlackList.ShowTooltip = true
+
+function iBuffFilter:OnShow()
+	iBuffBlackList:SuspendLayout()
+
+    iBuffBlackList:Clear()
+
+    for spellID in pairs(_BuffBlackList) do
+        local name, _, icon = GetSpellInfo(spellID)
+
+        iBuffBlackList:AddItem(spellID, name, icon)
+    end
+
+    iBuffBlackList:ResumeLayout()
+end
+
+function iBuffBlackList:OnItemDoubleClick(spellID, name, icon)
+    self:RemoveItem(spellID)
+    _BuffBlackList[spellID] = nil
+end
+
+function iBuffBlackList:OnGameTooltipShow(GameTooltip, spellID)
+    GameTooltip:SetSpellByID(spellID)
+end
+
+-- Menu Settings
+mnuRaidPanelBuffFilter = raidPanelConfig:AddMenuButton(L"Element Settings", L"Buff filter")
+
+function mnuRaidPanelBuffFilter:OnClick()
+	iBuffFilter.Visible = true
+end
+
 -- Debuff filter
 iDebuffFilter = Form("IGAS_UI_IDebuffFilter")
 iDebuffFilter.Caption = L"Black list"
@@ -379,7 +422,7 @@ iDebuffFilter.Visible = false
 iDebuffBlackList = List("BlackList", iDebuffFilter)
 iDebuffBlackList:SetPoint("TOPLEFT", 4, -26)
 iDebuffBlackList:SetPoint("BOTTOMRIGHT", -4, 26)
-iDebuffBlackList.ShowTootip = true
+iDebuffBlackList.ShowTooltip = true
 
 function iDebuffFilter:OnShow()
 	iDebuffBlackList:SuspendLayout()
@@ -411,7 +454,7 @@ function mnuRaidPanelDebuffFilter:OnClick()
 	iDebuffFilter.Visible = true
 end
 
-mnuRaidPanelDebuffRightMouseRemove = raidPanelConfig:AddMenuButton(L"Element Settings", L"Right mouse-click send debuff to black list")
+mnuRaidPanelDebuffRightMouseRemove = raidPanelConfig:AddMenuButton(L"Element Settings", L"Right mouse-click send buff/debuff to black list")
 mnuRaidPanelDebuffRightMouseRemove.IsCheckButton = true
 
 mnuRaidPanelDebuffShowTooltip = raidPanelConfig:AddMenuButton(L"Element Settings", L"Show buff/debuff tootip")

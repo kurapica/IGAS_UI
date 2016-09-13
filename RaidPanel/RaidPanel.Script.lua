@@ -342,6 +342,10 @@ function LoadConfig(_DBChar)
 
 	_DebuffBlackList = _DB.DebuffBlackList
 
+	-- Buff filter
+	_DBChar.BuffBlackList = _DBChar.BuffBlackList or {}
+	_BuffBlackList = _DBChar.BuffBlackList
+
 	-- Default true
 	if _DBChar.DebuffRightMouseRemove == nil then _DBChar.DebuffRightMouseRemove = true end
 	if _DBChar.ShowDebuffTooltip == nil then _DBChar.ShowDebuffTooltip = true end
@@ -1054,6 +1058,7 @@ function UpdateAuraIconTip(self, showTooltip, enableMouse)
 	ele = self:GetElement(iBuffPanel)
 	if ele then
 		ele:Each("ShowTooltip", showTooltip)
+		ele:Each("MouseEnabled", enableMouse)
 	end
 end
 

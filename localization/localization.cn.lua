@@ -7,6 +7,13 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/09/13 v124 : </lime>
+</p><br/>
+<p>
+    1. 现在玩家的所有增益效果都会显示在团队面板，通过右键点击可以送入黑名单，不再显示，操作和移除减益相同。
+</p>
+<br/><br/>
+<p>
 <lime>2016/08/30 v116 : </lime>
 </p><br/>
 <p>
@@ -411,10 +418,11 @@ L["DAMAGER"] = "伤害"
 L["Dead panel"] = "死者面板"
 
 L["Debuff filter"] = "减益过滤"
+L["Buff filter"] = "增益过滤"
 L["Black list"] = "黑名单"
 L["Double click to remove"] = "双击项目移除"
 
-L["Right mouse-click send debuff to black list"] = "右键点击减益送至黑名单"
+L["Right mouse-click send buff/debuff to black list"] = "右键点击增益/减益送至黑名单"
 L["Show buff/debuff tootip"] = "显示增益/减益的提示"
 
 L["Auto generate popup actions"] = "自动填充弹出动作条"

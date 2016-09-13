@@ -143,23 +143,36 @@ class "iBuffPanel"
 	function CustomFilter(self, unit, index, filter)
 		if filter == "HELPFUL" then return true end
 
-		local name, rank, texture, count, dtype, duration, expires, caster, isStealable, shouldConsolidate, spellID, canApplyAura, isBossDebuff = UnitAura(unit, index, filter)
+		local name, _, _, count, dtype, duration, expires, caster, isStealable, _, spellID, _, isBossDebuff = UnitAura(unit, index, filter)
 
-		if name and caster == "player" then
-			if _Buff_List[spellID] then return true end
-			if count > 0 then return true end
-			if duration and (_IGASUI_HELPFUL_SPELL[spellID] or _IGASUI_HELPFUL_SPELL[name]) and duration > 0 and duration < 31 then
-				return true
-			end
-		end
+		if not name or caster ~= "player" then return false end
+
+		if _BuffBlackList[spellID] then return false end
+
+		return true
 	end
 
 	------------------------------------------------------
 	-- Event Handler
 	------------------------------------------------------
+	local function OnMouseUp(self, button)
+		if button == "RightButton" and _DBChar[GetSpecialization() or 1].DebuffRightMouseRemove and not UnitCanAttack("player", self.Parent.Unit) then
+			local name, _, _, _, _, _, _, _, _, _, spellID = UnitAura(self.Parent.Unit, self.Index, self.Parent.Filter)
+
+			if name then
+				_BuffBlackList[spellID] = true
+
+				return self.Parent:Refresh()
+			end
+		end
+	end
+
 	local function OnElementAdd(self, element)
-		element.ShowTooltip = _DBChar[GetSpecialization() or 1].ShowDebuffTooltip
 		element:GetChild("Count").FontObject = AuraCountFont
+
+		element.ShowTooltip = _DBChar[GetSpecialization() or 1].ShowDebuffTooltip
+		element.MouseEnabled = _DBChar[GetSpecialization() or 1].ShowDebuffTooltip or _DBChar[GetSpecialization() or 1].DebuffRightMouseRemove
+		element.OnMouseUp = element.OnMouseUp + OnMouseUp
 	end
 
 	------------------------------------------------------
