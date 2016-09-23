@@ -17,8 +17,6 @@ for i, v in ipairs(BAG_ITEM_QUALITY_COLORS) do
 end
 BAG_ITEM_QUALITY_COLORS[0] = ColorType(0.4, 0.4, 0.4)
 BAG_ITEM_QUALITY_COLORS[1] = ColorType(1, 1, 1)
-TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN = _G.TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN
-ITEM_BIND_ON_EQUIP = _G.ITEM_BIND_ON_EQUIP
 
 _GameTooltip = CreateFrame("GameTooltip", "IGAS_UI_Container_Tooltip", UIParent, "GameTooltipTemplate")
 
@@ -232,20 +230,27 @@ _ItemConditions = {
 		Condition = "GetContainerItemEquipmentSetInfo(bag, slot)",
 		RequireEvent = { "EQUIPMENT_SETS_CHANGED" },
 	},
-	{
+	--[[{
 		ID = 100017,
-		Name = L"IsUnknownAppearance",
+		Name = _G.TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN,
 		Desc = L"The slot has item, and the item has unknown appearance",
-		Condition = "isUnknownAppearance",
-		RequireTooltip = { isUnknownAppearance = _G.TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN },
+		Condition = "(equipSlot and equipSlot~='' and equipSlot~='INVTYPE_BAG')",
+		TooltipFilter = _G.TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN,
 	},
 	{
 		ID = 100018,
-		Name = L"IsBindOnEquip(UnBind)",
+		Name = _G.ITEM_BIND_ON_EQUIP,
 		Desc = L"The slot has item, and the item is a BOE equipment(unbind)",
-		Condition = "isBOE",
-		RequireTooltip = { isBOE = _G.ITEM_BIND_ON_EQUIP },
+		Condition = "(equipSlot and equipSlot~='' and equipSlot~='INVTYPE_BAG')",
+		TooltipFilter = _G.ITEM_BIND_ON_EQUIP,
 	},
+	{
+		ID = 100019,
+		Name = _G.ARTIFACT_POWER,
+		Desc = L"The slot has item, and the item is an artifact power",
+		Condition = ("(cls == %q and subclass == %q)"):format(GetItemClassInfo(_G.LE_ITEM_CLASS_CONSUMABLE), GetItemSubClassInfo(_G.LE_ITEM_CLASS_CONSUMABLE, tremove({GetAuctionItemSubClasses(_G.LE_ITEM_CLASS_CONSUMABLE)}))),
+		TooltipFilter = _G.ARTIFACT_POWER,
+	},--]]
 	{
 		ID = 200001,
 		Name = _G["RARITY"] .. "-" .. _G["ITEM_QUALITY0_DESC"],
@@ -539,53 +544,83 @@ class "ContainerView"
 
 	local tconcat = table.concat
 
+	local function matchText(txt, lst)
+		for _, v in ipairs(lst) do
+			if txt:match(v) then
+				return true
+			end
+		end
+		return false
+	end
+
 	local function buildContainerRules(containerRules, itemList, isBank)
 		if not containerRules or #containerRules == 0 then return nil end
 
+		local defines = {}
 		local codes = {}
+		local scanConds = {}
+		local scanCodes = {}
+
 		local bags = {}
 		local evts = {}
-		local tips = {}
+
+		local groupCnt = 0
+		local ruleCnt = 0
+		local filterList = {}
 
 		for i, containerRule in ipairs(containerRules) do
 			if containerRule and #containerRule > 0 then
+				groupCnt = groupCnt + 1
+
 				for j, rules in ipairs(containerRule) do
-					if rules and #rules > 0 then
+					if rules and (#rules > 0 or rules.TooltipFilter) then
+						ruleCnt = ruleCnt + 1
+
 						local cond = {}
 						local requireBag = false
 
+						if rules.TooltipFilter then
+							local filter = {}
+							rules.TooltipFilter:gsub("[^;]+", function(w)
+								w = strtrim(w)
+								if w ~= "" then
+									tinsert(filter, w)
+								end
+							end)
+							filterList[ruleCnt] = filter
+						else
+							filterList[ruleCnt] = false
+						end
+
 						for k, rule in ipairs(rules) do
-							if _ItemConditions[math.abs(rule)].RequireEvent then
-								for i, v in ipairs(_ItemConditions[math.abs(rule)].RequireEvent) do
-									if not evts[v] then
-										tinsert(evts, v)
-										evts[v] = true
+							if _ItemConditions[math.abs(rule)] then
+								if _ItemConditions[math.abs(rule)].RequireEvent then
+									for i, v in ipairs(_ItemConditions[math.abs(rule)].RequireEvent) do
+										if not evts[v] then
+											tinsert(evts, v)
+											evts[v] = true
+										end
 									end
 								end
-							end
-							if _ItemConditions[math.abs(rule)].RequireTooltip then
-								for k, v in pairs(_ItemConditions[math.abs(rule)].RequireTooltip) do
-									tips[k] = v
-								end
-							end
-							if rule > 0 then
-								if not bags.RequireAll and _ItemConditions[rule].RequireBag then
-									requireBag = true
-									for i, v in ipairs(_ItemConditions[rule].RequireBag) do
-										bags[v] = true
+								if rule > 0 then
+									if not bags.RequireAll and _ItemConditions[rule].RequireBag then
+										requireBag = true
+										for i, v in ipairs(_ItemConditions[rule].RequireBag) do
+											bags[v] = true
+										end
 									end
-								end
 
-								tinsert(cond, _ItemConditions[rule].Condition)
-							else
-								if not bags.RequireAll and _ItemConditions[math.abs(rule)].DenyBag then
-									requireBag = true
-									for i, v in ipairs(_ItemConditions[math.abs(rule)].DenyBag) do
-										bags[v] = true
+									tinsert(cond, _ItemConditions[rule].Condition)
+								else
+									if not bags.RequireAll and _ItemConditions[math.abs(rule)].DenyBag then
+										requireBag = true
+										for i, v in ipairs(_ItemConditions[math.abs(rule)].DenyBag) do
+											bags[v] = true
+										end
 									end
-								end
 
-								tinsert(cond, "not " .. _ItemConditions[math.abs(rule)].Condition)
+									tinsert(cond, "not " .. _ItemConditions[math.abs(rule)].Condition)
+								end
 							end
 						end
 
@@ -593,9 +628,22 @@ class "ContainerView"
 							bags.RequireAll = true
 						end
 
-						cond = tconcat(cond, " and ")
+						if #cond > 0 then
+							cond = tconcat(cond, " and ")
+						elseif filterList[ruleCnt] then
+							cond = "true"
+						else
+							cond = "false"
+						end
 
-						tinsert(codes, ("if %s then yield(%d, bag, slot) else"):format(cond, i))
+						tinsert(defines, ("local isRule%d = %s\nlocal ruleFilterMatch%d = %s"):format(ruleCnt, cond, ruleCnt, filterList[ruleCnt] and "false" or "true"))
+
+						if filterList[ruleCnt] then
+							tinsert(scanConds, ("(isRule%d and filterList[%d])"):format(ruleCnt, ruleCnt))
+							tinsert(scanCodes, ("ruleFilterMatch%d = ruleFilterMatch%d or matchText(tipText, filterList[%d])"):format(ruleCnt, ruleCnt, ruleCnt))
+						end
+
+						tinsert(codes, ("if isRule%d and ruleFilterMatch%d then yield(%d, bag, slot) else"):format(ruleCnt, ruleCnt, groupCnt))
 					end
 				end
 			end
@@ -631,45 +679,8 @@ class "ContainerView"
 
 		if #evts == 0 then evts = nil end
 
-		local additonVar = ""
-		local additionCode = ""
-		if next(tips) then
-			additonVar = {}
-			additionCode = {}
-
-			local vars = {}
-			for k, v in pairs(tips) do
-				tinsert(additonVar, k)
-				tinsert(additionCode, ([[if t:GetText() == %q then %s = true end]]):format(v, k))
-			end
-
-			additonVar = "local " .. table.concat(additonVar, ", ")
-			additionCode = ([[
-				if equipSlot and equipSlot~='' and equipSlot~='INVTYPE_BAG' then
-					GameTooltip:SetOwner(UIParent)
-					if bag == BANK_CONTAINER then
-						GameTooltip:SetInventoryItem("player", BankButtonIDToInvSlotID(slot))
-					elseif bag == REAGENTBANK_CONTAINER then
-						GameTooltip:SetInventoryItem("player", ReagentBankButtonIDToInvSlotID(slot))
-					else
-						GameTooltip:SetBagItem(bag, slot)
-					end
-					local i = 1
-					local t = _G["IGAS_UI_Container_TooltipTextLeft"..i]
-
-					while t and t:IsShown() do
-						%s
-
-						i = i + 1
-						t = _G["IGAS_UI_Container_TooltipTextLeft"..i]
-					end
-					GameTooltip:Hide()
-				end
-			]]):format(table.concat(additionCode, "\n"))
-		end
-
 		codes = ([[
-			local containerList, itemList = ...
+			local containerList, itemList, filterList, matchText = ...
 			return function()
 				local yield = coroutine.yield
 				local GetContainerItemInfo = GetContainerItemInfo
@@ -689,7 +700,6 @@ class "ContainerView"
 						local isQuest, questId, isActive = GetContainerItemQuestInfo(bag, slot)
 						local name, iLevel, reqLevel, cls, subclass, maxStack, equipSlot, vendorPrice
 						local itemSpell, isNewItem
-						%s
 
 						if itemID then
 							name, _, _, iLevel, reqLevel, cls, subclass, maxStack, equipSlot, _, vendorPrice = GetItemInfo(itemID)
@@ -699,13 +709,37 @@ class "ContainerView"
 
 						%s
 
+						if %s then
+							GameTooltip:SetOwner(UIParent)
+							if bag == BANK_CONTAINER then
+								GameTooltip:SetInventoryItem("player", BankButtonIDToInvSlotID(slot))
+							elseif bag == REAGENTBANK_CONTAINER then
+								GameTooltip:SetInventoryItem("player", ReagentBankButtonIDToInvSlotID(slot))
+							else
+								GameTooltip:SetBagItem(bag, slot)
+							end
+							local i = 1
+							local t = _G["IGAS_UI_Container_TooltipTextLeft"..i]
+
+							while t and t:IsShown() do
+								local tipText = t:GetText()
+								if tipText and tipText ~= "" then
+									%s
+								end
+
+								i = i + 1
+								t = _G["IGAS_UI_Container_TooltipTextLeft"..i]
+							end
+							GameTooltip:Hide()
+						end
+
 						%s
 					end
 				end
 			end
-		]]):format(additonVar, additionCode, codes)
+		]]):format(tconcat(defines, "\n"), #scanConds>0 and tconcat(scanConds, " or ") or "false", tconcat(scanCodes, "\n"), codes)
 
-		return loadstring(codes)(containerList, itemList or {}), evts
+		return loadstring(codes)(containerList, itemList or {}, filterList, matchText), evts
 	end
 
 	local function OnShow(self)

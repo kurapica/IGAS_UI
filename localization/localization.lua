@@ -4,6 +4,13 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/09/23 v125 : </lime>
+</p><br/>
+<p>
+    1. Tooltip filter is added to the container view system, you can use it to scan items with tip like 'Artifact Power', so some condition is removed, and you'd better to use it with other rules to speed up.
+</p>
+<br/><br/>
+<p>
 <lime>2016/09/13 v124 : </lime>
 </p><br/>
 <p>

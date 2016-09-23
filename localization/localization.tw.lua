@@ -7,6 +7,13 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/09/23 v125 : </lime>
+</p><br/>
+<p>
+    1. 鼠標提示信息被作為過濾信息加入，妳可以輸入過濾文本比如'神器能量'來對物品進行分組，以往的壹些相關規則被移除。
+</p>
+<br/><br/>
+<p>
 <lime>2016/09/13 v124 : </lime>
 </p><br/>
 <p>
@@ -613,8 +620,4 @@ L["The slot has item, and the item is newly added."] = "物品槽中有物品存
 L["IsEquipSet"] = "裝備配置方案中"
 L["The slot has item, and the item is in a equip set."] = "物品槽中有物品存在，並且該物品屬於某個裝備配置方案"
 
-L["IsUnknownAppearance"] = "未收藏外觀"
-L["The slot has item, and the item has unknown appearance"] = "物品槽中有物品存在，並且該物品具有未收藏外觀"
-
-L["IsBindOnEquip(UnBind)"] = "裝備時綁定(未綁定)"
-L["The slot has item, and the item is a BOE equipment(unbind)"] = "物品槽中有物品存在，並且該物品是裝綁並且未綁定的裝備"
+L["Tooltip Filter(Use ';' to seperate)"] = "鼠標提示信息過濾(使用';'號來間隔)"

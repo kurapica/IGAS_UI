@@ -1,3 +1,6 @@
+2016/09/23 v125
+	1. Tooltip filter is added to the container view system.
+
 2016/09/13 v124
 	1. All player's buff would be shown on the raidpanel, you can right-click to send them to black list, just like the debuffs.
 

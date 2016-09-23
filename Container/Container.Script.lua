@@ -293,6 +293,7 @@ end
 
 function viewRuleManager:OnShow()
 	htmlRule.Text = ""
+	htmlFilter.Text = ""
 
 	local tree = {}
 	local viewconfigs = headerMenu.Header == _ContainerHeader and _ContainerDB.ViewConfigs or
@@ -321,6 +322,8 @@ end
 
 function viewRuleManager:OnHide()
 	viewRuleTree:SetTree(nil)
+	lblFitler.Visible = false
+	htmlFilter.Visible = false
 	htmlRule.Visible = false
 	htmlCondition.Visible = false
 end
@@ -415,20 +418,27 @@ end
 function viewRuleTree:OnNodeSelected(node)
 	if node and node.Level == 3 then
 		htmlCondition.Visible = true
+		lblFitler.Visible = true
+		htmlFilter.Visible = true
 		htmlRule.Visible = true
 		htmlRule.Height = 100
 		htmlRule.Node = node
 		htmlRule.Text = buildResult(node.MetaData.Data)
+		htmlFilter.Text = node.MetaData.Data.TooltipFilter or ""
 		viewRuleManager.Message = ""
 	elseif node and node.Level == 1 then
 		viewRuleManager.Message = L"Drag item to the right panel"
 		htmlCondition.Visible = false
+		lblFitler.Visible = false
+		htmlFilter.Visible = false
 		htmlRule.Visible = true
 		htmlRule.Height = viewRuleTree.Height
 		htmlRule.Node = node
 		htmlRule.Text = buildItemList(node.MetaData.Data)
 	else
 		viewRuleManager.Message = ""
+		lblFitler.Visible = false
+		htmlFilter.Visible = false
 		htmlCondition.Visible = false
 		htmlRule.Visible = false
 		htmlRule.Node = nil
@@ -514,6 +524,17 @@ function htmlRule:OnHyperlinkLeave(v)
 	_G.GameTooltip:Hide()
 end
 
+function htmlFilter:OnTextChanged(isUserInput)
+	if self.Visible and isUserInput and htmlRule.Node then
+		local txt = strtrim(htmlFilter.Text)
+		if txt ~= "" then
+			htmlRule.Node.MetaData.Data.TooltipFilter = txt
+		else
+			htmlRule.Node.MetaData.Data.TooltipFilter = nil
+		end
+	end
+end
+
 function btnApply:OnClick()
 	local config = {}
 
@@ -533,7 +554,7 @@ function btnApply:OnClick()
 				local rnode = cnode:GetNode(k)
 				local rule = rnode.MetaData.Data
 
-				if rule and #rule > 0 then
+				if rule and (#rule > 0 or rule.TooltipFilter) then
 					tinsert(container, rule)
 				end
 			end
@@ -570,10 +591,12 @@ function buildResult(data)
 	local text = {}
 	if data and #data > 0 then
 		for i, cnd in ipairs(data) do
-			if cnd < 0 then
-				tinsert(text, HTML_HREF_TEMPLATE:format(cnd, L"[not]" .. "[" .. (_ItemConditions[math.abs(cnd)].Name) .. "]"))
-			else
-				tinsert(text, HTML_HREF_TEMPLATE:format(cnd, "[" .. (_ItemConditions[cnd].Name) .. "]"))
+			if _ItemConditions[math.abs(cnd)] then
+				if cnd < 0 then
+					tinsert(text, HTML_HREF_TEMPLATE:format(cnd, L"[not]" .. "[" .. (_ItemConditions[math.abs(cnd)].Name) .. "]"))
+				else
+					tinsert(text, HTML_HREF_TEMPLATE:format(cnd, "[" .. (_ItemConditions[cnd].Name) .. "]"))
+				end
 			end
 		end
 	end

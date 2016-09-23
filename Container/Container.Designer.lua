@@ -73,8 +73,17 @@ btnAdd.Style = "Classic"
 btnAdd:ActiveThread("OnClick")
 btnAdd.FrameStrata = "HIGH"
 
+lblFitler = FontString("LabelFilter", viewRuleManager)
+lblFitler:SetPoint("TOPLEFT", viewRuleTree, "TOPRIGHT", 4, 0)
+lblFitler.Text = L"Tooltip Filter(Use ';' to seperate)"
+
+htmlFilter = SingleTextBox("HtmlFilter", viewRuleManager)
+htmlFilter:SetPoint("TOPLEFT", lblFitler, "BOTTOMLEFT")
+htmlFilter.Height = 24
+htmlFilter:SetPoint("RIGHT", -4, 0)
+
 htmlRule = HTMLViewer("HtmlRule", viewRuleManager)
-htmlRule:SetPoint("TOPLEFT", viewRuleTree, "TOPRIGHT", 4, 0)
+htmlRule:SetPoint("TOPLEFT", htmlFilter, "BOTTOMLEFT")
 htmlRule:SetPoint("RIGHT", -4, 0)
 htmlRule.Height = 100
 htmlRule:ActiveThread("OnHyperlinkClick")
