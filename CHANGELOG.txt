@@ -1,3 +1,7 @@
+2016/10/01 v126
+	1. A new class buff panel is added to raidpanel, used to show the class's ability like Shield Block, also you can modify the list by yourself.
+	2. The buff/debuff/class buff panel's settings like location, grid set and others can be modified through the menu.
+
 2016/09/23 v125
 	1. Tooltip filter is added to the container view system.
 

@@ -7,6 +7,16 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/10/01 v126 : </lime>
+</p><br/>
+<p>
+    1. 新的職業增益面板會顯示在團隊面板中，用於顯示盾墻等特殊增益，妳也可以通過修改列表來調整顯示的增益和順序。
+</p>
+<p>
+    1. 增益/減益/職業增益的屬性(例如位置，行列等)都可以在菜單中進行配置。
+</p>
+<br/><br/>
+<p>
 <lime>2016/09/23 v125 : </lime>
 </p><br/>
 <p>
@@ -621,3 +631,33 @@ L["IsEquipSet"] = "裝備配置方案中"
 L["The slot has item, and the item is in a equip set."] = "物品槽中有物品存在，並且該物品屬於某個裝備配置方案"
 
 L["Tooltip Filter(Use ';' to seperate)"] = "鼠標提示信息過濾(使用';'號來間隔)"
+
+L["Class Buff indicator"] = "職業增益指示器"
+L["Buff Panel"] = "增益面板"
+L["Debuff Panel"] = "減益面板"
+L["Class Buff Panel"] = "職業增益面板"
+L["Column Count"] = "列數"
+L["Row Count"] = "行數"
+
+L["TOPLEFT"] = "左上角"
+L["TOPRIGHT"] = "右上角"
+L["BOTTOMLEFT"] = "左下角"
+L["BOTTOMRIGHT"] = "右下角"
+L["TOP"] = "上側"
+L["BOTTOM"] = "下側"
+L["LEFT"] = "左側"
+L["RIGHT"] = "右側"
+L["CENTER"] = "中間"
+
+L["Top to Bottom"] = "從上到下"
+L["Left to Right"] = "從左到右"
+L["Show tooltip"] = "顯示提示信息"
+L["Right-click to black list"] = "右鍵送至黑名單"
+L["Show on player"] = "顯示玩家自身"
+L["Black List"] = "黑名單"
+L["ClassBuff list"] = "職業增益列表"
+L["The buff would be shown follow the order"] = "增益將按照順序顯示"
+L["Please input the class buff's id or name"] = "請輸入職業增益的id或者名字"
+L["Are you sure to delete the class buff"] = "是否確定刪除該職業增益"
+L["Export"] = "導出"
+L["Import"] = "導入"

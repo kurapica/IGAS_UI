@@ -152,7 +152,7 @@ function LoadConfig(_DBChar)
 		_RaidPetPanelSet.ShowSolo = true
 		_RaidPetPanelSet.GroupBy = "GROUP"
 		_RaidPetPanelSet.SortBy = "INDEX"
-		_RaidPetPanelSet.Orientation = "HORIZONTAL"
+		_RaidPetPanelSet.Orientation = "VERTICAL"
 	end
 
 	if not next(_RaidDeadPanelSet) then
@@ -167,7 +167,7 @@ function LoadConfig(_DBChar)
 
 	if not next(_RaidUnitWatchSet) then
 		_RaidUnitWatchSet.Orientation = "HORIZONTAL"
-		_RaidUnitWatchSet.UnitList = { "tank", "tanktarget" }
+		_RaidUnitWatchSet.UnitList = { "target", "tank", "tanktarget" }
 		_RaidUnitWatchSet.AutoLayout = true
 	end
 
@@ -211,8 +211,75 @@ function LoadConfig(_DBChar)
 	UpdatePowerHeight()
 
 	-- Aura Size
-	_DBChar.AuraSize = _DBChar.AuraSize or 16
-	UpdateAuraSizeForAll()
+	_DBChar.AuraSize = nil
+	_DBChar.BuffPanelSet = _DBChar.BuffPanelSet or {
+		ColumnCount = 3,
+		RowCount = 2,
+		ElementSize = 16,
+		Orientation = Orientation.HORIZONTAL,
+		Location = { AnchorPoint("TOPLEFT", 0, 0, "iHealthBar") },
+		TopToBottom = true,
+		LeftToRight = true,
+		ShowTooltip = true,
+		RightRemove = true,
+	}
+	UpdateAuraPanelForAll(iBuffPanel, _DBChar.BuffPanelSet)
+
+	_M["mnuBuffColumnCount" .. _DBChar.BuffPanelSet.ColumnCount].Checked = true
+	_M["mnuBuffRowCount" .. _DBChar.BuffPanelSet.RowCount].Checked = true
+	_M["mnuBuffAuraSize"].Text = L"Aura Size : " .. _DBChar.BuffPanelSet.ElementSize
+	_M["mnuBuffOrientation_" .. _DBChar.BuffPanelSet.Orientation].Checked = true
+	_M["mnuBuffLoc_" .. _DBChar.BuffPanelSet.Location[1].point].Checked = true
+	_M["mnuBuffTopToBottom"].Checked = _DBChar.BuffPanelSet.TopToBottom
+	_M["mnuBuffLeftToRight"].Checked = _DBChar.BuffPanelSet.LeftToRight
+	_M["mnuBuffShowTooltip"].Checked = _DBChar.BuffPanelSet.ShowTooltip
+	_M["mnuBuffRightRemove"].Checked = _DBChar.BuffPanelSet.RightRemove
+
+	_DBChar.DebuffPanelSet = _DBChar.DebuffPanelSet or {
+		ColumnCount = 3,
+		RowCount = 2,
+		ElementSize = 16,
+		Orientation = Orientation.VERTICAL,
+		Location = { AnchorPoint("BOTTOMRIGHT", 0, 0, "iHealthBar") },
+		TopToBottom = false,
+		LeftToRight = false,
+		ShowTooltip = true,
+		RightRemove = true,
+	}
+	UpdateAuraPanelForAll(iDebuffPanel, _DBChar.DebuffPanelSet)
+
+	_M["mnuDebuffColumnCount" .. _DBChar.DebuffPanelSet.ColumnCount].Checked = true
+	_M["mnuDebuffRowCount" .. _DBChar.DebuffPanelSet.RowCount].Checked = true
+	_M["mnuDebuffAuraSize"].Text = L"Aura Size : " .. _DBChar.DebuffPanelSet.ElementSize
+	_M["mnuDebuffOrientation_" .. _DBChar.DebuffPanelSet.Orientation].Checked = true
+	_M["mnuDebuffLoc_" .. _DBChar.DebuffPanelSet.Location[1].point].Checked = true
+	_M["mnuDebuffTopToBottom"].Checked = _DBChar.DebuffPanelSet.TopToBottom
+	_M["mnuDebuffLeftToRight"].Checked = _DBChar.DebuffPanelSet.LeftToRight
+	_M["mnuDebuffShowTooltip"].Checked = _DBChar.DebuffPanelSet.ShowTooltip
+	_M["mnuDebuffRightRemove"].Checked = _DBChar.DebuffPanelSet.RightRemove
+
+	_DBChar.ClassBuffPanelSet = _DBChar.ClassBuffPanelSet or {
+		ColumnCount = 3,
+		RowCount = 2,
+		ElementSize = 16,
+		Orientation = Orientation.HORIZONTAL,
+		Location = { AnchorPoint("BOTTOM", 0, 0, "iHealthBar") },
+		TopToBottom = false,
+		LeftToRight = true,
+		ShowTooltip = false,
+		ShowOnPlayer = true,
+	}
+	UpdateAuraPanelForAll(iClassBuffPanel, _DBChar.ClassBuffPanelSet)
+
+	_M["mnuClassBuffColumnCount" .. _DBChar.ClassBuffPanelSet.ColumnCount].Checked = true
+	_M["mnuClassBuffRowCount" .. _DBChar.ClassBuffPanelSet.RowCount].Checked = true
+	_M["mnuClassBuffAuraSize"].Text = L"Aura Size : " .. _DBChar.ClassBuffPanelSet.ElementSize
+	_M["mnuClassBuffOrientation_" .. _DBChar.ClassBuffPanelSet.Orientation].Checked = true
+	_M["mnuClassBuffLoc_" .. _DBChar.ClassBuffPanelSet.Location[1].point].Checked = true
+	_M["mnuClassBuffTopToBottom"].Checked = _DBChar.ClassBuffPanelSet.TopToBottom
+	_M["mnuClassBuffLeftToRight"].Checked = _DBChar.ClassBuffPanelSet.LeftToRight
+	_M["mnuClassBuffShowTooltip"].Checked = _DBChar.ClassBuffPanelSet.ShowTooltip
+	_M["mnuClassBuffShowOnPlayer"].Checked = _DBChar.ClassBuffPanelSet.ShowOnPlayer
 
 	-- Load Config
 	SetLocation(_DBChar.PetPanelLocation)
@@ -343,16 +410,18 @@ function LoadConfig(_DBChar)
 	_DebuffBlackList = _DB.DebuffBlackList
 
 	-- Buff filter
-	_DBChar.BuffBlackList = _DBChar.BuffBlackList or {}
-	_BuffBlackList = _DBChar.BuffBlackList
+	_DBChar.BuffBlackList = nil
+	_DB.BuffBlackList = _DB.BuffBlackList or {}
+	_BuffBlackList = _DB.BuffBlackList
+
+	-- ClassBuff filter
+	_DB.ClassBuffList = _DB.ClassBuffList or BaseClassBuffList
+	_ClassBuffList = _DB.ClassBuffList
+	BuildClassBuffMap()
 
 	-- Default true
-	if _DBChar.DebuffRightMouseRemove == nil then _DBChar.DebuffRightMouseRemove = true end
-	if _DBChar.ShowDebuffTooltip == nil then _DBChar.ShowDebuffTooltip = true end
-
-	mnuRaidPanelDebuffRightMouseRemove.Checked = _DBChar.DebuffRightMouseRemove
-	mnuRaidPanelDebuffShowTooltip.Checked = _DBChar.ShowDebuffTooltip
-	UpdateAllAuraIconTip()
+	_DBChar.DebuffRightMouseRemove = nil
+	_DBChar.ShowDebuffTooltip = nil
 
 	-- Spell bindings
 	if _DBChar.SpellBindings then
@@ -582,16 +651,6 @@ function mnuRaidPanelSetPowerHeight:OnClick()
 	end
 end
 
-function mnuRaidPanelSetAuraSize:OnClick()
-	local value = tonumber(IGAS:MsgBox(L"Please input the aura's size(px)", "ic") or nil)
-
-	if value and value > 0 then
-		_DBChar[_LoadingConfig].AuraSize = value
-
-		return UpdateAuraSizeForAll()
-	end
-end
-
 function mnuRaidPanelSetUseClassColor:OnCheckChanged()
 	if raidPanelConfig.Visible then
 		_DBChar[_LoadingConfig].ElementUseClassColor = self.Checked
@@ -787,22 +846,6 @@ function roleDeadFilterArray:OnCheckChanged(index)
 	end
 end
 
-function mnuRaidPanelDebuffRightMouseRemove:OnCheckChanged()
-	if raidPanelConfig.Visible then
-		_DBChar[_LoadingConfig].DebuffRightMouseRemove = self.Checked
-
-		UpdateAllAuraIconTip()
-	end
-end
-
-function mnuRaidPanelDebuffShowTooltip:OnCheckChanged()
-	if raidPanelConfig.Visible then
-		_DBChar[_LoadingConfig].ShowDebuffTooltip = self.Checked
-
-		UpdateAllAuraIconTip()
-	end
-end
-
 function mnuRaidUnitWatchList:OnClick()
 	lstWatchUnit.Keys = _RaidUnitWatchSet.UnitList
 	lstWatchUnit.Items = _RaidUnitWatchSet.UnitList
@@ -826,6 +869,54 @@ function mnuRaidPanelModifyAnchors:OnClick()
 	IGAS:ManageAnchorPoint(raidPanel, nil, true)
 
 	_DBChar[_LoadingConfig].Location = raidPanel.Location
+end
+
+function auraPanelCheckArray:OnCheckChanged(index)
+	if raidPanelConfig.Visible then
+		local chkBtn = self[index]
+		local set = chkBtn.ConfigSet
+
+		if chkBtn.IsToggle then
+			_DBChar[_LoadingConfig][set][chkBtn.ConfigName] = chkBtn.Checked
+
+			if set == "BuffPanelSet" then
+				return UpdateAuraPanelForAll(iBuffPanel, _DBChar[_LoadingConfig][set])
+			elseif set == "DebuffPanelSet" then
+				return UpdateAuraPanelForAll(iDebuffPanel, _DBChar[_LoadingConfig][set])
+			elseif set == "ClassBuffPanelSet" then
+				return UpdateAuraPanelForAll(iClassBuffPanel, _DBChar[_LoadingConfig][set])
+			end
+		elseif chkBtn.Checked then
+			_DBChar[_LoadingConfig][set][chkBtn.ConfigName] = chkBtn.ConfigValue
+
+			if set == "BuffPanelSet" then
+				return UpdateAuraPanelForAll(iBuffPanel, _DBChar[_LoadingConfig][set])
+			elseif set == "DebuffPanelSet" then
+				return UpdateAuraPanelForAll(iDebuffPanel, _DBChar[_LoadingConfig][set])
+			elseif set == "ClassBuffPanelSet" then
+				return UpdateAuraPanelForAll(iClassBuffPanel, _DBChar[_LoadingConfig][set])
+			end
+		end
+	end
+end
+
+function auraPanelSizeArray:OnClick(index)
+	local set = self[index].ConfigSet
+	local value = tonumber(IGAS:MsgBox(L"Please input the aura's size(px)", "ic") or nil)
+
+	if value and value > 0 then
+		_DBChar[_LoadingConfig][set].ElementSize = value
+		if set == "BuffPanelSet" then
+			_M["mnuBuffAuraSize"].Text = L"Aura Size : " .. _DBChar[_LoadingConfig][set].ElementSize
+			return UpdateAuraPanelForAll(iBuffPanel, _DBChar[_LoadingConfig][set])
+		elseif set == "DebuffPanelSet" then
+			_M["mnuDebuffAuraSize"].Text = L"Aura Size : " .. _DBChar[_LoadingConfig][set].ElementSize
+			return UpdateAuraPanelForAll(iDebuffPanel, _DBChar[_LoadingConfig][set])
+		elseif set == "ClassBuffPanelSet" then
+			_M["mnuClassBuffAuraSize"].Text = L"Aura Size : " .. _DBChar[_LoadingConfig][set].ElementSize
+			return UpdateAuraPanelForAll(iClassBuffPanel, _DBChar[_LoadingConfig][set])
+		end
+	end
 end
 
 function btnAdd:OnClick()
@@ -906,6 +997,15 @@ end
 --------------------
 -- Tool function
 --------------------
+function BuildClassBuffMap()
+	_ClassBuffMap = _ClassBuffMap or {}
+	wipe(_ClassBuffMap)
+
+	for i, v in ipairs(_ClassBuffList) do
+		_ClassBuffMap[v] = i
+	end
+end
+
 function AddType4Config(type, text)
 	local name = System.Reflector.GetNameSpaceName(type)
 	local btn = raidPanelConfig:AddMenuButton(L"Indicator", text)
@@ -1006,36 +1106,6 @@ function UpdatePowerHeight()
 	mnuRaidPanelSetPowerHeight.Text = L"Power Height : " .. tostring(value)
 end
 
-function UpdateAuraSizeForAll()
-	local font = AuraCountFont.Font
-	font.height = _DBChar[_LoadingConfig].AuraSize
-	AuraCountFont.Font = font
-
-	raidPanel:Each(UpdateAuraSizeForFrame)
-	raidPetPanel:Each(UpdateAuraSizeForFrame)
-	raidUnitWatchPanel:Each(UpdateAuraSizeForFrame)
-
-	mnuRaidPanelSetAuraSize.Text = L"Aura Size : " .. tostring(_DBChar[_LoadingConfig].AuraSize)
-end
-
-function UpdateAuraSizeForFrame(unitframe)
-	local value = _DBChar[_LoadingConfig].AuraSize
-
-	ele = unitframe:GetElement(iBuffPanel)
-
-	if ele then
-		ele.ElementWidth = value
-		ele.ElementHeight = value
-	end
-
-	local ele = unitframe:GetElement(iDebuffPanel)
-
-	if ele then
-		ele.ElementWidth = value
-		ele.ElementHeight = value
-	end
-end
-
 function InitUnitFrame(unitframe)
 	raidpanelMenuArray:Each(UpdateConfig4MenuBtn, unitframe)
 
@@ -1045,31 +1115,51 @@ function InitUnitFrame(unitframe)
 		unitframe:AddElement(iPowerBar, "south", _DBChar[_LoadingConfig].PowerHeight, "px")
 	end
 
-	UpdateAuraSizeForFrame(unitframe)
+	-- Init the aura panels
+	UpdateAuraPanel(unitframe, iBuffPanel, _DBChar[_LoadingConfig].BuffPanelSet)
+	UpdateAuraPanel(unitframe, iDebuffPanel, _DBChar[_LoadingConfig].DebuffPanelSet)
+	UpdateAuraPanel(unitframe, iClassBuffPanel, _DBChar[_LoadingConfig].ClassBuffPanelSet)
 end
 
-function UpdateAuraIconTip(self, showTooltip, enableMouse)
-	local ele = self:GetElement(iDebuffPanel)
+-- Aura Panels
+function UpdateAuraPanel(self, type, config)
+	local ele = self:GetElement(type)
 	if ele then
-		ele:Each("ShowTooltip", showTooltip)
-		ele:Each("MouseEnabled", enableMouse)
+		ele.ColumnCount = config.ColumnCount
+		ele.RowCount = config.RowCount
+		ele.ElementWidth = config.ElementSize
+		ele.ElementHeight = config.ElementSize
+		ele.Orientation = config.Orientation
+		ele.TopToBottom = config.TopToBottom
+		ele.LeftToRight = config.LeftToRight
+		ele.Location = config.Location
+
+		ele:Each("ShowTooltip", config.ShowTooltip)
+		ele:Each("MouseEnabled", config.ShowTooltip or config.RightRemove)
+	end
+end
+
+function UpdateAuraPanelForAll(type, config)
+	if type == iBuffPanel then
+		local font = AuraCountFont_Buff.Font
+		font.height = config.ElementSize
+		AuraCountFont_Buff.Font = font
+	elseif type == iDebuffPanel then
+		local font = AuraCountFont_Debuff.Font
+		font.height = config.ElementSize
+		AuraCountFont_Debuff.Font = font
+	elseif type == iClassBuffPanel then
+		local font = AuraCountFont_ClassBuff.Font
+		font.height = config.ElementSize
+		AuraCountFont_ClassBuff.Font = font
 	end
 
-	ele = self:GetElement(iBuffPanel)
-	if ele then
-		ele:Each("ShowTooltip", showTooltip)
-		ele:Each("MouseEnabled", enableMouse)
-	end
+	raidPanel:Each(UpdateAuraPanel, type, config)
+	raidPetPanel:Each(UpdateAuraPanel, type, config)
+	raidUnitWatchPanel:Each(UpdateAuraPanel, type, config)
 end
 
-function UpdateAllAuraIconTip()
-	local showTooltip = _DBChar[_LoadingConfig].ShowDebuffTooltip
-	local enableMouse = _DBChar[_LoadingConfig].ShowDebuffTooltip or _DBChar[_LoadingConfig].DebuffRightMouseRemove
-
-	raidPanel:Each(UpdateAuraIconTip, showTooltip, enableMouse)
-	raidPetPanel:Each(UpdateAuraIconTip, showTooltip, enableMouse)
-	raidUnitWatchPanel:Each(UpdateAuraIconTip, showTooltip, enableMouse)
-end
+-- Unit List
 
 local _TempList = {}
 local _TankList = {}

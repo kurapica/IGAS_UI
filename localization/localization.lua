@@ -4,6 +4,16 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/10/01 v126 : </lime>
+</p><br/>
+<p>
+    1. A new class buff panel is added to raidpanel, used to show the class's ability like Shield Block, also you can modify the list by yourself.
+</p>
+<p>
+    1. The buff/debuff/class buff panel's settings like location, grid set and others can be modified through the menu.
+</p>
+<br/><br/>
+<p>
 <lime>2016/09/23 v125 : </lime>
 </p><br/>
 <p>

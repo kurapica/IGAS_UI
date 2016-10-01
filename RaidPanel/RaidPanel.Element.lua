@@ -10,9 +10,14 @@ import "System.Widget.Unit"
 --==========================
 -- Global
 --==========================
-AuraCountFont = Font("IGAS_AuraCountFont")
-AuraCountFont:CopyFontObject("NumberFontNormal")
+AuraCountFont_Buff = Font("IGAS_BuffCountFont")
+AuraCountFont_Buff:CopyFontObject("NumberFontNormal")
 
+AuraCountFont_Debuff = Font("IGAS_DebuffCountFont")
+AuraCountFont_Debuff:CopyFontObject("NumberFontNormal")
+
+AuraCountFont_ClassBuff = Font("IGAS_ClassBuffCountFont")
+AuraCountFont_ClassBuff:CopyFontObject("NumberFontNormal")
 --==========================
 -- Elements
 --==========================
@@ -156,7 +161,7 @@ class "iBuffPanel"
 	-- Event Handler
 	------------------------------------------------------
 	local function OnMouseUp(self, button)
-		if button == "RightButton" and _DBChar[GetSpecialization() or 1].DebuffRightMouseRemove and not UnitCanAttack("player", self.Parent.Unit) then
+		if button == "RightButton" and _DBChar[GetSpecialization() or 1].BuffPanelSet.RightRemove and not UnitCanAttack("player", self.Parent.Unit) then
 			local name, _, _, _, _, _, _, _, _, _, spellID = UnitAura(self.Parent.Unit, self.Index, self.Parent.Filter)
 
 			if name then
@@ -168,10 +173,10 @@ class "iBuffPanel"
 	end
 
 	local function OnElementAdd(self, element)
-		element:GetChild("Count").FontObject = AuraCountFont
+		element:GetChild("Count").FontObject = AuraCountFont_Buff
 
-		element.ShowTooltip = _DBChar[GetSpecialization() or 1].ShowDebuffTooltip
-		element.MouseEnabled = _DBChar[GetSpecialization() or 1].ShowDebuffTooltip or _DBChar[GetSpecialization() or 1].DebuffRightMouseRemove
+		element.ShowTooltip = _DBChar[GetSpecialization() or 1].BuffPanelSet.ShowTooltip
+		element.MouseEnabled = _DBChar[GetSpecialization() or 1].BuffPanelSet.ShowTooltip or _DBChar[GetSpecialization() or 1].BuffPanelSet.RightRemove
 		element.OnMouseUp = element.OnMouseUp + OnMouseUp
 	end
 
@@ -186,7 +191,7 @@ class "iBuffPanel"
 		self.RowCount = 2
 		self.ElementWidth = 16
 		self.ElementHeight = 16
-		self.Orientation = Orientation.VERTICAL
+		self.Orientation = Orientation.HORIZONTAL
 
 		self.OnElementAdd = self.OnElementAdd + OnElementAdd
     end
@@ -226,7 +231,7 @@ class "iDebuffPanel"
 	-- Event Handler
 	------------------------------------------------------
 	local function OnMouseUp(self, button)
-		if button == "RightButton" and _DBChar[GetSpecialization() or 1].DebuffRightMouseRemove and not UnitCanAttack("player", self.Parent.Unit) then
+		if button == "RightButton" and _DBChar[GetSpecialization() or 1].DebuffPanelSet.RightRemove and not UnitCanAttack("player", self.Parent.Unit) then
 			local name, _, _, _, _, _, _, _, _, _, spellID = UnitAura(self.Parent.Unit, self.Index, self.Parent.Filter)
 
 			if name then
@@ -238,8 +243,10 @@ class "iDebuffPanel"
 	end
 
 	local function OnElementAdd(self, element)
-		element.ShowTooltip = _DBChar[GetSpecialization() or 1].ShowDebuffTooltip
-		element.MouseEnabled = _DBChar[GetSpecialization() or 1].ShowDebuffTooltip or _DBChar[GetSpecialization() or 1].DebuffRightMouseRemove
+		element:GetChild("Count").FontObject = AuraCountFont_Debuff
+
+		element.ShowTooltip = _DBChar[GetSpecialization() or 1].DebuffPanelSet.ShowTooltip
+		element.MouseEnabled = _DBChar[GetSpecialization() or 1].DebuffPanelSet.ShowTooltip or _DBChar[GetSpecialization() or 1].DebuffPanelSet.RightRemove
 		element.OnMouseUp = element.OnMouseUp + OnMouseUp
 	end
 
@@ -254,7 +261,7 @@ class "iDebuffPanel"
 		self.RowCount = 2
 		self.ElementWidth = 16
 		self.ElementHeight = 16
-		self.Orientation = Orientation.HORIZONTAL
+		self.Orientation = Orientation.VERTICAL
 		self.TopToBottom = false
 		self.LeftToRight = false
 
@@ -318,3 +325,114 @@ class "iRoleIcon"
 		self.TexturePath = nil
 	end
 endclass "iRoleIcon"
+
+class "iClassBuffPanel"
+	inherit "AuraPanel"
+
+	------------------------------------------------------
+	-- Method
+	------------------------------------------------------
+	function UpdateAuras(self)
+		if unit then
+			if UnitCanAttack("player", unit) then
+				-- So nothing should be shown
+				self.Filter = "HELPFUL|PLAYER"
+			else
+				self.Filter = "HELPFUL"
+			end
+		end
+
+		local index = 1
+		local i = 0
+		local name
+		local unit = self.Unit
+		local filter = self.Filter
+		local maxCount = self.MaxCount
+
+		wipe(self.PriorityIndex)
+		wipe(self.PriorityMap)
+
+		if unit and ( unit ~= "player" or _DBChar[GetSpecialization() or 1].ClassBuffPanelSet.ShowOnPlayer ) then
+			local priorityIndex = self.PriorityIndex
+			local priorityMap = self.PriorityMap
+
+			local name, _, _, _, _, _, _, caster, isStealable, _, spellID, _, isBossDebuff = UnitAura(unit, index, filter)
+
+			while name and spellID do
+				if _ClassBuffMap[name] or _ClassBuffMap[spellID] then
+					local priority = _ClassBuffMap[name] or _ClassBuffMap[spellID]
+					local placed = false
+
+					for j = 1, i do
+						if priorityMap[j] > priority then
+							placed = true
+
+							i = math.min(i + 1, self.MaxCount)
+
+							for k = i, j + 1, -1 do
+								priorityIndex[k] = priorityIndex[k-1]
+								priorityMap[k] = priorityMap[k-1]
+							end
+
+							priorityIndex[j] = index
+							priorityMap[j] = priority
+
+							break
+						end
+					end
+
+					if not placed and i < self.MaxCount then
+						i = i + 1
+						priorityIndex[i] = index
+						priorityMap[i] = priority
+					end
+				end
+
+				index = index + 1
+				name, _, _, _, _, _, _, caster, isStealable, _, spellID, _, isBossDebuff = UnitAura(unit, index, filter)
+			end
+
+			for j = 1, i do
+				self.Element[j]:Refresh(unit, priorityIndex[j], filter)
+			end
+		end
+
+		i = i + 1
+		while i <= self.Count do
+			self.Element[i].Visible = false
+			i = i + 1
+		end
+
+		self:UpdatePanelSize()
+	end
+
+	------------------------------------------------------
+	-- Event Handler
+	------------------------------------------------------
+	local function OnElementAdd(self, element)
+		element:GetChild("Count").FontObject = AuraCountFont_ClassBuff
+
+		element.ShowTooltip = _DBChar[GetSpecialization() or 1].ClassBuffPanelSet.ShowTooltip
+		element.MouseEnabled = _DBChar[GetSpecialization() or 1].ClassBuffPanelSet.ShowTooltip
+	end
+
+	------------------------------------------------------
+	-- Constructor
+	------------------------------------------------------
+    function iClassBuffPanel(self, name, parent, ...)
+		Super(self, name, parent, ...)
+
+		self.Filter = "HELPFUL"
+		self.ColumnCount = 3
+		self.RowCount = 2
+		self.ElementWidth = 16
+		self.ElementHeight = 16
+		self.Orientation = Orientation.HORIZONTAL
+		self.TopToBottom = false
+
+		self.PriorityIndex = {}
+		self.PriorityMap = {}
+
+		self.OnElementAdd = self.OnElementAdd + OnElementAdd
+    end
+endclass "iClassBuffPanel"
