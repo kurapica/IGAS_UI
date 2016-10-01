@@ -1,3 +1,6 @@
+2016/10/01 v127
+	1. Fix display error for raidpanel's menu.
+
 2016/10/01 v126
 	1. A new class buff panel is added to raidpanel, used to show the class's ability like Shield Block, also you can modify the list by yourself.
 	2. The buff/debuff/class buff panel's settings like location, grid set and others can be modified through the menu.

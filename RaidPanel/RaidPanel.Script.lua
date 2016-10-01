@@ -102,6 +102,8 @@ function OnLoad(self)
 end
 
 function LoadConfig(_DBChar)
+	raidPanelConfig.Visible = false
+
 	-- Load location
 	if _DBChar.Location then
 		raidPanel.Location = _DBChar.Location
@@ -211,6 +213,8 @@ function LoadConfig(_DBChar)
 	UpdatePowerHeight()
 
 	-- Aura Size
+	auraPanelCheckArray:Each("Checked", false)
+
 	_DBChar.AuraSize = nil
 	_DBChar.BuffPanelSet = _DBChar.BuffPanelSet or {
 		ColumnCount = 3,
