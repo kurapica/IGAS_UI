@@ -681,19 +681,22 @@ class "ContainerView"
 
 		codes = ([[
 			local containerList, itemList, filterList, matchText = ...
-			return function()
-				local yield = coroutine.yield
-				local GetContainerItemInfo = GetContainerItemInfo
-				local GetContainerItemQuestInfo = GetContainerItemQuestInfo
-				local GetItemInfo = GetItemInfo
-				local GetItemSpell = GetItemSpell
-				local IsNewItem =  C_NewItems.IsNewItem
-				local BANK_CONTAINER = BANK_CONTAINER
-				local REAGENTBANK_CONTAINER = REAGENTBANK_CONTAINER
-				local GameTooltip = IGAS_UI_Container_Tooltip
-				local BankButtonIDToInvSlotID = BankButtonIDToInvSlotID
-				local ReagentBankButtonIDToInvSlotID = ReagentBankButtonIDToInvSlotID
+			local yield = coroutine.yield
+			local GetContainerItemInfo = GetContainerItemInfo
+			local GetContainerItemQuestInfo = GetContainerItemQuestInfo
+			local GetItemInfo = GetItemInfo
+			local GetItemSpell = GetItemSpell
+			local IsNewItem =  C_NewItems.IsNewItem
+			local BANK_CONTAINER = BANK_CONTAINER
+			local REAGENTBANK_CONTAINER = REAGENTBANK_CONTAINER
+			local GameTooltip = IGAS_UI_Container_Tooltip
+			local BankButtonIDToInvSlotID = BankButtonIDToInvSlotID
+			local ReagentBankButtonIDToInvSlotID = ReagentBankButtonIDToInvSlotID
+			local pcall = pcall
+			local SetInventoryItem = GameTooltip.SetInventoryItem
+			local SetBagItem = GameTooltip.SetBagItem
 
+			return function()
 				for _, bag in ipairs(containerList) do
 					for slot = 1, GetContainerNumSlots(bag) do
 						local _, count, _, quality, readable, lootable, link, _, hasNoValue, itemID = GetContainerItemInfo(bag, slot)
@@ -710,25 +713,30 @@ class "ContainerView"
 						%s
 
 						if %s then
+							local ok, msg
+
 							GameTooltip:SetOwner(UIParent)
 							if bag == BANK_CONTAINER then
-								GameTooltip:SetInventoryItem("player", BankButtonIDToInvSlotID(slot))
+								ok, msg = pcall(SetInventoryItem, GameTooltip,"player", BankButtonIDToInvSlotID(slot))
 							elseif bag == REAGENTBANK_CONTAINER then
-								GameTooltip:SetInventoryItem("player", ReagentBankButtonIDToInvSlotID(slot))
+								ok, msg = pcall(SetInventoryItem, GameTooltip, "player", ReagentBankButtonIDToInvSlotID(slot))
 							else
-								GameTooltip:SetBagItem(bag, slot)
+								ok, msg = pcall(SetBagItem, GameTooltip, bag, slot)
 							end
-							local i = 1
-							local t = _G["IGAS_UI_Container_TooltipTextLeft"..i]
 
-							while t and t:IsShown() do
-								local tipText = t:GetText()
-								if tipText and tipText ~= "" then
-									%s
+							if ok then
+								local i = 1
+								local t = _G["IGAS_UI_Container_TooltipTextLeft"..i]
+
+								while t and t:IsShown() do
+									local tipText = t:GetText()
+									if tipText and tipText ~= "" then
+										%s
+									end
+
+									i = i + 1
+									t = _G["IGAS_UI_Container_TooltipTextLeft"..i]
 								end
-
-								i = i + 1
-								t = _G["IGAS_UI_Container_TooltipTextLeft"..i]
 							end
 							GameTooltip:Hide()
 						end

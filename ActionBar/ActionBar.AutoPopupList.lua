@@ -3,50 +3,6 @@
 -----------------------------------------
 IGAS:NewAddon "IGAS_UI.ActionBar"
 
-_FilterCodeItem = [[
--- itemID : the item's id
-local itemID = ...
-
--- return true to generate a button for the action
-return true
-]]
-
-_FilterCodeToy = [[
--- toyID : the toy's id
--- index : the toy's index that can be used by C_ToyBox.GetToyInfo
-local toyID, index = ...
-
--- return true to generate a button for the action
-return true
-]]
-
-_FilterCodeBattlePet = [[
--- petID : the pet's id
--- index : the pet's index that can be used by C_PetJournal.GetPetInfoByIndex
-local petID, index = ...
-
--- return true to generate a button for the action
-return true
-]]
-
-_FilterCodeMount = [[
--- mountID : the mount's id
--- index : the mount's index that can be used by C_MountJournal.GetMountInfo
-local mountID, index = ...
-
--- return true to generate a button for the action
-return true
-]]
-
-_FilterCodeEquipSet = [[
--- name : the equipset's name
--- index : the equipset's index that can be used by GetEquipmentSetInfo
-local name, index = ...
-
--- return true to generate a button for the action
-return true
-]]
-
 --------------------------------
 -- Designer
 --------------------------------
@@ -58,6 +14,8 @@ autoGenerateForm:SetSize(600, 400)
 autoGenerateForm:SetMinResize(400, 300)
 autoGenerateForm:SetMaxResize(900, 600)
 autoGenerateForm.Visible = false
+autoGenerateForm.Panel.HSpacing = 3
+autoGenerateForm.Panel.VSpacing = 3
 
 autoGenerateForm:AddWidget(List, "west", 100, "px")
 autoList = autoGenerateForm:GetWidget(List)
@@ -80,19 +38,19 @@ btnRemove.Text = "-"
 btnRemove.Style = "Classic"
 btnRemove:ActiveThread("OnClick")
 
-autoGenerateForm:AddWidget("OptionGrp", GroupBox, "north", 160, "px")
-grpOption = autoGenerateForm:GetWidget("OptionGrp")
-grpOption.Caption = ""
-grpOption:SetMinResize(160, 160)
-grpOption:SetMaxResize(300, 300)
-grpOption.Visible = false
-
 autoGenerateForm:AddWidget("CommitGrp", GroupBox, "south", 32, "px")
 grpCommit = autoGenerateForm:GetWidget("CommitGrp")
 grpCommit.Caption = ""
 grpCommit:SetMinResize(120, 32)
 grpCommit:SetMaxResize(300, 32)
 grpCommit.Visible = false
+
+autoGenerateForm:AddWidget("OptionGrp", GroupBox, "rest")
+grpOption = autoGenerateForm:GetWidget("OptionGrp")
+grpOption.Caption = ""
+grpOption:SetMinResize(160, 160)
+grpOption:SetMaxResize(300, 300)
+grpOption.Visible = false
 
 btnApply = NormalButton("btnApply", grpCommit)
 btnApply.Style = "Classic"
@@ -109,10 +67,6 @@ btnSave:SetPoint("CENTER", grpCommit)
 btnSave:SetPoint("RIGHT", btnApply, "LEFT")
 btnSave.Width = 100
 btnSave.Height = 24
-
-autoGenerateForm:AddWidget(CodeEditor, "rest")
-editor = autoGenerateForm:GetWidget(CodeEditor)
-editor.Visible = false
 
 lblType = FontString("lblType", grpOption)
 lblType.FontObject = "ChatFontNormal"
@@ -146,32 +100,18 @@ optMaxActionButtons:SetMinMaxValues(1, 24)
 optMaxActionButtons.Value = 1
 optMaxActionButtons.Enabled = false
 
-chkFilter = CheckBox("chkFilter", grpOption)
-chkFilter:GetChild("Text").FontObject = "ChatFontNormal"
-chkFilter:SetPoint("TOPLEFT", chkAutoGenerate, "BOTTOMLEFT", 0, -16)
-chkFilter:SetPoint("TOPRIGHT", chkAutoGenerate, "BOTTOMRIGHT")
-chkFilter.Text = L"Use filter"
-chkFilter.Checked = false
-
 chkFavourite = CheckBox("chkFavourite", grpOption)
 chkFavourite:GetChild("Text").FontObject = "ChatFontNormal"
-chkFavourite:SetPoint("TOP", chkFilter)
-chkFavourite:SetPoint("RIGHT", -4, 0)
+chkFavourite:SetPoint("TOPLEFT", chkAutoGenerate, "BOTTOMLEFT", 0, -16)
+chkFavourite:SetPoint("TOPRIGHT", chkAutoGenerate, "BOTTOMRIGHT")
 chkFavourite:SetPoint("LEFT", grpOption, "CENTER")
 chkFavourite.Text = L"Only Favourite"
 chkFavourite.Checked = false
 
-chkOrder = CheckBox("chkOrder", grpOption)
-chkOrder:GetChild("Text").FontObject = "ChatFontNormal"
-chkOrder:SetPoint("TOP", chkFilter)
-chkOrder:SetPoint("RIGHT", -4, 0)
-chkOrder:SetPoint("LEFT", grpOption, "CENTER")
-chkOrder.Text = L"Use reverse order"
-chkOrder.Checked = false
-
 cboItemClass = ComboBox("cboItemClass", grpOption)
-cboItemClass:SetPoint("TOPLEFT", chkFilter, "BOTTOMLEFT", 0, -16)
-cboItemClass:SetPoint("TOPRIGHT", chkFilter, "BOTTOMRIGHT")
+cboItemClass:SetPoint("TOPLEFT", chkAutoGenerate, "BOTTOMLEFT", 0, -16)
+cboItemClass:SetPoint("TOPRIGHT", chkAutoGenerate, "BOTTOMRIGHT")
+cboItemClass:SetPoint("RIGHT", grpOption, "CENTER")
 cboItemClass.Value = 0
 
 _AuctionItemClasses = {}
@@ -206,6 +146,16 @@ cboItemSubClass:SetPoint("RIGHT", -4, 0)
 cboItemSubClass:SetPoint("LEFT", grpOption, "CENTER")
 cboItemSubClass.Visible = false
 
+lblFilter = FontString("lblFilter", grpOption)
+lblFilter.FontObject = "ChatFontNormal"
+lblFilter:SetPoint("TOPLEFT", cboItemClass, "BOTTOMLEFT", 0, -16)
+lblFilter.Text = L"Tooltip filter(Like 'Artifact Power', use ';' to seperate)"
+
+txtFilter = SingleTextBox("txtFilter", grpOption)
+txtFilter:SetPoint("TOPLEFT", lblFilter, "BOTTOMLEFT", 0, -16)
+txtFilter.Height = 24
+txtFilter:SetPoint("RIGHT", -4, 0)
+
 --------------------------------
 -- Script
 --------------------------------
@@ -229,19 +179,18 @@ function autoList:OnItemChoosed(key)
 		if cboType.Value == "Item" then
 			cboItemClass.Visible = true
 			cboItemSubClass.Visible = true
-			chkOrder.Visible = true
 			cboItemClass.Value = _autoPopupSet.ItemClass or 0
 			cboItemClass:OnValueChanged(cboItemClass.Value)
 			cboItemSubClass.Value = _autoPopupSet.ItemSubClass or 100
-			chkOrder.Checked = _autoPopupSet.UseReverseOrder
+			lblFilter.Visible = true
+			txtFilter.Visible = true
+			txtFilter.Text = _autoPopupSet.TipFilter or ""
 		else
 			cboItemClass.Visible = false
 			cboItemSubClass.Visible = false
-			chkOrder.Visible = false
+			lblFilter.Visible = false
+			txtFilter.Visible = false
 		end
-		chkFilter.Checked = _autoPopupSet.FilterCode and true or false
-		editor.Visible = chkFilter.Checked
-		editor.Text = _autoPopupSet.FilterCode or ""
 		chkAutoGenerate.Checked = _autoPopupSet.AutoGenerate
 		optMaxActionButtons.Enabled = chkAutoGenerate.Checked
 		optMaxActionButtons.Value = _autoPopupSet.MaxAction or 1
@@ -254,16 +203,13 @@ function autoList:OnItemChoosed(key)
 		cboType.Value = "Item"
 		chkFavourite.Visible = false
 		chkFavourite.Checked = false
-		chkFilter.Checked = false
 		cboItemClass.Visible = true
 		cboItemSubClass.Visible = true
-		chkOrder.Visible = true
-		editor.Visible = false
-		editor.Text = ""
 		chkAutoGenerate.Checked = false
 		optMaxActionButtons.Enabled = false
 		optMaxActionButtons.Value = 1
-		chkOrder.Checked = false
+		lblFilter.Visible = false
+		txtFilter.Visible = false
 
 		grpOption.Visible = false
 		grpCommit.Visible = false
@@ -280,15 +226,17 @@ function cboType:OnValueChanged(key)
 	if cboType.Value == "Item" then
 		cboItemClass.Visible = true
 		cboItemSubClass.Visible = true
-		chkOrder.Visible = true
 		cboItemClass.Value = _autoPopupSet and _autoPopupSet.ItemClass or 0
 		cboItemClass:OnValueChanged(cboItemClass.Value)
 		cboItemSubClass.Value = _autoPopupSet and _autoPopupSet.ItemSubClass or 100
-		chkOrder.Checked = _autoPopupSet and _autoPopupSet.UseReverseOrder
+		lblFilter.Visible = true
+		txtFilter.Visible = true
+		txtFilter.Text = _autoPopupSet and _autoPopupSet.TipFilter or ""
 	else
 		cboItemClass.Visible = false
 		cboItemSubClass.Visible = false
-		chkOrder.Visible = false
+		lblFilter.Visible = false
+		txtFilter.Visible = false
 	end
 end
 
@@ -319,27 +267,6 @@ function chkAutoGenerate:OnValueChanged()
 	end
 end
 
-function chkFilter:OnValueChanged()
-	editor.Visible = self.Checked
-	if editor.Visible and _autoPopupSet then
-		autoGenerateForm.Panel:Layout()
-		if not _autoPopupSet.FilterCode then
-			-- Auto generate code
-			if cboType.Value == "Item" then
-				editor.Text = _FilterCodeItem
-			elseif cboType.Value == "Toy" then
-				editor.Text = _FilterCodeToy
-			elseif cboType.Value == "BattlePet" then
-				editor.Text = _FilterCodeBattlePet
-			elseif cboType.Value == "Mount" then
-				editor.Text = _FilterCodeMount
-			elseif cboType.Value == "EquipSet" then
-				editor.Text = _FilterCodeEquipSet
-			end
-		end
-	end
-end
-
 function btnSave:OnClick()
 	if _autoPopupSet then
 		_autoPopupSet.Type = cboType.Value
@@ -353,27 +280,26 @@ function btnSave:OnClick()
 			else
 				_autoPopupSet.ItemSubClass = nil
 			end
-			_autoPopupSet.UseReverseOrder = chkOrder.Checked
+
+			local filter = txtFilter.Text
+			if type(filter) == "string" then filter = strtrim(filter) end
+			if filter == "" then filter = nil end
+			_autoPopupSet.TipFilter = filter
 		else
 			_autoPopupSet.ItemClass = nil
 			_autoPopupSet.ItemSubClass = nil
-			_autoPopupSet.UseReverseOrder = nil
+			_autoPopupSet.TipFilter = nil
 		end
-		local code = editor.Visible and editor.Text
-		if code then code = strtrim(code) end
-		if not code or code == "" then code = nil end
-		_autoPopupSet.FilterCode = code
 
 		local task = AutoActionTask(_autoPopupSet.Name)
+		task:StopTask()
 
 		task.Type = _autoPopupSet.Type
 		task.OnlyFavourite = _autoPopupSet.OnlyFavourite
 		task.AutoGenerate = _autoPopupSet.AutoGenerate
 		task.MaxAction = _autoPopupSet.MaxAction
-		task.FilterCode = _autoPopupSet.FilterCode
 		task.ItemClass = _autoPopupSet.ItemClass
 		task.ItemSubClass = _autoPopupSet.ItemSubClass
-		task.UseReverseOrder = _autoPopupSet.UseReverseOrder
 
 		return task:RestartTask()
 	end
@@ -395,6 +321,7 @@ function autoGenerateForm:OnShow()
 		autoList:SelectItemByValue(nil)
 		autoList:OnItemChoosed(nil)
 	end
+	Task.NextCall(autoGenerateForm.Panel.Layout, autoGenerateForm.Panel)
 end
 
 function autoGenerateForm:OnHide()

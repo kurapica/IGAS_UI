@@ -4,13 +4,23 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/10/08 v128 : </lime>
+</p><br/>
+<p>
+    1. Remove the filter code and order settings from the auto-gen popup system, add gametooltip filter for it.
+</p>
+<p>
+    2. All auto-gen popup bar of items will used one thread to refresh, so the cost is reduced and no item would be displayed twice.
+</p>
+<br/><br/>
+<p>
 <lime>2016/10/01 v126 : </lime>
 </p><br/>
 <p>
     1. A new class buff panel is added to raidpanel, used to show the class's ability like Shield Block, also you can modify the list by yourself.
 </p>
 <p>
-    1. The buff/debuff/class buff panel's settings like location, grid set and others can be modified through the menu.
+    2. The buff/debuff/class buff panel's settings like location, grid set and others can be modified through the menu.
 </p>
 <br/><br/>
 <p>

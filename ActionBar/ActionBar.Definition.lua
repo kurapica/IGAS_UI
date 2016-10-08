@@ -1450,6 +1450,7 @@ class "AutoActionTask"
 	local resume = coroutine.resume
 	local running = coroutine.running
 	local tpairs = Threading.Iterator
+	local tconcat = table.concat
 
 	local NUM_BAG_FRAMES = _G.NUM_BAG_FRAMES
 	local _ContainerItemList = {}
@@ -1459,6 +1460,251 @@ class "AutoActionTask"
 	local _ContainerItemChangeTask = {}
 	local _ItemMark = 0
 	local _ScanTaskStarted = false
+
+	local _ItemTaskListWithFilter = {}
+	local _ItemTaskListNoFilter = {}
+
+	local _ItemFillIter = function() end
+
+	_GameTooltip = CreateFrame("GameTooltip", "IGAS_UI_ActionBar_Tooltip", UIParent, "GameTooltipTemplate")
+
+	local function matchText(txt, lst)
+		for _, v in ipairs(lst) do
+			if txt:match(v) then
+				return true
+			end
+		end
+		return false
+	end
+
+	local function BuildFillRules()
+		local defines = {}
+		local scanConds = {}
+		local scanCodes = {}
+		local codes = {}
+		local filterList = {}
+
+		for i, task in ipairs(_ItemTaskListWithFilter) do
+			local filter = {}
+
+			task.TipFilter:gsub("[^;]+", function(w)
+				w = strtrim(w)
+				if w ~= "" then
+					tinsert(filter, w)
+				end
+			end)
+			filterList[i] = filter
+
+			local cond = task.ItemSubClass and
+				("cls==%q and subclass==%q"):format(GetItemClassInfo(task.ItemClass), GetItemSubClassInfo(task.ItemClass, task.ItemSubClass)) or
+				("cls==%q"):format(GetItemClassInfo(task.ItemClass))
+
+			tinsert(defines, ("local isTask%d= (%s)\nlocal isFilterMatch%d=false"):format(i, cond, i))
+			tinsert(scanConds, ("isTask%d"):format(i))
+			tinsert(scanCodes, ("isFilterMatch%d=isFilterMatch%d or matchText(tipText,filterList[%d])"):format(i,i,i))
+
+			tinsert(codes, ("if isTask%d and isFilterMatch%d then yield(%d, itemID, true) else"):format(i,i,i))
+		end
+
+		local filterCnt = #_ItemTaskListWithFilter
+
+		for i, task in ipairs(_ItemTaskListNoFilter) do
+			local cond = task.ItemSubClass and
+				("cls==%q and subclass==%q"):format(GetItemClassInfo(task.ItemClass), GetItemSubClassInfo(task.ItemClass, task.ItemSubClass)) or
+				("cls==%q"):format(GetItemClassInfo(task.ItemClass))
+
+			tinsert(defines, ("local isTask%d=(%s)"):format(i+filterCnt, cond))
+
+			tinsert(codes, ("if isTask%d then yield(%d, itemID, false) else"):format(i+filterCnt,i))
+		end
+
+		if #codes == 0 then
+			return function() end
+		else
+			tinsert(codes, " end")
+		end
+
+		codes = tconcat(codes, "") or "if true then return end"
+
+		codes = ([[
+			local _ContainerItemList, _ItemTaskListWithFilter, _ItemTaskListNoFilter, filterList, matchText = ...
+			local GetItemInfo = GetItemInfo
+			local GameTooltip = IGAS_UI_Container_Tooltip
+			local yield = coroutine.yield
+			local ipairs = ipairs
+			local pcall = pcall
+			local SetInventoryItem = GameTooltip.SetInventoryItem
+			local SetItemByID = GameTooltip.SetItemByID
+
+			return function()
+				for _, itemID in ipairs(_ContainerItemList) do
+					local name, _, _, iLevel, reqLevel, cls, subclass, maxStack, equipSlot, _, vendorPrice = GetItemInfo(itemID)
+
+					%s
+
+					if %s then
+						local ok, msg
+
+						GameTooltip:SetOwner(UIParent)
+						ok, msg = pcall(SetItemByID, GameTooltip, itemID)
+
+						if ok then
+							local i = 1
+							local t = _G["IGAS_UI_Container_TooltipTextLeft"..i]
+
+							while t and t:IsShown() do
+								local tipText = t:GetText()
+								if tipText and tipText ~= "" then
+									%s
+								end
+
+								i = i + 1
+								t = _G["IGAS_UI_Container_TooltipTextLeft"..i]
+							end
+						end
+						GameTooltip:Hide()
+					end
+
+					%s
+				end
+			end
+		]]):format(tconcat(defines, "\n"), #scanConds>0 and tconcat(scanConds, " or ") or "false", tconcat(scanCodes, "\n"), codes)
+
+		return loadstring(codes)(_ContainerItemList, _ItemTaskListWithFilter, _ItemTaskListNoFilter, filterList, matchText)
+	end
+
+	local function AutoGenForItems()
+		-- Clear to go
+		for _, task in ipairs(_ItemTaskListWithFilter) do task.rIdx = 1 task.curBtn = nil task.curCnt = 0 end
+		for _, task in ipairs(_ItemTaskListNoFilter) do task.rIdx = 1 task.curBtn = nil task.curCnt = 0 end
+
+		-- Generate buttons
+		for i, itemID, isFilter in tpairs(_ItemFillIter) do
+			local self = isFilter and _ItemTaskListWithFilter[i] or _ItemTaskListNoFilter[i]
+			local root = self.Roots[self.rIdx]
+
+			while root do
+				local autoGen = self.AutoGenerate and not root.FreeMode
+				local maxAction = autoGen and self.MaxAction or 24
+				local btn = self.curBtn or root
+
+				if self.curCnt < maxAction then
+					if self.curCnt > 0 then
+						if not btn.Branch then
+							if autoGen then
+								root:GenerateBranch(self.curCnt)
+								btn.Branch.Visible = btn.Visible
+								btn = btn.Branch
+								btn:SetAutoGenAction("item", itemID)
+								self.curCnt = self.curCnt + 1
+								self.curBtn = btn
+								break
+							end
+						else
+							btn = btn.Branch
+							btn:SetAutoGenAction("item", itemID)
+							self.curCnt = self.curCnt + 1
+							self.curBtn = btn
+							break
+						end
+					else
+						btn:SetAutoGenAction("item", itemID)
+						self.curCnt = self.curCnt + 1
+						self.curBtn = btn
+						break
+					end
+				end
+
+				if autoGen then
+					root:GenerateBranch(self.curCnt > 1 and self.curCnt - 1 or 1)
+				end
+
+				self.rIdx = self.rIdx + 1
+				root = self.Roots[self.rIdx]
+				self.curCnt = 0
+				self.curBtn = nil
+			end
+		end
+
+		-- Clear buttons
+		for _, task in ipairs(_ItemTaskListWithFilter) do
+			local root = task.Roots[task.rIdx]
+			if root then
+				local autoGen = task.AutoGenerate and not root.FreeMode
+				local maxAction = autoGen and task.MaxAction or 24
+				local btn = task.curBtn or root
+
+				if autoGen then
+					root = btn.Root
+					root:GenerateBranch(task.curCnt > 1 and task.curCnt - 1 or 1)
+					if task.curCnt <= 1 then root.Branch:SetAutoGenAction(nil) end
+					if task.curCnt <= 0 then root:SetAutoGenAction(nil) end
+				else
+					btn = btn.Branch
+					while btn do
+						btn:SetAutoGenAction(nil)
+						btn = btn.Branch
+					end
+				end
+			end
+
+			-- Clear
+			for idx = task.rIdx + 1, #task.Roots do
+				local root = task.Roots[idx]
+				local autoGen = task.AutoGenerate and not root.FreeMode
+
+				if autoGen then
+					root:GenerateBranch(1)
+					root.Branch:SetAutoGenAction(nil)
+					root:SetAutoGenAction(nil)
+				else
+					while root do
+						root:SetAutoGenAction(nil)
+						root = root.Branch
+					end
+				end
+			end
+		end
+
+		for _, task in ipairs(_ItemTaskListNoFilter) do
+			local root = task.Roots[task.rIdx]
+			if root then
+				local autoGen = task.AutoGenerate and not root.FreeMode
+				local maxAction = autoGen and task.MaxAction or 24
+				local btn = task.curBtn or root
+
+				if autoGen then
+					root = btn.Root
+					root:GenerateBranch(task.curCnt > 1 and task.curCnt - 1 or 1)
+					if task.curCnt <= 1 then root.Branch:SetAutoGenAction(nil) end
+					if task.curCnt <= 0 then root:SetAutoGenAction(nil) end
+				else
+					btn = btn.Branch
+					while btn do
+						btn:SetAutoGenAction(nil)
+						btn = btn.Branch
+					end
+				end
+			end
+
+			-- Clear
+			for idx = task.rIdx + 1, #task.Roots do
+				local root = task.Roots[idx]
+				local autoGen = task.AutoGenerate and not root.FreeMode
+
+				if autoGen then
+					root:GenerateBranch(1)
+					root.Branch:SetAutoGenAction(nil)
+					root:SetAutoGenAction(nil)
+				else
+					while root do
+						root:SetAutoGenAction(nil)
+						root = root.Branch
+					end
+				end
+			end
+		end
+	end
 
 	local function ScanContainerItems()
 		while true do
@@ -1472,7 +1718,7 @@ class "AutoActionTask"
 			for bag = 0, NUM_BAG_FRAMES do
 				for slot = 1, GetContainerNumSlots(bag) do
 					local itemID = GetContainerItemID(bag, slot)
-					if itemID and GetItemSpell(itemID) and _ContainerItemCache[itemID] ~= _ItemMark then
+					if itemID and GetItemSpell(itemID) and not _AutoGenItemBlackList[itemID] and _ContainerItemCache[itemID] ~= _ItemMark then
 						-- Cache the item with mark
 						_ContainerItemCache[itemID] = _ItemMark
 
@@ -1495,59 +1741,43 @@ class "AutoActionTask"
 			if itemChanged then
 				Debug("Container items changed, start updating")
 
-				local startp, endp = _ContainerTaskStart, _ContainerTaskEnd
+				AutoGenForItems()
+
+				--[[local startp, endp = _ContainerTaskStart, _ContainerTaskEnd
 				_ContainerTaskStart = _ContainerTaskEnd + 1
 				for i = startp, endp do
 					local th = _ContainerItemChangeTask[i]
 					_ContainerItemChangeTask[i] = nil
 					resume(th)
-				end
+				end--]]
 			else
 				Debug("Container items nochange")
 			end
 
-			Task.Wait("BAG_NEW_ITEMS_UPDATED", "BAG_UPDATE")
-			Task.Delay(0.1) --Use delay to block too many BAG_UPDATE at a same time
+			Task.Event("BAG_UPDATE_DELAYED")
+			Task.Next()
 		end
 	end
 
 	local function getItem(self)
-		local filter = self.Filter
 		local itemCls = self.ItemClass
 		local itemSubCls = self.ItemSubClass
 
-		if self.UseReverseOrder then
-			for i = #_ContainerItemList, 1, -1 do
-				local itemID = _ContainerItemList[i]
-				if not _AutoGenItemBlackList[itemID] then
-					local pass = true
-					if itemCls then
-						local cls, subclass = select(12, GetItemInfo(itemID))
-						pass = itemCls == cls and (not itemSubCls or subclass == itemSubCls)
-					end
-					if pass and (not filter or filter(itemID)) then
-						yield("item", itemID)
-					end
+		for _, itemID in ipairs(_ContainerItemList) do
+			if not _AutoGenItemBlackList[itemID] then
+				local pass = true
+				if itemCls then
+					local cls, subclass = select(12, GetItemInfo(itemID))
+					pass = itemCls == cls and (not itemSubCls or subclass == itemSubCls)
 				end
-			end
-		else
-			for _, itemID in ipairs(_ContainerItemList) do
-				if not _AutoGenItemBlackList[itemID] then
-					local pass = true
-					if itemCls then
-						local cls, subclass = select(12, GetItemInfo(itemID))
-						pass = itemCls == cls and (not itemSubCls or subclass == itemSubCls)
-					end
-					if pass and (not filter or filter(itemID)) then
-						yield("item", itemID)
-					end
+				if pass then
+					yield("item", itemID)
 				end
 			end
 		end
 	end
 
 	local function getToy(self)
-		local filter = self.Filter
 		local onlyFavourite = self.OnlyFavourite
 		for i = 1, C_ToyBox.GetNumToys() do
 			local index = C_ToyBox.GetToyFromIndex(i)
@@ -1555,9 +1785,7 @@ class "AutoActionTask"
 				local item = C_ToyBox.GetToyInfo(index)
 				if item and PlayerHasToy(item) then
 					if not onlyFavourite or C_ToyBox.GetIsFavorite(item) then
-						if not filter or filter(item, index) then
-							yield("item", item)
-						end
+						yield("item", item)
 					end
 				end
 			end
@@ -1565,16 +1793,13 @@ class "AutoActionTask"
 	end
 
 	local function getBattlePet(self)
-		local filter = self.Filter
 		local onlyFavourite = self.OnlyFavourite
 		local generated = {}
 		for index = 1, C_PetJournal.GetNumPets() do
 			local petID, speciesID, isOwned, _, _, favorite = C_PetJournal.GetPetInfoByIndex(index)
 			if isOwned and not generated[speciesID] and (not onlyFavourite or favorite) then
 				generated[speciesID] = true
-				if not filter or filter(petID, index) then
-					yield("battlepet", petID)
-				end
+				yield("battlepet", petID)
 			end
 		end
 		generated = nil
@@ -1584,28 +1809,24 @@ class "AutoActionTask"
 
 	local function getMount(self)
 		mountIDS = mountIDS or C_MountJournal.GetMountIDs()
-		local filter = self.Filter
+
 		local onlyFavourite = self.OnlyFavourite
 		for _, id in ipairs(mountIDS) do
 			local creatureName, creatureID, _, _, summonable, _, isFavorite, _, _, _, owned = C_MountJournal.GetMountInfoByID(id)
 			if owned and summonable then
 				if not onlyFavourite or isFavorite then
-					if not filter or filter(id, index) then
-						yield("mount", id)
-					end
+					yield("mount", id)
 				end
 			end
 		end
 	end
 
 	local function getEquipSet(self)
-		local filter = self.Filter
 		local index = 1
 		local name = GetEquipmentSetInfo(index)
 		while name do
-			if not filter or filter(name, index) then
-				yield("equipmentset", name)
-			end
+			yield("equipmentset", name)
+
 			index = index + 1
 			name = GetEquipmentSetInfo(index)
 		end
@@ -1646,6 +1867,11 @@ class "AutoActionTask"
 						break
 					end
 				end
+
+				if autoGen then
+					root:GenerateBranch(cnt > 1 and cnt - 1 or 1)
+				end
+
 				rIdx = rIdx + 1
 				root = roots[rIdx]
 				if root then
@@ -1753,7 +1979,8 @@ class "AutoActionTask"
 	end
 
 	function RestartTask(self)
-		self.TaskMark = (self.TaskMark or 0) + 1
+		self:StopTask()
+
 		if self.Roots and #self.Roots > 0 then
 			return self:StartTask()
 		end
@@ -1774,7 +2001,44 @@ class "AutoActionTask"
 
 		if self.Type == AutoActionTaskType.Item then
 			if not _ScanTaskStarted then _ScanTaskStarted = true Task.ThreadCall(ScanContainerItems) end
-			return Task.ThreadCall(itemTask, self, getItem)
+
+			if self.TipFilter then
+				local existed = false
+				for i, task in ipairs(_ItemTaskListWithFilter) do
+					if task == self then existed = true break end
+				end
+				if not existed then
+					for i, task in ipairs(_ItemTaskListNoFilter) do
+						if task == self then
+							tremove(_ItemTaskListNoFilter, i)
+							break
+						end
+					end
+
+					tinsert(_ItemTaskListWithFilter, self)
+				end
+			else
+				local existed = false
+				for i, task in ipairs(_ItemTaskListNoFilter) do
+					if task == self then existed = true break end
+				end
+				if not existed then
+					for i, task in ipairs(_ItemTaskListWithFilter) do
+						if task == self then
+							tremove(_ItemTaskListWithFilter, i)
+							break
+						end
+					end
+
+					tinsert(_ItemTaskListNoFilter, self)
+				end
+			end
+
+			_ItemFillIter = BuildFillRules()
+
+			return Task.NoCombatCall(AutoGenForItems)
+
+			-- return Task.ThreadCall(itemTask, self, getItem)
 		elseif self.Type == AutoActionTaskType.Toy then
 			return Task.ThreadCall(task, self, getToy, "TOYS_UPDATED")
 		elseif self.Type == AutoActionTaskType.BattlePet then
@@ -1786,7 +2050,35 @@ class "AutoActionTask"
 		end
 	end
 
-	function StopTask(self) self.TaskMark = (self.TaskMark or 0) + 1 end
+	function StopTask(self)
+		self.TaskMark = (self.TaskMark or 0) + 1
+
+		local removed = false
+
+		if self.Type == AutoActionTaskType.Item then
+			for i, task in ipairs(_ItemTaskListNoFilter) do
+				if task == self then
+					removed = true
+					tremove(_ItemTaskListNoFilter, i)
+					break
+				end
+			end
+
+			for i, task in ipairs(_ItemTaskListWithFilter) do
+				if task == self then
+					removed = true
+					tremove(_ItemTaskListWithFilter, i)
+					break
+				end
+			end
+
+			if removed then
+				_ItemFillIter = BuildFillRules()
+
+				return Task.NoCombatCall(AutoGenForItems)
+			end
+		end
+	end
 
 	property "Name" { Type = String }
 
@@ -1799,25 +2091,11 @@ class "AutoActionTask"
 
 	property "MaxAction" { Type = NaturalNumber }
 
-	__Handler__(function(self, code)
-		if code then
-			if code:match("^%s*function") then
-				code = "return " .. code:gsub("^%s*function%s*[^%(]*", "function")
-				self.Filter = assert(loadstring(code))()
-			else
-				self.Filter = loadstring(code)
-			end
-		else
-			self.Filter = nil
-		end
-	end)
-	property "FilterCode" { Type = String }
-
 	property "ItemClass" { Type = Number }
 
 	property "ItemSubClass" { Type = NumberNil }
 
-	property "UseReverseOrder" { Type = Boolean }
+	property "TipFilter" { Type = String }
 
 	_AutoActionTask = {}
 
@@ -1836,10 +2114,9 @@ class "AutoActionTask"
 		self.OnlyFavourite = _DBAutoPopupList[name].OnlyFavourite
 		self.AutoGenerate = _DBAutoPopupList[name].AutoGenerate
 		self.MaxAction = _DBAutoPopupList[name].MaxAction
-		self.FilterCode = _DBAutoPopupList[name].FilterCode
 		self.ItemClass = _DBAutoPopupList[name].ItemClass
 		self.ItemSubClass = _DBAutoPopupList[name].ItemSubClass
-		self.UseReverseOrder = _DBAutoPopupList[name].UseReverseOrder
+		self.TipFilter = _DBAutoPopupList[name].TipFilter
 	end
 
 	function __exist(name) return _AutoActionTask[name] end
