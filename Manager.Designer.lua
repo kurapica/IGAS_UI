@@ -20,12 +20,10 @@ manager.Resizable = false
 TOP = 26
 
 -- Modules
-local lst = _Addon:GetModules()
-
-for i = 1, #lst do
-	if lst[i] ~= _M and lst[i].Toggle then
-		local toggle = lst[i].Toggle
-		local chkToggle = CheckBox("Toggle_"..lst[i]._Name, manager)
+for _, subMdl in _Addon:GetModules() do
+	if subMdl ~= _M and subMdl.Toggle then
+		local toggle = subMdl.Toggle
+		local chkToggle = CheckBox("Toggle_"..subMdl._Name, manager)
 
 		chkToggle:SetPoint("TOP", 0, - TOP)
 		chkToggle:SetPoint("LEFT", 2)

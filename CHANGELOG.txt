@@ -1,3 +1,6 @@
+2016/10/15 v129
+	1. Update for the IGAS v121
+
 2016/10/08 v128
 	1. Remove the filter code and order settings from the auto-gen popup system, add gametooltip filter for it.
 	2. All auto-gen popup bar of items will used one thread to refresh, so the cost is reduced and no item would be displayed twice.
