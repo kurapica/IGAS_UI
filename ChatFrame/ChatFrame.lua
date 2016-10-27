@@ -27,7 +27,7 @@ function OnEnable(self)
 		i = i + 1
 	end
 
-	_G.FriendsMicroButton:Hide()
+	_G.QuickJoinToastButton:Hide()
 
 	_G.ChatFrameMenuButton:ClearAllPoints()
 	_G.ChatFrameMenuButton:SetAlpha(0.1)

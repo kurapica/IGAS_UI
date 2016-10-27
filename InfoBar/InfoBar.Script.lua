@@ -322,6 +322,8 @@ function _Timer:OnTimer()
 
     -- get player x,y
     local x, y = GetPlayerMapPosition("player")
+   	x = x or 0
+   	y = y or 0
     -- if x and y 0 then boo
     if(x == 0 and y == 0) then
         coords = "";

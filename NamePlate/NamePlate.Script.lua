@@ -187,7 +187,8 @@ function UpdateNamePlateOptions()
 	local clampedZeroBasedScale = Saturate(zeroBasedScale)
 
 	Task.NoCombatCall(function()
-		C_NamePlate.SetNamePlateOtherSize(_BaseNamePlateWidth * _HorizontalScale, _BaseNamePlateHeight * Lerp(1.0, 1.25, zeroBasedScale))
+		C_NamePlate.SetNamePlateFriendlySize(_BaseNamePlateWidth * _HorizontalScale, _BaseNamePlateHeight * Lerp(1.0, 1.25, zeroBasedScale))
+		C_NamePlate.SetNamePlateEnemySize(_BaseNamePlateWidth * _HorizontalScale, _BaseNamePlateHeight * Lerp(1.0, 1.25, zeroBasedScale))
 		C_NamePlate.SetNamePlateSelfSize(_BaseNamePlateWidth * _HorizontalScale * Lerp(1.1, 1.0, clampedZeroBasedScale), _BaseNamePlateHeight)
 
 		local font = NAME_FONT.Font

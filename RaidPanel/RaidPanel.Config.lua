@@ -133,7 +133,7 @@ Config = {
 		RangeChecker = {
 			Type = RangeChecker,
 			Location = { AnchorPoint("CENTER", 16, 0, nil, "LEFT") },
-			Property = { UseIndicator = true, FrameStrata="DIALOG" },
+			Property = { UseIndicator = false, FrameStrata="DIALOG" },
 			Locale = L"Range indicator",
 			Index = newIndex(),
 		},
