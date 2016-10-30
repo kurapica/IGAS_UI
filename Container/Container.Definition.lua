@@ -469,6 +469,9 @@ class "ContainerButton"
 		Type = String + Number,
 	}
 
+	__Handler__(function(self, val) self.UpgradeIcon.Visible = val end)
+	property "IsUpgradeItem" { Type = Boolean }
+
 	function ContainerButton(self, ...)
 		Super(self, ...)
 
@@ -478,6 +481,11 @@ class "ContainerButton"
 		lvl.FontObject = Media.NumberFont
 		lvl.JustifyH = "LEFT"
 		lvl:SetPoint("BOTTOMLEFT", 4, 4)
+
+		local upgrade = Texture("UpgradeIcon", self, "OVERLAY", nil, 1)
+		upgrade:SetAtlas("bags-greenarrow", true)
+		upgrade:SetPoint("TOPLEFT")
+		upgrade.Visible = false
 	end
 endclass "ContainerButton"
 
