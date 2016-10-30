@@ -1783,7 +1783,7 @@ class "AutoActionTask"
 			local index = C_ToyBox.GetToyFromIndex(i)
 			if index > 0 then
 				local item = C_ToyBox.GetToyInfo(index)
-				if item and PlayerHasToy(item) then
+				if item and PlayerHasToy(item) and C_ToyBox.IsToyUsable(item) then
 					if not onlyFavourite or C_ToyBox.GetIsFavorite(item) then
 						yield("item", item)
 					end
