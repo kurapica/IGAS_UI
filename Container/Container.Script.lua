@@ -189,6 +189,19 @@ function OnEnable(self)
 
 	tinsert(UISpecialFrames,"IGAS_UI_ContainerHeader")
 	tinsert(UISpecialFrames,"IGAS_UI_BankHeader")
+
+	-- Token List
+	if not _ContainerDB.TokenWatchList then
+		local tbl = {}
+		for i = 1, GetCurrencyListSize() do
+			local name, isHeader, isExpanded, isUnused, isWatched, count, icon = GetCurrencyListInfo(i)
+			if isHeader and i > 1 then break end
+			if not isHeader then
+				tbl[name] = true
+			end
+		end
+		_ContainerDB.TokenWatchList = tbl
+	end
 end
 
 function OpenAllBags()
@@ -582,6 +595,47 @@ function btnApply:OnClick()
 		_ContainerDB.BankViewConfigs = config
 		_BankHeader:ApplyConfig(config, true)
 	end
+end
+
+function mnuShowTokenList:OnClick()
+	tokenWatchManager.Visible = not tokenWatchManager.Visible
+end
+
+function tokenWatchManager:OnShow()
+	local tree = {}
+	local header
+	for i = 1, GetCurrencyListSize() do
+		local name, isHeader, isExpanded, isUnused, isWatched, count, icon = GetCurrencyListInfo(i)
+
+		if isHeader then
+			header = { Text = name, Childs = {} }
+			tinsert(tree, header)
+		elseif header then
+			tinsert(header.Childs, { Text = name })
+		end
+	end
+
+	tokenWatchTree:SetTree(tree)
+
+	tokenWatchList:Clear()
+	for name in pairs(_ContainerDB.TokenWatchList) do
+		tokenWatchList:AddItem(name, name)
+	end
+end
+
+function tokenWatchTree:OnDoubleClick(node)
+	if node.Level == 2 then
+		local name = node.Text
+		if not _ContainerDB.TokenWatchList[name] then
+			_ContainerDB.TokenWatchList[name] = true
+			tokenWatchList:AddItem(name, name)
+		end
+	end
+end
+
+function tokenWatchList:OnItemDoubleClick(key)
+	tokenWatchList:RemoveItem(key)
+	_ContainerDB.TokenWatchList[key] = nil
 end
 
 -------------------------------

@@ -379,9 +379,11 @@ class "BagPanel"
 
 	local function OnElementRemove(self, btn)
 		btn:SetAction(nil)
+		btn:Hide()
 	end
 
 	local function OnElementAdd(self, btn)
+		btn:Show()
 	end
 
 	function BagPanel(self, name, ...)
@@ -1041,6 +1043,118 @@ class "ViewButton"
 	end
 endclass "ViewButton"
 
+class "TokenInfo"
+	inherit "Button"
+
+	local function OnEnter(self)
+		_GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+		_GameTooltip:SetCurrencyToken(self.ID)
+	end
+
+	local function OnLeave(self)
+		_GameTooltip:Hide()
+	end
+
+	__Handler__(function(self, val)
+		if val then
+			local name, isHeader, isExpanded, isUnused, isWatched, count, icon = GetCurrencyListInfo(val)
+			if count and count <= 99999 then
+				self.Count.Text = tostring(count)
+			else
+				self.Count.Text = "*"
+			end
+			self.Icon.TexturePath = icon
+			self.Icon:SetTexCoord(0.06, 0.94, 0.06, 0.94)
+		end
+	end)
+	property "ID" { Type = NumberNil }
+
+	function TokenInfo(self, ...)
+		Super(self, ...)
+
+		local cnt = FontString("Count", self, "ARTWORK", "GameFontHighlight")
+		cnt.JustifyH = "RIGHT"
+		cnt:SetSize(38, 32)
+		cnt:SetPoint("TOPLEFT")
+
+		local mask = Texture("Mask", self)
+		mask:SetSize(32, 32)
+		mask:SetPoint("LEFT", cnt, "RIGHT")
+		mask.DrawLayer = "OVERLAY"
+		mask.TexturePath = Media.BORDER_TEXTURE_PATH
+		mask.VertexColor = Media.PLAYER_CLASS_COLOR
+
+		local icon = Texture("Icon", self, "ARTWORK")
+		icon:SetPoint("TOPLEFT", mask, "TOPLEFT", 2, -2)
+		icon:SetPoint("BOTTOMRIGHT", mask, "BOTTOMRIGHT", -2, 2)
+
+		self.OnEnter = self.OnEnter + OnEnter
+		self.OnLeave = self.OnLeave + OnLeave
+	end
+endclass "TokenInfo"
+
+class "TokenPanel"
+	inherit "Frame"
+	extend "IFElementPanel"
+
+	local CurrentProcess = 0
+
+	local function OnShow(self)
+		local watchList = _ContainerDB.TokenWatchList
+		CurrentProcess = CurrentProcess + 1
+
+		local process = CurrentProcess
+
+		Debug("[TokenPanel] Start process %d", process)
+
+		while self:IsVisible() and process == CurrentProcess do
+			local idx = 1
+
+			if watchList then
+				for i = 1, GetCurrencyListSize() do
+					if idx > self.MaxCount then break end
+
+					local name, isHeader, isExpanded, isUnused, isWatched, count, icon = GetCurrencyListInfo(i)
+					if watchList[name] then
+						self.Element[idx].ID = i
+						self.Element[idx].Visible = true
+						idx = idx + 1
+					end
+				end
+			end
+
+			while idx <= self.Count do
+				self.Element[idx].Visible = false
+				idx = idx + 1
+			end
+
+			self:UpdatePanelSize()
+
+			Task.Delay(1)
+		end
+
+		Debug("[TokenPanel] Stop process %d", process)
+	end
+
+	function TokenPanel(self, ...)
+		Super(self, ...)
+
+		self.AutoSize = true
+		self.ColumnCount = 1
+		self.RowCount = 20
+		self.ElementWidth = 70
+		self.ElementHeight = 32
+		self.HSpacing = 2
+		self.VSpacing = 2
+		self.MouseEnabled = false
+		self.MouseWheelEnabled = false
+		self.ElementType = TokenInfo
+
+		self.OnShow = self.OnShow + OnShow
+		self.OnShow.Delegate = Task.ThreadCall
+	end
+endclass "TokenPanel"
+
 class "ContainerHeader"
 	inherit "SecureFrame"
 	extend "IFSecurePanel"
@@ -1068,39 +1182,31 @@ class "ContainerHeader"
 	local function GenerateBankSlots(bagPanel)
 		if bagPanel.Visible then
 			local num = GetNumBankSlots()
+			local cnt = num
 			for i = 1, num do bagPanel.Element[i]:SetAction("bag", i + 4) end
 			if num < NUM_BANKBAGSLOTS then
 				_G.BankFrame.nextSlotCost = GetBankSlotCost(num)
 
-				num = num + 1
-				bagPanel.Element[num].MacroText = "/click BankFramePurchaseButton"
-				bagPanel.Element[num].CustomTooltip = _G.BANKSLOTPURCHASE
-				bagPanel.Element[num].CustomTexture = [[Interface\PaperDollInfoFrame\Character-Plus]]
-				bagPanel.Element[num]:Refresh()
+				cnt = cnt + 1
+				bagPanel.Element[cnt].MacroText = "/click BankFramePurchaseButton"
+				bagPanel.Element[cnt].CustomTooltip = _G.BANKSLOTPURCHASE
+				bagPanel.Element[cnt].CustomTexture = [[Interface\PaperDollInfoFrame\Character-Plus]]
+				bagPanel.Element[cnt]:Refresh()
 			end
 
-			num = num + 1
-
 			if not IsReagentBankUnlocked() then
-				bagPanel.Element[num].MacroText = "/click ReagentBankFrameUnlockInfoPurchaseButton"
-				bagPanel.Element[num].CustomTooltip = _G.BANKSLOTPURCHASE
-				bagPanel.Element[num].CustomTexture = [[Interface\PaperDollInfoFrame\Character-Plus]]
-				bagPanel.Element[num]:Refresh()
+				cnt = cnt + 1
+				bagPanel.Element[cnt].MacroText = "/click ReagentBankFrameUnlockInfoPurchaseButton"
+				bagPanel.Element[cnt].CustomTooltip = _G.BANKSLOTPURCHASE
+				bagPanel.Element[cnt].CustomTexture = [[Interface\PaperDollInfoFrame\Character-Plus]]
+				bagPanel.Element[cnt]:Refresh()
 			else
-				bagPanel.Element[num].Custom = function()
-					if not InCombatLockdown() then
-						PlaySound("igMainMenuOption")
-						DepositReagentBank()
-					end
-				end
-				bagPanel.Element[num].CustomTooltip = _G.REAGENTBANK_DEPOSIT
-				bagPanel.Element[num].CustomTexture = 644387
-				bagPanel.Element[num]:Refresh()
+				bagPanel.Count = cnt
 			end
 
 			if num < NUM_BANKBAGSLOTS or not IsReagentBankUnlocked() then
 				Task.ThreadCall(function()
-					if Task.Wait("BANKFRAME_CLOSED", "REAGENTBANK_PURCHASED", "PLAYERBANKBAGSLOTS_CHANGED") ~= "BANKFRAME_CLOSED" then
+					if Task.Wait("REAGENTBANK_PURCHASED", "PLAYERBANKBAGSLOTS_CHANGED") then
 						return Task.NextCall(Task.NoCombatCall, GenerateBankSlots, bagPanel)
 					end
 				end)
@@ -1244,6 +1350,19 @@ class "ContainerHeader"
 			end
 			sortBtn:SetAttribute("type", "macro")
 			sortBtn:SetAttribute("macrotext", "/click BankItemAutoSortButton")
+
+			sortBtn = BagButton(name .. "DepositButton", self)
+			sortBtn:SetSize(28, 26)
+			sortBtn:SetPoint("BOTTOMRIGHT", -58, 4)
+			sortBtn.Custom = function()
+				if not InCombatLockdown() and IsReagentBankUnlocked() then
+					PlaySound("igMainMenuOption")
+					DepositReagentBank()
+				end
+			end
+			sortBtn.CustomTooltip = _G.REAGENTBANK_DEPOSIT
+			sortBtn.CustomTexture = 644387
+			sortBtn:Refresh()
 		else
 			sortBtn.PreClick = function()
 				self.StartSort = GetTime()
@@ -1263,6 +1382,12 @@ class "ContainerHeader"
 		-- money frame
 		local moneyFrame = CreateFrame("Frame", name .. "_MoneyFrame", self, "SmallMoneyFrameTemplate")
 		moneyFrame:SetPoint("BOTTOMRIGHT", sortBtn, "BOTTOMLEFT", -4, 4)
+
+		if not isBank then
+			local tokenPanel = TokenPanel("TokenPanel", self)
+			tokenPanel.FrameStrata = "DIALOG"
+			tokenPanel:SetPoint("TOPRIGHT", self, "TOPLEFT", -4, 0)
+		end
 
 		-- Setting
 		local btnContainerSetting = Button("Setting", self)
@@ -1356,7 +1481,7 @@ class "ContainerHeader"
 			if not InCombatLockdown() then
 				if bagPanel.Visible then
 					bagPanel.Visible = false
-					for i = 1, bagPanel.Count do bagPanel.Element[i]:SetAction(nil) end
+					-- for i = 1, bagPanel.Count do bagPanel.Element[i]:SetAction(nil) end
 					self.MarginBottom = 30
 					btnToggleContainer.NormalTexture:SetPoint("CENTER", 0, 0)
 					btnToggleContainer.NormalTexture:SetTexCoord(0, 1, 0.5, 1)
@@ -1365,10 +1490,14 @@ class "ContainerHeader"
 				else
 					self.MarginBottom = 72
 					bagPanel.Visible = true
-					if self.IsBank then
-						GenerateBankSlots(bagPanel)
-					else
-						for i = 0, 4 do bagPanel.Element[i+1]:SetAction("bag", i) end
+					if not self.IsFirstTimeToggled then
+						self.IsFirstTimeToggled = true
+
+						if self.IsBank then
+							GenerateBankSlots(bagPanel)
+						else
+							for i = 0, 4 do bagPanel.Element[i+1]:SetAction("bag", i) end
+						end
 					end
 					btnToggleContainer.NormalTexture:SetPoint("CENTER", 0, 4)
 					btnToggleContainer.NormalTexture:SetTexCoord(0, 1, 0, 0.5)

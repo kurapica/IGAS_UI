@@ -1,3 +1,7 @@
+2016/10/31 v133
+	1. The bank container's deposit button has changed the position to be used more easily.
+	2. The token list would be shown, and the watch list can be modified through the menu.
+
 2016/10/30 v132
 	1. Show the upgrade icon on container buttons, (won't work until blz fix the api).
 

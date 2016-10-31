@@ -13,6 +13,8 @@ mnuModifyAnchor:ActiveThread("OnClick")
 
 mnuShowRuleManager = headerMenu:AddMenuButton(L"Show the view manager")
 
+mnuShowTokenList = headerMenu:AddMenuButton(L"Show the token watch list")
+
 --------------------------
 -- Container
 --------------------------
@@ -104,3 +106,23 @@ btnApply:SetPoint("TOP", htmlCondition, "BOTTOMRIGHT")
 btnApply.Width = 100
 btnApply.Text = L"Apply"
 btnApply.Style = "Classic"
+
+--------------------------
+-- Token Watch List
+--------------------------
+tokenWatchManager = Form("IGAS_UI_ContainerTokenWatchManager")
+tokenWatchManager.Visible = false
+tokenWatchManager:SetSize(510, 400)
+tokenWatchManager.Caption = L"Token Watch List Manager"
+tokenWatchManager.Resizable = false
+tokenWatchManager.Message = L"Double click to add or remove token"
+
+tokenWatchTree = TreeView("TokenTree", tokenWatchManager)
+tokenWatchTree:SetPoint("TOPLEFT", 4, -26)
+tokenWatchTree:SetPoint("BOTTOMLEFT", 4, 32)
+tokenWatchTree.Width = 250
+tokenWatchTree.Style = "Classic"
+
+tokenWatchList = List("TokenList", tokenWatchManager)
+tokenWatchList:SetPoint("TOPLEFT", tokenWatchTree, "TOPRIGHT")
+tokenWatchList:SetPoint("BOTTOMRIGHT", -4, 32)

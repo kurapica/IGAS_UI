@@ -7,6 +7,16 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/10/31 v133 : </lime>
+</p><br/>
+<p>
+    1. 存入銀行倉庫的按鈕位置被調整，以便於使用。
+</p>
+<p>
+    2. 代幣會被顯示在背包視圖上，可以通過菜單修改監視列表。
+</p>
+<br/><br/>
+<p>
 <lime>2016/10/08 v128 : </lime>
 </p><br/>
 <p>
@@ -673,3 +683,11 @@ L["Export"] = "導出"
 L["Import"] = "導入"
 
 L["Tooltip filter(Like 'Artifact Power', use ';' to seperate)"] = "提示信息過濾(比如'神器能量'，使用';'號間隔)"
+
+L["Show the token watch list"] = "显示代币监视列表"
+L["Token Watch List Manager"] = "代币监视列表管理器"
+L["Double click to add or remove token"] = "双击代币来添加或者移除监视"
+
+L["Show the token watch list"] = "顯示代幣監視列表"
+L["Token Watch List Manager"] = "代幣監視列表管理器"
+L["Double click to add or remove token"] = "雙擊代幣來添加或者移除監視"

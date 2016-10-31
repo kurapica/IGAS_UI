@@ -4,6 +4,16 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/10/31 v133 : </lime>
+</p><br/>
+<p>
+    1. The bank container's deposit button has changed the position to be used more easily.
+</p>
+<p>
+    2. The token list would be shown, and the watch list can be modified through the menu.
+</p>
+<br/><br/>
+<p>
 <lime>2016/10/08 v128 : </lime>
 </p><br/>
 <p>
