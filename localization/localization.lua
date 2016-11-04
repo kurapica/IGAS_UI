@@ -4,6 +4,16 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/11/04 v134 : </lime>
+</p><br/>
+<p>
+    1. In raid panel, sending buff/debuff to black list is using alt+right-click, not right-click only.
+</p>
+<p>
+    2. The auto-gen toy bar will remove used in-cooldown toys, so you can always get usable toy in the auto-gen list.
+</p>
+<br/><br/>
+<p>
 <lime>2016/10/31 v133 : </lime>
 </p><br/>
 <p>

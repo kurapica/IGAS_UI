@@ -7,6 +7,16 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/11/04 v134 : </lime>
+</p><br/>
+<p>
+    1. 团队面板中，不再使用右键来将增益/减益送入黑名单，而是使用Alt+右键，避免误操作。
+</p>
+<p>
+    2. 自动生成玩具时会忽略正在冷却的玩具，已保证玩具条上的玩具一直是玩家可用的。
+</p>
+<br/><br/>
+<p>
 <lime>2016/10/31 v133 : </lime>
 </p><br/>
 <p>
@@ -674,7 +684,7 @@ L["CENTER"] = "中间"
 L["Top to Bottom"] = "从上到下"
 L["Left to Right"] = "从左到右"
 L["Show tooltip"] = "显示提示信息"
-L["Right-click to black list"] = "右键送至黑名单"
+L["Alt+Right-click to black list"] = "Alt+右键送至黑名单"
 L["Show on player"] = "显示玩家自身"
 L["Black List"] = "黑名单"
 L["ClassBuff List"] = "职业增益列表"

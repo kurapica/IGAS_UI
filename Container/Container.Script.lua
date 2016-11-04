@@ -445,7 +445,7 @@ function viewRuleTree:OnNodeSelected(node)
 		lblFitler.Visible = false
 		htmlFilter.Visible = false
 		htmlRule.Visible = true
-		htmlRule.Height = viewRuleTree.Height
+		htmlRule.Height = viewRuleTree.Height - 40
 		htmlRule.Node = node
 		htmlRule.Text = buildItemList(node.MetaData.Data)
 	else

@@ -1,3 +1,7 @@
+2016/11/04 v134
+	1. In raid panel, sending buff/debuff to black list is using alt+right-click, not right-click only.
+	2. The auto-gen toy bar will remove used in-cooldown toys, so you can always get usable toy in the auto-gen list.
+
 2016/10/31 v133
 	1. The bank container's deposit button has changed the position to be used more easily.
 	2. The token list would be shown, and the watch list can be modified through the menu.

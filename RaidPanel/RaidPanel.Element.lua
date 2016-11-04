@@ -161,7 +161,7 @@ class "iBuffPanel"
 	-- Event Handler
 	------------------------------------------------------
 	local function OnMouseUp(self, button)
-		if button == "RightButton" and _DBChar[GetSpecialization() or 1].BuffPanelSet.RightRemove and not UnitCanAttack("player", self.Parent.Unit) then
+		if IsAltKeyDown() and button == "RightButton" and _DBChar[GetSpecialization() or 1].BuffPanelSet.RightRemove and not UnitCanAttack("player", self.Parent.Unit) then
 			local name, _, _, _, _, _, _, _, _, _, spellID = UnitAura(self.Parent.Unit, self.Index, self.Parent.Filter)
 
 			if name then
@@ -231,7 +231,7 @@ class "iDebuffPanel"
 	-- Event Handler
 	------------------------------------------------------
 	local function OnMouseUp(self, button)
-		if button == "RightButton" and _DBChar[GetSpecialization() or 1].DebuffPanelSet.RightRemove and not UnitCanAttack("player", self.Parent.Unit) then
+		if IsAltKeyDown() and button == "RightButton" and _DBChar[GetSpecialization() or 1].DebuffPanelSet.RightRemove and not UnitCanAttack("player", self.Parent.Unit) then
 			local name, _, _, _, _, _, _, _, _, _, spellID = UnitAura(self.Parent.Unit, self.Index, self.Parent.Filter)
 
 			if name then

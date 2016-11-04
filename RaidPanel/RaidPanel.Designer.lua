@@ -442,7 +442,7 @@ for i, name in ipairs{L"Buff Panel", L"Debuff Panel", L"Class Buff Panel"} do
 	auraPanelCheckArray:Insert(_M[baseName .. "ShowTooltip"])
 
 	if i <= 2 then
-		_M[baseName .. "RightRemove"] = raidPanelConfig:AddMenuButton(L"Element Settings", name, L"Right-click to black list")
+		_M[baseName .. "RightRemove"] = raidPanelConfig:AddMenuButton(L"Element Settings", name, L"Alt+Right-click to black list")
 		_M[baseName .. "RightRemove"].IsCheckButton = true
 		_M[baseName .. "RightRemove"].ConfigName = "RightRemove"
 		_M[baseName .. "RightRemove"].IsToggle = true
