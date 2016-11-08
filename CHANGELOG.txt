@@ -1,3 +1,6 @@
+2016/11/08 v135
+	1. Fix the token panel's width to show value more than 10000.
+
 2016/11/04 v134
 	1. In raid panel, sending buff/debuff to black list is using alt+right-click, not right-click only.
 	2. The auto-gen toy bar will remove used in-cooldown toys, so you can always get usable toy in the auto-gen list.

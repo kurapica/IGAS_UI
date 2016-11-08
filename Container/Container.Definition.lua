@@ -1074,7 +1074,7 @@ class "TokenInfo"
 
 		local cnt = FontString("Count", self, "ARTWORK", "GameFontHighlight")
 		cnt.JustifyH = "RIGHT"
-		cnt:SetSize(38, 32)
+		cnt:SetSize(68, 32)
 		cnt:SetPoint("TOPLEFT")
 
 		local mask = Texture("Mask", self)
@@ -1142,7 +1142,7 @@ class "TokenPanel"
 		self.AutoSize = true
 		self.ColumnCount = 1
 		self.RowCount = 20
-		self.ElementWidth = 70
+		self.ElementWidth = 100
 		self.ElementHeight = 32
 		self.HSpacing = 2
 		self.VSpacing = 2
