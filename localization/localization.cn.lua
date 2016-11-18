@@ -7,6 +7,13 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/11/18 v136 : </lime>
+</p><br/>
+<p>
+    1. 背包会显示它们的名字，可以在背包视图管理器中进行修改。
+</p>
+<br/><br/>
+<p>
 <lime>2016/11/04 v134 : </lime>
 </p><br/>
 <p>
@@ -699,3 +706,5 @@ L["Tooltip filter(Like 'Artifact Power', use ';' to seperate)"] = "提示信息�
 L["Show the token watch list"] = "显示代币监视列表"
 L["Token Watch List Manager"] = "代币监视列表管理器"
 L["Double click to add or remove token"] = "双击代币来添加或者移除监视"
+
+L["Please input the container's name"] = "请输入背包的名称"

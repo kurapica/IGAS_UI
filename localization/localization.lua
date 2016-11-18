@@ -4,6 +4,13 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/11/18 v136 : </lime>
+</p><br/>
+<p>
+    1. The containers will show their names, and the names can be modified in the container view manager.
+</p>
+<br/><br/>
+<p>
 <lime>2016/11/04 v134 : </lime>
 </p><br/>
 <p>

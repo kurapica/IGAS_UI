@@ -317,7 +317,7 @@ function viewRuleManager:OnShow()
 	for i, config in ipairs(viewconfigs) do
 		local node = { Text = config.Name, FunctionName = "R,X,+", Childs = {}, Data = System.Reflector.Clone(config.ItemList) }
 		for j, containerRule in ipairs(config.ContainerRules) do
-			local cnode = { Text = L"Container" .. j, FunctionName = "X,+", Childs = {} }
+			local cnode = { Text = containerRule.Name or L"Container" .. j, FunctionName = "R,X,+", Childs = {} }
 
 			for k, rules in ipairs(containerRule) do
 				local rnode = { Text = L"Rule" .. k, FunctionName = "X", Data = System.Reflector.Clone(rules) }
@@ -355,7 +355,7 @@ function btnAdd:OnClick()
 			end
 		end
 
-		node = node:AddNode{ Text = name, FunctionName = "X,+" }
+		node = node:AddNode{ Text = name, FunctionName = "R,X,+" }
 
 		return node:Select()
 	end
@@ -403,14 +403,15 @@ function viewRuleTree:OnNodeFunctionClick(func, node)
 		end
 	elseif func == "+" then
 		if node.Level == 1 then
-			node = node:AddNode{ Text = L"Container" .. (node.ChildNodeCount+1), FunctionName = "X,+" }
+			node = node:AddNode{ Text = L"Container" .. (node.ChildNodeCount+1), FunctionName = "R,X,+" }
 			return node:Select()
 		elseif node.Level == 2 then
 			node = node:AddNode{ Text = L"Rule" .. (node.ChildNodeCount+1), FunctionName = "X", Data = {} }
 			return node:Select()
 		end
 	elseif func == "R" then
-		local name = IGAS:MsgBox(L["Please input the container view's name"], "ic")
+		local name = IGAS:MsgBox(node.Level == 1 and L["Please input the container view's name"]
+			or node.Level == 2 and L["Please input the container's name"], "ic")
 
 		if type(name) == "string" then
 			name = strtrim(name)
@@ -562,6 +563,12 @@ function btnApply:OnClick()
 		for j = 1, node.ChildNodeCount do
 			local container = {}
 			local cnode = node:GetNode(j)
+
+			if not cnode.Text:match("^" .. L"Container" .. "%d+$") then
+				container.Name = cnode.Text
+			else
+				container.Name = nil
+			end
 
 			for k = 1, cnode.ChildNodeCount do
 				local rnode = cnode:GetNode(k)

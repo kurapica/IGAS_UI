@@ -504,8 +504,25 @@ class "Container"
 		btn.Visible = true
 	end
 
+	property "Name" {
+		Type = String,
+		Handler = function(self, name)
+			if name and name ~= "" then
+				self.NameLabel.Text = name
+				self.MarginTop = self.NameLabel.Height + 1
+			else
+				self.MarginTop = 1
+				self.NameLabel.Text = ""
+			end
+		end,
+	}
+
 	function Container(self, name, ...)
 		Super(self, name, ...)
+
+		local label = FontString("NameLabel", self)
+		label.FontObject = GameFontHighlight
+		label:SetPoint("TOPLEFT")
 
 		local prev, id = name:match("^(.*)(%d+)$")
 		id = tonumber(id)
@@ -926,6 +943,8 @@ class "ContainerView"
 		while i <= count do
 			container = self:GetChild(self.ElementPrefix .. i) or Container(self.ElementPrefix .. i, self)
 			container.Visible = true
+
+			container.Name = containerRules[i].Name
 
 			i = i + 1
 		end

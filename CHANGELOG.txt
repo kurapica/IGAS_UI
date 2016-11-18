@@ -1,3 +1,6 @@
+2016/11/18 v136
+	1. The container can be renamed and it's name would be shown.
+
 2016/11/08 v135
 	1. Fix the token panel's width to show value more than 10000.
 
