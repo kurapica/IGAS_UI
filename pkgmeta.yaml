@@ -1,0 +1,6 @@
+package-as: IGAS_UI
+
+required-dependencies:
+    - IGAS
+
+manual-changelog: CHANGELOG.txt
