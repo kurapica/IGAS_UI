@@ -1,3 +1,6 @@
+2016/11/20 v138
+	1. The Order Hall's CommandBar will be auto hide after several times, move the mouse over it would show.
+
 2016/11/18 v136
 	1. The container can be renamed and it's name would be shown.
 

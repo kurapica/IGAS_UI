@@ -1,4 +1,5 @@
 package-as: IGAS_UI
+enable-nolib-creation: yes
 
 required-dependencies:
     - IGAS

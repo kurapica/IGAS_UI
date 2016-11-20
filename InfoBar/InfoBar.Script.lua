@@ -94,6 +94,33 @@ function OnLoad(self)
 	_Text:SetTextColor(classColor.r, classColor.g, classColor.b)
 
 	UpdateColor()
+
+	if _G.OrderHallCommandBar then
+		OrderHall_LoadUI()
+	else
+		self:SecureHook("OrderHall_LoadUI")
+	end
+end
+
+function OrderHall_LoadUI()
+	IGAS.OrderHallCommandBar.OnShow.Delegate = Task.ThreadCall
+	IGAS.OrderHallCommandBar.OnShow = function(self)
+		local chkTime = GetTime()
+		local alpha
+
+		while self.Visible do
+			if self:IsMouseOver() then
+				chkTime = GetTime()
+				self.Alpha = 1
+			else
+				alpha = 1- (GetTime() - chkTime) / 3
+				if alpha < 0 then alpha = 0 end
+				self.Alpha = alpha
+			end
+
+			Task.Next()
+		end
+	end
 end
 
 function UpdateColor()
