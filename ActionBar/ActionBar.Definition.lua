@@ -402,6 +402,16 @@ class "IActionButton"
 		end
 	end
 
+	local function SetKeepFadeOut(self, value)
+		self.KeepFadeOut = value
+		if self.Branch then
+			SetKeepFadeOut(self.Branch, value)
+		end
+		if self.Brother then
+			SetKeepFadeOut(self.Brother, value)
+		end
+	end
+
 	------------------------------------------------------
 	-- Method
 	------------------------------------------------------
@@ -807,6 +817,15 @@ class "IActionButton"
 		Type = Table,
 	}
 
+	property "AutoFadeOut" {
+		Handler = function(self, value)
+			self.Alpha = 1
+			if value then self:OnLeave() end
+			return SetKeepFadeOut(self, value)
+		end,
+		Type = Boolean,
+	}
+
 	property "AutoSwapRoot" {
 		Handler = function (self, value)
 			if value then
@@ -1032,6 +1051,21 @@ class "IActionButton"
 		Type = Boolean,
 	}
 
+	property "Alpha" {
+		Get = function(self)
+			return self:GetAlpha()
+		end,
+		Set = function(self, alpha)
+			self:SetAlpha(alpha)
+			if self.Brother then
+				self.Brother.Alpha = alpha
+			end
+			if self.Branch then
+				self.Branch.Alpha = alpha
+			end
+		end,
+	}
+
 	------------------------------------------------------
 	-- Script Handler
 	------------------------------------------------------
@@ -1085,6 +1119,31 @@ class "IActionButton"
 			if self.ITail then
 				self.ITail.Visible = not self.LockMode and not self.FreeMode
 			end
+		end
+		self = self.Root.Header
+		if self.AutoFadeOut then
+			self.__AutoFadeOutStart = false
+			self.Alpha = 1
+		end
+	end
+
+	local function OnLeave(self)
+		self = self.Root.Header
+
+		if self.AutoFadeOut then
+			self.__AutoFadeOutStart = true
+			Task.ThreadCall(function(self)
+				local st = GetTime()
+				while self.__AutoFadeOutStart and self.AutoFadeOut do
+					Task.Next()
+					local alpha = (GetTime() - st) * 1.0 / 2
+					if alpha >= 1 then
+						self.Alpha = 0
+						return
+					end
+					self.Alpha = 1 - alpha
+				end
+			end, self)
 		end
 	end
 
@@ -1143,6 +1202,7 @@ class "IActionButton"
 		self.MarginY = 2
 
 		self.OnEnter = self.OnEnter + OnEnter
+		self.OnLeave = self.OnLeave + OnLeave
 		self.OnMouseDown = self.OnMouseDown + OnMouseDown
 		self.OnCooldownUpdate = self.OnCooldownUpdate + OnCooldownUpdate
 		self.OnSizeChanged = self.OnSizeChanged + OnSizeChanged
@@ -1529,7 +1589,7 @@ class "AutoActionTask"
 		codes = ([[
 			local _ContainerItemList, _ItemTaskListWithFilter, _ItemTaskListNoFilter, filterList, matchText = ...
 			local GetItemInfo = GetItemInfo
-			local GameTooltip = IGAS_UI_Container_Tooltip
+			local GameTooltip = IGAS_UI_ActionBar_Tooltip
 			local yield = coroutine.yield
 			local ipairs = ipairs
 			local pcall = pcall
@@ -1550,7 +1610,7 @@ class "AutoActionTask"
 
 						if ok then
 							local i = 1
-							local t = _G["IGAS_UI_Container_TooltipTextLeft"..i]
+							local t = _G["IGAS_UI_ActionBar_TooltipTextLeft"..i]
 
 							while t and t:IsShown() do
 								local tipText = t:GetText()
@@ -1559,7 +1619,7 @@ class "AutoActionTask"
 								end
 
 								i = i + 1
-								t = _G["IGAS_UI_Container_TooltipTextLeft"..i]
+								t = _G["IGAS_UI_ActionBar_TooltipTextLeft"..i]
 							end
 						end
 						GameTooltip:Hide()

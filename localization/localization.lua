@@ -4,6 +4,13 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/11/26 v140 : </lime>
+</p><br/>
+<p>
+    1. Auto fade out added to the action bars.
+</p>
+<br/><br/>
+<p>
 <lime>2016/11/18 v136 : </lime>
 </p><br/>
 <p>

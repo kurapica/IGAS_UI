@@ -7,6 +7,13 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/11/26 v140 : </lime>
+</p><br/>
+<p>
+    1. 動作條添加了自動漸隱功能。
+</p>
+<br/><br/>
+<p>
 <lime>2016/11/18 v136 : </lime>
 </p><br/>
 <p>
@@ -710,3 +717,5 @@ L["Token Watch List Manager"] = "代幣監視列表管理器"
 L["Double click to add or remove token"] = "雙擊代幣來添加或者移除監視"
 
 L["Please input the container's name"] = "請輸入背包的名稱"
+
+L["Auto Fade Out"] = "自動漸隱"

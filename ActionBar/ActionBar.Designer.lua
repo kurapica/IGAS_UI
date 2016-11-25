@@ -81,6 +81,9 @@ _MenuMarginY.DropDownList = _ListMarginY
 _MenuAutoHide = _Menu:AddMenuButton(L"Bar Style", L"Auto Hide")
 _MenuAutoHide:ActiveThread("OnClick")
 
+_MenuAutoFadeOut = _Menu:AddMenuButton(L"Bar Style", L"Auto Fade Out")
+_MenuAutoFadeOut.IsCheckButton = true
+
 _MenuAlwaysShowGrid = _Menu:AddMenuButton(L"Bar Style", L"Always Show Grid")
 _MenuAlwaysShowGrid.IsCheckButton = true
 

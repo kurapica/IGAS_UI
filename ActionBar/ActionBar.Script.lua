@@ -13,6 +13,7 @@ Toggle = {
 		_DBChar.LockBar = value
 		_HeadList:Each(function(self)
 			self.LockMode = value
+			self.Alpha = 1
 			self.IHeader.Visible = not value
 			if not value then
 				self.Visible = true
@@ -321,6 +322,9 @@ function GenerateBarConfig(header, includeContent)
 
 	-- bar set
 	bar.Location = header.Location
+	for _, anchor in ipairs(bar.Location) do
+		anchor.relativeTo = nil	-- Clear the name
+	end
 	if header.FreeMode then
 		bar.Size = header.Size
 	end
@@ -335,6 +339,7 @@ function GenerateBarConfig(header, includeContent)
 	bar.ReplaceBlzMainAction = header.ReplaceBlzMainAction
 
 	bar.AutoHideCondition = System.Reflector.Clone(header.AutoHideCondition)
+	bar.AutoFadeOut = header.AutoFadeOut
 
 	bar.AlwaysShowGrid = header.AlwaysShowGrid
 
@@ -355,6 +360,9 @@ function GenerateBarConfig(header, includeContent)
 
 		if btn.FreeMode then
 			set.Location = btn.Location
+			for _, anchor in ipairs(set.Location) do
+				anchor.relativeTo = nil	-- Clear the name
+			end
 			set.Size = btn.Size
 		end
 		set.BranchCount = btn.BranchCount
@@ -468,6 +476,12 @@ function LoadBarConfig(header, bar)
 			end
 
 			if btn.FreeMode then
+				if btn ~= header then
+					local name = header:GetName()
+					for _, anchor in ipairs(set.Location) do
+						anchor.relativeTo = name	-- Set the name
+					end
+				end
 				btn.Location = set.Location
 				btn.Size = set.Size
 			end
@@ -506,6 +520,7 @@ function LoadBarConfig(header, bar)
 		end
 
 		header.AutoHideCondition = System.Reflector.Clone(bar.AutoHideCondition)
+		header.AutoFadeOut = bar.AutoFadeOut
 
 		header.AlwaysShowGrid = bar.AlwaysShowGrid
 	else
@@ -592,6 +607,7 @@ function RemoveHeader(header)
 		_StanceBar = nil
 	end
 	header.AutoHideCondition = nil
+	header.AutoFadeOut = false
 	header:GenerateBrother(1, 1)
 	header:GenerateBranch(0)
 	_HeadList:Remove(header)
@@ -848,6 +864,9 @@ function _Menu:OnShow()
 	-- AutoHide
 	_MenuAutoHide.Enabled = notBagSlotBar
 
+	-- Auto fade out
+	_MenuAutoFadeOut.Checked = header.AutoFadeOut
+
 	-- Always show grid
 	_MenuAlwaysShowGrid.Checked = header.AlwaysShowGrid
 
@@ -1060,6 +1079,10 @@ function _MenuAutoHide:OnClick()
 	end
 end
 
+function _MenuAutoFadeOut:OnCheckChanged()
+	_Menu.Parent.AutoFadeOut = self.Checked
+end
+
 function _MenuAlwaysShowGrid:OnCheckChanged()
 	_Menu.Parent.AlwaysShowGrid = self.Checked
 end
@@ -1247,6 +1270,10 @@ end
 
 function _MenuDelete:OnClick()
 	if IGAS:MsgBox(L"Please confirm to delete this action bar", "n") then
+		if IFMovable._IsModeOn(_IGASUI_ACTIONBAR_GROUP) then
+			IFMovable._ModeOff(_IGASUI_ACTIONBAR_GROUP)
+			IFResizable._ModeOff(_IGASUI_ACTIONBAR_GROUP)
+		end
 		RemoveHeader(_Menu.Parent)
 	end
 end

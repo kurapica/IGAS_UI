@@ -1,3 +1,7 @@
+2016/11/26 v140
+	1. Fix several bugs.
+	2. Auto fade out is added to the action bars.
+
 2016/11/20 v138
 	1. The Order Hall's CommandBar will be auto hide after several times, move the mouse over it would show.
 
