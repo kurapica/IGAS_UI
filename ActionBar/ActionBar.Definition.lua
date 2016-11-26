@@ -287,12 +287,14 @@ class "IActionButton"
 	end
 
 	local function SetKeepFadeOut(self, value)
-		self.KeepFadeOut = value
-		if self.Branch then
-			SetKeepFadeOut(self.Branch, value)
-		end
-		if self.Brother then
-			SetKeepFadeOut(self.Brother, value)
+		while self do
+			self.KeepFadeOut = value
+			local branch = self.Branch
+			while branch do
+				branch.KeepFadeOut = value
+				branch = branch.Branch
+			end
+			self = self.Brother
 		end
 	end
 
@@ -1102,12 +1104,14 @@ class "IActionButton"
 			return self:GetAlpha()
 		end,
 		Set = function(self, alpha)
-			self:SetAlpha(alpha)
-			if self.Brother then
-				self.Brother.Alpha = alpha
-			end
-			if self.Branch then
-				self.Branch.Alpha = alpha
+			while self do
+				self:SetAlpha(alpha)
+				local branch = self.Branch
+				while branch do
+					branch:SetAlpha(alpha)
+					branch = branch.Branch
+				end
+				self = self.Brother
 			end
 		end,
 	}
