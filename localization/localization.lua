@@ -4,6 +4,16 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/11/27 v145 : </lime>
+</p><br/>
+<p>
+    1. The micro menu buttons can be moved to anywhere if the MainMenuBar is hide, and auto hide, auto fade can be used on it.
+</p>
+<p>
+    2. The extra bar can be moved, unlock it in the manager frame.
+</p>
+<br/><br/>
+<p>
 <lime>2016/11/26 v142 : </lime>
 </p><br/>
 <p>

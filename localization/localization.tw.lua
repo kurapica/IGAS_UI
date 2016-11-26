@@ -7,6 +7,16 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/11/27 v145 : </lime>
+</p><br/>
+<p>
+    1. 如果隱藏了原始界面的話，微型菜單可以被移動，也可以設置自動隱藏或者漸隱。
+</p>
+<p>
+    2. 額外動作條可以被移動。
+</p>
+<br/><br/>
+<p>
 <lime>2016/11/26 v142 : </lime>
 </p><br/>
 <p>
@@ -729,3 +739,6 @@ L["Double click to add or remove token"] = "雙擊代幣來添加或者移除監
 L["Please input the container's name"] = "請輸入背包的名稱"
 
 L["Auto Fade Out"] = "自動漸隱"
+
+L["Lock Micro Menu"] = "鎖定微菜單"
+L["Lock Extra Action Bar"] = "鎖定額外動作條"

@@ -22,6 +22,8 @@
 	<Script file = "ChatFrame\ChatFrame.lua"/>
 	<Script file = "QuestMover\QuestMover.lua"/>
 	<Script file = "BuffFrameStyle\BuffFrameStyle.lua"/>
+	<Script file = "MicroMenu\MicroMenu.lua"/>
+	<Script file = "ExtraBarMover\ExtraBarMover.lua"/>
 
 	<!-- Manager -->
 	<Script file = "Manager.Designer.lua"/>
