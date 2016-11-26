@@ -1,3 +1,7 @@
+2016/11/26 v141
+	1. Fix the fade out effect.
+	2. The action bar's bag bar can be auto fade out.
+
 2016/11/26 v140
 	1. Fix several bugs.
 	2. Auto fade out is added to the action bars.

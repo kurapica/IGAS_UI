@@ -1135,13 +1135,13 @@ class "IActionButton"
 			Task.ThreadCall(function(self)
 				local st = GetTime()
 				while self.__AutoFadeOutStart and self.AutoFadeOut do
-					Task.Next()
 					local alpha = (GetTime() - st) * 1.0 / 2
 					if alpha >= 1 then
 						self.Alpha = 0
 						return
 					end
 					self.Alpha = 1 - alpha
+					Task.Next()
 				end
 			end, self)
 		end

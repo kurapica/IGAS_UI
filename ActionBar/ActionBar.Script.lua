@@ -419,6 +419,7 @@ function GenerateConfig(includeContent)
 		bar.MarginY = _BagSlotBar.MarginY
 		bar.Scale = _BagSlotBar.Scale
 		bar.Expansion = _BagSlotBar.Expansion
+		bar.AutoFadeOut = _BagSlotBar.AutoFadeOut
 
 		config.BagSlotBar = bar
 	end
@@ -684,6 +685,7 @@ function UpdateBlzMainMenuBar()
 			_BagSlotBar.MarginY = _BagSlotBarConfig.MarginY
 			_BagSlotBar.Scale = _BagSlotBarConfig.Scale
 			_BagSlotBar.Expansion = _BagSlotBarConfig.Expansion
+			_BagSlotBar.AutoFadeOut = _BagSlotBarConfig.AutoFadeOut
 		else
 			_BagSlotBar.Location = { AnchorPoint("BOTTOMLEFT", GetScreenWidth() - _BagSlotBar.Width, 0) }
 			_BagSlotBar.Scale = 1
