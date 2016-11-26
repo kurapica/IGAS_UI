@@ -177,7 +177,7 @@ class "IActionButton"
 		if BranchHeader[root] and not RootExpansion[root] then
 			Manager:RunFor(self, HideBranch)
 		end
-		if AutoSwapHeader[root] and root ~= self then
+		if AutoSwapHeader[root] and root ~= self and not root:GetAttribute("isflyoutspell") then
 			self:SetAttribute("frameref-SwapTarget", root)
 			return self:RunAttribute("SwapAction")
 		end
@@ -577,8 +577,9 @@ class "IActionButton"
 					self:SetAction(nil)
 				end)
 			else
-				self.__IsFlyOutSpell = true
 				Task.NoCombatCall(function()
+					self:SetAttribute("isflyoutspell", true)
+
 					local flyoutID = self.ActionTarget
 					local _, _, numSlots, isKnown = GetFlyoutInfo(flyoutID)
 					if numSlots > 0 and isKnown then
@@ -592,9 +593,9 @@ class "IActionButton"
 					end
 				end)
 			end
-		elseif self.__IsFlyOutSpell then
-			self.__IsFlyOutSpell = nil
+		elseif self:GetAttribute("isflyoutspell") then
 			Task.NoCombatCall(function()
+				self:SetAttribute("isflyoutspell", nil)
 				self:GenerateBranch(0)
 			end)
 		end
