@@ -1,3 +1,7 @@
+2016/11/26 v142
+	1. The auto-hide system can works with the auto fade, it the bar use them both, then the macro condition will be used to check if the bar need to be auto fade, it'll not be auto-hide.
+	2. Add several macro unit id to the macro condition maker.
+
 2016/11/26 v141
 	1. Fix the fade out effect.
 	2. The action bar's bag bar can be auto fade out.

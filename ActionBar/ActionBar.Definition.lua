@@ -39,6 +39,7 @@ class "IActionButton"
 			State = newtable()
 			StanceBar = newtable()
 			AutoHideMap = newtable()
+			AutoFadeMap = newtable()
 			PetHeader = newtable()
 			AutoSwapHeader = newtable()
 
@@ -230,7 +231,7 @@ class "IActionButton"
 		]]
 	end
 
-	local function RegisterAutoHide(self, cond)
+	local function RegisterAutoHide(self, cond, autofade)
 		self.AutoHideState = "autohide" .. self.Name
 
 		_ManagerFrame:SetFrameRef("StateButton", self)
@@ -239,26 +240,34 @@ class "IActionButton"
 			local bar = Manager:GetFrameRef("StateButton")
 			AutoHideMap[name] = bar
 			AutoHideMap[bar] = name
-		]]):format(self.AutoHideState))
+			AutoFadeMap[name] = %s
+			bar:SetAttribute("autofadeout", false)
+		]]):format(self.AutoHideState, tostring(autofade or false)))
 
 		_ManagerFrame:RegisterStateDriver(self.AutoHideState, cond)
 		_ManagerFrame:SetAttribute("_onstate-" .. self.AutoHideState, ([[
 			local name = "%s"
 			local bar = AutoHideMap[name]
 			if not bar then return end
+			local autofade = AutoFadeMap[name]
 
 			State[bar] = newstate ~= "hide"
 
 			if newstate == "hide" then
-				-- Unregister HideBranch
-				for root in pairs(HideBranchList) do
-					if root == bar or HeaderMap[root] == bar then
-						root:UnregisterAutoHide()
-						HideBranchList[root] = nil
+				if autofade then
+					bar:SetAttribute("autofadeout", true)
+					Manager:CallMethod("StartAutoFadeOut", bar:GetName())
+				else
+					-- Unregister HideBranch
+					for root in pairs(HideBranchList) do
+						if root == bar or HeaderMap[root] == bar then
+							root:UnregisterAutoHide()
+							HideBranchList[root] = nil
+						end
 					end
-				end
-				if bar:IsShown() then
-					bar:Hide()
+					if bar:IsShown() then
+						bar:Hide()
+					end
 				end
 			else
 				if PetHeader[bar] and not State["pet"] then
@@ -268,9 +277,36 @@ class "IActionButton"
 				elseif not bar:IsShown() then
 					bar:Show()
 				end
+				if autofade then
+					bar:SetAttribute("autofadeout", false)
+					Manager:CallMethod("StopAutoFadeOut", bar:GetName())
+				end
 			end
 		]]):format(self.AutoHideState))
 		_ManagerFrame:SetAttribute("state-" .. self.AutoHideState, nil)
+	end
+
+	local function SetKeepFadeOut(self, value)
+		self.KeepFadeOut = value
+		if self.Branch then
+			SetKeepFadeOut(self.Branch, value)
+		end
+		if self.Brother then
+			SetKeepFadeOut(self.Brother, value)
+		end
+	end
+
+	IGAS:GetUI(_ManagerFrame).StartAutoFadeOut = function(self, name)
+		local header = IGAS:GetWrapper(_G[name])
+		header.Alpha = 1
+		SetKeepFadeOut(header, true)
+		header:OnLeave()
+	end
+
+	IGAS:GetUI(_ManagerFrame).StopAutoFadeOut = function(self, name)
+		local header = IGAS:GetWrapper(_G[name])
+		header.Alpha = 1
+		SetKeepFadeOut(header, false)
 	end
 
 	local function UnregisterAutoHide(self)
@@ -283,6 +319,7 @@ class "IActionButton"
 				local bar = Manager:GetFrameRef("StateButton")
 				AutoHideMap[name] = nil
 				AutoHideMap[bar] = nil
+				AutoFadeMap[name] = nil
 				State[bar] = nil
 
 				if not PetHeader[bar] or State["pet"] then
@@ -399,16 +436,6 @@ class "IActionButton"
 		if self.Item and self.Root.AutoActionTask then
 			_AutoGenItemBlackList[self.Item] = true
 			self.Root.AutoActionTask:RestartTask()
-		end
-	end
-
-	local function SetKeepFadeOut(self, value)
-		self.KeepFadeOut = value
-		if self.Branch then
-			SetKeepFadeOut(self.Branch, value)
-		end
-		if self.Brother then
-			SetKeepFadeOut(self.Brother, value)
 		end
 	end
 
@@ -548,8 +575,26 @@ class "IActionButton"
 					self:SetAction(nil)
 				end)
 			else
-				Task.NoCombatCall(GenerateBranch, self, 0)
+				self.__IsFlyOutSpell = true
+				Task.NoCombatCall(function()
+					local flyoutID = self.ActionTarget
+					local _, _, numSlots, isKnown = GetFlyoutInfo(flyoutID)
+					if numSlots > 0 and isKnown then
+						self:GenerateBranch(numSlots)
+						for i = 1, numSlots do
+							self = self.Branch
+							self.Spell = GetFlyoutSlotInfo(flyoutID, i)
+						end
+					else
+						self:GenerateBranch(0)
+					end
+				end)
 			end
+		elseif self.__IsFlyOutSpell then
+			self.__IsFlyOutSpell = nil
+			Task.NoCombatCall(function()
+				self:GenerateBranch(0)
+			end)
 		end
 		if self.UseBlizzardArt then
 			return Super.UpdateAction(self)
@@ -799,30 +844,31 @@ class "IActionButton"
 		Type = Boolean,
 	}
 
+	local function HandlerAutoHide(self)
+		if self.Root.Header == self then
+			if self.AutoHideCondition and next(self.AutoHideCondition) then
+				local cond = ""
+				for k in pairs(self.AutoHideCondition) do cond = cond .. k .. "hide;" end
+				cond = cond .. "show;"
+				RegisterAutoHide(self, cond, self.AutoFadeOut)
+			else
+				UnregisterAutoHide(self)
+
+				self.Alpha = 1
+				self:SetAttribute("autofadeout", self.AutoFadeOut)
+				if self.AutoFadeOut then self:OnLeave() end
+				SetKeepFadeOut(self, self.AutoFadeOut)
+			end
+		end
+	end
+
 	property "AutoHideCondition" {
-		Handler = function (self, value)
-			Task.NoCombatCall(function()
-				if value and next(value) then
-					local cond = ""
-					for k in pairs(value) do
-						cond = cond .. k .. "hide;"
-					end
-					cond = cond .. "show;"
-					RegisterAutoHide(self, cond)
-				else
-					UnregisterAutoHide(self)
-				end
-			end)
-		end,
+		Handler = HandlerAutoHide,
 		Type = Table,
 	}
 
 	property "AutoFadeOut" {
-		Handler = function(self, value)
-			self.Alpha = 1
-			if value then self:OnLeave() end
-			return SetKeepFadeOut(self, value)
-		end,
+		Handler = HandlerAutoHide,
 		Type = Boolean,
 	}
 
@@ -1130,11 +1176,11 @@ class "IActionButton"
 	local function OnLeave(self)
 		self = self.Root.Header
 
-		if self.AutoFadeOut then
+		if self:GetAttribute("autofadeout") then
 			self.__AutoFadeOutStart = true
 			Task.ThreadCall(function(self)
 				local st = GetTime()
-				while self.__AutoFadeOutStart and self.AutoFadeOut do
+				while self.__AutoFadeOutStart and self:GetAttribute("autofadeout") do
 					local alpha = (GetTime() - st) * 1.0 / 2
 					if alpha >= 1 then
 						self.Alpha = 0

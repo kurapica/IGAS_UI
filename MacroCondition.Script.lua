@@ -29,10 +29,16 @@ HTML_RESULT = [[
 
 targetData = {
 	"target",
+	"pet",
+	"vehicle",
 	"focus",
 	"mouseover",
 	"targettarget",
 	"focustarget",
+	"boss1",
+	"arena1",
+	"party1",
+	"raid1",
 }
 
 condtionData = {

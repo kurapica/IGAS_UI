@@ -4,6 +4,16 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/11/26 v142 : </lime>
+</p><br/>
+<p>
+    1. The auto-hide system can works with the auto fade, it the bar use them both, then the macro condition will be used to check if the bar need to be auto fade, it'll not be auto-hide.
+</p>
+<p>
+    2. Add several macro unit id to the macro condition maker.
+</p>
+<br/><br/>
+<p>
 <lime>2016/11/26 v140 : </lime>
 </p><br/>
 <p>
