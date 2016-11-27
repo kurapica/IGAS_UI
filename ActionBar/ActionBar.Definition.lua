@@ -1231,6 +1231,8 @@ class "IActionButton"
 	function RefreshForAutoHide(self)
 		if self.AutoHideState then
 			_ManagerFrame:SetAttribute("state-" .. self.AutoHideState, nil)
+		elseif self.AutoFadeOut then
+			self:OnLeave()
 		end
 	end
 

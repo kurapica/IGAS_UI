@@ -1,3 +1,6 @@
+2016/11/27 v146
+	1. Fix the auto fade bar won't fade when lock the action bar.
+
 2016/11/26 v145
 	1. The micro menu buttons can be moved to anywhere, and auto hide, auto fade can be used on it.
 	2. The extra bar can be moved, unlock it in the manager frame.

@@ -1,7 +1,7 @@
 ## Interface: 70100
 ## Title: IGAS_UI
 ## Author: kurapica.igas@gmail.com
-## Version: v145
+## Version: v146
 ## Notes: UI demo for IGAS
 ## eMail: kurapica.igas@gmail.com
 ## URL: http://github.com/kurapica
