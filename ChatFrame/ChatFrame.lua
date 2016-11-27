@@ -4,6 +4,9 @@
 IGAS:NewAddon "IGAS_UI.ChatFrame"
 
 function OnLoad(self)
+	_G.CHAT_FRAME_TAB_SELECTED_NOMOUSE_ALPHA = 0
+	_G.CHAT_FRAME_TAB_NORMAL_NOMOUSE_ALPHA = 0
+
 	self:SecureHook("FCF_StopDragging")
 
 	_DBChar.ChatFramePos = _DBChar.ChatFramePos or {}
@@ -24,6 +27,11 @@ function OnEnable(self)
 		_G["ChatFrame" .. i .. "EditBoxMid"]:Hide()
 		_G["ChatFrame" .. i .. "ButtonFrame"]:Hide()
 
+		_G["ChatFrame" .. i .. "Tab"].noMouseAlpha = 0
+		_G["ChatFrame" .. i .. "Tab"].leftTexture:Hide()
+		_G["ChatFrame" .. i .. "Tab"].middleTexture:Hide()
+		_G["ChatFrame" .. i .. "Tab"].rightTexture:Hide()
+
 		i = i + 1
 	end
 
@@ -32,7 +40,7 @@ function OnEnable(self)
 	_G.ChatFrameMenuButton:ClearAllPoints()
 	_G.ChatFrameMenuButton:SetAlpha(0.1)
 	_G.ChatFrameMenuButton:SetPoint("TOPRIGHT", _G["ChatFrame1"])
-	_G.ChatFrameMenuButton:HookScript("OnEnter", function(self) _leave = false self:SetAlpha(1) end)
+	--[[_G.ChatFrameMenuButton:HookScript("OnEnter", function(self) _leave = false self:SetAlpha(1) end)
 	_G.ChatFrameMenuButton:HookScript("OnLeave", function(self)
 		_leave = true
 		Task.ThreadCall(function()
@@ -41,11 +49,18 @@ function OnEnable(self)
 				Task.Delay(0.1)
 			end
 		end)
-	end)
+	end)--]]
 
 	for name, loc in pairs(_ChatFramePos) do
 		IGAS[name].Location = loc
 	end
+
+	self:SecureHook(_G["ChatFrame" .. 1 .. "Tab"], "SetAlpha")
+	ChatFrameMenuButton:SetAlpha(_G["ChatFrame" .. 1 .. "Tab"]:GetAlpha())
+end
+
+function SetAlpha(self, alpha)
+	ChatFrameMenuButton:SetAlpha(alpha)
 end
 
 function FCF_StopDragging(frame)

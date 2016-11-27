@@ -1220,7 +1220,7 @@ class "IActionButton"
 	local function OnSizeChanged(self)
 		local width, height = self:GetSize()
 		if math.abs(width-height) > 0.1 then
-			local size = math.min(width, height)
+			local size = math.floor(math.min(width, height))
 			self:SetSize(size, size)
 		end
 	end

@@ -18,6 +18,11 @@ Toggle = {
 				menu:Hide()
 				Task.NoCombatCall(RefreshMiniButtonPos)
 			end
+			if _DB.AutoFade then
+				ObjectiveTrackerFrame:OnEnter()
+			else
+				ObjectiveTrackerFrame.Alpha = 1
+			end
 		elseif _G["ObjectiveTrackerFrame"] then
 			if not mask then
 				mask = Mask("IGAS_UI_ObjectiveTracker_Mask", ObjectiveTrackerFrame)
@@ -47,6 +52,12 @@ Toggle = {
 				menu.Visible = false
 				menu:SetPoint("TOP", mask, "BOTTOM")
 
+				_MenuAutoFade = menu:AddMenuButton(L"Auto Fade Out")
+				_MenuAutoFade.IsCheckButton = true
+				_MenuAutoFade.OnCheckChanged = function(self)
+					_DB.AutoFade = self.Checked
+				end
+
 				_MenuModifyAnchorPoints = menu:AddMenuButton(L"Modify AnchorPoints")
 				_MenuModifyAnchorPoints:ActiveThread("OnClick")
 				_MenuModifyAnchorPoints.OnClick = function(self)
@@ -62,6 +73,9 @@ Toggle = {
 					Task.NoCombatCall(RefreshMiniButtonPos)
 				end
 			end
+
+			_MenuAutoFade.Checked = _DB.AutoFade
+			ObjectiveTrackerFrame.Alpha = 1
 
 			mask:Show()
 			menu:Show()
@@ -93,7 +107,42 @@ function OnEnable(self)
 		ObjectiveTrackerFrame.Size = _DB.Size
 	end
 
+	if _DB.AutoFade then
+		ObjectiveTrackerFrame:OnEnter()
+	end
+
 	Task.NoCombatCall(RefreshMiniButtonPos)
+end
+
+function ObjectiveTrackerFrame:OnEnter()
+	if _DB.AutoFade then
+		self.Alpha = 1
+		self.StartTime = GetTime()
+
+		if not self.ThreadStart then
+			Task.ThreadCall(function()
+				self.ThreadStart = true
+
+				local alpha = 0
+
+				while alpha < 1 do
+					self.Alpha = 1-alpha
+
+					if self:IsMouseOver() then
+						self.StartTime = GetTime()
+						alpha = 0
+					else
+						alpha = (GetTime() - self.StartTime) / 3.0
+					end
+
+					Task.Next()
+				end
+
+				self.Alpha = 0
+				self.ThreadStart = false
+			end)
+		end
+	end
 end
 
 function RefreshMiniButtonPos()

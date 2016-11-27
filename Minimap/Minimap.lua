@@ -209,6 +209,7 @@ end
 function Minimap:OnEnter()
 	if _DB.AutoFade then
 		self.Alpha = 1
+		MinimapZoneTextButton.Alpha = 1
 		self.StartTime = GetTime()
 
 		if not self.ThreadStart then
