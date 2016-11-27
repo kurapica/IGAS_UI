@@ -7,6 +7,7 @@ local locked = true
 local mask
 local menu
 local _DB
+local _MicroMenus = System.Reflector.Clone(_G.MICRO_BUTTONS)
 
 Toggle = {
 	Message = L"Lock Micro Menu",
@@ -111,7 +112,7 @@ local function OnEnter(self)
 	end
 end
 
-for i, btn in ipairs(_G.MICRO_BUTTONS) do
+for i, btn in ipairs(_MicroMenus) do
 	btn = IGAS[btn]
 	btn.Parent = _MicroMenuPanel
 
@@ -119,6 +120,7 @@ for i, btn in ipairs(_G.MICRO_BUTTONS) do
 end
 
 _M:SecureHook(_MDL, "UpdateBlzMainMenuBar")
+_M:SecureHook("MoveMicroButtons")
 
 function UpdateBlzMainMenuBar()
 	if not _DB then
@@ -146,5 +148,15 @@ function UpdateBlzMainMenuBar()
 		_MicroMenuPanel.Visible = true
 		_MicroMenuPanel.Parent = _OrgParent
 		_MicroMenuPanel.Location = _OrgLocation
+	end
+end
+
+function MoveMicroButtons(point, name)
+	if name:GetName() == "MainMenuBarArtFrame" then
+		UpdateMicroButtonsParent(_MicroMenuPanel)
+		MoveMicroButtons("TOPLEFT", _MicroMenuPanel, "TOPLEFT", 0, 0, false)
+
+		CharacterMicroButton:ClearAllPoints()
+		CharacterMicroButton:SetPoint("TOPLEFT", _MicroMenuPanel)
 	end
 end

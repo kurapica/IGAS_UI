@@ -1,3 +1,7 @@
+2016/11/27 v147
+	1. Fix the micro menu not shown when get out of the vehicle.
+	2. Auto fade option added to minimap.
+
 2016/11/27 v146
 	1. Fix the auto fade bar won't fade when lock the action bar.
 

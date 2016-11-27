@@ -29,6 +29,12 @@ Toggle = {
 		if locked then
 			if mask then mask:Hide() mnuMinimap:Hide() end
 			if maskBuffFrame then maskBuffFrame:Hide() mnuBuffFrame:Hide() end
+			if _DB.AutoFade then
+				Minimap:OnEnter()
+			else
+				Minimap.Alpha = 1
+				MinimapZoneTextButton.Alpha = 1
+			end
 		else
 			if not mask then
 				mask = Mask("IGAS_UI_Minimap_Mask", Minimap)
@@ -59,6 +65,12 @@ Toggle = {
 				mnuMinimap.Visible = false
 				mnuMinimap:SetPoint("TOP", mask, "BOTTOM")
 
+				_MenuAutoFade = mnuMinimap:AddMenuButton(L"Auto Fade Out")
+				_MenuAutoFade.IsCheckButton = true
+				_MenuAutoFade.OnCheckChanged = function(self)
+					_DB.AutoFade = self.Checked
+				end
+
 				local modify = mnuMinimap:AddMenuButton(L"Modify AnchorPoints")
 				modify:ActiveThread("OnClick")
 				modify.OnClick = function(self)
@@ -87,6 +99,10 @@ Toggle = {
 					_DB.BuffFrameLocation = BuffFrame.Location
 				end
 			end
+
+			_MenuAutoFade.Checked = _DB.AutoFade
+			Minimap.Alpha = 1
+			MinimapZoneTextButton.Alpha = 1
 
 			mask:Show()
 			mnuMinimap:Show()
@@ -132,6 +148,10 @@ function OnLoad(self)
 	_DB.MoveBuffFrame = nil
 	if _DB.BuffFrameLocation then
 		BuffFrame.Location = _DB.BuffFrameLocation
+	end
+
+	if _DB.AutoFade then
+		Minimap:OnEnter()
 	end
 end
 
@@ -184,6 +204,39 @@ function Minimap:OnMouseWheel(wheel)
     else
         Minimap.Zoom = Minimap.Zoom > 0 and (Minimap.Zoom - 1) or 0
     end
+end
+
+function Minimap:OnEnter()
+	if _DB.AutoFade then
+		self.Alpha = 1
+		self.StartTime = GetTime()
+
+		if not self.ThreadStart then
+			Task.ThreadCall(function()
+				self.ThreadStart = true
+
+				local alpha = 0
+
+				while alpha < 1 do
+					self.Alpha = 1-alpha
+					MinimapZoneTextButton.Alpha = 1 - alpha
+
+					if self:IsMouseOver() then
+						self.StartTime = GetTime()
+						alpha = 0
+					else
+						alpha = (GetTime() - self.StartTime) / 3.0
+					end
+
+					Task.Next()
+				end
+
+				self.Alpha = 0
+				MinimapZoneTextButton.Alpha = 0
+				self.ThreadStart = false
+			end)
+		end
+	end
 end
 
 MinimapZoneTextButton:ClearAllPoints()
