@@ -4,6 +4,16 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/11/28 v150 : </lime>
+</p><br/>
+<p>
+    1. Right-click the minimap's zone text to toggle the auto fade option.
+</p>
+<p>
+    2. Right-click the quest log's header to toggle the auto fade option.
+</p>
+<br/><br/>
+<p>
 <lime>2016/11/27 v145 : </lime>
 </p><br/>
 <p>

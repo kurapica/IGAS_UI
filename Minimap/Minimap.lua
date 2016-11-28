@@ -65,12 +65,6 @@ Toggle = {
 				mnuMinimap.Visible = false
 				mnuMinimap:SetPoint("TOP", mask, "BOTTOM")
 
-				_MenuAutoFade = mnuMinimap:AddMenuButton(L"Auto Fade Out")
-				_MenuAutoFade.IsCheckButton = true
-				_MenuAutoFade.OnCheckChanged = function(self)
-					_DB.AutoFade = self.Checked
-				end
-
 				local modify = mnuMinimap:AddMenuButton(L"Modify AnchorPoints")
 				modify:ActiveThread("OnClick")
 				modify.OnClick = function(self)
@@ -100,7 +94,6 @@ Toggle = {
 				end
 			end
 
-			_MenuAutoFade.Checked = _DB.AutoFade
 			Minimap.Alpha = 1
 			MinimapZoneTextButton.Alpha = 1
 
@@ -153,6 +146,8 @@ function OnLoad(self)
 	if _DB.AutoFade then
 		Minimap:OnEnter()
 	end
+
+	MinimapZoneTextButton:RegisterForClicks("AnyUp")
 end
 
 function TimeManager_LoadUI()
@@ -218,7 +213,7 @@ function Minimap:OnEnter()
 
 				local alpha = 0
 
-				while alpha < 1 do
+				while alpha < 1 and _DB.AutoFade do
 					self.Alpha = 1-alpha
 					MinimapZoneTextButton.Alpha = 1 - alpha
 
@@ -232,10 +227,27 @@ function Minimap:OnEnter()
 					Task.Next()
 				end
 
-				self.Alpha = 0
-				MinimapZoneTextButton.Alpha = 0
+				if _DB.AutoFade then
+					self.Alpha = 0
+					MinimapZoneTextButton.Alpha = 0
+				else
+					self.Alpha = 1
+					MinimapZoneTextButton.Alpha = 1
+				end
 				self.ThreadStart = false
 			end)
+		end
+	end
+end
+
+function MinimapZoneTextButton:OnClick(button)
+	if button == "RightButton" then
+		_DB.AutoFade = not _DB.AutoFade
+		if _DB.AutoFade then
+			Minimap:OnEnter()
+		else
+			Minimap.Alpha = 1
+			MinimapZoneTextButton.Alpha = 1
 		end
 	end
 end

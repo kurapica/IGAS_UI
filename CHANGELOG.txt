@@ -1,3 +1,7 @@
+2016/11/28 v150
+	1. Right-click the minimap's zone text to toggle the auto fade option.
+	2. Right-click the quest log's header to toggle the auto fade option.
+
 2016/11/28 v149
 	1. Fix chat frame tab's broken.
 

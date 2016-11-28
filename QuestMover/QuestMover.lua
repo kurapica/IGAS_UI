@@ -52,12 +52,6 @@ Toggle = {
 				menu.Visible = false
 				menu:SetPoint("TOP", mask, "BOTTOM")
 
-				_MenuAutoFade = menu:AddMenuButton(L"Auto Fade Out")
-				_MenuAutoFade.IsCheckButton = true
-				_MenuAutoFade.OnCheckChanged = function(self)
-					_DB.AutoFade = self.Checked
-				end
-
 				_MenuModifyAnchorPoints = menu:AddMenuButton(L"Modify AnchorPoints")
 				_MenuModifyAnchorPoints:ActiveThread("OnClick")
 				_MenuModifyAnchorPoints.OnClick = function(self)
@@ -74,7 +68,6 @@ Toggle = {
 				end
 			end
 
-			_MenuAutoFade.Checked = _DB.AutoFade
 			ObjectiveTrackerFrame.Alpha = 1
 
 			mask:Show()
@@ -125,7 +118,7 @@ function ObjectiveTrackerFrame:OnEnter()
 
 				local alpha = 0
 
-				while alpha < 1 do
+				while alpha < 1 and _DB.AutoFade do
 					self.Alpha = 1-alpha
 
 					if self:IsMouseOver() then
@@ -138,9 +131,20 @@ function ObjectiveTrackerFrame:OnEnter()
 					Task.Next()
 				end
 
-				self.Alpha = 0
+				self.Alpha = _DB.AutoFade and 0 or 1
 				self.ThreadStart = false
 			end)
+		end
+	end
+end
+
+IGAS:GetWrapper(_G.ObjectiveTrackerBlocksFrame.QuestHeader).OnMouseUp = function(self, button)
+	if button == "RightButton" then
+		_DB.AutoFade = not _DB.AutoFade
+		if _DB.AutoFade then
+			ObjectiveTrackerFrame:OnEnter()
+		else
+			ObjectiveTrackerFrame.Alpha = 1
 		end
 	end
 end
