@@ -28,9 +28,9 @@ function OnEnable(self)
 		_G["ChatFrame" .. i .. "ButtonFrame"]:Hide()
 
 		_G["ChatFrame" .. i .. "Tab"].noMouseAlpha = 0
-		_G["ChatFrame" .. i .. "Tab"].leftTexture:Hide()
-		_G["ChatFrame" .. i .. "Tab"].middleTexture:Hide()
-		_G["ChatFrame" .. i .. "Tab"].rightTexture:Hide()
+		_G["ChatFrame" .. i .. "Tab"].leftTexture:SetTexture(nil)
+		_G["ChatFrame" .. i .. "Tab"].middleTexture:SetTexture(nil)
+		_G["ChatFrame" .. i .. "Tab"].rightTexture:SetTexture(nil)
 
 		i = i + 1
 	end

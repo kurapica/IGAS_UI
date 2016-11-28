@@ -1,3 +1,6 @@
+2016/11/28 v149
+	1. Fix chat frame tab's broken.
+
 2016/11/28 v148
 	1. Auto fade option added to quest list.
 	2. Chat Frame use a more clear style.
