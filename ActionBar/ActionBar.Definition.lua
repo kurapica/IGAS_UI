@@ -10,6 +10,16 @@ import "System.Widget.Action"
 
 _IGASUI_ACTIONBAR_GROUP = "IActionButton"
 
+_M:RegisterEvent("SPELL_FLYOUT_UPDATE")
+
+_SpellFlyoutMap = {}
+
+function SPELL_FLYOUT_UPDATE(self)
+	for root in pairs(_SpellFlyoutMap) do
+		root:RegenerateFlyout()
+	end
+end
+
 ------------------------------------------------------
 -- Class
 ------------------------------------------------------
@@ -570,6 +580,82 @@ class "IActionButton"
 		end
 	end
 
+	function RegenerateFlyout(self)
+		local flyoutID = self.ActionTarget
+		local _, _, numSlots, isKnown = GetFlyoutInfo(flyoutID)
+
+		if numSlots and numSlots > 0 and isKnown then
+			local changed = false
+
+			if not _SpellFlyoutMap[self] then
+				changed = true
+				_SpellFlyoutMap[self] = {}
+			end
+
+			local map = _SpellFlyoutMap[self]
+
+			local j = 1
+			for i = 1, numSlots do
+				local spellID, _, isKnown = GetFlyoutSlotInfo(flyoutID, i)
+				if isKnown then
+					if changed then
+						map[j] = spellID
+					elseif map[j] ~= spellID then
+						changed = true
+						map[j] = spellID
+					end
+					j = j + 1
+				end
+			end
+
+			for i = #map, j, -1 do
+				tremove(map)
+				changed = true
+			end
+
+			if changed then
+				if not self.FreeMode then
+					self:GenerateBranch(#map)
+					for i = 1, #map do
+						self = self.Branch
+						self.Spell = map[i]
+					end
+				else
+					self = self.Branch
+					local i = 1
+					while self do
+						if map[i] then
+							self.Spell = map[i]
+						else
+							self:SetAction(nil)
+						end
+
+						i = i + 1
+						self = self.Branch
+					end
+				end
+			end
+		else
+			self:ClearFlyout()
+		end
+	end
+
+	function ClearFlyout(self)
+		if _SpellFlyoutMap[self] then
+			_SpellFlyoutMap[self] = nil
+
+			if not self.FreeMode then
+				self:GenerateBranch(0)
+			else
+				self = self.Branch
+				while self do
+					self:SetAction(nil)
+					self = self.Branch
+				end
+			end
+		end
+	end
+
 	function UpdateAction(self)
 		if self.ActionType == "flyout" then
 			if self.Root ~= self then
@@ -579,24 +665,15 @@ class "IActionButton"
 			else
 				Task.NoCombatCall(function()
 					self:SetAttribute("isflyoutspell", true)
-
-					local flyoutID = self.ActionTarget
-					local _, _, numSlots, isKnown = GetFlyoutInfo(flyoutID)
-					if numSlots > 0 and isKnown then
-						self:GenerateBranch(numSlots)
-						for i = 1, numSlots do
-							self = self.Branch
-							self.Spell = GetFlyoutSlotInfo(flyoutID, i)
-						end
-					else
-						self:GenerateBranch(0)
-					end
+					self:SetAttribute("type1", "custom")
+					self:RegenerateFlyout()
 				end)
 			end
 		elseif self:GetAttribute("isflyoutspell") then
 			Task.NoCombatCall(function()
+				self:SetAttribute("type1", nil)
 				self:SetAttribute("isflyoutspell", nil)
-				self:GenerateBranch(0)
+				self:ClearFlyout()
 			end)
 		end
 		if self.UseBlizzardArt then

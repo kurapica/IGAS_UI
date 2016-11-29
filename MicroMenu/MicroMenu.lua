@@ -151,12 +151,20 @@ function UpdateBlzMainMenuBar()
 	end
 end
 
-function MoveMicroButtons(point, name)
-	if name:GetName() == "MainMenuBarArtFrame" then
-		UpdateMicroButtonsParent(_MicroMenuPanel)
-		MoveMicroButtons("TOPLEFT", _MicroMenuPanel, "TOPLEFT", 0, 0, false)
+function ResetPos()
+	UpdateMicroButtonsParent(_MicroMenuPanel)
+	CharacterMicroButton:ClearAllPoints()
 
-		CharacterMicroButton:ClearAllPoints()
-		CharacterMicroButton:SetPoint("TOPLEFT", _MicroMenuPanel)
+	CharacterMicroButton:SetPoint("TOPLEFT", _MicroMenuPanel)
+	_G.MoveMicroButtons("TOPLEFT", _MicroMenuPanel, "TOPLEFT", 0, 0, false)
+end
+
+function MoveMicroButtons(point, name)
+	if name == _MicroMenuPanel then return end
+
+	if name:GetName() == "MainMenuBarArtFrame" then
+		ResetPos()
+	else
+		IGAS:GetWrapper(name).OnHide = ResetPos
 	end
 end

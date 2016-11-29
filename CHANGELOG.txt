@@ -1,3 +1,9 @@
+2016/11/29 v151
+	1. Fix flyout spell's generation.
+	2. The auto hide/fade bar will be shown when pick up a spell, and will be hide/fade correctly after place or cancel it.
+	3. Fix style for temp chatframe.
+	4. Fix micro menu's position after the pet combat.
+
 2016/11/28 v150
 	1. Right-click the minimap's zone text to toggle the auto fade option.
 	2. Right-click the quest log's header to toggle the auto fade option.

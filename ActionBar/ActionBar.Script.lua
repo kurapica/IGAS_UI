@@ -176,6 +176,8 @@ function OnLoad(self)
 
 	self:RegisterEvent("UPDATE_SHAPESHIFT_FORMS")
 
+	self:RegisterEvent("ACTIONBAR_HIDEGRID")
+
 	_LoadingConfig = GetSpecialization() or 1
 	LoadConfig(_DBChar[_LoadingConfig])
 
@@ -315,6 +317,14 @@ function PLAYER_LOGOUT(self)
 	_DBChar[spec] = GenerateConfig(true)
 
 	ClearScreen()	-- make sure no key bindings would be saved
+end
+
+function ACTIONBAR_HIDEGRID(self)
+	Task.NoCombatCall(function()
+		for _, header in ipairs(_HeadList) do
+			header:RefreshForAutoHide()
+		end
+	end)
 end
 
 function GenerateBarConfig(header, includeContent)

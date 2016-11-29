@@ -3,36 +3,27 @@
 -----------------------------------------
 IGAS:NewAddon "IGAS_UI.ChatFrame"
 
+_LoadedTab = 1
+
 function OnLoad(self)
 	_G.CHAT_FRAME_TAB_SELECTED_NOMOUSE_ALPHA = 0
 	_G.CHAT_FRAME_TAB_NORMAL_NOMOUSE_ALPHA = 0
 
 	self:SecureHook("FCF_StopDragging")
+	self:SecureHook("FCF_OpenTemporaryWindow")
 
 	_DBChar.ChatFramePos = _DBChar.ChatFramePos or {}
 	_ChatFramePos = _DBChar.ChatFramePos
 end
 
 function OnEnable(self)
-	local i = 1
 	local _leave = true
 	_G.CHAT_SHOW_IME = false
 
-	while _G["ChatFrame" .. i] do
-		_G["ChatFrame" .. i]:SetClampRectInsets(0, 0, 38, - 38)
-		FCF_SetWindowAlpha(_G["ChatFrame" .. i], 0)
+	while _G["ChatFrame" .. _LoadedTab] do
+		ApplyStyle("ChatFrame" .. _LoadedTab)
 
-		_G["ChatFrame" .. i .. "EditBoxLeft"]:Hide()
-		_G["ChatFrame" .. i .. "EditBoxRight"]:Hide()
-		_G["ChatFrame" .. i .. "EditBoxMid"]:Hide()
-		_G["ChatFrame" .. i .. "ButtonFrame"]:Hide()
-
-		_G["ChatFrame" .. i .. "Tab"].noMouseAlpha = 0
-		_G["ChatFrame" .. i .. "Tab"].leftTexture:SetTexture(nil)
-		_G["ChatFrame" .. i .. "Tab"].middleTexture:SetTexture(nil)
-		_G["ChatFrame" .. i .. "Tab"].rightTexture:SetTexture(nil)
-
-		i = i + 1
+		_LoadedTab = _LoadedTab + 1
 	end
 
 	_G.QuickJoinToastButton:Hide()
@@ -57,6 +48,29 @@ function OnEnable(self)
 
 	self:SecureHook(_G["ChatFrame" .. 1 .. "Tab"], "SetAlpha")
 	ChatFrameMenuButton:SetAlpha(_G["ChatFrame" .. 1 .. "Tab"]:GetAlpha())
+end
+
+function FCF_OpenTemporaryWindow()
+	while _G["ChatFrame" .. _LoadedTab] do
+		ApplyStyle("ChatFrame" .. _LoadedTab)
+
+		_LoadedTab = _LoadedTab + 1
+	end
+end
+
+function ApplyStyle(tabName)
+	_G[tabName]:SetClampRectInsets(0, 0, 38, - 38)
+	FCF_SetWindowAlpha(_G[tabName], 0)
+
+	_G[tabName .. "EditBoxLeft"]:Hide()
+	_G[tabName .. "EditBoxRight"]:Hide()
+	_G[tabName .. "EditBoxMid"]:Hide()
+	_G[tabName .. "ButtonFrame"]:Hide()
+
+	_G[tabName .. "Tab"].noMouseAlpha = 0
+	_G[tabName .. "Tab"].leftTexture:SetTexture(nil)
+	_G[tabName .. "Tab"].middleTexture:SetTexture(nil)
+	_G[tabName .. "Tab"].rightTexture:SetTexture(nil)
 end
 
 function SetAlpha(self, alpha)
