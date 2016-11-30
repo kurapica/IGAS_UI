@@ -1,3 +1,6 @@
+2016/11/30 v153
+	1. Fix the auto fade of the minimap.
+
 2016/11/30 v152
 	1. Fix the autofade bar with show grid options.
 
