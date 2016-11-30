@@ -1,3 +1,6 @@
+2016/11/30 v152
+	1. Fix the autofade bar with show grid options.
+
 2016/11/29 v151
 	1. Fix flyout spell's generation.
 	2. The auto hide/fade bar will be shown when pick up a spell, and will be hide/fade correctly after place or cancel it.

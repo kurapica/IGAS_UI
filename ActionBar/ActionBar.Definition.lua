@@ -11,12 +11,60 @@ import "System.Widget.Action"
 _IGASUI_ACTIONBAR_GROUP = "IActionButton"
 
 _M:RegisterEvent("SPELL_FLYOUT_UPDATE")
+_M:RegisterEvent("ACTIONBAR_SHOWGRID")
+_M:RegisterEvent("ACTIONBAR_HIDEGRID")
+_M:RegisterEvent("PET_BAR_SHOWGRID")
+_M:RegisterEvent("PET_BAR_HIDEGRID")
 
 _SpellFlyoutMap = {}
 
 function SPELL_FLYOUT_UPDATE(self)
 	for root in pairs(_SpellFlyoutMap) do
 		root:RegenerateFlyout()
+	end
+end
+
+_BlockGridUpdatingBar = {}
+
+function ACTIONBAR_SHOWGRID(self)
+	for btn, flag in pairs(_BlockGridUpdatingBar) do
+		if flag and not btn.PetBar and not btn.StanceBar then
+			btn.ShowGrid = true
+			btn.FadeAlpha = 1
+		end
+	end
+end
+
+function ACTIONBAR_HIDEGRID(self)
+	for btn, flag in pairs(_BlockGridUpdatingBar) do
+		if flag and not btn.PetBar and not btn.StanceBar then
+			btn.ShowGrid = btn.AlwaysShowGrid or not btn.LockMode
+			btn:OnLeave()
+		end
+	end
+end
+
+function PET_BAR_SHOWGRID(self)
+	for btn, flag in pairs(_BlockGridUpdatingBar) do
+		if flag and btn.PetBar then
+			while btn do
+				btn:SetAlpha(1)
+				local branch = btn.Branch
+				while branch do
+					branch:SetAlpha(1)
+					branch = branch.Branch
+				end
+				btn = btn.Brother
+			end
+		end
+	end
+end
+
+function PET_BAR_HIDEGRID(self)
+	for btn, flag in pairs(_BlockGridUpdatingBar) do
+		if flag and btn.PetBar then
+			btn:OnLeave()
+		end
 	end
 end
 
@@ -296,12 +344,14 @@ class "IActionButton"
 		_ManagerFrame:SetAttribute("state-" .. self.AutoHideState, nil)
 	end
 
-	local function SetKeepFadeOut(self, value)
+	local function SetBlockGridUpdating(self, value)
+		_BlockGridUpdatingBar[self] = value or nil
+
 		while self do
-			self.KeepFadeOut = value
+			self.BlockGridUpdating = value
 			local branch = self.Branch
 			while branch do
-				branch.KeepFadeOut = value
+				branch.BlockGridUpdating = value
 				branch = branch.Branch
 			end
 			self = self.Brother
@@ -310,15 +360,13 @@ class "IActionButton"
 
 	IGAS:GetUI(_ManagerFrame).StartAutoFadeOut = function(self, name)
 		local header = IGAS:GetWrapper(_G[name])
-		header.Alpha = 1
-		SetKeepFadeOut(header, true)
+		SetBlockGridUpdating(header, true)
 		header:OnLeave()
 	end
 
 	IGAS:GetUI(_ManagerFrame).StopAutoFadeOut = function(self, name)
 		local header = IGAS:GetWrapper(_G[name])
-		header.Alpha = 1
-		SetKeepFadeOut(header, false)
+		SetBlockGridUpdating(header, false)
 	end
 
 	local function UnregisterAutoHide(self)
@@ -931,13 +979,16 @@ class "IActionButton"
 				for k in pairs(self.AutoHideCondition) do cond = cond .. k .. "hide;" end
 				cond = cond .. "show;"
 				RegisterAutoHide(self, cond, self.AutoFadeOut)
+				if not self.AutoFadeOut then
+					SetBlockGridUpdating(self, false)
+					self.FadeAlpha = 1
+				end
 			else
 				UnregisterAutoHide(self)
 
-				self.Alpha = 1
 				self:SetAttribute("autofadeout", self.AutoFadeOut)
 				if self.AutoFadeOut then self:OnLeave() end
-				SetKeepFadeOut(self, self.AutoFadeOut)
+				SetBlockGridUpdating(self, self.AutoFadeOut)
 			end
 		end
 	end
@@ -1177,19 +1228,35 @@ class "IActionButton"
 		Type = Boolean,
 	}
 
-	property "Alpha" {
+	property "FadeAlpha" {
 		Get = function(self)
 			return self:GetAlpha()
 		end,
 		Set = function(self, alpha)
-			while self do
-				self:SetAlpha(alpha)
-				local branch = self.Branch
-				while branch do
-					branch:SetAlpha(alpha)
-					branch = branch.Branch
+			if self.Root.Header == self then
+				if self.ShowGrid then
+					while self do
+						self:SetAlpha(alpha)
+						local branch = self.Branch
+						while branch do
+							branch:SetAlpha(alpha)
+							branch = branch.Branch
+						end
+						self = self.Brother
+					end
+				else
+					while self do
+						self:SetAlpha( self:HasAction() and alpha or 0 )
+						local branch = self.Branch
+						while branch do
+							branch:SetAlpha( branch:HasAction() and alpha or 0 )
+							branch = branch.Branch
+						end
+						self = self.Brother
+					end
 				end
-				self = self.Brother
+			else
+				self:SetAlpha(alpha)
 			end
 		end,
 	}
@@ -1251,7 +1318,7 @@ class "IActionButton"
 		self = self.Root.Header
 		if self.AutoFadeOut then
 			self.__AutoFadeOutStart = false
-			self.Alpha = 1
+			self.FadeAlpha = 1
 		end
 	end
 
@@ -1262,13 +1329,14 @@ class "IActionButton"
 			self.__AutoFadeOutStart = true
 			Task.ThreadCall(function(self)
 				local st = GetTime()
+				local sta = self:GetAlpha() or 1
 				while self.__AutoFadeOutStart and self:GetAttribute("autofadeout") do
 					local alpha = (GetTime() - st) * 1.0 / 2
-					if alpha >= 1 then
-						self.Alpha = 0
+					if alpha >= sta then
+						self.FadeAlpha = 0
 						return
 					end
-					self.Alpha = 1 - alpha
+					self.FadeAlpha = sta - alpha
 					Task.Next()
 				end
 			end, self)
