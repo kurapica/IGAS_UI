@@ -574,6 +574,8 @@ class "IActionButton"
 	function GenerateBranch(self, num, force)
 		num = num or self.BranchCount
 
+		local blockGridUpdating = self.BlockGridUpdating
+
 		if self.Root == self and not InCombatLockdown() then
 			if force or self.BranchCount ~= num then
 				local w, h, marginX, marginY, branch, last = self.Width, self.Height, self.MarginX, self.MarginY, self
@@ -585,6 +587,7 @@ class "IActionButton"
 					end
 					branch = branch.Branch
 					branch:ClearAllPoints()
+					branch.BlockGridUpdating = blockGridUpdating
 
 					if dir == FlyoutDirection.LEFT then
 						branch:SetPoint("LEFT", self, "LEFT", -(w + marginX) * i, 0)
@@ -626,6 +629,7 @@ class "IActionButton"
 				end
 			end
 		end
+		return UpdateExpansion(self, self.Expansion)
 	end
 
 	function RegenerateFlyout(self)
@@ -663,12 +667,9 @@ class "IActionButton"
 
 			if changed then
 				if not self.FreeMode then
-					local blockGridUpdating = self.BlockGridUpdating
 					self:GenerateBranch(#map)
-					Task.NoCombatCall(UpdateExpansion, self, self.Expansion)
 					for i = 1, #map do
 						self = self.Branch
-						self.BlockGridUpdating = blockGridUpdating
 						self.Spell = map[i]
 					end
 				else

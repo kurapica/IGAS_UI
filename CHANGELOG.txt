@@ -1,4 +1,7 @@
-2016/11/09 v154
+2016/12/10 v155
+	1. Re-fix the auto-gen flyout spell's visibility.
+
+2016/12/09 v154
 	1. ChatFrame'll show the tips when mouse is over links.
 	2. Auto sell, auto repair, auto split and stack added for container.
 	3. Auto quest added for quest mover.
