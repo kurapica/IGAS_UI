@@ -78,6 +78,8 @@ function OnLoad(self)
 	self:RegisterEvent("BANKFRAME_OPENED")
 	self:RegisterEvent("BANKFRAME_CLOSED")
 	self:RegisterEvent("PLAYER_LEVEL_UP")
+	self:RegisterEvent("MERCHANT_SHOW")
+	self:RegisterEvent("MERCHANT_CLOSED")
 
 	for i = 1, 13 do
 		if _G["ContainerFrame" .. i] then
@@ -91,6 +93,14 @@ function OnLoad(self)
 
 	self:SecureHook("OpenAllBags")
 	self:SecureHook("CloseAllBags")
+
+	self:SecureHook("UseContainerItem", "Hook_UseContainerItem")
+	self:SecureHook("ContainerFrameItemButton_OnClick")
+	self:SecureHook("ContainerFrameItemButton_OnModifiedClick")
+	self:SecureHook("BuybackItem")
+	self:SecureHook("BuyMerchantItem")
+
+	self:SecureHook("OpenStackSplitFrame")
 
 	-- DB
 	if _DB.ContainerDB and (not _DB.ContainerDB.SaveFormatVer or _DB.ContainerDB.SaveFormatVer < 1) then
@@ -128,6 +138,24 @@ function OnLoad(self)
 			},
 		},
 	}
+
+	-- Other settings
+	_ToolSet = _ContainerDB.ToolSet or {
+		AutoRepair = true,
+		AutoRepairChkRep = 3,
+		AutoSell = true,
+		AutoSplit = true,
+	}
+	_ContainerDB.ToolSet = _ToolSet
+
+	_CharContainerDB = _DBChar.ContainerDB or {
+		DontSell = {},
+		NeedSell = {},
+	}
+	_DBChar.ContainerDB = _CharContainerDB
+
+	_ToolDontSell = _CharContainerDB.DontSell
+	_ToolNeedSell = _CharContainerDB.NeedSell
 
 	-- Location
 	if _ContainerDB.Location then
@@ -263,9 +291,47 @@ function PLAYER_LEVEL_UP(self)
 	end
 end
 
+local _MERCHANT_SHOW = false
+
+function MERCHANT_SHOW(self)
+	_MERCHANT_SHOW = true
+
+	if _ToolSet.AutoRepair then DoAutoRepair() end
+	if _ToolSet.AutoSell then DoAutoSell() end
+end
+
+function MERCHANT_CLOSED(self)
+	_MERCHANT_SHOW = false
+end
+
 -------------------------------
 -- UI Handlers
 -------------------------------
+function headerMenu:OnShow()
+	mnuAutoRepair.Checked = _ToolSet.AutoRepair
+	_ListReputation.SelectedIndex = _ToolSet.AutoRepairChkRep
+
+	mnuAutoSell.Checked = _ToolSet.AutoSell
+
+	mnuAutoSplit.Checked = _ToolSet.AutoSplit
+end
+
+function mnuAutoRepair:OnCheckChanged()
+	_ToolSet.AutoRepair = self.Checked
+end
+
+function _ListReputation:OnItemChoosed(key, item)
+	_ToolSet.AutoRepairChkRep = self.SelectedIndex
+end
+
+function mnuAutoSell:OnCheckChanged()
+	_ToolSet.AutoSell = self.Checked
+end
+
+function mnuAutoSplit:OnCheckChanged()
+	_ToolSet.AutoSplit = self.Checked
+end
+
 function _ContainerHeader.Mask:OnShow()
 	Toggle.Update()
 end
@@ -678,4 +744,433 @@ function buildItemList(itemlist)
 		end
 	end
 	return HTML_TEMPLATE:format(HTML_RESULT:format(table.concat( text, ", " )))
+end
+
+function FormatMoney(money)
+	if money >= 10000 then
+		return (GOLD_AMOUNT_TEXTURE.." "..SILVER_AMOUNT_TEXTURE.." "..COPPER_AMOUNT_TEXTURE):format(math.floor(money / 10000), 0, 0, math.floor(money % 10000 / 100), 0, 0, money % 100, 0, 0)
+	elseif money >= 100 then
+		return (SILVER_AMOUNT_TEXTURE.." "..COPPER_AMOUNT_TEXTURE):format(math.floor(money % 10000 / 100), 0, 0, money % 100, 0, 0)
+	else
+		return (COPPER_AMOUNT_TEXTURE):format(money % 100, 0, 0)
+	end
+end
+
+-------------------------------
+-- Auto Repair
+-------------------------------
+function DoAutoRepair(self)
+	if UnitReaction("target", "player") < _ToolSet.AutoRepairChkRep then return end
+
+	local repairByGuild = false
+
+	if not CanMerchantRepair() then return end
+
+	repairAllCost, canRepair = GetRepairAllCost()
+
+	if repairAllCost == 0 or not canRepair then return end
+
+	--See if can guildbank repair
+	if CanGuildBankRepair() then
+
+		local guildName, _, guildRankIndex = GetGuildInfo("player")
+
+		GuildControlSetRank(guildRankIndex)
+
+		if GetGuildBankWithdrawGoldLimit()*10000 >= repairAllCost then
+			repairByGuild = true
+			RepairAllItems(1)
+		else
+			if repairAllCost > GetMoney() then
+				return Warn(L["[AutoRepair] No enough money to repair."])
+			end
+
+			RepairAllItems()
+		end
+		PlaySound("ITEM_REPAIR")
+	else
+		if repairAllCost > GetMoney() then
+			return Warn(L["[AutoRepair] No enough money to repair."])
+		end
+
+		RepairAllItems()
+		PlaySound("ITEM_REPAIR")
+	end
+
+	Warn("-----------------------------")
+	if repairByGuild then
+		Info(L["[AutoRepair] Cost [Guild] %s."], FormatMoney(repairAllCost))
+	else
+		Info(L["[AutoRepair] Cost %s."], FormatMoney(repairAllCost))
+	end
+	Warn("-----------------------------")
+end
+
+-------------------------------
+-- Auto Sell
+-------------------------------
+_SelledList = {}
+_SelledCount = {}
+_SelledMoney = {}
+
+function DoAutoSell()
+	wipe(_SelledList)
+	wipe(_SelledCount)
+	wipe(_SelledMoney)
+
+	local selled = false
+
+	for bag = 0, NUM_BAG_FRAMES do
+		for slot = 1, GetContainerNumSlots(bag) do
+			local itemId = GetContainerItemID(bag, slot)
+			if itemId then
+				local _, _, itemRarity, _, _, _, _, _, _, _, money = GetItemInfo(itemId)
+
+				if money and money > 0 and (_ToolNeedSell[itemId] or (itemRarity == 0 and not _ToolDontSell[itemId])) then
+					local _, count, _, _, _, _, link = GetContainerItemInfo(bag, slot)
+					UseContainerItem(bag, slot)
+					selled = true
+					Add2List(link, count, money)
+				end
+			end
+		end
+	end
+
+	if selled then
+		Warn("-----------------------------")
+		Info(L["[AutoSell] Item List:"])
+		local money = 0
+		for _, link in ipairs(_SelledList) do
+			money = money + _SelledMoney[link]
+			icon = select(10, GetItemInfo(link)) or ""
+
+			if _SelledCount[link] > 1 then
+				Info("\124T%s:0\124t %s (%d) => %s.", icon, link, _SelledCount[link], FormatMoney(_SelledMoney[link]))
+			else
+				Info("\124T%s:0\124t %s => %s.", icon, link, FormatMoney(_SelledMoney[link]))
+			end
+		end
+		Info(L["[AutoSell] Total : %s."], FormatMoney(money))
+		Warn(L["[AutoSell] Buy back item if you don't want auto sell it."])
+		Warn(L["[AutoSell] Alt+Right-Click to mark item as auto sell."])
+		Warn("-----------------------------")
+	end
+end
+
+function Add2List(link, count, money)
+	count = count or 1
+	money = money * count
+
+	if _SelledCount[link] then
+		_SelledCount[link] = _SelledCount[link] + (count or 1)
+		_SelledMoney[link] = _SelledMoney[link] + money
+	else
+		tinsert(_SelledList, link)
+		_SelledCount[link] = count or 1
+		_SelledMoney[link] = money
+	end
+end
+
+function GetItemId(link)
+	local _, link = GetItemInfo(link)
+	if link then return tonumber(link:match":(%d+):") end
+end
+
+-------------------------------
+-- Auto Sell
+-------------------------------
+function ContainerFrameItemButton_OnClick(self, button)
+	if _MERCHANT_SHOW and _ToolSet.AutoSell and button == "RightButton" and IsModifiedClick("Alt") then
+		local itemId = GetContainerItemID(self:GetParent():GetID(), self:GetID())
+
+		if itemId then
+			_ToolDontSell[itemId] = nil
+			_ToolNeedSell[itemId] = true
+			DoAutoSell()
+		end
+	end
+end
+
+function ContainerFrameItemButton_OnModifiedClick(self, button)
+	if _MERCHANT_SHOW and _ToolSet.AutoSell and button == "RightButton" and IsModifiedClick("Alt") then
+		local itemId = GetContainerItemID(self:GetParent():GetID(), self:GetID())
+
+		if itemId then
+			_ToolDontSell[itemId] = nil
+			_ToolNeedSell[itemId] = true
+			DoAutoSell()
+		end
+	elseif IsAltKeyDown() and button and button:upper() == "LEFTBUTTON" then
+		local itemLink = GetContainerItemLink(self:GetParent():GetID(), self:GetID())
+		if itemLink then
+			local _, _, _, _, _, _, _, itemStackCount = GetItemInfo(itemLink)
+			if itemStackCount > 1 then
+				return Task.ThreadCall(StackItem, tonumber(itemLink:match":(%d+):"), itemStackCount)
+			end
+		end
+	end
+end
+
+-------------------------------
+-- Rollback auto sell
+-------------------------------
+function BuybackItem(index)
+	local link = GetBuybackItemLink(index)
+
+	if link then
+		local itemId = GetItemId(link)
+
+		if itemId then
+			_ToolNeedSell[itemId] = nil
+			local _, _, itemRarity = GetItemInfo(itemId)
+			if itemRarity == 0 then
+				_ToolDontSell[itemId] = true
+			end
+		end
+	end
+end
+
+function BuyMerchantItem(index, quantity)
+	local link = GetMerchantItemLink(index)
+
+	if link then
+		local itemId = GetItemId(link)
+
+		if itemId then
+			_ToolNeedSell[itemId] = nil
+		end
+	end
+end
+
+-------------------------------
+-- Auto Split
+-------------------------------
+StackSplitFrame = _G.StackSplitFrame
+StackSplitOkayButton = _G.StackSplitOkayButton
+StackSplitCancelButton = _G.StackSplitCancelButton
+
+StackSplitAllButton = CreateFrame("Button", "StackSplitAllButton", StackSplitFrame, "UIPanelButtonTemplate")
+StackSplitAllButton:SetWidth(42)
+StackSplitAllButton:SetHeight(24)
+StackSplitAllButton:Hide()
+StackSplitAllButton:SetPoint("CENTER", StackSplitFrame, "BOTTOM", 0, 32)
+StackSplitAllButton:SetText(L"Auto")
+StackSplitAllButton:SetScript("OnClick", function()
+	if not InCombatLockdown() then
+		local item = StackSplitFrame.owner
+		local split = StackSplitFrame.split
+
+	    StackSplitFrame:Hide()
+
+	    if item then
+	        return Task.ThreadCall(SplitItem, item:GetParent():GetID(), item:GetID(), split)
+	    end
+	end
+end)
+
+function OpenStackSplitFrame(maxStack, parent, anchor, anchorTo)
+	if _ToolSet.AutoSplit and StackSplitFrame:IsShown() and not InCombatLockdown() then
+		local bag = parent:GetParent() and parent:GetParent():GetID()
+		if bag and bag >=0 and bag <= NUM_BAG_FRAMES then
+			StackSplitOkayButton:SetWidth(40)
+			StackSplitOkayButton:SetPoint("RIGHT", StackSplitFrame, "BOTTOM", -23, 32)
+			StackSplitCancelButton:SetWidth(40)
+			StackSplitCancelButton:SetPoint("LEFT", StackSplitFrame, "BOTTOM", 23, 32)
+
+			StackSplitAllButton:Show()
+		else
+			StackSplitOkayButton:SetWidth(64)
+			StackSplitOkayButton:SetPoint("RIGHT", StackSplitFrame, "BOTTOM", -3, 32)
+			StackSplitCancelButton:SetWidth(64)
+			StackSplitCancelButton:SetPoint("LEFT", StackSplitFrame, "BOTTOM", 5, 32)
+
+			StackSplitAllButton:Hide()
+		end
+	end
+end
+
+StackSplitFrame:HookScript("OnHide", function(self)
+	Task.NoCombatCall(function()
+		if StackSplitAllButton:IsShown() then
+			StackSplitOkayButton:SetWidth(64)
+			StackSplitOkayButton:SetPoint("RIGHT", StackSplitFrame, "BOTTOM", -3, 32)
+			StackSplitCancelButton:SetWidth(64)
+			StackSplitCancelButton:SetPoint("LEFT", StackSplitFrame, "BOTTOM", 5, 32)
+
+			StackSplitAllButton:Hide()
+		end
+	end)
+end)
+
+----------------------------------------
+-- Stack
+----------------------------------------
+StackLoc = {}
+ceil = math.ceil
+
+function StackItem(itemId, itemStackCount)
+	GetLocForStack(itemId, itemStackCount)
+
+	if ceil(StackLoc.Sum / itemStackCount) < StackLoc["Cnt"] then
+		while StackItemOnce(itemStackCount) do
+			Task.Delay(1)
+		end
+	end
+end
+
+function StackItemOnce(itemStackCount)
+	local start, last, chg = 1, StackLoc["Cnt"], false
+	local _, esLink
+
+	-- ReCount
+	for i, v in ipairs(StackLoc) do
+		esLink = GetContainerItemLink(v["bag"], v["slot"])
+		if esLink then
+			_, v["cnt"] = GetContainerItemInfo(v["bag"], v["slot"])
+		else
+			v["cnt"] = 0
+		end
+	end
+
+	-- Stack main
+	while start < last do
+		if StackLoc[start]["cnt"] < itemStackCount then
+			if StackLoc[last]["cnt"] > 0 then
+				if StackLoc[last]["cnt"] + StackLoc[start]["cnt"] <= itemStackCount then
+					PickupContainerItem(StackLoc[last]["bag"], StackLoc[last]["slot"])
+					PickupContainerItem(StackLoc[start]["bag"], StackLoc[start]["slot"])
+				else
+					SplitContainerItem(StackLoc[last]["bag"], StackLoc[last]["slot"], itemStackCount - StackLoc[start]["cnt"])
+					PickupContainerItem(StackLoc[start]["bag"], StackLoc[start]["slot"])
+				end
+				chg = true
+				start = start + 1
+				last = last - 1
+			else
+				last = last - 1
+			end
+		else
+			start = start + 1
+		end
+	end
+
+	return chg
+end
+
+function GetLocForStack(itemId, itemStackCount)
+    local shdCnt = 0
+    StackLoc.Sum = 0
+
+	for bag = NUM_BAG_FRAMES,0,-1 do
+		for slot = GetContainerNumSlots(bag),1,-1 do
+			local esLink = GetContainerItemLink(bag, slot)
+
+			if esLink then
+				if tonumber(esLink:match":(%d+):") == itemId then
+					local _, itemCount = GetContainerItemInfo(bag, slot)
+					if itemCount < itemStackCount then
+						shdCnt = shdCnt + 1
+						if not StackLoc[shdCnt] then
+							StackLoc[shdCnt]= {}
+						end
+						StackLoc[shdCnt]["bag"] = bag
+						StackLoc[shdCnt]["slot"] = slot
+						StackLoc[shdCnt]["cnt"] = itemCount
+
+						StackLoc.Sum = StackLoc.Sum + itemCount
+					end
+				end
+			end
+		end
+	end
+
+    StackLoc["Cnt"] = shdCnt
+    shdCnt = shdCnt + 1
+    StackLoc[shdCnt] = nil
+
+	-- Sort
+	SortStack()
+end
+
+function SortStack()
+	local chg = false
+
+	for i, v in ipairs(StackLoc) do
+		if StackLoc[i+1] then
+			if StackLoc[i]["cnt"] < StackLoc[i+1]["cnt"] then
+				chg = true
+				StackLoc[i+1], StackLoc[i] = StackLoc[i], StackLoc[i+1]
+			end
+		end
+	end
+
+	if chg then
+		return SortStack()
+	end
+end
+
+----------------------------------------
+-- Split
+----------------------------------------
+FreeLoc = {}
+
+function GetFreeLocForSplit(Cnt)
+    local shdCnt = 0
+
+	for bag = NUM_BAG_FRAMES,0,-1 do
+		for slot = GetContainerNumSlots(bag),1,-1 do
+			if shdCnt >= Cnt then
+				break
+			end
+
+			esLink = GetContainerItemLink(bag,slot)
+			if not esLink then
+				shdCnt = shdCnt + 1
+				if not FreeLoc[shdCnt] then
+					FreeLoc[shdCnt]= {}
+				end
+				FreeLoc[shdCnt]["bag"] = bag
+				FreeLoc[shdCnt]["slot"] = slot
+				FreeLoc[shdCnt]["used"] = false
+			end
+		end
+	end
+
+    FreeLoc["Cnt"] = shdCnt
+    shdCnt = shdCnt + 1
+    FreeLoc[shdCnt] = nil
+end
+
+function GetFree()
+    for _, loc in ipairs(FreeLoc) do
+        if not loc["used"] then
+            loc["used"] = true
+            return loc
+        end
+    end
+    return nil
+end
+
+function SplitItem(bag, slot, num)
+    local _, itemCount = GetContainerItemInfo(bag, slot)
+    local loc
+
+    if itemCount > num and num > 0 then
+        GetFreeLocForSplit(math.ceil(itemCount/num))
+
+        while itemCount > num do
+        	loc = GetFree()
+
+        	if not loc then return end
+
+			SplitContainerItem(bag, slot, num)
+			PickupContainerItem(loc["bag"], loc["slot"])
+
+        	Task.Delay(1)	-- Seep safe, wait for 1 sec
+
+        	_, itemCount = GetContainerItemInfo(bag, slot)
+        end
+
+        Info(L"[AutoSplit] You also can use Alt+Left-Click to push items together.")
+    end
 end

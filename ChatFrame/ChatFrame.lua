@@ -3,7 +3,11 @@
 -----------------------------------------
 IGAS:NewAddon "IGAS_UI.ChatFrame"
 
-_LoadedTab = 1
+local _LoadedTab = 1
+local _CheckCompare = false
+local _CheckType = nil
+local _CheckAchievement = nil
+local GameTooltip = _G.GameTooltip
 
 function OnLoad(self)
 	_G.CHAT_FRAME_TAB_SELECTED_NOMOUSE_ALPHA = 0
@@ -59,6 +63,9 @@ function FCF_OpenTemporaryWindow()
 end
 
 function ApplyStyle(tabName)
+	_G[tabName]:HookScript("OnHyperlinkEnter", OnHyperlinkEnter)
+	_G[tabName]:HookScript("OnHyperlinkLeave", OnHyperlinkLeave)
+
 	_G[tabName]:SetClampRectInsets(0, 0, 38, - 38)
 	FCF_SetWindowAlpha(_G[tabName], 0)
 
@@ -80,4 +87,112 @@ end
 function FCF_StopDragging(frame)
 	local name = frame:GetName()
 	_ChatFramePos[name] = IGAS[name].Location
+end
+
+-- OnHyperlinkEnter
+function OnHyperlinkEnter(self, linkData)
+	local linkType, id = strsplit(":", linkData, 3)
+
+	GameTooltip:SetOwner(self, "ANCHOR_CURSOR")
+	local ok = pcall(GameTooltip.SetHyperlink, GameTooltip, linkData)
+	if ok then
+		GameTooltip:Show()
+
+		if linkType == "item" then
+			_CheckCompare = true
+			_CheckType = "item"
+
+			return Task.ThreadCall(AutoCheckCompare)
+		elseif linkType == "achievement" and id then
+			local selfLink = GetAchievementLink(id)
+
+			if selfLink then
+				_CheckCompare = true
+				_CheckType = "achievement"
+				_CheckAchievement = selfLink
+
+				return Task.ThreadCall(AutoCheckCompare)
+			end
+		end
+	end
+end
+
+-- OnHyperlinkLeave
+function OnHyperlinkLeave(self, linkData)
+	_CheckCompare = false
+	_CheckAchievement = nil
+	_CheckType = nil
+	GameTooltip:Hide()
+	if ( GameTooltip.shoppingTooltips ) then
+		for _, frame in pairs(GameTooltip.shoppingTooltips) do
+			frame:Hide();
+		end
+	end
+end
+
+-- AutoCheckCompareAchievement
+function AutoCheckCompare()
+	local inCompare = false
+
+	while true do
+		if not _CheckCompare then
+			inCompare = false
+			return
+		end
+
+		Task.Next()
+
+		if _CheckType == "item" then
+			if GameTooltip:IsShown() and IsModifiedClick("COMPAREITEMS") then
+				if not inCompare then
+					inCompare = true
+					GameTooltip_ShowCompareItem()
+				end
+			elseif inCompare then
+				inCompare = false
+				if ( GameTooltip.shoppingTooltips ) then
+					for _, frame in pairs(GameTooltip.shoppingTooltips) do
+						frame:Hide();
+					end
+				end
+			end
+		elseif _CheckType == "achievement" then
+			if GameTooltip:IsShown() and IsModifiedClick("COMPAREITEMS") then
+				if not inCompare then
+					inCompare = true
+
+					-- find correct side
+					local rightDist = 0;
+					local leftPos = GameTooltip:GetLeft();
+					local rightPos = GameTooltip:GetRight();
+					if ( not rightPos ) then
+						rightPos = 0;
+					end
+					if ( not leftPos ) then
+						leftPos = 0;
+					end
+
+					rightDist = GetScreenWidth() - rightPos;
+
+					if (leftPos and (rightDist < leftPos)) then
+						GameTooltip.shoppingTooltips[1]:SetOwner(GameTooltip, "ANCHOR_NONE")
+						GameTooltip.shoppingTooltips[1]:SetPoint("TOPRIGHT", GameTooltip, "TOPLEFT")
+					else
+						GameTooltip.shoppingTooltips[1]:SetOwner(GameTooltip, "ANCHOR_NONE")
+						GameTooltip.shoppingTooltips[1]:SetPoint("TOPLEFT", GameTooltip, "TOPRIGHT")
+					end
+
+					GameTooltip.shoppingTooltips[1]:SetHyperlink(_CheckAchievement)
+					GameTooltip.shoppingTooltips[1]:Show()
+				end
+			elseif inCompare then
+				inCompare = false
+				if ( GameTooltip.shoppingTooltips ) then
+					for _, frame in pairs(GameTooltip.shoppingTooltips) do
+						frame:Hide();
+					end
+				end
+			end
+		end
+	end
 end

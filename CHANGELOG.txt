@@ -1,3 +1,9 @@
+2016/11/09 v154
+	1. ChatFrame'll show the tips when mouse is over links.
+	2. Auto sell, auto repair, auto split and stack added for container.
+	3. Auto quest added for quest mover.
+	4. Fix the auto-gen flyout spell.
+
 2016/11/30 v153
 	1. Fix the auto fade of the minimap.
 

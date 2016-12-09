@@ -663,9 +663,12 @@ class "IActionButton"
 
 			if changed then
 				if not self.FreeMode then
+					local blockGridUpdating = self.BlockGridUpdating
 					self:GenerateBranch(#map)
+					Task.NoCombatCall(UpdateExpansion, self, self.Expansion)
 					for i = 1, #map do
 						self = self.Branch
+						self.BlockGridUpdating = blockGridUpdating
 						self.Spell = map[i]
 					end
 				else

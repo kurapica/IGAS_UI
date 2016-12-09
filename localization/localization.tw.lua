@@ -7,6 +7,22 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/12/10 v154 : </lime>
+</p><br/>
+<p>
+    1. 鼠標移到聊天欄的鏈接上，會顯示對應的信息，也可以比較成就和物品。
+</p>
+<p>
+    2. 背包系統增加自動修理，販賣，分割，堆疊功能。
+</p>
+<p>
+    3. 自動任務加入(默認關閉)。
+</p>
+<p>
+    4. 修復彈出技能的自動生成機能。偶爾會在恰當的時候顯示出來。
+</p>
+<br/><br/>
+<p>
 <lime>2016/11/28 v150 : </lime>
 </p><br/>
 <p>
@@ -752,3 +768,19 @@ L["Auto Fade Out"] = "自動漸隱"
 
 L["Lock Micro Menu"] = "鎖定微菜單"
 L["Lock Extra Action Bar"] = "鎖定額外動作條"
+
+L["Auto Repair"] = "自動修理"
+L["Check Reputation"] = "檢查聲望"
+L["Auto Sell"] = "自動販賣"
+L["Auto Split"] = "自動分割"
+L["Auto"] = "自動"
+L["[AutoRepair] No enough money to repair."] = "[自動修理]沒有足夠的錢進行修理。"
+L["[AutoRepair] Cost [Guild] %s."] = "[自動修理]消耗[工會] %s."
+L["[AutoRepair] Cost %s."] = "[自動修理]消耗 %s."
+L["[AutoSell] Item List:"] = "[自動販賣]物品列表:"
+L["[AutoSell] Total : %s."] = "[自動販賣]總計 : %s."
+L["[AutoSell] Buy back item if you don't want auto sell it."] = "[自動販賣]買回的物品不會再自動販賣。"
+L["[AutoSell] Alt+Right-Click to mark item as auto sell."] = "[自動販賣]Alt+鼠標右鍵標記該物品自動販賣。"
+L["[AutoSplit] You also can use Alt+Left-Click to push items together."] = "[自動分割]妳可以使用Alt+鼠標點擊物品來進行合並。"
+
+L["Auto Quest"] = "自動任務"

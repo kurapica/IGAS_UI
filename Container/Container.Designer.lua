@@ -15,6 +15,32 @@ mnuShowRuleManager = headerMenu:AddMenuButton(L"Show the view manager")
 
 mnuShowTokenList = headerMenu:AddMenuButton(L"Show the token watch list")
 
+mnuAutoRepair = headerMenu:AddMenuButton(L"Auto Repair", L"Auto Repair")
+mnuAutoRepair.IsCheckButton = true
+
+mnuAutoRepairChkRep = headerMenu:AddMenuButton(L"Auto Repair", L"Check Reputation")
+_ListReputation = List("LstReputation", mnuAutoRepairChkRep)
+_ListReputation:SetList({
+	_G["FACTION_STANDING_LABEL"..1],
+	_G["FACTION_STANDING_LABEL"..2],
+	_G["FACTION_STANDING_LABEL"..3],
+	_G["FACTION_STANDING_LABEL"..4],
+	_G["FACTION_STANDING_LABEL"..5],
+	_G["FACTION_STANDING_LABEL"..6],
+	_G["FACTION_STANDING_LABEL"..7],
+	_G["FACTION_STANDING_LABEL"..8],
+})
+_ListReputation.Width = 150
+_ListReputation.Height = 250
+_ListReputation.Visible = false
+mnuAutoRepairChkRep.DropDownList = _ListReputation
+
+mnuAutoSell = headerMenu:AddMenuButton(L"Auto Sell")
+mnuAutoSell.IsCheckButton = true
+
+mnuAutoSplit = headerMenu:AddMenuButton(L"Auto Split")
+mnuAutoSplit.IsCheckButton = true
+
 --------------------------
 -- Container
 --------------------------

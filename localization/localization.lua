@@ -4,6 +4,22 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2016/12/10 v154 : </lime>
+</p><br/>
+<p>
+    1. ChatFrame'll show the tips when mouse is over links.
+</p>
+<p>
+    2. Auto sell, auto repair, auto split and stack added for container.
+</p>
+<p>
+    3. Auto quest added for quest mover.
+</p>
+<p>
+    4. Fix the auto-gen flyout spell.
+</p>
+<br/><br/>
+<p>
 <lime>2016/11/28 v150 : </lime>
 </p><br/>
 <p>
