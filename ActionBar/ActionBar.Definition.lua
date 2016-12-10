@@ -571,7 +571,7 @@ class "IActionButton"
 		end
 	end
 
-	function GenerateBranch(self, num, force)
+	function GenerateBranch(self, num, force, duringCreation)
 		num = num or self.BranchCount
 
 		local blockGridUpdating = self.BlockGridUpdating
@@ -629,7 +629,9 @@ class "IActionButton"
 				end
 			end
 		end
-		return UpdateExpansion(self, self.Expansion)
+		if not duringCreation then
+			return UpdateExpansion(self, self.Expansion)
+		end
 	end
 
 	function RegenerateFlyout(self)
@@ -1303,7 +1305,7 @@ class "IActionButton"
 					end
 
 					if not self.FlytoutID then
-						self:GenerateBranch(num)
+						self:GenerateBranch(num, false, true)
 					end
 				end
 			end)

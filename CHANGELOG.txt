@@ -1,3 +1,6 @@
+2016/12/10 v159
+	1. Fix the popup button won't show when drag to generate it.
+
 2016/12/10 v158
 	1. Fix the container view syste's manager for english version.
 
