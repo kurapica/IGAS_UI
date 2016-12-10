@@ -450,7 +450,9 @@ function viewRuleTree:OnNodeFunctionClick(func, node)
 				node:Dispose()
 			end
 			for i = index, parent.ChildNodeCount do
-				parent:GetNode(i).Text = L"Container" .. i
+				if parent:GetNode(i).Text:match("^" .. L"Container" .. "%d+$") then
+					parent:GetNode(i).Text = L"Container" .. i
+				end
 			end
 		elseif node.Level == 3 then
 			local index = node.Index
