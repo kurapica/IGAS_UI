@@ -1,3 +1,6 @@
+2016/12/10 v161
+	1. Since the quest reward all add to collection, there is no need to check it.
+
 2016/12/10 v160
 	1. Fix the container's name is changed when delete container that above it.
 

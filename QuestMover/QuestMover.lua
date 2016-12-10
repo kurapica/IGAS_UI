@@ -310,71 +310,29 @@ QuestFrameRewardPanel:ActiveThread("OnShow")
 QuestFrameRewardPanel.OnShow = QuestFrameRewardPanel.OnShow + function()
 	Task.Delay(0.1)
 
-	local chooseItem = nil
-	for i = 1, GetNumQuestChoices() do
-		local ft = IGAS["QuestInfoRewardsFrameQuestInfoItem"..i].WarnTrans
-		if not ft then
-			ft = Texture("WarnTrans", IGAS["QuestInfoRewardsFrameQuestInfoItem"..i])
-			ft:SetPoint("TOPRIGHT", 0, 0)
-			ft:SetSize(24, 24)
-			ft.TexturePath = [[Interface\Addons\IGAS_UI\Resource\HelpIcon-ReportAbuse.blp]]
-		end
-		ft.Visible = false
-
-		GameTooltip:SetOwner(UIParent,"ANCHOR_TOPRIGHT")
-		GameTooltip:SetQuestItem("choice", i)
-		local _, link = GameTooltip:GetItem()
-		GameTooltip:Hide()
-
-		if link then
-			GameTooltip:SetOwner(UIParent,"ANCHOR_TOPRIGHT")
-			GameTooltip:SetHyperlink(link)
-
-			local j = 1
-			local t = _G["GameTooltipTextLeft"..j]
-
-			while t and t:IsShown() do
-				if t:GetText() == TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN then
-					ft.Visible = true
-					break
-				end
-
-				j = j + 1
-				t = _G["GameTooltipTextLeft"..j]
-			end
-			GameTooltip:Hide()
-		end
-
-		if ft.Visible and not chooseItem then
-			chooseItem = i
-			QuestInfoItem_OnClick(_G["QuestInfoRewardsFrameQuestInfoItem"..i])
-			if GetNumQuestChoices() > 1 then
-				return
-			end
-		end
-	end
-
-	if not chooseItem and _G.QuestInfoFrame.itemChoice == 0 and GetNumQuestChoices() > 0 then
-		local index, maxV = 0, 0
-
-		for i = 1, GetNumQuestChoices() do
-			GameTooltip:SetOwner(UIParent)
-			GameTooltip:SetAnchorType("ANCHOR_TOPRIGHT")
-
-			GameTooltip:SetQuestItem("choice", i)
-
-			if IGAS.GameTooltip:GetMoney() > maxV then
-				maxV = IGAS.GameTooltip:GetMoney()
-				index = i
-			end
-		end
-
-		if index > 0 then
-			QuestInfoItem_OnClick(_G["QuestInfoRewardsFrameQuestInfoItem"..index])
-		end
-
+	if _G.QuestInfoFrame.itemChoice == 0 and GetNumQuestChoices() > 0 then
 		if GetNumQuestChoices() > 1 then
+			local index, maxV = 0, 0
+
+			for i = 1, GetNumQuestChoices() do
+				GameTooltip:SetOwner(UIParent)
+				GameTooltip:SetAnchorType("ANCHOR_TOPRIGHT")
+
+				GameTooltip:SetQuestItem("choice", i)
+
+				if IGAS.GameTooltip:GetMoney() > maxV then
+					maxV = IGAS.GameTooltip:GetMoney()
+					index = i
+				end
+			end
+
+			if index > 0 then
+				QuestInfoItem_OnClick(_G["QuestInfoRewardsFrameQuestInfoItem"..index])
+			end
+
 			return
+		else
+			QuestInfoItem_OnClick(_G["QuestInfoRewardsFrameQuestInfoItem1"])
 		end
 	end
 
@@ -385,17 +343,5 @@ QuestFrameRewardPanel.OnShow = QuestFrameRewardPanel.OnShow + function()
 		return
 	else
 		GetQuestReward(_G.QuestInfoFrame.itemChoice)
-	end
-end
-
-QuestFrameRewardPanel.OnHide = QuestFrameRewardPanel.OnHide + function()
-	local i = 1
-
-	while _G["QuestInfoRewardsFrameQuestInfoItem"..i] do
-		if IGAS["QuestInfoRewardsFrameQuestInfoItem"..i].WarnTrans then
-			IGAS["QuestInfoRewardsFrameQuestInfoItem"..i].WarnTrans.Visible = false
-		end
-
-		i = i + 1
 	end
 end
