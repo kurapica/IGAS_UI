@@ -27,6 +27,14 @@ _Backdrop = {
 }
 _BackColor = ColorType(0, 0, 0, 1)
 
+_EncodeMap = {
+	['<'] = "&lt;",
+	['>'] = "&gt;",
+	['"'] = "&quot;",
+	['\''] = "&#39;",
+	['&'] = "&amp;",
+}
+
 -- Item Conditions
 _ItemConditions = {
 	{
@@ -315,8 +323,8 @@ while itemCls and #itemCls > 0 do
 	_ID = 300000 + i * 1000
 	tinsert(_ItemConditions, {
 		ID = _ID,
-		Name = itemCls,
-		Desc = L"The slot has item, and the item's class is " .. itemCls,
+		Name = itemCls:gsub("%p", _EncodeMap),
+		Desc = L"The slot has item, and the item's class is " .. itemCls:gsub("%p", _EncodeMap),
 		Condition = ("(cls == %q)"):format(itemCls),
 	})
 
@@ -327,8 +335,8 @@ while itemCls and #itemCls > 0 do
 		_ID = _ID + 1
 		tinsert(_ItemConditions, {
 			ID = _ID,
-			Name = itemCls .. "-" .. itemSubCls,
-			Desc = L"The slot has item, and the item's sub-class is " .. itemSubCls,
+			Name = itemCls:gsub("%p", _EncodeMap) .. "-" .. itemSubCls:gsub("%p", _EncodeMap),
+			Desc = L"The slot has item, and the item's sub-class is " .. itemSubCls:gsub("%p", _EncodeMap),
 			Condition = ("(cls == %q and subclass == %q)"):format(itemCls, itemSubCls),
 		})
 
