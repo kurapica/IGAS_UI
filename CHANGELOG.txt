@@ -1,3 +1,6 @@
+2016/12/10 v157
+	1. Fix the auto quest select item.
+
 2016/12/10 v156
 	1. Fix the auto finish quest without select.
 

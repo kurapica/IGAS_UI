@@ -363,8 +363,8 @@ QuestFrameRewardPanel.OnShow = QuestFrameRewardPanel.OnShow + function()
 
 			GameTooltip:SetQuestItem("choice", i)
 
-			if GameTooltip:GetMoney() > maxV then
-				maxV = GameTooltip:GetMoney()
+			if IGAS.GameTooltip:GetMoney() > maxV then
+				maxV = IGAS.GameTooltip:GetMoney()
 				index = i
 			end
 		end
