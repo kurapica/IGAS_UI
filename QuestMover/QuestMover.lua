@@ -348,6 +348,9 @@ QuestFrameRewardPanel.OnShow = QuestFrameRewardPanel.OnShow + function()
 		if ft.Visible and not chooseItem then
 			chooseItem = i
 			QuestInfoItem_OnClick(_G["QuestInfoRewardsFrameQuestInfoItem"..i])
+			if GetNumQuestChoices() > 1 then
+				return
+			end
 		end
 	end
 
@@ -370,7 +373,9 @@ QuestFrameRewardPanel.OnShow = QuestFrameRewardPanel.OnShow + function()
 			QuestInfoItem_OnClick(_G["QuestInfoRewardsFrameQuestInfoItem"..index])
 		end
 
-		return
+		if GetNumQuestChoices() > 1 then
+			return
+		end
 	end
 
 	if not _AutoQuest.ToggleOn then return end
