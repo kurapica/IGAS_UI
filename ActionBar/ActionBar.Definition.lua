@@ -571,10 +571,11 @@ class "IActionButton"
 		end
 	end
 
-	function GenerateBranch(self, num, force, duringCreation)
+	function GenerateBranch(self, num, force)
 		num = num or self.BranchCount
 
 		local blockGridUpdating = self.BlockGridUpdating
+		local visible = self.Expansion or (self.Branch and self.Branch.Visible) or false
 
 		if self.Root == self and not InCombatLockdown() then
 			if force or self.BranchCount ~= num then
@@ -598,6 +599,8 @@ class "IActionButton"
 					elseif dir == FlyoutDirection.DOWN then
 						branch:SetPoint("TOP", self, "TOP", 0, -(h + marginY) * i)
 					end
+
+					branch.Visible = visible
 				end
 
 				-- Recycle useless button
@@ -628,9 +631,6 @@ class "IActionButton"
 					self:SetAttribute("type2", nil)
 				end
 			end
-		end
-		if not duringCreation then
-			return UpdateExpansion(self, self.Expansion)
 		end
 	end
 
@@ -1305,7 +1305,7 @@ class "IActionButton"
 					end
 
 					if not self.FlytoutID then
-						self:GenerateBranch(num, false, true)
+						self:GenerateBranch(num, false)
 					end
 				end
 			end)
