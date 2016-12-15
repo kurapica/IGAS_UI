@@ -1,3 +1,6 @@
+2016/12/10 v163
+	1. Fix popup-action won't show when alt+drag to create them, caused by v162.
+
 2016/12/10 v162
 	1. Fix the auto-gen popup bar auto hide for pet and mount.
 

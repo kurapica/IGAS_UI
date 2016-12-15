@@ -571,11 +571,11 @@ class "IActionButton"
 		end
 	end
 
-	function GenerateBranch(self, num, force)
+	function GenerateBranch(self, num, force, underCreation)
 		num = num or self.BranchCount
 
 		local blockGridUpdating = self.BlockGridUpdating
-		local visible = self.Expansion or (self.Branch and self.Branch.Visible) or false
+		local visible = underCreation or self.Expansion or (self.Branch and self.Branch.Visible) or false
 
 		if self.Root == self and not InCombatLockdown() then
 			if force or self.BranchCount ~= num then
@@ -1305,7 +1305,7 @@ class "IActionButton"
 					end
 
 					if not self.FlytoutID then
-						self:GenerateBranch(num, false)
+						self:GenerateBranch(num, false, true)
 					end
 				end
 			end)
