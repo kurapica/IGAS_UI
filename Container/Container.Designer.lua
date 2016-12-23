@@ -59,6 +59,25 @@ _ToggleButton.CloseBag = function() PlaySound("igBackPackClose") end
 SetOverrideBindingClick(_ToggleButton, true, GetBindingKey("OPENALLBAGS") or "B", "IGAS_UI_ContainerToggle", "LeftButton")
 --SetOverrideBindingClick(_ToggleButton, true, "SHIFT-" .. (GetBindingKey("OPENALLBAGS") or "B"), "IGAS_UI_ContainerToggle", "LeftButton")
 
+_ContainerHeader:SetFrameRef("ToggleButton", _ToggleButton)
+_ContainerHeader:RegisterStateDriver("autobind", "[combat]enable;disable")
+_ContainerHeader:SetAttribute("_onstate-autobind", [[
+	self:SetAttribute("autobindescape", newstate == "enable")
+	if newstate == "enable" and self:IsShown() then
+		self:GetFrameRef("ToggleButton"):SetBindingClick(true, "ESCAPE", "IGAS_UI_ContainerToggle", "LeftButton")
+	else
+		self:GetFrameRef("ToggleButton"):ClearBinding("ESCAPE")
+	end
+]])
+_ContainerHeader:SetAttribute("_onshow", [[
+	if self:GetAttribute("autobindescape") then
+		self:GetFrameRef("ToggleButton"):SetBindingClick(true, "ESCAPE", "IGAS_UI_ContainerToggle", "LeftButton")
+	end
+]])
+_ContainerHeader:SetAttribute("_onhide", [[
+	self:GetFrameRef("ToggleButton"):ClearBinding("ESCAPE")
+]])
+
 --------------------------
 -- Bank
 --------------------------

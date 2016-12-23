@@ -1,3 +1,6 @@
+2016/12/23 v164
+	1. Use esc to close container during combat would cause taint, since the problem can't be fixed, I'll bind escape key when the container is open and in-combat, and release it when continaer is closed or out-of-combat. It'd cause a tiny problem, you need esc twice to close all frames during combat, but I think it's acceptable.
+
 2016/12/10 v163
 	1. Fix popup-action won't show when alt+drag to create them, caused by v162.
 

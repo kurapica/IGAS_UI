@@ -1254,7 +1254,7 @@ class "ContainerHeader"
 	end
 
 	function ContainerHeader(self, name, parent, isBank)
-		Super(self, name, parent, "SecureHandlerStateTemplate")
+		Super(self, name, parent, "SecureHandlerStateTemplate,SecureHandlerShowHideTemplate")
 
 		self.IsBank = isBank
 		self.Visible = false
