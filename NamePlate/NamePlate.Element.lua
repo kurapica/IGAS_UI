@@ -192,6 +192,19 @@ class "iNameLabel"
 				lvlText = parseColor(self.LevelFormat:format("???") , 1.0, 0.82, 0.0)
 			end
 
+			local classification = UnitClassification(unit)
+
+			-- Check classification
+			if classification == "elite" then
+				lvlText = lvlText .. parseColor("+", 1, 1, 0)
+			elseif classification == "rare" then
+				lvlText = lvlText .. parseColor("+", 1, 1, 1)
+			elseif classification == "rareelite" then
+				lvlText = lvlText .. parseColor("+", 0, 1, 1)
+			elseif classification == "worldboss" then
+				lvlText = lvlText .. parseColor("+", 1, 0, 0)
+			end
+
 			-- Parse Name
 			local nameText
 
