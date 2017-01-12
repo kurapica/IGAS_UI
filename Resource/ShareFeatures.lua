@@ -318,7 +318,7 @@ class "iClassPower"
 	extend "IFClassPower"
 	extend "IFSoulFragment"
 
-	_MaxPower = 8
+	_MaxPower = 10
 
 	SPELL_POWER_HOLY_POWER = _G.SPELL_POWER_HOLY_POWER
 
@@ -384,6 +384,10 @@ class "iClassPower"
 
 			if self.PowerType == SPELL_POWER_HOLY_POWER then
 				if value >= 3 then
+					needActive = true
+				end
+			elseif self.PowerType == SPELL_POWER_COMBO_POINTS then
+				if value >= 5 then
 					needActive = true
 				end
 			elseif value >= self.MaxValue then
