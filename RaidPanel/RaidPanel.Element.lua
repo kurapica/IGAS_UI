@@ -82,7 +82,7 @@ class "iNameLabel"
 	end
 
 	function SetThreatLevel(self, lvl)
-		if lvl >= 2 and not UnitCanAttack("player", self.Unit) then
+		if self.Unit and lvl >= 2 and not UnitCanAttack("player", self.Unit) then
 			self.ThreatMarkLeft.Visible = true
 			self.ThreatMarkRight.Visible = true
 		else
@@ -333,6 +333,13 @@ class "iClassBuffPanel"
 	-- Method
 	------------------------------------------------------
 	function UpdateAuras(self)
+		local index = 1
+		local i = 0
+		local name
+		local unit = self.Unit
+		local filter = self.Filter
+		local maxCount = self.MaxCount
+
 		if unit then
 			if UnitCanAttack("player", unit) then
 				-- So nothing should be shown
@@ -341,13 +348,6 @@ class "iClassBuffPanel"
 				self.Filter = "HELPFUL"
 			end
 		end
-
-		local index = 1
-		local i = 0
-		local name
-		local unit = self.Unit
-		local filter = self.Filter
-		local maxCount = self.MaxCount
 
 		wipe(self.PriorityIndex)
 		wipe(self.PriorityMap)
