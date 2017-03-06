@@ -1082,7 +1082,7 @@ class "TokenInfo"
 		_GameTooltip:Hide()
 	end
 
-	__Handler__(function(self, val)
+	function SetCurrencyID(self, val)
 		if val then
 			local name, isHeader, isExpanded, isUnused, isWatched, count, icon = GetCurrencyListInfo(val)
 			if count and count <= 99999 then
@@ -1093,8 +1093,7 @@ class "TokenInfo"
 			self.Icon.TexturePath = icon
 			self.Icon:SetTexCoord(0.06, 0.94, 0.06, 0.94)
 		end
-	end)
-	property "ID" { Type = NumberNil }
+	end
 
 	function TokenInfo(self, ...)
 		Super(self, ...)
@@ -1143,7 +1142,7 @@ class "TokenPanel"
 
 					local name, isHeader, isExpanded, isUnused, isWatched, count, icon = GetCurrencyListInfo(i)
 					if watchList[name] then
-						self.Element[idx].ID = i
+						self.Element[idx]:SetCurrencyID(i)
 						self.Element[idx].Visible = true
 						idx = idx + 1
 					end

@@ -1,3 +1,6 @@
+2017/03/07 v168
+	1. Fix the curreny info won't update.
+
 2017/02/24 v167
 	1. Fix a code error for raidpanel's aura refreshing.
 
