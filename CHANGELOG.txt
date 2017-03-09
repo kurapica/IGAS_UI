@@ -1,3 +1,6 @@
+2017/03/09 v169
+	1. Fix the HELPFUL|PLAYER filter not works well.
+
 2017/03/07 v168
 	1. Fix the curreny info won't update.
 

@@ -156,6 +156,11 @@ Config = {
 				HSpacing = 1,
 				VSpacing = 1,
 				TopToBottom = false,
+
+				CustomFilter = function (self, unit, index, filter)
+					local name, _, _, _, _, duration, _, caster = UnitAura(unit, index, filter)
+					return name and caster == "player"
+				end,
 			},
 		},
 		iOtherBuffPanel = {

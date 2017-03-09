@@ -30,7 +30,7 @@ ADDON_MEM_KB_ABBR = ADDON_MEM_KB_ABBR
 
 GameTooltip = _G.GameTooltip
 
-NUM_ADDONS_TO_DISPLAY = 5;
+NUM_ADDONS_TO_DISPLAY = 20;
 topAddOns = {}
 for i=1, NUM_ADDONS_TO_DISPLAY do
 	topAddOns[i] = { value = 0, name = "" };
