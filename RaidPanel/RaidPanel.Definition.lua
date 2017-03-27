@@ -77,6 +77,14 @@ class "iRaidUnitFrame"
 		self.Panel.VSpacing = Config.UNITFRAME_VSPACING
 		self.Panel.HSpacing = Config.UNITFRAME_HSPACING
 		self.Panel.FrameLevel = 0
+
+		local _db = _DBChar[GetSpecialization() or 1]
+
+		if _db.ElementUseMouseDown then
+    		self:RegisterForClicks("AnyDown")
+		else
+			self:RegisterForClicks("AnyUp")
+		end
 	end
 endclass "iRaidUnitFrame"
 
