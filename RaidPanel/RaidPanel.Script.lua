@@ -435,7 +435,7 @@ function LoadConfig(_DBChar)
 	if _DBChar.ElementUseClassColor == nil then _DBChar.ElementUseClassColor = true end
 	if _DBChar.ElementUseDebuffColor == nil then _DBChar.ElementUseDebuffColor = true end
 	if _DBChar.ElementUseSmoothColor == nil then _DBChar.ElementUseSmoothColor = true end
-	if _DBChar.ElementUseMouseDown == nil then _DBChar.ElementUseMouseDown = false end
+	if _DBChar.ElementUseMouseDown == nil then _DBChar.ElementUseMouseDown = true end
 
 	mnuRaidPanelSetUseClassColor.Checked = _DBChar.ElementUseClassColor
 	mnuRaidPanelSetUseDebuffColor.Checked = _DBChar.ElementUseDebuffColor
