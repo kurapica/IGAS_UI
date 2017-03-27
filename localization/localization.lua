@@ -4,6 +4,13 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2017/03/27 v170 : </lime>
+</p><br/>
+<p>
+    1. A menu "Use mouse down" added for raid panel, so you can cast spell by press down the button directly.
+</p>
+<br/><br/>
+<p>
 <lime>2016/12/10 v154 : </lime>
 </p><br/>
 <p>

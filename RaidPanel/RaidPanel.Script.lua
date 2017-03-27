@@ -435,10 +435,12 @@ function LoadConfig(_DBChar)
 	if _DBChar.ElementUseClassColor == nil then _DBChar.ElementUseClassColor = true end
 	if _DBChar.ElementUseDebuffColor == nil then _DBChar.ElementUseDebuffColor = true end
 	if _DBChar.ElementUseSmoothColor == nil then _DBChar.ElementUseSmoothColor = true end
+	if _DBChar.ElementUseMouseDown == nil then _DBChar.ElementUseMouseDown = false end
 
 	mnuRaidPanelSetUseClassColor.Checked = _DBChar.ElementUseClassColor
 	mnuRaidPanelSetUseDebuffColor.Checked = _DBChar.ElementUseDebuffColor
 	mnuRaidPanelSetUseSmoothColor.Checked = _DBChar.ElementUseSmoothColor
+	mnuRaidPanelSetUseDown.Checked = _DBChar.ElementUseMouseDown
 	UpdateHealthBar4UseClassColor()
 
 	raidPanel:InitWithCount(25)
@@ -674,6 +676,14 @@ end
 function mnuRaidPanelSetUseSmoothColor:OnCheckChanged()
 	if raidPanelConfig.Visible then
 		_DBChar[_LoadingConfig].ElementUseSmoothColor = self.Checked
+
+		UpdateHealthBar4UseClassColor()
+	end
+end
+
+function mnuRaidPanelSetUseDown:OnCheckChanged()
+	if raidPanelConfig.Visible then
+		_DBChar[_LoadingConfig].ElementUseMouseDown = self.Checked
 
 		UpdateHealthBar4UseClassColor()
 	end
@@ -1066,25 +1076,30 @@ function UpdateHealthBar4UseClassColor()
 	local useClassColor = _DBChar[_LoadingConfig].ElementUseClassColor
 	local useDebuffColor = _DBChar[_LoadingConfig].ElementUseDebuffColor
 	local useSmoothColor = _DBChar[_LoadingConfig].ElementUseSmoothColor
+	local useMouseDown = _DBChar[_LoadingConfig].ElementUseMouseDown and "AnyDown" or "AnyUp"
 	raidPanel:Each(function(self)
 		self:GetElement(iHealthBar).UseClassColor = useClassColor
 		self:GetElement(iHealthBar).UseDebuffColor = useDebuffColor
 		self:GetElement(iHealthBar).UseSmoothColor = useSmoothColor
+		self:RegisterForClicks(useMouseDown)
 	end)
 	raidPetPanel:Each(function(self)
 		self:GetElement(iHealthBar).UseClassColor = useClassColor
 		self:GetElement(iHealthBar).UseDebuffColor = useDebuffColor
 		self:GetElement(iHealthBar).UseSmoothColor = useSmoothColor
+		self:RegisterForClicks(useMouseDown)
 	end)
 	raidDeadPanel:Each(function(self)
 		self:GetElement(iHealthBar).UseClassColor = useClassColor
 		self:GetElement(iHealthBar).UseDebuffColor = useDebuffColor
 		self:GetElement(iHealthBar).UseSmoothColor = useSmoothColor
+		self:RegisterForClicks(useMouseDown)
 	end)
 	raidUnitWatchPanel:Each(function(self)
 		self:GetElement(iHealthBar).UseClassColor = useClassColor
 		self:GetElement(iHealthBar).UseDebuffColor = useDebuffColor
 		self:GetElement(iHealthBar).UseSmoothColor = useSmoothColor
+		self:RegisterForClicks(useMouseDown)
 	end)
 end
 

@@ -1,3 +1,6 @@
+2017/03/27 v170
+	1. Add a menu "use mouse down" for raid panel.
+
 2017/03/09 v169
 	1. Fix the HELPFUL|PLAYER filter not works well.
 
