@@ -87,7 +87,7 @@ _MenuAutoFadeOut.IsCheckButton = true
 _MenuAlwaysShowGrid = _Menu:AddMenuButton(L"Bar Style", L"Always Show Grid")
 _MenuAlwaysShowGrid.IsCheckButton = true
 
-_MenuUseDown = _Menu:AddMenuButton(L"Global Style", L"Use mouse down")
+_MenuUseDown = _Menu:AddMenuButton(L"Global Style", L"Press down trigger")
 _MenuUseDown.IsCheckButton = true
 
 _MenuPopupDuration = _Menu:AddMenuButton(L"Global Style", L"Popup Duration")

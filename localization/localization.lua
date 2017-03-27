@@ -7,7 +7,7 @@ L["ChangeLog"] = [[
 <lime>2017/03/27 v170 : </lime>
 </p><br/>
 <p>
-    1. A menu "Use mouse down" added for raid panel, so you can cast spell by press down the button directly.
+    1. A menu "Press down trigger" added for raid panel, so you can cast spell by press down the button directly.
 </p>
 <br/><br/>
 <p>
