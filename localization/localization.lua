@@ -4,7 +4,7 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
-<lime>2017/03/27 v170 : </lime>
+<lime>2017/03/27 v172 : </lime>
 </p><br/>
 <p>
     1. A menu "Press down trigger" added for raid panel, so you can cast spell by press down the button directly.
