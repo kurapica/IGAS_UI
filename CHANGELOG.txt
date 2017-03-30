@@ -1,3 +1,6 @@
+2017/03/30 v174
+	1. Fix for 7.2.0
+
 2017/03/27 v170
 	1. Add a menu "use mouse down" for raid panel.
 
