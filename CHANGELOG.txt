@@ -1,3 +1,6 @@
+2017/04/01 v175
+	1. Modify the artifact power display style.
+
 2017/03/30 v174
 	1. Fix for 7.2.0
 

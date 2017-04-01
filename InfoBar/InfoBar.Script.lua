@@ -365,7 +365,7 @@ function _Timer:OnTimer()
 
 		local numPointsAvailableToSpend, xp, xpForNextPoint = MainMenuBar_GetNumArtifactTraitsPurchasableFromXP(pointsSpent, totalXP, artifactTier);
 
-		artifactXP = xp .. "/" .. xpForNextPoint.."  "
+		artifactXP = AbbreviateLargeNumbers(xp) .. "/" .. AbbreviateLargeNumbers(xpForNextPoint).."  "
 	end
 
 	-- Refresh
