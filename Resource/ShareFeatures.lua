@@ -712,6 +712,14 @@ class "iCastBar"
 		end
 	end
 
+	local function Status_OnHide(self)
+		if self.Owner.Duration and self.Owner.Duration > 0 then
+			self.Owner.Alpha = 0
+			self.Owner.Duration = 0
+			self.Owner.LineID = nil
+		end
+	end
+
 	------------------------------------------------------
 	-- Event
 	------------------------------------------------------
@@ -732,8 +740,10 @@ class "iCastBar"
 		status.StatusBarColor = Media.CASTBAR_COLOR
 		status.MinMaxValue = MinMax(1, 100)
 		status.Layer = "BORDER"
+		status.Owner = self
 
 		status.OnValueChanged = status.OnValueChanged + Status_OnValueChanged
+		status.OnHide = status.OnHide + Status_OnHide
 	end
 
 	function Start(self, spell, rank, lineID, spellID)
