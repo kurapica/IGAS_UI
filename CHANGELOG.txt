@@ -1,3 +1,6 @@
+2017/04/05 v177
+	1. Fix fake spell caused by blizzard like 'flash heal' -> 'shadow mend'.
+
 2017/04/04 v176
 	1. Fix the cast bar won't hidden if system event don't trigger.
 

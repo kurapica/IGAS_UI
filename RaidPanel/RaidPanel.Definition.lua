@@ -226,12 +226,17 @@ class "BindingButton"
 		local skillType, spellId = GetSpellBookItemInfo(slot, BOOKTYPE_SPELL)
 		local isPassive = IsPassiveSpell(slot, BOOKTYPE_SPELL)
 
-		if slotType == "FUTURESPELL" or slotType == "FLYOUT" or isPassive then
-			return
-		else
-			_IGASUI_SPELLHANDLER.Spell(spellId, self.With, IsHarmfulSpell(slot, BOOKTYPE_SPELL)).Key = key
-			return Masks:Each(RefreshBindingKey)
+		if slotType == "FUTURESPELL" or slotType == "FLYOUT" or isPassive then return end
+
+		local spellName = GetSpellBookItemName(slot, BOOKTYPE_SPELL)
+		local rspellID = spellName and select(7, GetSpellInfo(spellName))
+
+		if rspellID and rspellID ~= spellId and GetSpellInfo(rspellID) == spellName then
+			spellId = rspellID
 		end
+
+		_IGASUI_SPELLHANDLER.Spell(spellId, self.With, IsHarmfulSpell(slot, BOOKTYPE_SPELL)).Key = key
+		return Masks:Each(RefreshBindingKey)
 	end
 
 	------------------------------------
@@ -251,8 +256,13 @@ class "BindingButton"
 		local skillType, spellId = GetSpellBookItemInfo(slot, BOOKTYPE_SPELL)
 		local isPassive = IsPassiveSpell(slot, BOOKTYPE_SPELL)
 
-		if slotType == "FUTURESPELL" or slotType == "FLYOUT" or isPassive then
-			return
+		if slotType == "FUTURESPELL" or slotType == "FLYOUT" or isPassive then return end
+
+		local spellName = GetSpellBookItemName(slot, BOOKTYPE_SPELL)
+		local rspellID = spellName and select(7, GetSpellInfo(spellName))
+
+		if rspellID and rspellID ~= spellId and GetSpellInfo(rspellID) == spellName then
+			spellId = rspellID
 		end
 
 		if spellId then
@@ -289,6 +299,13 @@ class "BindingButton"
 		if slotType == "FUTURESPELL" or slotType == "FLYOUT" or isPassive then
 			self.Visible = false
 		else
+			local spellName = GetSpellBookItemName(slot, BOOKTYPE_SPELL)
+			local rspellID = spellName and select(7, GetSpellInfo(spellName))
+
+			if rspellID and rspellID ~= spellId and GetSpellInfo(rspellID) == spellName then
+				spellId = rspellID
+			end
+
 			local isHarmful = IsHarmfulSpell(slot, BOOKTYPE_SPELL)
 
 			self.Visible = true
