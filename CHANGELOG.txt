@@ -1,3 +1,6 @@
+2017/04/14 v179
+	1. Fix the auto-gen equipset action bar.
+
 2017/04/11 v178
 	1. Roll back to v176, the spell map will cause some spell can't be used by raid panel.
 

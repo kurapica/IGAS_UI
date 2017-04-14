@@ -2086,13 +2086,9 @@ class "AutoActionTask"
 	end
 
 	local function getEquipSet(self)
-		local index = 1
-		local name = GetEquipmentSetInfo(index)
-		while name do
+		for _, id in pairs(C_EquipmentSet.GetEquipmentSetIDs()) do
+			local name = C_EquipmentSet.GetEquipmentSetInfo(id)
 			yield("equipmentset", name)
-
-			index = index + 1
-			name = GetEquipmentSetInfo(index)
 		end
 	end
 
