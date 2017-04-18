@@ -27,7 +27,7 @@ local _ArrayMask = System.Collections.List()
 ------------------------------------------------------
 function OnLoad(self)
 	if _G.NamePlateDriverFrame then
-		_G.NamePlateDriverFrame:UnregisterAllEvents()
+		-- _G.NamePlateDriverFrame:UnregisterAllEvents()
 
 		_G.ClassNameplateBarRogueDruidFrame:UnregisterAllEvents()
 		_G.ClassNameplateBarWarlockFrame:UnregisterAllEvents()
@@ -41,10 +41,11 @@ function OnLoad(self)
 		_G.NamePlateTargetResourceFrame:UnregisterAllEvents()
 		_G.NamePlatePlayerResourceFrame:UnregisterAllEvents()
 
-		_G.NamePlateDriverFrame.UpdateNamePlateOptions = UpdateNamePlateOptions
+		self:SecureHook(_G.NamePlateDriverFrame, "UpdateNamePlateOptions", UpdateNamePlateOptions)
 	end
 
-	self:RegisterEvent("NAME_PLATE_CREATED")
+	-- self:RegisterEvent("NAME_PLATE_CREATED")
+	self:SecureHook(_G.NamePlateDriverFrame, "OnNamePlateCreated", NAME_PLATE_CREATED)
 	self:RegisterEvent("NAME_PLATE_UNIT_ADDED")
 	self:RegisterEvent("NAME_PLATE_UNIT_REMOVED")
 end
@@ -54,6 +55,8 @@ function OnEnable(self)
 end
 
 function NAME_PLATE_CREATED(self, base)
+	base.UnitFrame:Hide()
+
 	base.NamePlateMask = iNamePlateUnitFrame("iNamePlateMask", base)
 	base.NamePlateMask:ApplyFrameOptions(_VerticalScale, _HorizontalScale)
 	_ArrayMask:Insert(base.NamePlateMask)
@@ -64,17 +67,22 @@ function NAME_PLATE_UNIT_ADDED(self, unit)
 	local base = C_NamePlate.GetNamePlateForUnit(unit)
 	if UnitIsUnit("player", unit) then unit = "player" end
 
-	base.NamePlateMask.Unit = unit
+	if base.NamePlateMask then
+		base.UnitFrame:Hide()
+		base.NamePlateMask.Unit = unit
 
-	if unit == "player" then InstallClassPower(base.NamePlateMask) end
+		if unit == "player" then InstallClassPower(base.NamePlateMask) end
 
-	base.NamePlateMask:UpdateElements()
+		base.NamePlateMask:UpdateElements()
+	end
 end
 
 function NAME_PLATE_UNIT_REMOVED(self, unit)
 	local base = C_NamePlate.GetNamePlateForUnit(unit)
-	UninstallClassPower(base.NamePlateMask)
-	base.NamePlateMask.Unit = nil
+	if base.NamePlateMask then
+		UninstallClassPower(base.NamePlateMask)
+		base.NamePlateMask.Unit = nil
+	end
 end
 
 function InstallClassPower(self)
@@ -183,23 +191,15 @@ function UpdateNamePlateOptions()
 	if _VerticalScale < 1 then _VerticalScale = 1 end
 	if _HorizontalScale < 1 then _HorizontalScale = 1 end
 
-	local zeroBasedScale = _VerticalScale - 1.0
-	local clampedZeroBasedScale = Saturate(zeroBasedScale)
+	local font = NAME_FONT.Font
+	font.height = math.min(BASE_NAME_FONT_HEIGHT * _VerticalScale, MAX_NAME_FONT_HEIGHT)
+	NAME_FONT.Font = font
 
-	Task.NoCombatCall(function()
-		C_NamePlate.SetNamePlateFriendlySize(_BaseNamePlateWidth * _HorizontalScale, _BaseNamePlateHeight * Lerp(1.0, 1.25, zeroBasedScale))
-		C_NamePlate.SetNamePlateEnemySize(_BaseNamePlateWidth * _HorizontalScale, _BaseNamePlateHeight * Lerp(1.0, 1.25, zeroBasedScale))
-		C_NamePlate.SetNamePlateSelfSize(_BaseNamePlateWidth * _HorizontalScale * Lerp(1.1, 1.0, clampedZeroBasedScale), _BaseNamePlateHeight)
+	local np = _PlayerNamePlate
+	if np then UninstallClassPower(np) end
 
-		local font = NAME_FONT.Font
-		font.height = math.min(BASE_NAME_FONT_HEIGHT * _VerticalScale, MAX_NAME_FONT_HEIGHT)
-		NAME_FONT.Font = font
+	_ArrayMask:Each(function(self) IGAS:GetUI(self.Parent).UnitFrame:Hide() end)
+	_ArrayMask:Each(iNamePlateUnitFrame.ApplyFrameOptions, _VerticalScale, _HorizontalScale)
 
-		local np = _PlayerNamePlate
-		if np then UninstallClassPower(np) end
-
-		_ArrayMask:Each(iNamePlateUnitFrame.ApplyFrameOptions, _VerticalScale, _HorizontalScale)
-
-		if np then InstallClassPower(np) end
-	end)
+	if np then InstallClassPower(np) end
 end
