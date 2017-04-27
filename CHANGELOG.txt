@@ -1,3 +1,6 @@
+2017/04/27 v181
+	1. Force hide default nameplates in the next phase of the events.
+
 2017/04/18 v180
 	1. The blizzard's nameplates would be shown in the dungeon for frendly players.
 
