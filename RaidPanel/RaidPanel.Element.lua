@@ -57,6 +57,11 @@ class "iHealthBar"
 			self.UseSmoothColor = true
 		end
 
+		if _db.ElementSmoothUpdate then
+			self.Smoothing = true
+			self.SmoothDelay = _db.ElementSmoothUpdateDelay or 1
+		end
+
 		self.FrameLevel = self.FrameLevel + 1
 	end
 endclass "iHealthBar"

@@ -4,6 +4,13 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2017/04/29 v182 : </lime>
+</p><br/>
+<p>
+    1. "Smoothing updating" added for raid panel, it'll smooth the updating of the healthbar, you also can modify the smoothing delay.
+</p>
+<br/><br/>
+<p>
 <lime>2017/03/27 v172 : </lime>
 </p><br/>
 <p>

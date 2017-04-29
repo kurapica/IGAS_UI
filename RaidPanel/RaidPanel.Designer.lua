@@ -94,6 +94,8 @@ mnuRaidPanelSetUseClassColor = raidPanelConfig:AddMenuButton(L"Element Settings"
 mnuRaidPanelSetUseDebuffColor = raidPanelConfig:AddMenuButton(L"Element Settings", L"Use Debuff Color")
 mnuRaidPanelSetUseSmoothColor = raidPanelConfig:AddMenuButton(L"Element Settings", L"Use Smoothing Color")
 mnuRaidPanelSetUseDown = raidPanelConfig:AddMenuButton(L"Element Settings", L"Press down trigger")
+mnuRaidPanelSetSmooth = raidPanelConfig:AddMenuButton(L"Element Settings", L"Smoothing updating")
+mnuRaidPanelSetSmoothDelay = raidPanelConfig:AddMenuButton(L"Element Settings", L"Smoothing delay")
 mnuRaidPanelSetWidth:ActiveThread("OnClick")
 mnuRaidPanelSetHeight:ActiveThread("OnClick")
 mnuRaidPanelSetPowerHeight:ActiveThread("OnClick")
@@ -101,6 +103,8 @@ mnuRaidPanelSetUseClassColor.IsCheckButton = true
 mnuRaidPanelSetUseDebuffColor.IsCheckButton = true
 mnuRaidPanelSetUseSmoothColor.IsCheckButton = true
 mnuRaidPanelSetUseDown.IsCheckButton = true
+mnuRaidPanelSetSmooth.IsCheckButton = true
+mnuRaidPanelSetSmoothDelay:ActiveThread("OnClick")
 
 -- Activated
 mnuRaidPanelActivated = raidPanelConfig:AddMenuButton(L"Raid panel", L"Activated")

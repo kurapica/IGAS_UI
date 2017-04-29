@@ -7,6 +7,13 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2017/04/29 v182 : </lime>
+</p><br/>
+<p>
+    1. 团队面板提供"平滑血条更新"选项，同时也可以修改平滑更新的延迟。
+</p>
+<br/><br/>
+<p>
 <lime>2017/03/27 v172 : </lime>
 </p><br/>
 <p>
@@ -789,3 +796,7 @@ L["[AutoSell] Alt+Right-Click to mark item as auto sell."] = "[自动贩卖]Alt+
 L["[AutoSplit] You also can use Alt+Left-Click to push items together."] = "[自动分割]你可以使用Alt+鼠标点击物品来进行合并。"
 
 L["Auto Quest"] = "自动任务"
+
+L["Smoothing updating"] = "平滑血条更新"
+L["Smoothing delay"] = "平滑更新延迟"
+L["Please input the smoothing update delay(s)"] = "请输入平滑更新延迟(s)"

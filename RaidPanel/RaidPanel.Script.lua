@@ -436,11 +436,15 @@ function LoadConfig(_DBChar)
 	if _DBChar.ElementUseDebuffColor == nil then _DBChar.ElementUseDebuffColor = true end
 	if _DBChar.ElementUseSmoothColor == nil then _DBChar.ElementUseSmoothColor = true end
 	if _DBChar.ElementUseMouseDown == nil then _DBChar.ElementUseMouseDown = true end
+	if _DBChar.ElementSmoothUpdate == nil then _DBChar.ElementSmoothUpdate = false end
+	if _DBChar.ElementSmoothUpdateDelay == nil then _DBChar.ElementSmoothUpdateDelay = 0.2 end
 
 	mnuRaidPanelSetUseClassColor.Checked = _DBChar.ElementUseClassColor
 	mnuRaidPanelSetUseDebuffColor.Checked = _DBChar.ElementUseDebuffColor
 	mnuRaidPanelSetUseSmoothColor.Checked = _DBChar.ElementUseSmoothColor
 	mnuRaidPanelSetUseDown.Checked = _DBChar.ElementUseMouseDown
+	mnuRaidPanelSetSmooth.Checked = _DBChar.ElementSmoothUpdate
+	mnuRaidPanelSetSmoothDelay.Text = L"Smoothing delay" .. " : " .. _DBChar.ElementSmoothUpdateDelay
 	UpdateHealthBar4UseClassColor()
 
 	raidPanel:InitWithCount(25)
@@ -657,6 +661,16 @@ function mnuRaidPanelSetPowerHeight:OnClick()
 	end
 end
 
+function mnuRaidPanelSetSmoothDelay:OnClick()
+	local value = tonumber(IGAS:MsgBox(L"Please input the smoothing update delay(s)", "ic")) or nil
+
+	if value and value >= 0.1 then
+		_DBChar[_LoadingConfig].ElementSmoothUpdateDelay = value
+		self.Text = L"Smoothing delay" .. " : " .. value
+		UpdateHealthBar4UseClassColor()
+	end
+end
+
 function mnuRaidPanelSetUseClassColor:OnCheckChanged()
 	if raidPanelConfig.Visible then
 		_DBChar[_LoadingConfig].ElementUseClassColor = self.Checked
@@ -684,6 +698,14 @@ end
 function mnuRaidPanelSetUseDown:OnCheckChanged()
 	if raidPanelConfig.Visible then
 		_DBChar[_LoadingConfig].ElementUseMouseDown = self.Checked
+
+		UpdateHealthBar4UseClassColor()
+	end
+end
+
+function mnuRaidPanelSetSmooth:OnCheckChanged()
+	if raidPanelConfig.Visible then
+		_DBChar[_LoadingConfig].ElementSmoothUpdate = self.Checked
 
 		UpdateHealthBar4UseClassColor()
 	end
@@ -1077,28 +1099,38 @@ function UpdateHealthBar4UseClassColor()
 	local useDebuffColor = _DBChar[_LoadingConfig].ElementUseDebuffColor
 	local useSmoothColor = _DBChar[_LoadingConfig].ElementUseSmoothColor
 	local useMouseDown = _DBChar[_LoadingConfig].ElementUseMouseDown and "AnyDown" or "AnyUp"
+	local smoothUpdate = _DBChar[_LoadingConfig].ElementSmoothUpdate
+	local smoothdelay = _DBChar[_LoadingConfig].ElementSmoothUpdateDelay
 	raidPanel:Each(function(self)
 		self:GetElement(iHealthBar).UseClassColor = useClassColor
 		self:GetElement(iHealthBar).UseDebuffColor = useDebuffColor
 		self:GetElement(iHealthBar).UseSmoothColor = useSmoothColor
+		self:GetElement(iHealthBar).Smoothing = smoothUpdate
+		self:GetElement(iHealthBar).SmoothDelay = smoothdelay
 		self:RegisterForClicks(useMouseDown)
 	end)
 	raidPetPanel:Each(function(self)
 		self:GetElement(iHealthBar).UseClassColor = useClassColor
 		self:GetElement(iHealthBar).UseDebuffColor = useDebuffColor
 		self:GetElement(iHealthBar).UseSmoothColor = useSmoothColor
+		self:GetElement(iHealthBar).Smoothing = smoothUpdate
+		self:GetElement(iHealthBar).SmoothDelay = smoothdelay
 		self:RegisterForClicks(useMouseDown)
 	end)
 	raidDeadPanel:Each(function(self)
 		self:GetElement(iHealthBar).UseClassColor = useClassColor
 		self:GetElement(iHealthBar).UseDebuffColor = useDebuffColor
 		self:GetElement(iHealthBar).UseSmoothColor = useSmoothColor
+		self:GetElement(iHealthBar).Smoothing = smoothUpdate
+		self:GetElement(iHealthBar).SmoothDelay = smoothdelay
 		self:RegisterForClicks(useMouseDown)
 	end)
 	raidUnitWatchPanel:Each(function(self)
 		self:GetElement(iHealthBar).UseClassColor = useClassColor
 		self:GetElement(iHealthBar).UseDebuffColor = useDebuffColor
 		self:GetElement(iHealthBar).UseSmoothColor = useSmoothColor
+		self:GetElement(iHealthBar).Smoothing = smoothUpdate
+		self:GetElement(iHealthBar).SmoothDelay = smoothdelay
 		self:RegisterForClicks(useMouseDown)
 	end)
 end
