@@ -1,3 +1,9 @@
+2017/05/02 v183
+	1. Make sure the defaut nameplates will be hidden.
+
+2017/04/29 v182
+	1. Smooth mode added for raid panel.
+
 2017/04/27 v181
 	1. Force hide default nameplates in the next phase of the events.
 

@@ -68,7 +68,13 @@ function NAME_PLATE_UNIT_ADDED(self, unit)
 	if UnitIsUnit("player", unit) then unit = "player" end
 
 	if base.NamePlateMask then
-		Task.NextCall(base.UnitFrame.Hide, base.UnitFrame)
+		Task.ThreadCall(function()
+			local st = GetTime() + 1
+			while GetTime() < st do
+				base.UnitFrame:Hide()
+				Task.Next()
+			end
+		end)
 		base.NamePlateMask.Unit = unit
 
 		if unit == "player" then InstallClassPower(base.NamePlateMask) end
