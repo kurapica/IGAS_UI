@@ -4,6 +4,16 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2017/05/05 v184 : </lime>
+</p><br/>
+<p>
+    1. A macro binding editor is added for raid panel, so now you can bind keys for macros.
+</p>
+<p>
+    2. You can give order to buffs now, so important buffs would be shown in the first place.
+</p>
+<br/><br/>
+<p>
 <lime>2017/04/29 v182 : </lime>
 </p><br/>
 <p>

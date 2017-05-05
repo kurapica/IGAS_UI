@@ -212,6 +212,8 @@ function LoadConfig(_DBChar)
 	_DBChar.PowerHeight = _DBChar.PowerHeight or 3
 	UpdatePowerHeight()
 
+	_DBChar.MacroList = _DBChar.MacroList or {}
+
 	-- Aura Size
 	auraPanelCheckArray:Each("Checked", false)
 
@@ -422,6 +424,10 @@ function LoadConfig(_DBChar)
 	_DB.ClassBuffList = _DB.ClassBuffList or BaseClassBuffList
 	_ClassBuffList = _DB.ClassBuffList
 	BuildClassBuffMap()
+
+	-- Buff order List
+	_DBChar.BuffOrderList = _DBChar.BuffOrderList or {}
+	_BuffOrderList = _DBChar.BuffOrderList
 
 	-- Default true
 	_DBChar.DebuffRightMouseRemove = nil
@@ -1028,6 +1034,38 @@ function IGAS.GameTooltip:OnTooltipSetSpell()
 		self:AddLine("    ")
 		self:AddLine("ID: " .. tostring(id), 1, 1, 1)
 	end
+end
+
+function mnuRaidPanelMacroBind:OnClick()
+	MacroBindingRow.RefreshAll()
+
+	frmMacroBindPanel:Show()
+end
+
+function btnAddMacro:OnClick()
+	MacroBindingRow.NewRow()
+end
+
+function frmMacroBindPanel:OnShow()
+	frmMacroBindPanel.OnShow = nil
+
+	local tipCnt = 1
+	_Tips = {
+		L"Use '%unit' in macro as spell target",
+		L"You can drag spell into the edit box",
+	}
+	Task.ThreadCall(function()
+		while true do
+			frmMacroBindPanel.Message = _Tips[tipCnt]
+			tipCnt = tipCnt + 1
+			if tipCnt > #_Tips then tipCnt = 1 end
+			Task.Delay(5)
+		end
+	end)
+end
+
+function frmMacroBindPanel:OnHide()
+	Task.NoCombatCall(MacroBindingRow.ApplyNewSettings)
 end
 
 --------------------

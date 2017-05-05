@@ -370,3 +370,153 @@ class "BindingButton"
 		self.OnKeyClear = self.OnKeyClear + OnKeyClear
     end
 endclass "BindingButton"
+
+class "MacroBindingRow"
+	inherit "Frame"
+
+	_Rows = System.Collections.List()
+
+	------------------------------------------------------
+	-- Script Handler
+	------------------------------------------------------
+	local function OnKeySet(self, key, old)
+		self = self.Parent
+		for i, row in ipairs(_Rows) do
+			if row ~= self and row.BindKey == key then
+				row.BindKey = nil
+				return
+			end
+		end
+	end
+
+	local function OnReceiveDrag(self)
+		local type, id, detail, extra = GetCursorInfo()
+		if type == "spell" then
+			self.Text = self.Text .. GetSpellInfo(extra)
+		end
+		ClearCursor()
+	end
+
+	------------------------------------------------------
+	-- Methods
+	------------------------------------------------------
+	__Static__() function RefreshAll()
+		_Rows:Each("Visible", false)
+
+		for i, macro in ipairs(_DBChar[_LoadingConfig].MacroList) do
+			local row = MacroBindingRow("Row" ..i, conMacroBindPanel)
+			row.Visible = true
+
+			row.MacroText = macro
+			row.BindKey = _IGASUI_SPELLHANDLER.MacroText(macro).Key
+		end
+
+		conMacroBindPanel:UpdateSize()
+	end
+
+	__Static__() function NewRow()
+		for _, row in ipairs(_Rows) do
+			if not row.Visible then
+				row.Visible = true
+				return conMacroBindPanel:UpdateSize()
+			end
+		end
+
+		MacroBindingRow("Row" .. (#_Rows + 1), conMacroBindPanel).Visible = true
+		conMacroBindPanel:UpdateSize()
+	end
+
+	__Static__() function ApplyNewSettings()
+		_IGASUI_SPELLHANDLER:BeginUpdate()
+
+		-- Clear previous settings
+		for i, macro in ipairs(_DBChar[_LoadingConfig].MacroList) do
+			_IGASUI_SPELLHANDLER:Clear("MacroText", macro)
+		end
+
+		-- Binding new settings
+		wipe(_DBChar[_LoadingConfig].MacroList)
+
+		for _, row in ipairs(_Rows) do
+			local key, macro = row.BindKey, row.MacroText
+			key = key and strtrim(key)
+			macro = macro and strtrim(macro)
+			if macro and macro ~= "" then
+				tinsert(_DBChar[_LoadingConfig].MacroList, macro)
+				if key and key ~= "" then
+					_IGASUI_SPELLHANDLER.MacroText(macro).Key = key
+				end
+			end
+		end
+
+		_IGASUI_SPELLHANDLER:CommitUpdate()
+		return Masks:Each(BindingButton.RefreshBindingKey)
+	end
+
+	------------------------------------------------------
+	-- Property
+	------------------------------------------------------
+	property "BindKey" {
+		Get = function(self) return self.KeyBindMask.BindKey end,
+		Set = function(self, key) self.KeyBindMask.BindKey = key end,
+	}
+
+	property "MacroText" {
+		Get = function(self) return self.Macro.Text end,
+		Set = function(self, val) self.Macro.Text = val end,
+	}
+
+	------------------------------------------------------
+	-- Constructor
+	------------------------------------------------------
+	function MacroBindingRow(self, name, ...)
+		Super(self, name, ...)
+
+		self.Visible = false
+
+		local id = tonumber(name:match("%d+$"))
+
+		_Rows:Insert(self)
+
+		self:SetPoint("LEFT")
+		self:SetPoint("RIGHT")
+		self.Height = 36
+
+		if id == 1 then
+			self:SetPoint("TOP")
+		else
+			self:SetPoint("TOP", self.Parent:GetChild("Row" .. (id-1)), "BOTTOM")
+		end
+
+		local mask = Mask("KeyBindMask", self)
+		mask.OnShow:Clear()
+		mask.OnHide:Clear()
+		mask.Visible = true
+		mask:ClearAllPoints()
+		mask:SetSize(64, 32)
+		mask:SetPoint("LEFT", 2, 0)
+		mask.AsKeyBind = true
+
+		mask:SetNormalTexture("Interface\\Buttons\\UI-Panel-Button-Up")
+		local t = mask:GetNormalTexture()
+		t:SetTexCoord(0,0.625,0,0.6875)
+
+		mask:SetPushedTexture("Interface\\Buttons\\UI-Panel-Button-Down")
+		t = mask:GetPushedTexture()
+		t:SetTexCoord(0,0.625,0,0.6875)
+
+		mask:SetHighlightTexture("Interface\\Buttons\\UI-Panel-Button-Highlight")
+		t = mask:GetHighlightTexture()
+		t:SetTexCoord(0,0.625,0,0.6875)
+
+		mask.OnKeySet = mask.OnKeySet + OnKeySet
+
+		local input = SingleTextBox("Macro", self)
+		input:SetPoint("LEFT", mask, "RIGHT", 2, 0)
+		input:SetPoint("RIGHT", -24, 0)
+		input.Height = 32
+		input.OnReceiveDrag = OnReceiveDrag
+
+		self.Parent:UpdateSize()
+	end
+endclass "MacroBindingRow"

@@ -1,3 +1,7 @@
+2017/05/05 v184
+	1. A macro binding editor is added for raid panel, so you can bind keys for macros.
+	2. You can give an order for buffs, so you can find buff missing in the first time.
+
 2017/05/02 v183
 	1. Make sure the defaut nameplates will be hidden.
 

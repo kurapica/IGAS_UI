@@ -7,6 +7,16 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2017/05/05 v184 : </lime>
+</p><br/>
+<p>
+    1. 团队面板新增宏绑定工具，用户可以直接绑定按键到指定的宏(文本)。
+</p>
+<p>
+    2. 用户可以为部分增益指定顺序，这些特殊增益将被按顺序优先显示。
+</p>
+<br/><br/>
+<p>
 <lime>2017/04/29 v182 : </lime>
 </p><br/>
 <p>
@@ -800,3 +810,10 @@ L["Auto Quest"] = "自动任务"
 L["Smoothing updating"] = "平滑血条更新"
 L["Smoothing delay"] = "平滑更新延迟"
 L["Please input the smoothing update delay(s)"] = "请输入平滑更新延迟(s)"
+
+L["Macro Bindings"] = "宏绑定编辑器"
+L["Use '%unit' in macro as spell target"] = "在宏中使用%unit来替代动作目标"
+L["You can drag spell into the edit box"] = "你可以拖拽技能放入输入框"
+
+L["Buff Order List"] = "增益显示顺序"
+L["Please input the buff's spell id(you can get it in the game tip)"] = "请输入增益的技能ID(你可以在鼠标提示中找到)"

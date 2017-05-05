@@ -142,24 +142,73 @@ class "iBuffPanel"
 		if unit then
 			if UnitCanAttack("player", unit) then
 				self.Filter = "HELPFUL"
+				return Super.UpdateAuras(self)
 			else
 				self.Filter = "HELPFUL|PLAYER"
 			end
 		end
 
-		return Super.UpdateAuras(self)
-	end
+		local orderBuffs = self.OrderBuffs
+		wipe(orderBuffs)
 
-	function CustomFilter(self, unit, index, filter)
-		if filter == "HELPFUL" then return true end
+		local index = 1
+		local i = 1
+		local name
+		local filter = self.Filter
 
-		local name, _, _, count, dtype, duration, expires, caster, isStealable, _, spellID, _, isBossDebuff = UnitAura(unit, index, filter)
+		if unit then
+			for _, spellID in ipairs(_BuffOrderList) do
+				local name, _, _, count, dtype, duration, expires, caster = UnitAura(unit, (GetSpellInfo(spellID)))
 
-		if not name or caster ~= "player" then return false end
+				if name and caster == "player" then
+					if i <= self.MaxCount then
+						orderBuffs[spellID] = i
+						i = i + 1
+					else
+						break
+					end
+				end
+			end
 
-		if _BuffBlackList[spellID] then return false end
+			if i > 1 then
+				local name, _, _, count, dtype, duration, expires, caster, isStealable, _, spellID = UnitAura(unit, index, filter)
+				while name do
+					if caster == "player" then
+						if orderBuffs[spellID] then
+							self.Element[orderBuffs[spellID]]:Refresh(unit, index, filter)
+						elseif not _BuffBlackList[spellID] and i <= self.MaxCount then
+							self.Element[i]:Refresh(unit, index, filter)
+							i = i + 1
+						end
+					end
 
-		return true
+					index = index + 1
+					name, _, _, count, dtype, duration, expires, caster, isStealable, _, spellID = UnitAura(unit, index, filter)
+				end
+			else
+				while i <= self.MaxCount do
+					local name, _, _, count, dtype, duration, expires, caster, isStealable, _, spellID = UnitAura(unit, index, filter)
+
+					if name then
+						if caster == "player" and not _BuffBlackList[spellID] then
+							self.Element[i]:Refresh(unit, index, filter)
+							i = i + 1
+						end
+					else
+						break
+					end
+
+					index = index + 1
+				end
+			end
+		end
+
+		while i <= self.Count do
+			self.Element[i].Visible = false
+			i = i + 1
+		end
+
+		return self:UpdatePanelSize()
 	end
 
 	------------------------------------------------------
@@ -197,6 +246,7 @@ class "iBuffPanel"
 		self.ElementWidth = 16
 		self.ElementHeight = 16
 		self.Orientation = Orientation.HORIZONTAL
+		self.OrderBuffs = {}
 
 		self.OnElementAdd = self.OnElementAdd + OnElementAdd
     end

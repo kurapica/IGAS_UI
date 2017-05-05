@@ -96,6 +96,7 @@ mnuRaidPanelSetUseSmoothColor = raidPanelConfig:AddMenuButton(L"Element Settings
 mnuRaidPanelSetUseDown = raidPanelConfig:AddMenuButton(L"Element Settings", L"Press down trigger")
 mnuRaidPanelSetSmooth = raidPanelConfig:AddMenuButton(L"Element Settings", L"Smoothing updating")
 mnuRaidPanelSetSmoothDelay = raidPanelConfig:AddMenuButton(L"Element Settings", L"Smoothing delay")
+mnuRaidPanelMacroBind = raidPanelConfig:AddMenuButton(L"Element Settings", L"Macro Bindings")
 mnuRaidPanelSetWidth:ActiveThread("OnClick")
 mnuRaidPanelSetHeight:ActiveThread("OnClick")
 mnuRaidPanelSetPowerHeight:ActiveThread("OnClick")
@@ -470,6 +471,12 @@ for i, name in ipairs{L"Buff Panel", L"Debuff Panel", L"Class Buff Panel"} do
 
 		function mnuRaidPanelBuffFilter:OnClick()
 			iBuffFilter.Visible = true
+		end
+
+		mnuRaidPanelBuffOrder = raidPanelConfig:AddMenuButton(L"Element Settings", name, L"Buff Order List")
+
+		function mnuRaidPanelBuffOrder:OnClick()
+			iBuffOrder.Visible = true
 		end
 	elseif i == 2 then
 		mnuRaidPanelDebuffFilter = raidPanelConfig:AddMenuButton(L"Element Settings", name, L"Black list")
@@ -852,3 +859,163 @@ btnInfo = NormalButton("Info", frmUnitList) {
 
 btnAdd:ActiveThread("OnClick")
 btnRemove:ActiveThread("OnClick")
+
+--==========================
+-- Macro Binding Panel
+--==========================
+frmMacroBindPanel = Form("IGAS_UI_MacroBindPanel")
+frmMacroBindPanel.Visible = false
+frmMacroBindPanel.Caption = L"Macro Bindings"
+
+scrMacroBindPanel = ScrollForm("Scroll", frmMacroBindPanel)
+scrMacroBindPanel:SetPoint("TOPLEFT", 4, -26)
+scrMacroBindPanel:SetPoint("BOTTOMRIGHT", -4, 46)
+
+conMacroBindPanel = scrMacroBindPanel.ScrollChild
+conMacroBindPanel:SetPoint("LEFT")
+conMacroBindPanel:SetPoint("RIGHT")
+
+btnAddMacro = NormalButton("AddMacro", frmMacroBindPanel)
+btnAddMacro.Height = 24
+btnAddMacro.Width = 40
+btnAddMacro:SetPoint("BOTTOMLEFT", 4, 24)
+btnAddMacro.Style = "Classic"
+btnAddMacro.Text = "+"
+
+--==========================
+-- Buff Order List
+--==========================
+
+-- Unit List
+iBuffOrder = Form("IGAS_UI_BuffOrderList") {
+	Visible = false,
+	Size = Size(200, 400),
+	Caption = L"Buff Order List",
+	Resizable = false,
+
+	OnShow = function(self)
+		iBuffOrderList:SuspendLayout()
+
+		iBuffOrderList:Clear()
+
+		for _, spellID in ipairs(_BuffOrderList) do
+			local name, _, icon = GetSpellInfo(spellID)
+
+			iBuffOrderList:AddItem(spellID, name, icon)
+		end
+
+		iBuffOrderList:ResumeLayout()
+	end,
+}
+
+iBuffOrderList = List("OrderList", iBuffOrder) {
+	Location = {
+		AnchorPoint("TOPLEFT", 4, -26),
+		AnchorPoint("BOTTOMRIGHT", -4, 26),
+	},
+
+	OnItemDoubleClick = function(spellID, name, icon)
+		self:RemoveItem(spellID)
+		for i, v in ipairs(_BuffOrderList) do
+			if v == spellID then
+				return tremove(_BuffOrderList, i)
+			end
+		end
+	end,
+
+	OnGameTooltipShow = function(GameTooltip, spellID)
+		GameTooltip:SetSpellByID(spellID)
+	end,
+}
+
+btnBuffOrderAdd = NormalButton("Add2List", iBuffOrder) {
+	Location = {
+		AnchorPoint("TOPLEFT", 0, 0, "OrderList", "BOTTOMLEFT"),
+		AnchorPoint("BOTTOM", 0, 4),
+	},
+	Width = 40,
+	Style = "Classic",
+	Text = "+",
+
+	OnClick = function(self)
+		local spellID = IGAS:MsgBox(L"Please input the buff's spell id(you can get it in the game tip)", "ic")
+
+		if spellID and strtrim(spellID) ~= "" then
+			spellID = tonumber(strtrim(spellID))
+
+			for _, v in ipairs(iBuffOrderList.Keys) do
+				if v == spellID then return end
+			end
+
+			local name, _, icon = GetSpellInfo(spellID)
+
+			if name then
+				tinsert(_BuffOrderList, spellID)
+				iBuffOrderList:AddItem(spellID, name, icon)
+			end
+		end
+	end
+}
+
+btnBuffOrderRemove = NormalButton("Remove4List", iBuffOrder) {
+	Location = {
+		AnchorPoint("TOPLEFT", 0, 0, "Add2List", "TOPRIGHT"),
+		AnchorPoint("BOTTOM", 0, 4),
+	},
+	Width = 40,
+	Style = "Classic",
+	Text = "-",
+
+	OnClick = function(self)
+		local index = iBuffOrderList.SelectedIndex
+		if index > 0 then
+			tremove(_BuffOrderList, index)
+			iBuffOrderList:RemoveItemByIndex(index)
+		end
+	end
+}
+
+btnBuffOrderUp = NormalButton("MoveUp", iBuffOrder) {
+	Location = {
+		AnchorPoint("TOPLEFT", 0, 0, "Remove4List", "TOPRIGHT"),
+		AnchorPoint("BOTTOM", 0, 4),
+	},
+	Width = 40,
+	Style = "Classic",
+	Text = L"Up",
+	OnClick = function(self)
+		local index = iBuffOrderList.SelectedIndex
+		if index > 1 then
+			local spellID = _BuffOrderList[index-1]
+			local name, _, icon = GetSpellInfo(spellID)
+			_BuffOrderList[index], _BuffOrderList[index-1] = _BuffOrderList[index-1], _BuffOrderList[index]
+			iBuffOrderList:RemoveItemByIndex(index-1)
+			iBuffOrderList:InsertItem(index, spellID, name, icon)
+			iBuffOrderList.SelectedIndex = index - 1
+		end
+	end,
+}
+
+btnBuffOrderDown = NormalButton("MoveDown", iBuffOrder) {
+	Location = {
+		AnchorPoint("TOPLEFT", 0, 0, "MoveUp", "TOPRIGHT"),
+		AnchorPoint("BOTTOM", 0, 4),
+	},
+	Width = 40,
+	Style = "Classic",
+	Text = L"Down",
+	OnClick = function(self)
+		local index = iBuffOrderList.SelectedIndex
+
+		if index > 0 and index < #iBuffOrderList then
+			local spellID = _BuffOrderList[index]
+			local name, _, icon = GetSpellInfo(spellID)
+			_BuffOrderList[index], _BuffOrderList[index+1] = _BuffOrderList[index+1], _BuffOrderList[index]
+			iBuffOrderList:RemoveItemByIndex(index)
+			iBuffOrderList:InsertItem(index+1, spellID, name, icon)
+			iBuffOrderList.SelectedIndex = index + 1
+		end
+	end,
+}
+
+btnBuffOrderAdd:ActiveThread("OnClick")
