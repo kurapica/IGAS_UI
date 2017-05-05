@@ -1,3 +1,6 @@
+2017/05/05 v185
+	1. Change the method used to hide original nameplates.
+
 2017/05/05 v184
 	1. A macro binding editor is added for raid panel, so you can bind keys for macros.
 	2. You can give an order for buffs, so you can find buff missing in the first time.

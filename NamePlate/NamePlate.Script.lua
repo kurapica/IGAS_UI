@@ -56,6 +56,7 @@ end
 
 function NAME_PLATE_CREATED(self, base)
 	base.UnitFrame:Hide()
+	base.UnitFrame:HookScript("OnShow", base.UnitFrame.Hide)
 
 	base.NamePlateMask = iNamePlateUnitFrame("iNamePlateMask", base)
 	base.NamePlateMask:ApplyFrameOptions(_VerticalScale, _HorizontalScale)
@@ -69,13 +70,6 @@ function NAME_PLATE_UNIT_ADDED(self, unit)
 
 	local mask = base.NamePlateMask
 	if mask then
-		Task.ThreadCall(function()
-			local st = GetTime() + 6
-			while GetTime() < st and mask:IsVisible() do
-				base.UnitFrame:Hide()
-				Task.Next()
-			end
-		end)
 		mask.Unit = unit
 
 		if unit == "player" then InstallClassPower(mask) end
