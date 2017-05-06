@@ -2359,7 +2359,7 @@ class "AutoActionTask"
 
 	_AutoActionTask = {}
 
-	function Dispoe(self)
+	function Dispose(self)
 		self:StopTask()
 		if self.Roots then for _, root in ipairs(self.Roots) do root.AutoActionTask = nil end end
 		self.Roots = nil

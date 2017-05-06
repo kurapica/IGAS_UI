@@ -1,3 +1,6 @@
+2017/05/06 v186
+	1. Fix error when delete item form auto popup list.
+
 2017/05/05 v185
 	1. Change the method used to hide original nameplates.
 
