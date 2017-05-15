@@ -157,7 +157,7 @@ class "iBuffPanel"
 		local filter = self.Filter
 
 		if unit then
-			for _, spellID in ipairs(_BuffOrderList) do
+			for _, spellID in ipairs(_M._BuffOrderList) do
 				local name, _, _, count, dtype, duration, expires, caster = UnitAura(unit, (GetSpellInfo(spellID)))
 
 				if name and caster == "player" then
