@@ -300,6 +300,7 @@ function btnSave:OnClick()
 		task.MaxAction = _autoPopupSet.MaxAction
 		task.ItemClass = _autoPopupSet.ItemClass
 		task.ItemSubClass = _autoPopupSet.ItemSubClass
+		task.TipFilter = _autoPopupSet.TipFilter
 
 		return task:RestartTask()
 	end

@@ -1,3 +1,6 @@
+2017/05/21 v188
+	1. Add a missing line to fix tip filter changing not work for auto popup action bar.
+
 2017/05/15 v187
 	1. Fix the buff order when change the specialization.
 
