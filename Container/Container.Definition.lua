@@ -1084,6 +1084,7 @@ class "TokenInfo"
 
 	function SetCurrencyID(self, val)
 		if val then
+			self.ID = val
 			local name, isHeader, isExpanded, isUnused, isWatched, count, icon = GetCurrencyListInfo(val)
 			if count and count <= 99999 then
 				self.Count.Text = tostring(count)
