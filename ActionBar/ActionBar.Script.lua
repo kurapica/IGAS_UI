@@ -15,6 +15,7 @@ Toggle = {
 			self.LockMode = value
 			self.IHeader.Visible = not value
 			if not value then
+				self.__AutoFadeOutStart = false
 				self.FadeAlpha = 1
 				self.Visible = true
 			else
@@ -173,6 +174,7 @@ function OnLoad(self)
 	-- Register system events
 	self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
 	self:RegisterEvent("PLAYER_LOGOUT")
+	self:RegisterEvent("ACTIONBAR_HIDEGRID")
 
 	self:RegisterEvent("UPDATE_SHAPESHIFT_FORMS")
 
@@ -303,8 +305,11 @@ function PLAYER_SPECIALIZATION_CHANGED(self)
 		_DBChar[_LoadingConfig] = GenerateConfig(true)
 		_LoadingConfig = now
 		if _DBChar[now] then
-			Task.NoCombatCall(LoadConfig, _DBChar[now])
-			Task.NoCombatCall(UPDATE_SHAPESHIFT_FORMS)
+			Task.NoCombatCall(function()
+				LoadConfig(_DBChar[now])
+				UPDATE_SHAPESHIFT_FORMS()
+				_HeadList:Each(function(self) self:RefreshForAutoHide() end)
+			end)
 		end
 	end
 end
@@ -315,6 +320,14 @@ function PLAYER_LOGOUT(self)
 	_DBChar[spec] = GenerateConfig(true)
 
 	ClearScreen()	-- make sure no key bindings would be saved
+end
+
+function ACTIONBAR_HIDEGRID(self)
+	Task.NextCall(function()
+		_HeadList:Each(function(self)
+			self:OnLeave()
+		end)
+	end)
 end
 
 function GenerateBarConfig(header, includeContent)
@@ -524,11 +537,10 @@ function LoadBarConfig(header, bar)
 			btn = btn.Brother
 		end
 
-		header.AutoHideCondition = System.Reflector.Clone(bar.AutoHideCondition)
-		header.AutoFadeOut 	= bar.AutoFadeOut
 		header.MaxAlpha 	= bar.MaxAlpha
 		header.MinAlpha 	= bar.MinAlpha
-
+		header.AutoHideCondition = System.Reflector.Clone(bar.AutoHideCondition)
+		header.AutoFadeOut 	= bar.AutoFadeOut
 		header.AlwaysShowGrid = bar.AlwaysShowGrid
 	else
 		if header == _MainBar then
@@ -693,9 +705,9 @@ function UpdateBlzMainMenuBar()
 			_BagSlotBar.MarginY = _BagSlotBarConfig.MarginY
 			_BagSlotBar.Scale = _BagSlotBarConfig.Scale
 			_BagSlotBar.Expansion = _BagSlotBarConfig.Expansion
-			_BagSlotBar.AutoFadeOut = _BagSlotBarConfig.AutoFadeOut
 			_BagSlotBar.MaxAlpha = _BagSlotBarConfig.MaxAlpha
 			_BagSlotBar.MinAlpha = _BagSlotBarConfig.MinAlpha
+			_BagSlotBar.AutoFadeOut = _BagSlotBarConfig.AutoFadeOut
 		else
 			_BagSlotBar.Location = { AnchorPoint("BOTTOMLEFT", GetScreenWidth() - _BagSlotBar.Width, 0) }
 			_BagSlotBar.Scale = 1

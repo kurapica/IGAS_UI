@@ -1,3 +1,7 @@
+2017/08/14 v191
+	1. Fix bugs for the opacity mechanism.
+	2. The opacity will only affect when lock the bars.
+
 2017/08/14 v190
 	1. Max opacity and min opacity settings are added for the action bar.
 
