@@ -1,3 +1,6 @@
+2017/08/14 v190
+	1. Max opacity and min opacity settings are added for the action bar.
+
 2017/06/17 v189
 	1. Fix the tip for tokens.
 

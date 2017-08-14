@@ -214,19 +214,26 @@ function UpdateGameTooltip()
 	end
 
 	UpdateAddOnMemoryUsage();
+	UpdateAddOnCPUUsage();
+
 	local totalMem = 0;
+	local totalCpu = 0;
 
 	for i=1, GetNumAddOns(), 1 do
 		local mem = GetAddOnMemoryUsage(i);
+		local cpu = GetAddOnCPUUsage(i) or 0;
 		totalMem = totalMem + mem;
+		totalCpu = totalCpu + cpu;
 		for j=1, NUM_ADDONS_TO_DISPLAY, 1 do
 			if(mem > topAddOns[j].value) then
 				for k=NUM_ADDONS_TO_DISPLAY, 1, -1 do
 					if(k == j) then
+						topAddOns[k].cpu = cpu;
 						topAddOns[k].value = mem;
 						topAddOns[k].name = GetAddOnInfo(i);
 						break;
 					elseif(k ~= 1) then
+						topAddOns[k].cpu = topAddOns[k-1].cpu;
 						topAddOns[k].value = topAddOns[k-1].value;
 						topAddOns[k].name = topAddOns[k-1].name;
 					end
@@ -259,6 +266,11 @@ function UpdateGameTooltip()
 			else
 				string = format(ADDON_MEM_KB_ABBR, size, topAddOns[i].name);
 			end
+
+			if totalCpu > 0 then
+				string = string .. (" [CPU]: %.2f"):format(topAddOns[i].cpu / 1000)
+			end
+
 			GameTooltip:AddLine(string, 1.0, 1.0, 1.0);
 		end
 	end

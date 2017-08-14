@@ -340,6 +340,8 @@ function GenerateBarConfig(header, includeContent)
 
 	bar.AutoHideCondition = System.Reflector.Clone(header.AutoHideCondition)
 	bar.AutoFadeOut = header.AutoFadeOut
+	bar.MinAlpha 	= header.MinAlpha
+	bar.MaxAlpha 	= header.MaxAlpha
 
 	bar.AlwaysShowGrid = header.AlwaysShowGrid
 
@@ -420,6 +422,8 @@ function GenerateConfig(includeContent)
 		bar.Scale = _BagSlotBar.Scale
 		bar.Expansion = _BagSlotBar.Expansion
 		bar.AutoFadeOut = _BagSlotBar.AutoFadeOut
+		bar.MinAlpha 	= _BagSlotBar.MinAlpha
+		bar.MaxAlpha 	= _BagSlotBar.MaxAlpha
 
 		config.BagSlotBar = bar
 	end
@@ -521,7 +525,9 @@ function LoadBarConfig(header, bar)
 		end
 
 		header.AutoHideCondition = System.Reflector.Clone(bar.AutoHideCondition)
-		header.AutoFadeOut = bar.AutoFadeOut
+		header.AutoFadeOut 	= bar.AutoFadeOut
+		header.MaxAlpha 	= bar.MaxAlpha
+		header.MinAlpha 	= bar.MinAlpha
 
 		header.AlwaysShowGrid = bar.AlwaysShowGrid
 	else
@@ -609,6 +615,8 @@ function RemoveHeader(header)
 	end
 	header.AutoHideCondition = nil
 	header.AutoFadeOut = false
+	header.MaxAlpha = 1
+	header.MinAlpha = 0
 	header:GenerateBrother(1, 1)
 	header:GenerateBranch(0)
 	_HeadList:Remove(header)
@@ -686,6 +694,8 @@ function UpdateBlzMainMenuBar()
 			_BagSlotBar.Scale = _BagSlotBarConfig.Scale
 			_BagSlotBar.Expansion = _BagSlotBarConfig.Expansion
 			_BagSlotBar.AutoFadeOut = _BagSlotBarConfig.AutoFadeOut
+			_BagSlotBar.MaxAlpha = _BagSlotBarConfig.MaxAlpha
+			_BagSlotBar.MinAlpha = _BagSlotBarConfig.MinAlpha
 		else
 			_BagSlotBar.Location = { AnchorPoint("BOTTOMLEFT", GetScreenWidth() - _BagSlotBar.Width, 0) }
 			_BagSlotBar.Scale = 1
@@ -868,6 +878,9 @@ function _Menu:OnShow()
 
 	-- Auto fade out
 	_MenuAutoFadeOut.Checked = header.AutoFadeOut
+
+	_MenuMaxAlpha.Text = L"Max Opacity" .. " : " .. header.MaxAlpha
+	_MenuMinAlpha.Text = L"Min Opacity" .. " : " .. header.MinAlpha
 
 	-- Always show grid
 	_MenuAlwaysShowGrid.Checked = header.AlwaysShowGrid
@@ -1083,6 +1096,32 @@ end
 
 function _MenuAutoFadeOut:OnCheckChanged()
 	_Menu.Parent.AutoFadeOut = self.Checked
+end
+
+function _MenuMaxAlpha:OnClick()
+	local value = tonumber(IGAS:MsgBox(L"Please input the max opacity(0 - 1)", "ic") or nil)
+
+	if value then
+		if value < 0 or value > 1 then return end
+		if _Menu.Parent.MinAlpha > value then IGAS:MsgBox(L"The min opacity can't be greater than the max opacity") end
+		_Menu.Parent.MaxAlpha = value
+		_Menu.Parent.FadeAlpha = value
+		_MenuMaxAlpha.Text = L"Max Opacity" .. " : " .. value
+	end
+end
+
+function _MenuMinAlpha:OnClick()
+	local value = tonumber(IGAS:MsgBox(L"Please input the min opacity(0 - 1)", "ic") or nil)
+
+	if value then
+		if value < 0 or value > 1 then return end
+		if _Menu.Parent.MaxAlpha < value then IGAS:MsgBox(L"The min opacity can't be greater than the max opacity") end
+		_Menu.Parent.MinAlpha = value
+		_MenuMinAlpha.Text = L"Min Opacity" .. " : " .. value
+		if _Menu.Parent:GetAlpha() < value then
+			_Menu.Parent.FadeAlpha = value
+		end
+	end
 end
 
 function _MenuAlwaysShowGrid:OnCheckChanged()

@@ -47,7 +47,7 @@ function OnEnable(self)
 	end)--]]
 
 	for name, loc in pairs(_ChatFramePos) do
-		IGAS[name].Location = loc
+		if IGAS[name] then IGAS[name].Location = loc end
 	end
 
 	self:SecureHook(_G["ChatFrame" .. 1 .. "Tab"], "SetAlpha")

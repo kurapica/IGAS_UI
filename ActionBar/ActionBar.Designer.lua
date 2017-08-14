@@ -84,6 +84,12 @@ _MenuAutoHide:ActiveThread("OnClick")
 _MenuAutoFadeOut = _Menu:AddMenuButton(L"Bar Style", L"Auto Fade Out")
 _MenuAutoFadeOut.IsCheckButton = true
 
+_MenuMaxAlpha = _Menu:AddMenuButton(L"Bar Style", L"Max Opacity")
+_MenuMaxAlpha:ActiveThread("OnClick")
+
+_MenuMinAlpha = _Menu:AddMenuButton(L"Bar Style", L"Min Opacity")
+_MenuMinAlpha:ActiveThread("OnClick")
+
 _MenuAlwaysShowGrid = _Menu:AddMenuButton(L"Bar Style", L"Always Show Grid")
 _MenuAlwaysShowGrid.IsCheckButton = true
 

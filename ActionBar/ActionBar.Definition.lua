@@ -30,7 +30,7 @@ function ACTIONBAR_SHOWGRID(self)
 	for btn, flag in pairs(_BlockGridUpdatingBar) do
 		if flag and not btn.PetBar and not btn.StanceBar then
 			btn.ShowGrid = true
-			btn.FadeAlpha = 1
+			btn.FadeAlpha = btn.MaxAlpha
 		end
 	end
 end
@@ -987,7 +987,7 @@ class "IActionButton"
 				RegisterAutoHide(self, cond, self.AutoFadeOut)
 				if not self.AutoFadeOut then
 					SetBlockGridUpdating(self, false)
-					self.FadeAlpha = 1
+					self.FadeAlpha = self.MaxAlpha
 				end
 			else
 				UnregisterAutoHide(self)
@@ -1267,6 +1267,9 @@ class "IActionButton"
 		end,
 	}
 
+	property "MaxAlpha" { Type = Number, Default = 1 }
+	property "MinAlpha" { Type = Number, Default = 0 }
+
 	------------------------------------------------------
 	-- Script Handler
 	------------------------------------------------------
@@ -1324,7 +1327,7 @@ class "IActionButton"
 		self = self.Root.Header
 		if self.AutoFadeOut then
 			self.__AutoFadeOutStart = false
-			self.FadeAlpha = 1
+			self.FadeAlpha = self.MaxAlpha
 		end
 	end
 
@@ -1333,19 +1336,23 @@ class "IActionButton"
 
 		if self:GetAttribute("autofadeout") then
 			self.__AutoFadeOutStart = true
-			Task.ThreadCall(function(self)
-				local st = GetTime()
-				local sta = self:GetAlpha() or 1
-				while self.__AutoFadeOutStart and self:GetAttribute("autofadeout") do
-					local alpha = (GetTime() - st) * 1.0 / 2
-					if alpha >= sta then
-						self.FadeAlpha = 0
-						return
+			if self:GetAlpha() > self.MinAlpha then
+				Task.ThreadCall(function(self)
+					local endt = GetTime() + 2
+					local df   = (self:GetAlpha() or 1) - self.MinAlpha
+					while self.__AutoFadeOutStart and self:GetAttribute("autofadeout") do
+						local now = GetTime()
+						if now >= endt then
+							self.FadeAlpha = self.MinAlpha
+							return
+						end
+						self.FadeAlpha = self.MinAlpha + (endt - now) / 2 * df
+						Task.Next()
 					end
-					self.FadeAlpha = sta - alpha
-					Task.Next()
-				end
-			end, self)
+				end, self)
+			else
+				self.FadeAlpha = self.MinAlpha
+			end
 		end
 	end
 

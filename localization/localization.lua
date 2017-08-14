@@ -4,6 +4,13 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2017/08/14 v190 : </lime>
+</p><br/>
+<p>
+    1. Max opacity and min opacity settings are added for the action bar system.
+</p>
+<br/><br/>
+<p>
 <lime>2017/05/05 v184 : </lime>
 </p><br/>
 <p>

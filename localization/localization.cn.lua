@@ -7,6 +7,13 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2017/08/14 v190 : </lime>
+</p><br/>
+<p>
+    1. 动作条系统添加了最大和最小不透明度选项。可用来调整透明度。
+</p>
+<br/><br/>
+<p>
 <lime>2017/05/05 v184 : </lime>
 </p><br/>
 <p>
@@ -817,3 +824,9 @@ L["You can drag spell into the edit box"] = "你可以拖拽技能放入输入�
 
 L["Buff Order List"] = "增益显示顺序"
 L["Please input the buff's spell id(you can get it in the game tip)"] = "请输入增益的技能ID(你可以在鼠标提示中找到)"
+
+L["Max Opacity"] = "最大不透明度"
+L["Min Opacity"] = "最小不透明度"
+L["Please input the max opacity(0 - 1)"] = "请输入最大不透明度(0 - 1)"
+L["The min opacity can't be greater than the max opacity"] = "最小不透明度不能大于最大不透明度"
+L["Please input the min opacity(0 - 1)"] = "请输入最小不透明度(0 - 1)"
