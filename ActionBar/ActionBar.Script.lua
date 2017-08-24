@@ -849,6 +849,7 @@ function InstallUseCooldownLabel()
 
 		property "IFCooldownLabelUseDecimal" { Type = Boolean, Default = true }
 		property "IFCooldownLabelAutoColor" { Type = Boolean, Default = true }
+		property "IFCooldownLabelMinDuration" { Type = Number, Default = 1.6 }
 	end)
 end
 
