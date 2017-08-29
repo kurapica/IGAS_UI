@@ -165,6 +165,12 @@ function OnLoad(self)
 	if _ContainerDB.BankLocation then
 		_BankHeader.Location = _ContainerDB.BankLocation
 	end
+
+	-- Scale
+	if _ToolSet.Scale then
+		_ContainerHeader:SetScale(_ToolSet.Scale)
+		_BankHeader:SetScale(_ToolSet.Scale)
+	end
 end
 
 function OnEnable(self)
@@ -314,10 +320,22 @@ function headerMenu:OnShow()
 	mnuAutoSell.Checked = _ToolSet.AutoSell
 
 	mnuAutoSplit.Checked = _ToolSet.AutoSplit
+
+	mnuSetScale.Text = L"Scale" .. ":" .. (_ToolSet.Scale or 1)
 end
 
 function mnuAutoRepair:OnCheckChanged()
 	_ToolSet.AutoRepair = self.Checked
+end
+
+function mnuSetScale:OnClick()
+	local val = tonumber(IGAS:MsgBox(L"Please input the scale number [0.5-3]", "ic"))
+	if val and val >= 0.5 and val <= 3 then
+		_ToolSet.Scale = val
+		mnuSetScale.Text = L"Scale" .. ":" .. (_ToolSet.Scale or 1)
+		_ContainerHeader:SetScale(val)
+		_BankHeader:SetScale(val)
+	end
 end
 
 function _ListReputation:OnItemChoosed(key, item)

@@ -832,3 +832,5 @@ L["Min Opacity"] = "最小不透明度"
 L["Please input the max opacity(0 - 1)"] = "請輸入最大不透明度(0 - 1)"
 L["The min opacity can't be greater than the max opacity"] = "最小不透明度不能大於最大不透明度"
 L["Please input the min opacity(0 - 1)"] = "請輸入最小不透明度(0 - 1)"
+
+L["Please input the scale number [0.5-3]"] = "請輸入縮放的比例值[0.5-3]"

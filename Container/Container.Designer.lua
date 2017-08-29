@@ -15,6 +15,9 @@ mnuShowRuleManager = headerMenu:AddMenuButton(L"Show the view manager")
 
 mnuShowTokenList = headerMenu:AddMenuButton(L"Show the token watch list")
 
+mnuSetScale = headerMenu:AddMenuButton(L"Scale")
+mnuSetScale:ActiveThread("OnClick")
+
 mnuAutoRepair = headerMenu:AddMenuButton(L"Auto Repair", L"Auto Repair")
 mnuAutoRepair.IsCheckButton = true
 

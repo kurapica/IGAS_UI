@@ -1,3 +1,6 @@
+2017/08/29 v193
+	1. The container view's scale can be changed within the menu.
+
 2017/08/24 v192
 	1. The cooldown label won't display for global cooldown on the action buttons.
 
