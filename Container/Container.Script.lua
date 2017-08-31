@@ -807,14 +807,14 @@ function DoAutoRepair(self)
 
 			RepairAllItems()
 		end
-		PlaySound("ITEM_REPAIR")
+		PlaySound(SOUNDKIT.ITEM_REPAIR)
 	else
 		if repairAllCost > GetMoney() then
 			return Warn(L["[AutoRepair] No enough money to repair."])
 		end
 
 		RepairAllItems()
-		PlaySound("ITEM_REPAIR")
+		PlaySound(SOUNDKIT.ITEM_REPAIR)
 	end
 
 	Warn("-----------------------------")

@@ -1383,7 +1383,7 @@ class "ContainerHeader"
 			sortBtn:SetPoint("BOTTOMRIGHT", -58, 4)
 			sortBtn.Custom = function()
 				if not InCombatLockdown() and IsReagentBankUnlocked() then
-					PlaySound("igMainMenuOption")
+					PlaySound(SOUNDKIT.IG_MAINMENU_OPTION)
 					DepositReagentBank()
 				end
 			end

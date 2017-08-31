@@ -56,8 +56,8 @@ SecureHandlerSetFrameRef(_ToggleButton, "ContainerHeader", IGAS:GetUI(_Container
 SecureHandlerExecute(_ToggleButton, [[ContainerHeader = self:GetFrameRef("ContainerHeader")]])
 _ToggleButton:SetAttribute("type", "toggle")
 _ToggleButton:SetAttribute("_toggle", [[if ContainerHeader:IsShown() then ContainerHeader:Hide() self:CallMethod("OpenBag") else ContainerHeader:Show() self:CallMethod("CloseBag") end]])
-_ToggleButton.OpenBag = function() PlaySound("igBackPackOpen") end
-_ToggleButton.CloseBag = function() PlaySound("igBackPackClose") end
+_ToggleButton.OpenBag = function() PlaySound(SOUNDKIT.IG_BACKPACK_OPEN) end
+_ToggleButton.CloseBag = function() PlaySound(SOUNDKIT.IG_BACKPACK_CLOSE) end
 
 SetOverrideBindingClick(_ToggleButton, true, GetBindingKey("OPENALLBAGS") or "B", "IGAS_UI_ContainerToggle", "LeftButton")
 --SetOverrideBindingClick(_ToggleButton, true, "SHIFT-" .. (GetBindingKey("OPENALLBAGS") or "B"), "IGAS_UI_ContainerToggle", "LeftButton")
