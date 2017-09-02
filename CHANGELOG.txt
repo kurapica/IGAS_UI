@@ -1,3 +1,6 @@
+2017/09/02 v195
+	1. Block the auto guild repair since it's protected.
+
 2017/08/29 v193
 	1. The container view's scale can be changed within the menu.
 

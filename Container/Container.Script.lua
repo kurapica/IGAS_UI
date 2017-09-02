@@ -791,7 +791,7 @@ function DoAutoRepair(self)
 	if repairAllCost == 0 or not canRepair then return end
 
 	--See if can guildbank repair
-	if CanGuildBankRepair() then
+	if false and CanGuildBankRepair() then
 
 		local guildName, _, guildRankIndex = GetGuildInfo("player")
 
