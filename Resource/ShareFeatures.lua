@@ -1,5 +1,10 @@
 IGAS:NewAddon "IGAS_UI"
 
+BORDER_SIZE = 2
+
+SPELL_POWER_RUNE_POWER = 5
+SPELL_POWER_HOLY_POWER = _G.SPELL_POWER_HOLY_POWER
+
 --==========================
 -- Share Features
 --==========================
@@ -31,7 +36,7 @@ Media = {
 
 	DEFAULT_BACKDROP = {
 	    edgeFile = "Interface\\Buttons\\WHITE8x8",
-	    edgeSize = 1,
+	    edgeSize = BORDER_SIZE,
 	},
 
 	NumberFont = Font("IGAS_UI_NumberFont") {
@@ -82,8 +87,8 @@ interface "iBorder"
     function iBorder(self)
 		local bg = Frame("Back", self)
 		bg.FrameStrata = "BACKGROUND"
-		bg:SetPoint("TOPLEFT", -1, 1)
-		bg:SetPoint("BOTTOMRIGHT", 1, -1)
+		bg:SetPoint("TOPLEFT", -BORDER_SIZE, BORDER_SIZE)
+		bg:SetPoint("BOTTOMRIGHT", BORDER_SIZE, -BORDER_SIZE)
 		bg.Backdrop = Media.DEFAULT_BACKDROP
 		bg.BackdropBorderColor = Media.DEFAULT_BORDER_COLOR
     end
@@ -320,8 +325,6 @@ class "iClassPower"
 
 	_MaxPower = 10
 
-	SPELL_POWER_HOLY_POWER = _G.SPELL_POWER_HOLY_POWER
-
 	------------------------------------------------------
 	-- Method
 	------------------------------------------------------
@@ -332,6 +335,17 @@ class "iClassPower"
 
 	function SetClassPowerType(self, ty)
 		self.PowerType = ty
+	end
+
+	function RefreshSetting(self)
+		if self.PowerType == SPELL_POWER_HOLY_POWER then
+			self.HightLightValue = 3
+		elseif self.PowerType == SPELL_POWER_COMBO_POINTS then
+			self.HightLightValue = 5
+		else
+			self.HightLightValue = self.MaxValue
+		end
+		RefreshBar(self)
 	end
 
 	function RefreshBar(self)
@@ -345,6 +359,7 @@ class "iClassPower"
 		end
 
 		local width = floor((self.Parent.Width - 2 - self.HSpacing * (numBar-1)) / numBar)
+		local loff 	= (self.Parent.Width - self.HSpacing * (numBar - 1) - width * numBar) / 2
 
 		self.__NumBar = numBar
 
@@ -353,12 +368,8 @@ class "iClassPower"
 			self[i]:ClearAllPoints()
 			self[i]:SetPoint("TOP")
 			self[i]:SetPoint("BOTTOM")
-			self[i]:SetPoint("LEFT", 1 + (width + self.HSpacing) * (i - 1), 0)
-			if i == numBar then
-				self[i]:SetPoint("RIGHT", -1, 0)
-			else
-				self[i].Width = width
-			end
+			self[i]:SetPoint("LEFT", loff + (width + self.HSpacing) * (i - 1), 0)
+			self[i].Width = width
 			self[i].Activated = false
 			self[i]:Show()
 
@@ -379,20 +390,9 @@ class "iClassPower"
 
 		if self.__NumBar == 1 then
 			self[1].Value = value
+			-- self[1].Activated = value >= self.HightLightValue
 		else
-			local needActive = false
-
-			if self.PowerType == SPELL_POWER_HOLY_POWER then
-				if value >= 3 then
-					needActive = true
-				end
-			elseif self.PowerType == SPELL_POWER_COMBO_POINTS then
-				if value >= 5 then
-					needActive = true
-				end
-			elseif value >= self.MaxValue then
-				needActive = true
-			end
+			local needActive = value >= self.HightLightValue
 
 			for i = 1, self.__NumBar do
 				if value >= i then
@@ -410,11 +410,13 @@ class "iClassPower"
 	-- Property
 	------------------------------------------------------
 	-- Value
-	property "Value" { Handler = RefreshValue, Type = Number }
+	property "Value" { Handler = RefreshValue, Type = Number, Default = 0 }
 	-- MinMaxValue
-	property "MaxValue" { Handler = RefreshBar,	Type = Number }
+	property "MaxValue" { Handler = RefreshSetting,	Type = Number }
 	-- PowerType
-	property "PowerType" { Handler = RefreshBar, Type = NumberNil }
+	property "PowerType" { Handler = RefreshSetting, Type = NumberNil }
+	-- HightLightValue
+	property "HightLightValue" { Type = Number, Default = _MaxPower }
 
 	------------------------------------------------------
 	-- Constructor
@@ -422,7 +424,7 @@ class "iClassPower"
     function iClassPower(self, name, parent, ...)
 		Super(self, name, parent, ...)
 
-		self.HSpacing = 3
+		self.HSpacing = BORDER_SIZE * 2 + 1
 
 		for i = 1, _MaxPower do
 			self[i] = iClassPowerButton("Bar"..i, self)
@@ -436,6 +438,38 @@ class "iClassPower"
 endclass "iClassPower"
 
 class "iRuneBar"
+	inherit "iClassPower"
+	extend "IFRune"
+
+	function SetRuneByIndex(self, index, start, duration, ready, isEnergize)
+		index = - index
+		if ready then
+			if not self[index] then
+				self[index] = true
+				self.Value = self.Value + 1
+			end
+		else
+			if self[index] then
+				self[index] = false
+				self.Value = self.Value - 1
+			end
+		end
+	end
+
+	function SetMaxRune(self, max)
+		self.MaxValue = max
+		self.HightLightValue = 2
+	end
+
+	function iRuneBar(self, ...)
+		Super(self, ...)
+
+		self.Value = 0
+		self.PowerType = SPELL_POWER_RUNE_POWER
+	end
+endclass "iRuneBar"
+
+class "iRuneBarOld"
 	inherit "LayoutPanel"
 	extend "IFRune"
 
@@ -516,7 +550,7 @@ class "iRuneBar"
 			self[i] = btnRune
 		end
 	end
-endclass "iRuneBar"
+endclass "iRuneBarOld"
 
 class "iStaggerBar"
 	inherit "StatusBar"
