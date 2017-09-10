@@ -520,6 +520,7 @@ class "IActionButton"
 				for i = 1, num do
 					if not branch.Branch then
 						branch.Branch = _Recycle_IButtons()
+						branch.Branch.FadeAlpha = branch.FadeAlpha
 					end
 					branch = branch.Branch
 					branch:ClearAllPoints()

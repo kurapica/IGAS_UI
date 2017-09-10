@@ -1,3 +1,6 @@
+2017/09/10 v197
+	1. Fix a alpha error caused by button recycle.
+
 2017/09/04 v196
 	1. A little modification for the display style, If you don't need it, you can modify the ShareFeatures.lua change BORDER_SIZE to 1 to change back.
 	2. The runes are now ordered to be easy using.
