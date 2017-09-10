@@ -520,7 +520,6 @@ class "IActionButton"
 				for i = 1, num do
 					if not branch.Branch then
 						branch.Branch = _Recycle_IButtons()
-						branch.Branch.FadeAlpha = branch.FadeAlpha
 					end
 					branch = branch.Branch
 					branch:ClearAllPoints()
@@ -692,6 +691,8 @@ class "IActionButton"
 		self.ForceShowGrid = not self.LockMode or force or false
 		if force then
 			self:SetAlpha(1)
+		else
+			self:SetAlpha(self.FadeAlpha)
 		end
 	end
 
@@ -1188,10 +1189,12 @@ class "IActionButton"
 
 	property "FadeAlpha" {
 		Get = function(self)
-			return self:GetAlpha()
+			self = self.Root.Header
+			return self.__FadeAlpha or self:GetAlpha()
 		end,
 		Set = function(self, alpha)
 			if self.Root.Header == self then
+				self.__FadeAlpha = alpha
 				if self.ShowGrid or self.ForceShowGrid then
 					while self do
 						self:SetAlpha(alpha)
