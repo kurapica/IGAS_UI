@@ -65,5 +65,11 @@ Config = {
 				AnchorPoint("LEFT", 2, 0, "iHealthBar", "RIGHT")
 			},
 		},
+		{
+			Type = iQuestMark,
+			Location = {
+				AnchorPoint("RIGHT", -2, 0, "iHealthBar", "LEFT")
+			},
+		},
 	}
 }

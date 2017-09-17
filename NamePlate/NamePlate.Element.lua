@@ -259,3 +259,72 @@ class "iNameLabel"
 		label.FontObject = NAME_FONT
 	end
 endclass "iNameLabel"
+
+class "iQuestMark"
+	inherit "Texture"
+	extend "IFUnitElement"
+
+	_GameTooltip = System.Widget.GameTooltip("IGAS_UI_NamePlate_Tooltip", nil, "GameTooltipTemplate")
+
+	local function OnForceRefresh(self)
+		self.Visible = false
+		local unit = self.Unit
+		if unit and not UnitIsPlayer(unit) then
+			local player = UnitName("player")
+			local isQuest, isOtherQuest
+			_GameTooltip:SetOwner(WorldFrame, 'ANCHOR_NONE')
+			_GameTooltip:SetUnit(unit)
+
+			for i = 3, _GameTooltip:NumLines() do
+				local text = _GameTooltip:GetLeftText(i)
+				if not text then break end
+
+				if _WorldQuest[text] then
+					local progress = C_TaskQuest.GetQuestProgressBarInfo(_WorldQuest[text])
+					if progress then
+						if progress < 100 then
+							self:SetDesaturated(false)
+							self.Visible = true
+						end
+						return _GameTooltip:Hide()
+					end
+				end
+
+				if _QuestLog[text] then isQuest = _QuestLog[text] end
+
+				local name, progress = text:match("^%s*(%S-)%s*%-%s*(.+)$")
+
+				if progress then
+					if (not name or name == "" or name == player) then
+						local x, y = progress:match("(%d+)/(%d+)")
+						if x and y then
+							if tonumber(y) > tonumber(x) then
+								self:SetDesaturated(false)
+								self.Visible = true
+							end
+						end
+						return _GameTooltip:Hide()
+					else
+						isOtherQuest = true
+					end
+				end
+			end
+
+			if isQuest then
+				self.Visible = true
+				self:SetDesaturated(isOtherQuest)
+			end
+
+			return _GameTooltip:Hide()
+		end
+	end
+
+	function iQuestMark(self, ...)
+		Super(self, ...)
+
+		self.Visible = false
+		self:SetAtlas("QuestNormal", true)
+
+		self.OnForceRefresh = self.OnForceRefresh + OnForceRefresh
+	end
+endclass "iQuestMark"

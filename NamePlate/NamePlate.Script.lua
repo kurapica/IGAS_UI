@@ -22,6 +22,9 @@ local _HorizontalScale
 
 local _ArrayMask = System.Collections.List()
 
+_QuestLog = {}
+_WorldQuest = {}
+
 ------------------------------------------------------
 -- Module Script Handler
 ------------------------------------------------------
@@ -48,10 +51,25 @@ function OnLoad(self)
 	self:SecureHook(_G.NamePlateDriverFrame, "OnNamePlateCreated", NAME_PLATE_CREATED)
 	self:RegisterEvent("NAME_PLATE_UNIT_ADDED")
 	self:RegisterEvent("NAME_PLATE_UNIT_REMOVED")
+	self:RegisterEvent("QUEST_ACCEPTED")
+	self:RegisterEvent("QUEST_REMOVED")
+	self:RegisterEvent("QUEST_LOG_UPDATE")
+	self:RegisterEvent("UNIT_QUEST_LOG_CHANGED")
+
+	SetCVar("showQuestTrackingTooltips", "1")
 end
 
 function OnEnable(self)
 	UpdateNamePlateOptions()
+
+	for _, task in pairs(C_TaskQuest.GetQuestsForPlayerByMapID((GetCurrentMapAreaID()))) do
+		if task.inProgress then
+			local name = C_TaskQuest.GetQuestInfoByQuestID(task.questId)
+			if name then
+				_WorldQuest[name] = task.questId
+			end
+		end
+	end
 end
 
 function NAME_PLATE_CREATED(self, base)
@@ -83,6 +101,36 @@ function NAME_PLATE_UNIT_REMOVED(self, unit)
 	if base.NamePlateMask then
 		UninstallClassPower(base.NamePlateMask)
 		base.NamePlateMask.Unit = nil
+	end
+end
+
+function QUEST_ACCEPTED(self, logid, questId)
+	if QuestUtils_IsQuestWorldQuest(questId) then
+		local name = C_TaskQuest.GetQuestInfoByQuestID(questId)
+		if name then
+			_WorldQuest[name] = questId
+			Task.NextCall(RefreshAllQuestMark)
+		end
+	end
+end
+
+function QUEST_REMOVED(self, questId)
+	local name = C_TaskQuest.GetQuestInfoByQuestID(questId)
+	if name then
+		_WorldQuest[name] = nil
+		Task.NextCall(RefreshAllQuestMark)
+	end
+end
+
+function QUEST_LOG_UPDATE(self)
+	self:UnregisterEvent("QUEST_LOG_UPDATE")
+
+	UpdateQuestLog()
+end
+
+function UNIT_QUEST_LOG_CHANGED(self, unit)
+	if unit == "player" then
+		Task.NextCall(UpdateQuestLog, true)
 	end
 end
 
@@ -203,4 +251,28 @@ function UpdateNamePlateOptions()
 	_ArrayMask:Each(iNamePlateUnitFrame.ApplyFrameOptions, _VerticalScale, _HorizontalScale)
 
 	if np then InstallClassPower(np) end
+end
+
+function UpdateQuestLog(forceRefresh)
+	wipe(_QuestLog)
+
+	for i = 1, GetNumQuestLogEntries() do
+		local title, _, _, isHeader = GetQuestLogTitle(i)
+		if not isHeader then
+			_QuestLog[title] = i
+		end
+	end
+
+	if forceRefresh then
+		return RefreshAllQuestMark()
+	end
+end
+
+function RefreshAllQuestMark()
+	_ArrayMask:Each(RefreshQuestMark)
+end
+
+function RefreshQuestMark(self)
+	local mark = self:GetElement(iQuestMark)
+	if mark then mark:OnForceRefresh() end
 end
