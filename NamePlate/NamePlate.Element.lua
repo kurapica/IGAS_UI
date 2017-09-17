@@ -310,7 +310,7 @@ class "iQuestMark"
 				end
 			end
 
-			if isQuest then
+			if isQuest or isOtherQuest then
 				self.Visible = true
 				self:SetDesaturated(isOtherQuest)
 			end
