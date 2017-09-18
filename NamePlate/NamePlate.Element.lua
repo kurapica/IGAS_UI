@@ -302,8 +302,8 @@ class "iQuestMark"
 								self:SetDesaturated(false)
 								self.Visible = true
 							end
+							return _GameTooltip:Hide()
 						end
-						return _GameTooltip:Hide()
 					else
 						isOtherQuest = true
 					end
