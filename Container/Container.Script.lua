@@ -780,11 +780,11 @@ end
 -- Auto Repair
 -------------------------------
 function DoAutoRepair(self)
-	if UnitReaction("target", "player") < _ToolSet.AutoRepairChkRep then return end
+	if not CanMerchantRepair() then return end
+
+	if (UnitReaction("target", "player") or 4) < _ToolSet.AutoRepairChkRep then return end
 
 	local repairByGuild = false
-
-	if not CanMerchantRepair() then return end
 
 	repairAllCost, canRepair = GetRepairAllCost()
 
