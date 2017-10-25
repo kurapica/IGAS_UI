@@ -1,3 +1,6 @@
+2017/10/25 v203
+	1. Fix the minimap for EnhanceBattlefieldMinimap.
+
 2017/09/21 v201
 	1. Fix auto repair.
 

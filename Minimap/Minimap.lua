@@ -33,7 +33,6 @@ Toggle = {
 				Minimap:OnEnter()
 			else
 				Minimap.Alpha = 1
-				UpdateAlpha(1)
 			end
 		else
 			if not mask then
@@ -95,7 +94,6 @@ Toggle = {
 			end
 
 			Minimap.Alpha = 1
-			UpdateAlpha(1)
 
 			mask:Show()
 			mnuMinimap:Show()
@@ -204,7 +202,6 @@ end
 function Minimap:OnEnter()
 	if _DB.AutoFade then
 		self.Alpha = 1
-		UpdateAlpha(1)
 		self.StartTime = GetTime()
 
 		if not self.ThreadStart then
@@ -215,7 +212,6 @@ function Minimap:OnEnter()
 
 				while alpha < 1 and _DB.AutoFade do
 					self.Alpha = 1-alpha
-					UpdateAlpha(1 - alpha)
 
 					if self:IsMouseOver() then
 						self.StartTime = GetTime()
@@ -229,10 +225,8 @@ function Minimap:OnEnter()
 
 				if _DB.AutoFade then
 					self.Alpha = 0
-					UpdateAlpha(0)
 				else
 					self.Alpha = 1
-					UpdateAlpha(1)
 				end
 				self.ThreadStart = false
 			end)
@@ -247,17 +241,11 @@ function MinimapZoneTextButton:OnClick(button)
 			Minimap:OnEnter()
 		else
 			Minimap.Alpha = 1
-			UpdateAlpha(1)
 		end
 	end
 end
 
-function UpdateAlpha(alpha)
-	MinimapZoneTextButton:SetAlpha(alpha)
-	MiniMapInstanceDifficulty:SetAlpha(alpha)
-	GuildInstanceDifficulty:SetAlpha(alpha)
-end
-
+MinimapZoneTextButton:SetParent(Minimap)
 MinimapZoneTextButton:ClearAllPoints()
 MinimapZoneTextButton:SetPoint("BOTTOMLEFT", Minimap, "TOPLEFT", 0, 4)
 MinimapZoneTextButton:SetPoint("BOTTOMRIGHT", Minimap, "TOPRIGHT", 0, 4)
@@ -308,10 +296,12 @@ GarrisonLandingPageMinimapButton:ClearAllPoints()
 GarrisonLandingPageMinimapButton:SetPoint("CENTER", Minimap, "BOTTOMLEFT")
 
 -- MiniMapInstanceDifficulty
+MiniMapInstanceDifficulty:SetParent(Minimap)
 MiniMapInstanceDifficulty:ClearAllPoints()
 MiniMapInstanceDifficulty:SetPoint("TOPLEFT", Minimap, "TOPLEFT", -6, 4)
 
 -- GuildInstanceDifficulty
+GuildInstanceDifficulty:SetParent(Minimap)
 GuildInstanceDifficulty:ClearAllPoints()
 GuildInstanceDifficulty:SetPoint("TOPLEFT", Minimap, "TOPLEFT", -6, 4)
 
