@@ -7,6 +7,13 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2017/10/31 v204 : </lime>
+</p><br/>
+<p>
+    1. 现在你可以保存和加载特定动作条的布局和内容。
+</p>
+<br/><br/>
+<p>
 <lime>2017/08/14 v190 : </lime>
 </p><br/>
 <p>
@@ -832,3 +839,6 @@ L["The min opacity can't be greater than the max opacity"] = "最小不透明度
 L["Please input the min opacity(0 - 1)"] = "请输入最小不透明度(0 - 1)"
 
 L["Please input the scale number [0.5-3]"] = "请输入缩放的比例值[0.5-3]"
+
+L["Save action bar's settings"] = "保存该动作条布局及内容"
+L["Apply action bar's settings"] = "载入动作条布局及内容"

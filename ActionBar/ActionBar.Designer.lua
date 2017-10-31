@@ -154,6 +154,20 @@ _ListBarLoad.Height = 250
 _ListBarLoad.Visible = false
 _MenuBarLoad.DropDownList = _ListBarLoad
 
+_MenuBarContentSave = _Menu:AddMenuButton(L"Save & Load", L"Save action bar's settings")
+_ListBarContentSave = List("LstBarSave", _MenuBarContentSave)
+_ListBarContentSave.Width = 150
+_ListBarContentSave.Height = 250
+_ListBarContentSave.Visible = false
+_MenuBarContentSave.DropDownList = _ListBarContentSave
+
+_MenuBarContentLoad = _Menu:AddMenuButton(L"Save & Load", L"Apply action bar's settings")
+_ListBarContentLoad = List("LstBarLoad", _MenuBarContentLoad)
+_ListBarContentLoad.Width = 150
+_ListBarContentLoad.Height = 250
+_ListBarContentLoad.Visible = false
+_MenuBarContentLoad.DropDownList = _ListBarContentLoad
+
 _MenuHideBlz = _Menu:AddMenuButton(L"Global Style", L"Hidden MainMenuBar")
 _MenuHideBlz.IsCheckButton = true
 

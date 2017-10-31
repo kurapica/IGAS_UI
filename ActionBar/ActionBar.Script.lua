@@ -121,6 +121,23 @@ function OnLoad(self)
 	_ListBarLoad.Keys = _ActionBarLayoutLoad
 	_ListBarLoad.Items = _ActionBarLayoutLoad
 
+	-- Action bar's settings
+	_ActionBarSettings = _Addon._DB.ActionBarSettings or {}
+	_Addon._DB.ActionBarSettings = _ActionBarSettings
+
+	_ActionBarSettingsSave = {L"New Set"}
+	_ActionBarSettingsLoad = {L"Reset"}
+
+	for name in pairs(_ActionBarSettings) do
+		tinsert(_ActionBarSettingsSave, name)
+		tinsert(_ActionBarSettingsLoad, name)
+	end
+
+	_ListBarContentSave.Keys = _ActionBarSettingsSave
+	_ListBarContentSave.Items = _ActionBarSettingsSave
+	_ListBarContentLoad.Keys = _ActionBarSettingsLoad
+	_ListBarContentLoad.Items = _ActionBarSettingsLoad
+
 	-- Global Styles
 	_ActionBarGlobalStyle = _Addon._DB.ActionBarGlobalStyle or {}
 	_Addon._DB.ActionBarGlobalStyle = _ActionBarGlobalStyle
@@ -939,6 +956,10 @@ function _Menu:OnShow()
 	_ListBarSave.SelectedIndex = nil
 	_ListBarLoad.SelectedIndex = nil
 
+	-- Action Bar's Settings
+	_ListBarContentLoad.SelectedIndex = nil
+	_ListBarContentSave.SelectedIndex = nil
+
 	-- Hide Blz bar
 	_MenuHideBlz:BlockEvent("OnCheckChanged")
 	_MenuHideBlz.Checked = _HiddenMainMenuBar
@@ -953,6 +974,10 @@ function _Menu:OnShow()
 	-- MenuBar
 	_MenuBarSave.Enabled = notBagSlotBar
 	_MenuBarLoad.Enabled = notBagSlotBar
+
+	-- Setting
+	_MenuBarContentSave.Enabled = notBagSlotBar
+	_MenuBarContentLoad.Enabled = notBagSlotBar
 end
 
 function _MenuClose:OnClick()
@@ -1312,6 +1337,50 @@ function _ListBarLoad:OnItemChoosed(key, item)
 		self:ThreadCall(function (self)
 			if IGAS:MsgBox(L"Do you want load the layout?", "n") then
 				LoadBarConfig(header, _ActionBarLayout[key])
+			end
+		end)
+	end
+end
+
+function _ListBarContentSave:OnItemChoosed(key, item)
+	local header = _Menu.Parent
+	_Menu:Hide()
+	if key == L"New Set" then
+		self:ThreadCall(function (self)
+			local name = ""
+			while strtrim(name) == "" or name == L"New Set" or _ActionBarSettings[name] do
+				name = IGAS:MsgBox(L"Please input the new set name", "ic")
+				if not name then
+					return
+				end
+			end
+			_ActionBarSettings[name] = GenerateBarConfig(header, true)
+			tinsert(_ActionBarSettingsSave, name)
+			tinsert(_ActionBarSettingsLoad, name)
+		end)
+	else
+		self:ThreadCall(function (self)
+			if IGAS:MsgBox(L"Do you want overwrite the existed set?", "n") then
+				_ActionBarSettings[key] = GenerateBarConfig(header, true)
+			end
+		end)
+	end
+end
+
+function _ListBarContentLoad:OnItemChoosed(key, item)
+	local header = _Menu.Parent
+	_Menu:Hide()
+
+	if key == L"Reset" then
+		self:ThreadCall(function (self)
+			if IGAS:MsgBox(L"Do you want reset the layout?", "n") then
+				LoadBarConfig(header)
+			end
+		end)
+	else
+		self:ThreadCall(function (self)
+			if IGAS:MsgBox(L"Do you want load the set?", "n") then
+				LoadBarConfig(header, _ActionBarSettings[key])
 			end
 		end)
 	end
