@@ -31,10 +31,12 @@ Toggle = {
 	Update = function() end,
 }
 
-_MainBar = nil
-_PetBar = nil
-_StanceBar = nil
-_BagSlotBar = nil
+local _MainBar = nil
+local _PetBar = nil
+local _StanceBar = nil
+local _BagSlotBar = nil
+local _WorldMarkerBar = nil
+local _RaidTargetBar = nil
 
 _QuestMap = {}
 _ItemType = nil
@@ -211,6 +213,9 @@ function OnEnable(self)
 	_HeadList:Each(function(self)
 		self:RefreshForAutoHide()
 	end)
+
+	-- Skin data may not existed in OnLoad
+	ReloadMasqueSkin()
 end
 
 _Addon.OnSlashCmd = _Addon.OnSlashCmd + function(self, option, info)
@@ -366,6 +371,8 @@ function GenerateBarConfig(header, includeContent)
 	bar.MainBar = header.MainBar
 	bar.PetBar = header.PetBar
 	bar.StanceBar = header.StanceBar
+	bar.WorldMarkBar = header.WorldMarkBar
+	bar.RaidTargetBar = header.RaidTargetBar
 	bar.ReplaceBlzMainAction = header.ReplaceBlzMainAction
 
 	bar.AutoHideCondition = System.Reflector.Clone(header.AutoHideCondition)
@@ -505,6 +512,19 @@ function LoadBarConfig(header, bar)
 
 		for _, set in ipairs(bar) do
 			btn.FlyoutDirection = set.FlyoutDirection
+
+			if btn == header then
+				header.WorldMarkBar = bar.WorldMarkBar
+				if header.WorldMarkBar then
+					_WorldMarkerBar = header
+				end
+
+				header.RaidTargetBar = bar.RaidTargetBar
+				if header.RaidTargetBar then
+					_RaidTargetBar = header
+				end
+			end
+
 			btn:SetBindingKey(set.HotKey)
 			if set.ActionKind and set.ActionTarget then
 				btn:SetAction(set.ActionKind, set.ActionTarget, set.ActionDetail)
@@ -573,6 +593,14 @@ function LoadBarConfig(header, bar)
 			header.StanceBar = false
 			_StanceBar = nil
 		end
+		if header == _WorldMarkerBar then
+			header.WorldMarkBar = false
+			_WorldMarkerBar = nil
+		end
+		if header == _RaidTargetBar then
+			header.RaidTargetBar = false
+			_RaidTargetBar = nil
+		end
 		header:GenerateBrother(1, 1)
 		header:GenerateBranch(0)
 	end
@@ -604,6 +632,8 @@ function LoadConfig(config)
 	end
 
 	UpdateBlzMainMenuBar()
+
+	ReloadMasqueSkin()
 end
 
 function ClearScreen()
@@ -641,6 +671,14 @@ function RemoveHeader(header)
 	if header == _StanceBar then
 		header.StanceBar = false
 		_StanceBar = nil
+	end
+	if header == _WorldMarkerBar then
+		header.WorldMarkBar = false
+		_WorldMarkerBar = nil
+	end
+	if header == _RaidTargetBar then
+		header.RaidTargetBar = false
+		_RaidTargetBar = nil
 	end
 	header.AutoHideCondition = nil
 	header.AutoFadeOut = false
@@ -887,6 +925,10 @@ function _Menu:OnShow()
 		_ListActionMap.SelectedIndex = 9
 	elseif header.StanceBar then
 		_ListActionMap.SelectedIndex = 10
+	elseif header.WorldMarkBar then
+		_ListActionMap.SelectedIndex = 11
+	elseif header.RaidTargetBar then
+		_ListActionMap.SelectedIndex = 12
 	else
 		_ListActionMap.SelectedIndex = 1
 	end
@@ -920,14 +962,21 @@ function _Menu:OnShow()
 	_MenuFreeMode.Checked = header.FreeMode
 
 	-- Manual mode
-	_MenuManual.Enabled = notBagSlotBar and header.FreeMode
+	-- _MenuManual.Enabled = notBagSlotBar and header.FreeMode
+	if header.Brother == nil and header.Branch then
+		_MenuFreeSquare.Enabled = true
+		_MenuFreeCircle.Enabled = true
+	else
+		_MenuFreeSquare.Enabled = false
+		_MenuFreeCircle.Enabled = false
+	end
 
 	-- Auto Swap
 	_MenuSwap.Enabled = notBagSlotBar
 	_MenuSwap.Checked = header.AutoSwapRoot
 
 	-- Auto Generate
-	if header.ActionBar or header.MainBar or header.PetBar or header.StanceBar then
+	if header.ActionBar or header.MainBar or header.PetBar or header.StanceBar or header.WorldMarkBar or header.RaidTargetBar then
 		_MenuAutoGenerate.Enabled = false
 	else
 		_MenuAutoGenerate.Enabled = true
@@ -1011,6 +1060,14 @@ function _ListActionMap:OnItemChoosed(key, item)
 			_StanceBar = nil
 			_Menu.Parent.StanceBar = false
 		end
+		if _Menu.Parent == _WorldMarkerBar then
+			_WorldMarkerBar = nil
+			_Menu.Parent.WorldMarkBar = false
+		end
+		if _Menu.Parent == _RaidTargetBar then
+			_RaidTargetBar = nil
+			_Menu.Parent.RaidTargetBar = false
+		end
 	elseif index == 2 then
 		if not _MainBar then
 			if _Menu.Parent == _PetBar then
@@ -1020,6 +1077,14 @@ function _ListActionMap:OnItemChoosed(key, item)
 			if _Menu.Parent == _StanceBar then
 				_StanceBar = nil
 				_Menu.Parent.StanceBar = false
+			end
+			if _Menu.Parent == _WorldMarkerBar then
+				_WorldMarkerBar = nil
+				_Menu.Parent.WorldMarkBar =  false
+			end
+			if _Menu.Parent == _RaidTargetBar then
+				_RaidTargetBar = nil
+				_Menu.Parent.RaidTargetBar = false
 			end
 			_MainBar = _Menu.Parent
 			_Menu.Parent.ActionBar = nil
@@ -1041,6 +1106,14 @@ function _ListActionMap:OnItemChoosed(key, item)
 				_StanceBar = nil
 				_Menu.Parent.StanceBar = false
 			end
+			if _Menu.Parent == _WorldMarkerBar then
+				_WorldMarkerBar = nil
+				_Menu.Parent.WorldMarkBar =  false
+			end
+			if _Menu.Parent == _RaidTargetBar then
+				_RaidTargetBar = nil
+				_Menu.Parent.RaidTargetBar = false
+			end
 			_PetBar = _Menu.Parent
 			_Menu.Parent.PetBar = true
 		end
@@ -1053,9 +1126,57 @@ function _ListActionMap:OnItemChoosed(key, item)
 				_PetBar = nil
 				_Menu.Parent.PetBar = false
 			end
+			if _Menu.Parent == _WorldMarkerBar then
+				_WorldMarkerBar = nil
+				_Menu.Parent.WorldMarkBar =  false
+			end
+			if _Menu.Parent == _RaidTargetBar then
+				_RaidTargetBar = nil
+				_Menu.Parent.RaidTargetBar = false
+			end
 			_StanceBar = _Menu.Parent
 			_Menu.Parent.StanceBar = true
 			UPDATE_SHAPESHIFT_FORMS()
+		end
+	elseif index == 11 then
+		if not _WorldMarkerBar then
+			if _Menu.Parent == _MainBar then
+				return
+			end
+			if _Menu.Parent == _PetBar then
+				_PetBar = nil
+				_Menu.Parent.PetBar = false
+			end
+			if _Menu.Parent == _StanceBar then
+				_StanceBar = nil
+				_Menu.Parent.StanceBar = false
+			end
+			if _Menu.Parent == _RaidTargetBar then
+				_RaidTargetBar = nil
+				_Menu.Parent.RaidTargetBar = false
+			end
+			_WorldMarkerBar = _Menu.Parent
+			_Menu.Parent.WorldMarkBar = true
+		end
+	elseif index == 12 then
+		if not _RaidTargetBar then
+			if _Menu.Parent == _MainBar then
+				return
+			end
+			if _Menu.Parent == _PetBar then
+				_PetBar = nil
+				_Menu.Parent.PetBar = false
+			end
+			if _Menu.Parent == _StanceBar then
+				_StanceBar = nil
+				_Menu.Parent.StanceBar = false
+			end
+			if _Menu.Parent == _WorldMarkerBar then
+				_WorldMarkerBar = nil
+				_Menu.Parent.WorldMarkBar =  false
+			end
+			_RaidTargetBar = _Menu.Parent
+			_Menu.Parent.RaidTargetBar = true
 		end
 	else
 		if _Menu.Parent == _MainBar then
@@ -1070,6 +1191,14 @@ function _ListActionMap:OnItemChoosed(key, item)
 		if _Menu.Parent == _StanceBar then
 			_StanceBar = nil
 			_Menu.Parent.StanceBar = false
+		end
+		if _Menu.Parent == _WorldMarkerBar then
+			_WorldMarkerBar = nil
+			_Menu.Parent.WorldMarkBar =  false
+		end
+		if _Menu.Parent == _RaidTargetBar then
+			_RaidTargetBar = nil
+			_Menu.Parent.RaidTargetBar = false
 		end
 		_Menu.Parent.ActionBar = index - 2
 	end
@@ -1211,7 +1340,7 @@ end
 
 function _MenuFreeMode:OnCheckChanged()
 	_Menu.Parent.FreeMode = self.Checked
-	_MenuManual.Enabled = self.Checked
+	-- _MenuManual.Enabled = self.Checked
 	if not self.Checked then
 		IFMovable._ModeOff(_IGASUI_ACTIONBAR_GROUP)
 		IFResizable._ModeOff(_IGASUI_ACTIONBAR_GROUP)
@@ -1221,6 +1350,52 @@ end
 function _MenuManual:OnClick()
 	IFMovable._Toggle(_IGASUI_ACTIONBAR_GROUP)
 	IFResizable._Toggle(_IGASUI_ACTIONBAR_GROUP)
+
+	if not IFResizable._IsModeOn(_IGASUI_ACTIONBAR_GROUP) then
+		ReloadMasqueSkin()
+	end
+end
+
+function _MenuFreeSquare:OnClick()
+	local header = _Menu.Parent
+	_Menu:Hide()
+
+	header.FreeMode = true
+
+	local oldExp = header.Expansion
+	header.Expansion = true
+
+	_FreeMask.Parent = header.Branch
+	_FreeMask.Visible = true
+	_FreeMask.Mode = "Square"
+
+	IGAS:MsgBox(L"Drag the masked button to modify the layout.")
+
+	_FreeMask.Parent = nil
+	_FreeMask.Visible = false
+
+	header.Expansion = oldExp
+end
+
+function _MenuFreeCircle:OnClick()
+	local header = _Menu.Parent
+	_Menu:Hide()
+
+	header.FreeMode = true
+
+	local oldExp = header.Expansion
+	header.Expansion = true
+
+	_FreeMask.Parent = header.Branch
+	_FreeMask.Visible = true
+	_FreeMask.Mode = "Circle"
+
+	IGAS:MsgBox(L"Drag the masked button to modify the layout.")
+
+	_FreeMask.Parent = nil
+	_FreeMask.Visible = false
+
+	header.Expansion = oldExp
 end
 
 function _ListSaveSet:OnItemChoosed(key, item)

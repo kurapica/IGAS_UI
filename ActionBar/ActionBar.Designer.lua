@@ -27,6 +27,8 @@ _ListActionMap:SetList({
 	L"Bar 6",
 	L"Pet Bar",
 	L"Stance Bar",
+	L"World Mark",
+	L"Raid Target",
 })
 _ListActionMap.Width = 150
 _ListActionMap.Height = 250
@@ -101,12 +103,17 @@ _MenuPopupDuration:ActiveThread("OnClick")
 
 _MenuKeyBinding = _Menu:AddMenuButton(L"Key Binding")
 
-_MenuFreeMode = _Menu:AddMenuButton(L"Free Mode")
+_MenuFreeMode = _Menu:AddMenuButton(L"Bar Style", L"Free Mode")
 _MenuFreeMode.IsCheckButton = true
+
+_MenuFreeSquare = _Menu:AddMenuButton(L"Bar Style", L"Free Mode", L"Square Layout")
+_MenuFreeSquare:ActiveThread("OnClick")
+_MenuFreeCircle = _Menu:AddMenuButton(L"Bar Style", L"Free Mode", L"Circle Layout")
+_MenuFreeCircle:ActiveThread("OnClick")
 
 _MenuManual = _Menu:AddMenuButton(L"Manual Move&Resize")
 
-_MenuSwap = _Menu:AddMenuButton(L"Swap Pop-up action")
+_MenuSwap = _Menu:AddMenuButton(L"Bar Style", L"Swap Pop-up action")
 _MenuSwap.IsCheckButton = true
 
 _MenuAutoGenerate = _Menu:AddMenuButton(L"Auto generate popup actions")
@@ -217,3 +224,140 @@ _AutoGenBlackListList = List("List", _AutoGenBlackListForm)
 _AutoGenBlackListList:SetPoint("TOPLEFT", 4, -26)
 _AutoGenBlackListList:SetPoint("BOTTOMRIGHT", -4, 26)
 _AutoGenBlackListList.ShowTooltip = true
+
+
+-----------------------------------
+-- Free (Square|Circle) Mask
+-----------------------------------
+_FreeMask = Mask("IGAS_UI_Free_Mask")
+_FreeMask.AsMove = true
+_FreeMask:ActiveThread("OnMoveStarted")
+_FreeMask:ActiveThread("OnMoveFinished")
+
+function _FreeMask:OnMoveStarted()
+	self.FreeMoving = true
+
+	local bar = self.Parent.Root
+	local branch = bar.Branch
+	local count = 0
+
+	while branch do
+		count = count + 1
+		branch = branch.Branch
+	end
+
+	self.BranchCount = count
+
+	Task.Next()
+
+	while self.Visible and self.FreeMoving and not InCombatLockdown() do
+		RefreshPopupBarLayout(bar, self.Mode, count)
+
+		Task.Next()
+	end
+end
+
+function _FreeMask:OnMoveFinished()
+	self.FreeMoving = false
+
+	Task.Next() Task.Next()
+
+	if self.Parent then
+		RefreshPopupBarLayout(self.Parent.Root, self.Mode, self.BranchCount, true)
+	end
+end
+
+function RefreshPopupBarLayout(self, mode, count, fix)
+	local branch = self.Branch
+
+	local sx, sy = self:GetCenter()
+	local x, y = branch:GetCenter()
+
+	x = x - sx
+	y = y - sy
+
+	if mode == "Circle" then
+		local pangle = math.floor(360 / count)
+		local sangle
+
+		if x == 0 then
+			if y > 0 then
+				sangle = 90
+			else
+				sangle = 270
+			end
+		else
+			sangle = math.atan(y / x) / math.pi * 180
+
+			if y > 0 and x < 0 then
+				sangle = sangle + 180
+			elseif y < 0 and x < 0 then
+				sangle = sangle + 180
+			elseif y < 0 and x > 0 then
+				sangle = sangle + 360
+			end
+		end
+
+		if fix then
+			if sangle > math.floor(sangle / 10) * 10 + 5 then
+				sangle = math.ceil(sangle / 10) * 10
+			else
+				sangle = math.floor(sangle / 10) * 10
+			end
+		end
+
+		local radius 	= math.floor(math.sqrt(x ^ 2 + y ^ 2))
+
+		for i = fix and 0 or 1, count - 1 do
+			if i > 0 then
+				sangle = sangle - pangle
+				branch = branch.Branch
+			end
+
+			if sangle < 0 then sangle = sangle + 360 end
+
+			x = radius * math.cos(sangle / 180 * math.pi)
+			y = radius * math.sin(sangle / 180 * math.pi)
+
+			branch:ClearAllPoints()
+			branch:SetPoint("CENTER", self, "CENTER", x, y)
+		end
+	elseif mode == "Square" then
+		local size 		= math.max(math.abs(x), math.abs(y))
+		local pdis  	= size * 8 / count
+		local sp
+
+		if x == - size then
+			sp = y + size
+		elseif x == size then
+			sp = size * 5 - y
+		elseif y == size then
+			sp = size * 3 + x
+		else
+			sp = size * 7 - x
+		end
+
+		for i = 1, count - 1 do
+			branch = branch.Branch
+
+			sp = (sp + pdis) % (size * 8)
+
+			if sp <= 2 * size then
+				x = - size
+				y = sp - size
+			elseif sp <= 4 * size then
+				y = size
+				x = sp - 3 * size
+			elseif sp <= 6 * size then
+				x = size
+				y = size - (sp - 4 * size)
+			else
+				y = - size
+				x = size - (sp - 6 * size)
+			end
+
+			branch:ClearAllPoints()
+			branch:SetPoint("CENTER", self, "CENTER", x, y)
+		end
+	end
+end

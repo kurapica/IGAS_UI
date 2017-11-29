@@ -1,11 +1,12 @@
 ## Interface: 70300
 ## Title: IGAS_UI
 ## Author: kurapica.igas@gmail.com
-## Version: v204
+## Version: v205
 ## Notes: UI demo for IGAS
 ## eMail: kurapica.igas@gmail.com
 ## URL: http://github.com/kurapica
 ## Dependencies: IGAS
+## OptionalDeps: Masque
 ## DefaultState: Enabled
 ## LoadOnDemand: 0
 ## SavedVariablesPerCharacter: IGAS_UI_DB_Char

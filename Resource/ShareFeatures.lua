@@ -113,24 +113,30 @@ interface "IFStyle"
 	}
 
 	local function OnSizeChanged(self)
-		local size = math.min(self.Width, self.Height)
-		local border = math.max(2, math.ceil(size/24))
+		if not self.UseMasque then
+			local size = math.min(self.Width, self.Height)
+			local border = math.max(2, math.ceil(size/24))
 
-		self:GetChild("Icon").Location = {
-			AnchorPoint("TOPLEFT", border, -border),
-			AnchorPoint("BOTTOMRIGHT", -border, border),
-		}
+			self:GetChild("Icon").Location = {
+				AnchorPoint("TOPLEFT", border, -border),
+				AnchorPoint("BOTTOMRIGHT", -border, border),
+			}
 
-		if self:GetChild("HotKey") then self:GetChild("HotKey").Location = { AnchorPoint("TOPRIGHT", -border, -border) } end
-		self:GetChild("Count").Location = { AnchorPoint("BOTTOMRIGHT", -border, border) }
-		self:GetChild("Name").Location = { AnchorPoint("BOTTOM", 0, border) }
+			if self:GetChild("HotKey") then self:GetChild("HotKey").Location = { AnchorPoint("TOPRIGHT", -border, -border) } end
+			self:GetChild("Count").Location = { AnchorPoint("BOTTOMRIGHT", -border, border) }
+			self:GetChild("Name").Location = { AnchorPoint("BOTTOM", 0, border) }
 
-		border = math.floor(12 * size / 32)
-		self:GetChild("Border").Location = {
-			AnchorPoint("TOPLEFT", -border, border),
-			AnchorPoint("BOTTOMRIGHT", border, -border),
-		}
+			border = math.floor(12 * size / 32)
+			self:GetChild("Border").Location = {
+				AnchorPoint("TOPLEFT", -border, border),
+				AnchorPoint("BOTTOMRIGHT", border, -border),
+			}
+		else
+			self.OnSizeChanged = self.OnSizeChanged - OnSizeChanged
+		end
 	end
+
+	property "UseMasque" { Type = Boolean }
 
     function IFStyle(self)
     	self.UseBlizzardArt = false

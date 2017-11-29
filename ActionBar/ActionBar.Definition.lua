@@ -434,6 +434,15 @@ class "IActionButton"
 		end
 	end
 
+	local function UpdateTail(self)
+		if self.ITail then
+			self.ITail.Visible = not self.LockMode and
+								not self.FreeMode and
+								not self.WorldMarkBar and
+								not self.RaidTargetBar
+		end
+	end
+
 	------------------------------------------------------
 	-- Method
 	------------------------------------------------------
@@ -928,6 +937,66 @@ class "IActionButton"
 		Type = Boolean,
 	}
 
+	property "WorldMarkBar" {
+		Handler = function(self, value)
+			if value and self.ReplaceBlzMainAction then return end
+
+			if value then
+				Task.NoCombatCall(function()
+					self:GenerateBrother(1, 1)
+					self:GenerateBranch(_G.NUM_WORLD_RAID_MARKERS - 1)
+
+					local i = 0
+
+					while self do
+						i = i + 1
+						self.WorldMarker = i
+						self = self.Branch
+					end
+				end)
+			else
+				Task.NoCombatCall(function()
+					self:GenerateBrother(1, 1)
+					self:GenerateBranch(0)
+					self:SetAction(nil)
+				end)
+			end
+		end,
+		Type = Boolean,
+	}
+
+	property "RaidTargetBar" {
+		Handler = function(self, value)
+			if value and self.ReplaceBlzMainAction then return end
+
+			if value then
+				Task.NoCombatCall(function()
+					self:GenerateBrother(1, 1)
+					self:GenerateBranch(_G.NUM_WORLD_RAID_MARKERS)
+
+					local i = 0
+
+					UpdateAction(self)
+
+					while self do
+						self.RaidTarget = i
+						self = self.Branch
+						i = i + 1
+					end
+				end)
+			else
+				Task.NoCombatCall(function()
+					self:GenerateBrother(1, 1)
+					self:GenerateBranch(0)
+					self:SetAction(nil)
+
+					UpdateTail(self)
+				end)
+			end
+		end,
+		Type = Boolean,
+	}
+
 	local function HandlerAutoHide(self)
 		if self.Root.Header == self then
 			if self.AutoHideCondition and next(self.AutoHideCondition) then
@@ -1035,9 +1104,7 @@ class "IActionButton"
 			if self.Branch then
 				self.Branch.FreeMode = value
 			end
-			if self.ITail then
-				self.ITail.Visible = not self.LockMode and not self.FreeMode
-			end
+			UpdateTail(self)
 
 			self.ShowFlyOut = self.BranchCount > 0 and (not self.LockMode or not self.FreeMode)
 		end,
@@ -1060,9 +1127,7 @@ class "IActionButton"
 			if self.IHeader then
 				self.IHeader.Checked = value
 			end
-			if self.ITail then
-				self.ITail.Visible = not self.LockMode and not self.FreeMode
-			end
+			UpdateTail(self)
 
 			self.ShowFlyOut = self.BranchCount > 0 and (not self.LockMode or not self.FreeMode)
 		end,
@@ -1278,9 +1343,7 @@ class "IActionButton"
 			if self.IHeader then
 				self.IHeader.Visible = not _DBChar.LockBar
 			end
-			if self.ITail then
-				self.ITail.Visible = not self.LockMode and not self.FreeMode
-			end
+			UpdateTail(self)
 		end
 		self = self.Root.Header
 		if self.AutoFadeOut then
@@ -2364,6 +2427,10 @@ _Recycle_IButtons = Recycle(IActionButton, "IActionButton%d", UIParent)
 _Recycle_IHeaders = Recycle(IHeader, "IHeader%d", UIParent)
 _Recycle_ITails = Recycle(ITail, "ITail%d", UIParent)
 _Recycle_AutoPopupMask = Recycle(AutoPopupMask, "AutoPopupMask%d", UIParent)
+
+function _Recycle_IButtons:OnInit(btn)
+	AddtoMasque(btn)
+end
 
 function _Recycle_IButtons:OnPop(btn)
 	btn.ShowGrid = true
