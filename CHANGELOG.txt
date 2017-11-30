@@ -1,3 +1,6 @@
+2017/11/30 v207
+	1. [mod:shift][mod:ctrl][mod:alt] is added for macro conditons.
+
 2017/11/29 v205
 	1. The action bar support Masque now.
 	2. If an action bar has only one button with its branches, you can use "Square Layout" or "Circle Layout" to change their locations with more easy ways.

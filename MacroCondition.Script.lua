@@ -201,6 +201,26 @@ condtionData = {
 		Text = L"Player's main action bar is currently replaced by a temporary shapeshift action bar.",
 		ForPlayer = true,
 	},
+	{
+		Condition = "mod:shift",
+		Text = L"Player's holding the shift key",
+		ForPlayer = true,
+	},
+	{
+		Condition = "mod:ctrl",
+		Text = L"Player's holding the ctrl key",
+		ForPlayer = true,
+	},
+	{
+		Condition = "mod:alt",
+		Text = L"Player's holding the alt key",
+		ForPlayer = true,
+	},
+	{
+		Condition = "cursor",
+		Text = L"Player's mouse cursor is currently holding an item/ability/macro/etc",
+		ForPlayer = true,
+	},
 }
 
 local targets = {}

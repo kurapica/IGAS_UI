@@ -531,3 +531,8 @@ L["Raid Target"] = "團隊標記"
 L["Square Layout"] = "方形布局"
 L["Circle Layout"] = "圓形布局"
 L["Drag the masked button to modify the layout."] = "移動被選中的按鈕來修改布局。"
+
+L["Player's holding the shift key"] = "玩家按住了shift鍵"
+L["Player's holding the ctrl key"] = "玩家按住了ctrl鍵"
+L["Player's holding the alt key"] = "玩家按住了alt鍵"
+L["Player's mouse cursor is currently holding an item/ability/macro/etc"] = "玩家的鼠標上有物品/技能/宏等"
