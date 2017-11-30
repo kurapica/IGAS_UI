@@ -1344,6 +1344,7 @@ function _MenuFreeMode:OnCheckChanged()
 	if not self.Checked then
 		IFMovable._ModeOff(_IGASUI_ACTIONBAR_GROUP)
 		IFResizable._ModeOff(_IGASUI_ACTIONBAR_GROUP)
+		ReloadMasqueSkin()
 	end
 end
 
@@ -1506,12 +1507,14 @@ function _ListBarLoad:OnItemChoosed(key, item)
 		self:ThreadCall(function (self)
 			if IGAS:MsgBox(L"Do you want reset the layout?", "n") then
 				LoadBarConfig(header)
+				ReloadMasqueSkin()
 			end
 		end)
 	else
 		self:ThreadCall(function (self)
 			if IGAS:MsgBox(L"Do you want load the layout?", "n") then
 				LoadBarConfig(header, _ActionBarLayout[key])
+				ReloadMasqueSkin()
 			end
 		end)
 	end
@@ -1550,12 +1553,14 @@ function _ListBarContentLoad:OnItemChoosed(key, item)
 		self:ThreadCall(function (self)
 			if IGAS:MsgBox(L"Do you want reset the layout?", "n") then
 				LoadBarConfig(header)
+				ReloadMasqueSkin()
 			end
 		end)
 	else
 		self:ThreadCall(function (self)
 			if IGAS:MsgBox(L"Do you want load the set?", "n") then
 				LoadBarConfig(header, _ActionBarSettings[key])
+				ReloadMasqueSkin()
 			end
 		end)
 	end
