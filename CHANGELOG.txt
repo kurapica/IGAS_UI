@@ -1,3 +1,6 @@
+2017/11/30 v208
+	1. Fix the contaner view system error when there are 10 containers in one view.
+
 2017/11/30 v207
 	1. [mod:shift][mod:ctrl][mod:alt] is added for macro conditons.
 

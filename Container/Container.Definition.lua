@@ -532,7 +532,7 @@ class "Container"
 		label.FontObject = GameFontHighlight
 		label:SetPoint("TOPLEFT")
 
-		local prev, id = name:match("^(.*)(%d+)$")
+		local prev, id = name:match("^(.-)(%d+)$")
 		id = tonumber(id)
 
 		self.Parent[id] = self
