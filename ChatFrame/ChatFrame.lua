@@ -12,6 +12,7 @@ local GameTooltip = _G.GameTooltip
 function OnLoad(self)
 	_G.CHAT_FRAME_TAB_SELECTED_NOMOUSE_ALPHA = 0
 	_G.CHAT_FRAME_TAB_NORMAL_NOMOUSE_ALPHA = 0
+	_G.DEFAULT_CHATFRAME_ALPHA = 0
 
 	self:SecureHook("FCF_StopDragging")
 	self:SecureHook("FCF_OpenTemporaryWindow")

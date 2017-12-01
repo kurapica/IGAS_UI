@@ -1,3 +1,6 @@
+2017/12/01 v209
+	1. Fix the ChatFrame's alpha settings.
+
 2017/11/30 v208
 	1. Fix the contaner view system error when there are 10 containers in one view.
 
