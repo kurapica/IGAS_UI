@@ -15,6 +15,7 @@ function OnLoad(self)
 
 	self:SecureHook("FCF_StopDragging")
 	self:SecureHook("FCF_OpenTemporaryWindow")
+	self:SecureHook("FCF_OpenNewWindow")
 
 	_DBChar.ChatFramePos = _DBChar.ChatFramePos or {}
 	_ChatFramePos = _DBChar.ChatFramePos
@@ -59,6 +60,14 @@ function FCF_OpenTemporaryWindow()
 		ApplyStyle("ChatFrame" .. _LoadedTab)
 
 		_LoadedTab = _LoadedTab + 1
+	end
+end
+
+function FCF_OpenNewWindow(chatframe)
+	local i = 1
+	while _G["ChatFrame" .. i] do
+		FCF_SetWindowAlpha(_G["ChatFrame" .. i], 0)
+		i = i + 1
 	end
 end
 

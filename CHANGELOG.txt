@@ -1,3 +1,6 @@
+2017/12/01 v211
+	1. Fix the fade settings for the new opened chat frame.
+
 2017/11/30 v208
 	1. Fix the contaner view system error when there are 10 containers in one view.
 
