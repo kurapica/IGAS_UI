@@ -271,7 +271,7 @@ class "iQuestMark"
 		local unit = self.Unit
 		if unit and not UnitIsPlayer(unit) then
 			local player = UnitName("player")
-			local isQuest, isOtherQuest
+			local isQuest, isOtherQuest, isFullfiled
 			_GameTooltip:SetOwner(WorldFrame, 'ANCHOR_NONE')
 			_GameTooltip:SetUnit(unit)
 
@@ -285,8 +285,10 @@ class "iQuestMark"
 						if progress < 100 then
 							self:SetDesaturated(false)
 							self.Visible = true
+							return _GameTooltip:Hide()
+						else
+							isFullfiled = true
 						end
-						return _GameTooltip:Hide()
 					end
 				end
 
@@ -301,8 +303,10 @@ class "iQuestMark"
 							if tonumber(y) > tonumber(x) then
 								self:SetDesaturated(false)
 								self.Visible = true
+								return _GameTooltip:Hide()
+							else
+								isFullfiled = true
 							end
-							return _GameTooltip:Hide()
 						end
 					else
 						isOtherQuest = true
@@ -310,7 +314,7 @@ class "iQuestMark"
 				end
 			end
 
-			if isQuest or isOtherQuest then
+			if (isQuest and not isFullfiled) or isOtherQuest then
 				self.Visible = true
 				self:SetDesaturated(isOtherQuest)
 			end

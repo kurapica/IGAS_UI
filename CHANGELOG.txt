@@ -1,3 +1,6 @@
+2017/12/02 v213
+	1. Fix the quest mark on nameplates for multi-quest target.
+
 2017/12/02 v212
 	1. Modify the minimaptrack's framestrata, so it won't block the instance difficulty icon.
 
