@@ -256,7 +256,9 @@ MiniMapTrackingIconOverlay:Hide()
 MiniMapTrackingButtonBorder:Hide()
 
 MiniMapTracking:ClearAllPoints()
+MiniMapTracking:SetParent(Minimap)
 MiniMapTracking:SetPoint("TOPLEFT", Minimap, "TOPLEFT")
+MiniMapTracking:SetFrameStrata("LOW")
 
 MinimapZoneText:ClearAllPoints()
 MinimapZoneText:SetAllPoints()
@@ -299,15 +301,18 @@ GarrisonLandingPageMinimapButton:SetPoint("CENTER", Minimap, "BOTTOMLEFT")
 MiniMapInstanceDifficulty:SetParent(Minimap)
 MiniMapInstanceDifficulty:ClearAllPoints()
 MiniMapInstanceDifficulty:SetPoint("TOPLEFT", Minimap, "TOPLEFT", -6, 4)
+MiniMapInstanceDifficulty:SetFrameStrata("MEDIUM")
 
 -- GuildInstanceDifficulty
 GuildInstanceDifficulty:SetParent(Minimap)
 GuildInstanceDifficulty:ClearAllPoints()
 GuildInstanceDifficulty:SetPoint("TOPLEFT", Minimap, "TOPLEFT", -6, 4)
+GuildInstanceDifficulty:SetFrameStrata("MEDIUM")
 
 -- MiniMapChallengeMode
 MiniMapChallengeMode:ClearAllPoints()
 MiniMapChallengeMode:SetPoint("TOPLEFT", Minimap, "TOPLEFT", 0, 0)
+MiniMapChallengeMode:SetFrameStrata("MEDIUM")
 
 -- QueueStatusMinimapButton
 QueueStatusMinimapButton:ClearAllPoints()
