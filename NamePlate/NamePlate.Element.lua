@@ -380,7 +380,7 @@ class "iHighlightMark"
 		local start = GetTime()
 
 		while self ~= _CurrentMark and self.Visible do
-			local alpha = 1 - (GetTime() - start) / 2
+			local alpha = 1 - (GetTime() - start) / 1.5
 			if alpha > 0 then
 				self.Alpha = alpha
 			else
@@ -402,7 +402,7 @@ class "iHighlightMark"
 		tinsert(_HighlightMark, self)
 
 		self.TexturePath = Media.NAMEPLATE_HIGHLIGHT_ARROW
-		self:SetSize(30, 90)
+		self:SetSize(60, 90)
 		self:SetVertexColor(0, 1, 1)
 		self.Visible = false
 
