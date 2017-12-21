@@ -133,6 +133,8 @@ raidPanelConfig:GetMenuButton(L"Pet panel", L"Location").DropDownList.MultiSelec
 mnuRaidUnitWatchList = raidPanelConfig:AddMenuButton(L"Unit watch panel", L"Modify unit list")
 mnuRaidUnitwatchAutoLayout = raidPanelConfig:AddMenuButton(L"Unit watch panel", L"Auto layout")
 mnuRaidUnitwatchAutoLayout.IsCheckButton = true
+mnuRaidUnitwatchOnlyEnemy = raidPanelConfig:AddMenuButton(L"Unit watch panel", L"Only Enemy")
+mnuRaidUnitwatchOnlyEnemy.IsCheckButton = true
 
 -- Show ->
 ShowProperty = {"ShowRaid", "ShowParty", "ShowPlayer", "ShowSolo"}

@@ -16,6 +16,9 @@ Media = {
 	--BORDER_TEXTURE_PATH = [[Interface\Common\WhiteIconFrame]],
 	BORDER_TEXTURE_PATH = [[Interface\Addons\IGAS_UI\Resource\border.tga]],
 
+	-- Nameplate Arrow Texture
+	NAMEPLATE_HIGHLIGHT_ARROW = [[Interface\Addons\IGAS_UI\Resource\questicon.tga]],
+
 	-- Color settings
 	DEFAULT_BORDER_COLOR = ColorType(0, 0, 0),
 	ACTIVED_BORDER_COLOR = ColorType(1, 1, 1),

@@ -531,3 +531,5 @@ L["Player's holding the shift key"] = "玩家按住了shift键"
 L["Player's holding the ctrl key"] = "玩家按住了ctrl键"
 L["Player's holding the alt key"] = "玩家按住了alt键"
 L["Player's mouse cursor is currently holding an item/ability/macro/etc"] = "玩家的鼠标上有物品/技能/宏等"
+
+L["Only Enemy"] = "只显示敌人"

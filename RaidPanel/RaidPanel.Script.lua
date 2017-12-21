@@ -466,6 +466,10 @@ function LoadConfig(_DBChar)
 	mnuRaidUnitwatchAutoLayout.Checked = _RaidUnitWatchSet.AutoLayout
 	raidUnitWatchPanel.KeepMaxSize = not _RaidUnitWatchSet.AutoLayout
 	raidUnitWatchPanel.AutoPosition = _RaidUnitWatchSet.AutoLayout
+
+	mnuRaidUnitwatchOnlyEnemy.Enabled = _RaidUnitWatchSet.AutoLayout
+	mnuRaidUnitwatchOnlyEnemy.Checked = _RaidUnitWatchSet.AutoLayout and _RaidUnitWatchSet.OnlyEnemy
+
 	InstallUnitList()
 end
 
@@ -617,6 +621,10 @@ function raidUnitWatchPanel:OnElementAdd(unitframe)
 end
 
 function raidUnitWatchPanel:OnElementRemove(unitframe)
+	if unitframe.StateRegistered then
+		unitframe:UnregisterStateDriver("visibility")
+		unitframe.StateRegistered = false
+	end
 	unitframe.Unit = nil
 	unitframe.Visible = false
 end
@@ -903,6 +911,22 @@ function mnuRaidUnitwatchAutoLayout:OnCheckChanged()
 		raidUnitWatchPanel.KeepMaxSize = not _RaidUnitWatchSet.AutoLayout
 		raidUnitWatchPanel.AutoPosition = _RaidUnitWatchSet.AutoLayout
 
+		if not self.Checked then
+			_RaidUnitWatchSet.OnlyEnemy = false
+			mnuRaidUnitwatchOnlyEnemy.Checked = false
+			mnuRaidUnitwatchOnlyEnemy.Enabled = false
+		else
+			mnuRaidUnitwatchOnlyEnemy.Enabled = true
+		end
+
+		InstallUnitList()
+	end
+end
+
+function mnuRaidUnitwatchOnlyEnemy:OnCheckChanged()
+	if raidPanelConfig.Visible then
+		_RaidUnitWatchSet.OnlyEnemy = self.Checked
+
 		InstallUnitList()
 	end
 end
@@ -1019,7 +1043,7 @@ function frmUnitList:OnHide()
 	helper.Visible = false
 
 	if frmUnitList.Modified then
-		Task.NoCombatCall(InstallUnitList)
+		InstallUnitList()
 	end
 end
 
@@ -1346,12 +1370,24 @@ function RefreshUnitList()
 			raidUnitWatchPanel.Count = #_TempList
 
 			for i, unit in ipairs(_TempList) do
-				raidUnitWatchPanel.Element[i].Unit = unit
+				local unitframe = raidUnitWatchPanel.Element[i]
+				if unitframe.StateRegistered then
+					unitframe:UnregisterStateDriver("visibility")
+					unitframe.StateRegistered = false
+				end
+				unitframe.Unit = unit
+
 				if _RaidUnitWatchSet.AutoLayout then
-					raidUnitWatchPanel.Element[i].NoUnitWatch = false
+					if _RaidUnitWatchSet.OnlyEnemy and not unit:match("nameplate") then
+						unitframe.NoUnitWatch = true
+						unitframe.StateRegistered = true
+						unitframe:RegisterStateDriver("visibility", ("[@%s,harm]show;hide"):format(unit))
+					else
+						unitframe.NoUnitWatch = false
+					end
 				else
-					raidUnitWatchPanel.Element[i].NoUnitWatch = true
-					raidUnitWatchPanel.Element[i].Visible = true
+					unitframe.NoUnitWatch = true
+					unitframe.Visible = true
 				end
 			end
 
@@ -1369,12 +1405,23 @@ function RefreshUnitList()
 			raidUnitWatchPanel.Count = #list
 
 			for i, unit in ipairs(list) do
-				raidUnitWatchPanel.Element[i].Unit = unit
+				local unitframe = raidUnitWatchPanel.Element[i]
+				if unitframe.StateRegistered then
+					unitframe:UnregisterStateDriver("visibility")
+					unitframe.StateRegistered = false
+				end
+				unitframe.Unit = unit
 				if _RaidUnitWatchSet.AutoLayout then
-					raidUnitWatchPanel.Element[i].NoUnitWatch = false
+					if _RaidUnitWatchSet.OnlyEnemy and not unit:match("nameplate") then
+						unitframe.NoUnitWatch = true
+						unitframe.StateRegistered = true
+						unitframe:RegisterStateDriver("visibility", ("[@%s,harm]show;hide"):format(unit))
+					else
+						unitframe.NoUnitWatch = false
+					end
 				else
-					raidUnitWatchPanel.Element[i].NoUnitWatch = true
-					raidUnitWatchPanel.Element[i].Visible = true
+					unitframe.NoUnitWatch = true
+					unitframe.Visible = true
 				end
 			end
 		end

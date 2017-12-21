@@ -1,3 +1,7 @@
+2017/12/21 v214
+	1. You can choose "Only Enemy" for the unit watch panel.
+	2. When use "nameplate%d" unit in unit watch panel, move mouse in it, the nameplate should show an arrow to high ligh it.
+
 2017/12/02 v213
 	1. Fix the quest mark on nameplates for multi-quest target.
 

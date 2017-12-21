@@ -150,6 +150,32 @@ class "iPetUnitPanel"
     end
 endclass "iPetUnitPanel"
 
+local nameplateModule = _Addon:GetModule("NamePlate")
+
+class "iUnitWatchFrame"
+	inherit "iRaidUnitFrame"
+
+	__Thread__()
+	function Th_OnEnter(self)
+		local unit = self.Unit
+		if unit:match("nameplate") then
+			nameplateModule.iHighlightMark.HighlightNamePlate(unit)
+
+			while self:IsMouseOver() do
+				Task.Next()
+			end
+
+			nameplateModule.iHighlightMark.FadeoutNamePlate(unit)
+		end
+	end
+
+	function iUnitWatchFrame(self, ...)
+		Super(self, ...)
+
+		self.OnEnter = self.OnEnter + Th_OnEnter
+	end
+endclass "iUnitWatchFrame"
+
 class "iUnitWatchPanel"
 	inherit "SecureFrame"
 	extend "IFSecurePanel"
@@ -173,7 +199,7 @@ class "iUnitWatchPanel"
     function iUnitWatchPanel(self, name, parent, ...)
 		Super(self, name, parent, ...)
 
-		self.ElementType = iRaidUnitFrame
+		self.ElementType = nameplateModule and iUnitWatchFrame or iRaidUnitFrame
 
 		self.OnElementAdd = self.OnElementAdd + OnElementAdd
 

@@ -332,3 +332,80 @@ class "iQuestMark"
 		self.OnForceRefresh = self.OnForceRefresh + OnForceRefresh
 	end
 endclass "iQuestMark"
+
+class "iHighlightMark"
+	inherit "Texture"
+	extend "IFUnitElement"
+
+	local _CurrentMark
+	local _HighlightMark = {}
+
+	__Static__() function HighlightNamePlate(unit)
+		local oldmark = _CurrentMark
+		if unit then
+			_CurrentMark = nil
+			for _, mark in ipairs(_HighlightMark) do
+				if mark.Unit == unit then
+					mark.Visible = true
+					mark.Alpha = 1
+					_CurrentMark = mark
+					break
+				end
+			end
+		end
+		if oldmark then
+			oldmark:FadeOut()
+		end
+	end
+
+	__Static__() function FadeoutNamePlate(unit)
+		local oldmark = _CurrentMark
+		if oldmark and (not oldmark.Unit or oldmark.Unit == unit) then
+			_CurrentMark = nil
+			oldmark:FadeOut()
+		end
+	end
+
+	local function OnForceRefresh(self)
+		if self == _CurrentMark then
+			self.Alpha = 1
+			self.Visible = true
+		else
+			self.Visible = false
+		end
+	end
+
+	__Thread__()
+	function FadeOut(self)
+		local start = GetTime()
+
+		while self ~= _CurrentMark and self.Visible do
+			local alpha = 1 - (GetTime() - start) / 2
+			if alpha > 0 then
+				self.Alpha = alpha
+			else
+				self.Visible = false
+				return
+			end
+			Task.Next()
+		end
+
+		if self == _CurrentMark then
+			self.Visible = true
+			self.Alpha = 1
+		end
+	end
+
+	function iHighlightMark(self, ...)
+		Super(self, ...)
+
+		tinsert(_HighlightMark, self)
+
+		self.TexturePath = Media.NAMEPLATE_HIGHLIGHT_ARROW
+		self:SetSize(30, 90)
+		self:SetVertexColor(0, 1, 1)
+		self.Visible = false
+
+		self.OnForceRefresh = self.OnForceRefresh + OnForceRefresh
+	end
+endclass "iHighlightMark"

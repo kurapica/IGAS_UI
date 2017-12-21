@@ -7,6 +7,7 @@ IGAS:NewAddon "IGAS_UI"
 import "System"
 import "System.Widget"
 import "System.Widget.Unit"
+import "System.Threading"
 
 -- Localization
 L = Locale(_Name)

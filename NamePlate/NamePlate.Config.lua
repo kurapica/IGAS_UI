@@ -71,5 +71,11 @@ Config = {
 				AnchorPoint("RIGHT", -2, 0, "iHealthBar", "LEFT")
 			},
 		},
+		{
+			Type = iHighlightMark,
+			Location = {
+				AnchorPoint("BOTTOM", 0, -6, "iNameLabel", "TOP")
+			},
+		}
 	}
 }
