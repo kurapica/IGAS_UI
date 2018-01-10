@@ -1,3 +1,6 @@
+2018/01/10 v216
+	1. "As Global" menu added for the action bar, so the action bar should be used by all characters and all specialization.
+
 2017/12/21 v214
 	1. You can choose "Only Enemy" for the unit watch panel.
 	2. When use "nameplate%d" unit in unit watch panel, move mouse in it, the nameplate should show an arrow to high ligh it.

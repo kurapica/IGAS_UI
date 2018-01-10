@@ -4,6 +4,13 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2018/01/10 v216 : </lime>
+</p><br/>
+<p>
+    1. "As Global" menu added for the action bar, so the action bar should be used by all characters and all specialization.
+</p>
+<br/><br/>
+<p>
 <lime>2017/11/29 v205 : </lime>
 </p><br/>
 <p>

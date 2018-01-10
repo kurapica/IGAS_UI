@@ -7,6 +7,13 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2018/01/10 v216 : </lime>
+</p><br/>
+<p>
+    1. "全账号通用"菜单项加入，被指定的动作条将被所有角色和专精使用，比如宠物坐骑动作条之类，无需再自行同步内容。
+</p>
+<br/><br/>
+<p>
 <lime>2017/11/29 v205 : </lime>
 </p><br/>
 <p>
@@ -533,3 +540,4 @@ L["Player's holding the alt key"] = "玩家按住了alt键"
 L["Player's mouse cursor is currently holding an item/ability/macro/etc"] = "玩家的鼠标上有物品/技能/宏等"
 
 L["Only Enemy"] = "只显示敌人"
+L["As Global"] = "全账号通用"

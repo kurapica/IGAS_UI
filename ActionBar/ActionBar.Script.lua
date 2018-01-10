@@ -190,12 +190,18 @@ function OnLoad(self)
 	_AutoGenItemBlackList = _DBChar.AutoGenItemBlackList or {}
 	_DBChar.AutoGenItemBlackList = _AutoGenItemBlackList
 
+	-- Global action bars
+	_GlobalActionBar = _Addon._DB.GlobalActionBar or {}
+	_Addon._DB.GlobalActionBar = _GlobalActionBar
+
 	-- Register system events
 	self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
 	self:RegisterEvent("PLAYER_LOGOUT")
 	self:RegisterEvent("ACTIONBAR_HIDEGRID")
 
 	self:RegisterEvent("UPDATE_SHAPESHIFT_FORMS")
+
+	LoadGlobalActionBar()
 
 	_LoadingConfig = GetSpecialization() or 1
 	LoadConfig(_DBChar[_LoadingConfig])
@@ -341,7 +347,16 @@ function PLAYER_LOGOUT(self)
 
 	_DBChar[spec] = GenerateConfig(true)
 
-	ClearScreen()	-- make sure no key bindings would be saved
+	-- Global Action bar
+	wipe(_GlobalActionBar)
+
+	for _, header in ipairs(_HeadList) do
+		if header.AsGlobal then
+			tinsert(_GlobalActionBar, GenerateBarConfig(header, true))
+		end
+	end
+
+	ClearScreen(true)	-- make sure no key bindings would be saved
 end
 
 function ACTIONBAR_HIDEGRID(self)
@@ -466,7 +481,9 @@ function GenerateConfig(includeContent)
 	end
 
 	for _, header in ipairs(_HeadList) do
-		tinsert(config, GenerateBarConfig(header, includeContent))
+		if not header.AsGlobal then
+			tinsert(config, GenerateBarConfig(header, includeContent))
+		end
 	end
 
 	return config
@@ -636,9 +653,19 @@ function LoadConfig(config)
 	ReloadMasqueSkin()
 end
 
-function ClearScreen()
+function LoadGlobalActionBar()
+	for _, bar in ipairs(_GlobalActionBar) do
+		local header = NewHeader()
+		LoadBarConfig(header, bar)
+		header.AsGlobal = true
+	end
+end
+
+function ClearScreen(includeGlobal)
 	for i = #_HeadList, 1, -1 do
-		RemoveHeader(_HeadList[i])
+		if includeGlobal or not _HeadList[i].AsGlobal then
+			RemoveHeader(_HeadList[i])
+		end
 	end
 end
 
@@ -975,6 +1002,9 @@ function _Menu:OnShow()
 	_MenuSwap.Enabled = notBagSlotBar
 	_MenuSwap.Checked = header.AutoSwapRoot
 
+	-- As Global
+	_MenuAsGlobal.Checked = header.AsGlobal
+
 	-- Auto Generate
 	if header.ActionBar or header.MainBar or header.PetBar or header.StanceBar or header.WorldMarkBar or header.RaidTargetBar then
 		_MenuAutoGenerate.Enabled = false
@@ -1215,6 +1245,10 @@ end
 
 function _MenuSwap:OnCheckChanged()
 	_Menu.Parent.AutoSwapRoot = self.Checked
+end
+
+function _MenuAsGlobal:OnCheckChanged()
+	_Menu.Parent.AsGlobal = self.Checked
 end
 
 function _ListScale:OnItemChoosed(key, item)

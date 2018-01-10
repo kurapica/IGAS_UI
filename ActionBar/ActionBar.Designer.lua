@@ -116,6 +116,9 @@ _MenuManual = _Menu:AddMenuButton(L"Manual Move&Resize")
 _MenuSwap = _Menu:AddMenuButton(L"Bar Style", L"Swap Pop-up action")
 _MenuSwap.IsCheckButton = true
 
+_MenuAsGlobal = _Menu:AddMenuButton(L"Bar Style", L"As Global")
+_MenuAsGlobal.IsCheckButton = true
+
 _MenuAutoGenerate = _Menu:AddMenuButton(L"Auto generate popup actions")
 _MenuAutoGenerate:ActiveThread("OnClick")
 

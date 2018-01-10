@@ -1293,6 +1293,8 @@ class "IActionButton"
 	}
 	property "MinAlpha" { Type = Number, Default = 0 }
 
+	property "AsGlobal" { Type = Boolean }
+
 	------------------------------------------------------
 	-- Script Handler
 	------------------------------------------------------
@@ -2454,6 +2456,7 @@ function _Recycle_IButtons:OnPush(btn)
 	btn.HideInPetBattle = false
 	btn.HideInVehicle = false
 	btn.AutoSwapRoot = false
+	btn.AsGlobal = false
 	btn:Hide()
 	btn:SetSize(36, 36)
 	btn:ClearBindingKey()

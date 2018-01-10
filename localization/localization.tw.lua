@@ -7,6 +7,13 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2018/01/10 v216 : </lime>
+</p><br/>
+<p>
+    1. "全賬號通用"菜單項加入，被指定的動作條將被所有角色和專精使用，比如寵物坐騎動作條之類，無需再自行同步內容。
+</p>
+<br/><br/>
+<p>
 <lime>2017/11/29 v205 : </lime>
 </p><br/>
 <p>
@@ -538,3 +545,4 @@ L["Player's holding the alt key"] = "玩家按住了alt鍵"
 L["Player's mouse cursor is currently holding an item/ability/macro/etc"] = "玩家的鼠標上有物品/技能/宏等"
 
 L["Only Enemy"] = "只顯示敵人"
+L["As Global"] = "全賬號通用"
