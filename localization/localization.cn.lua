@@ -7,6 +7,13 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2018/02/02 v217 : </lime>
+</p><br/>
+<p>
+    1. 当需要给目标补减益时，动作条会高亮提示。
+</p>
+<br/><br/>
+<p>
 <lime>2018/01/10 v216 : </lime>
 </p><br/>
 <p>
@@ -541,3 +548,8 @@ L["Player's mouse cursor is currently holding an item/ability/macro/etc"] = "玩
 
 L["Only Enemy"] = "只显示敌人"
 L["As Global"] = "全账号通用"
+
+L["Debuff Record Min Threshold"] = "减益最小监控时间"
+L["Debuff Alert Threshold"] = "减益最大警告时间"
+L["Please input the debuff alert threshold(0 - 10)"] = "请输入减益剩余多少时间时发起警告(0-10)"
+L["Please input the debuff record min threshold(0 - 10)"] = "请输入最小多少持续时间的减益被监视(0-10)"

@@ -101,6 +101,12 @@ _MenuUseDown.IsCheckButton = true
 _MenuPopupDuration = _Menu:AddMenuButton(L"Global Style", L"Popup Duration")
 _MenuPopupDuration:ActiveThread("OnClick")
 
+_MenuDebuffRecord = _Menu:AddMenuButton(L"Global Style", L"Debuff Record Min Threshold")
+_MenuDebuffRecord:ActiveThread("OnClick")
+
+_MenuDebuffThreshold = _Menu:AddMenuButton(L"Global Style", L"Debuff Alert Threshold")
+_MenuDebuffThreshold:ActiveThread("OnClick")
+
 _MenuKeyBinding = _Menu:AddMenuButton(L"Key Binding")
 
 _MenuFreeMode = _Menu:AddMenuButton(L"Bar Style", L"Free Mode")

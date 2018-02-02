@@ -674,6 +674,21 @@ class "IActionButton"
 				self:ClearFlyout()
 			end)
 		end
+		if self.ActionType == "action" then
+			local type, id = GetActionInfo(self.ActionTarget)
+			if type == "spell" then
+				_Button2Spell[self] = id
+			elseif type == "macro" then
+				_Button2Spell[self] = (select(3, GetMacroSpell(id)))
+			else
+				_Button2Spell[self] = nil
+			end
+		elseif self.ActionType == "spell" then
+			_Button2Spell[self] = self.ActionTarget
+		else
+			_Button2Spell[self] = nil
+		end
+		UpdateOverlayGlow(self)
 		if self.UseBlizzardArt then
 			return Super.UpdateAction(self)
 		end
@@ -720,6 +735,12 @@ class "IActionButton"
 		end)
 	end)
 	property "PopupDuration" { Type = NumberNil, Default = 0.25 }
+
+	__Static__()
+	property "DebuffThreshold" { Type = NumberNil, Default = 2 }
+
+	__Static__()
+	property "RecordThreshold"  { Type = NumberNil, Default = 8 }
 
 	------------------------------------------------------
 	-- Interface Property

@@ -1,3 +1,6 @@
+2018/02/02 v217
+	1. The action bar will now notify you that some debuff should be recast on the target.
+
 2018/01/10 v216
 	1. "As Global" menu added for the action bar, so the action bar should be used by all characters and all specialization.
 

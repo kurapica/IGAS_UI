@@ -20,9 +20,13 @@ Toggle = {
 	end,
 	Set = function (value)
 		if value then
+			raidPanel:Refresh()
 			raidPanelMask.Visible = false
 			raidPanelConfig.Visible = false
 		elseif not InCombatLockdown() then
+			if raidPanel.Width < 4 then
+				raidPanel.Element[1].Unit = "player"
+			end
 			raidPanelMask.Visible = true
 			raidPanelConfig.Visible = true
 		end

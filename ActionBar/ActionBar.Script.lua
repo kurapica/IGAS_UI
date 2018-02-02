@@ -461,7 +461,7 @@ function GenerateBarConfig(header, includeContent)
 end
 
 function GenerateConfig(includeContent)
-	local config = { PopupDuration = IActionButton.PopupDuration }
+	local config = { PopupDuration = IActionButton.PopupDuration, DebuffThreshold = IActionButton.DebuffThreshold, RecordThreshold = IActionButton.RecordThreshold }
 
 	if _HiddenMainMenuBar and _BagSlotBar then
 		local bar = {}
@@ -631,6 +631,8 @@ function LoadConfig(config)
 
 	if config and next(config) then
 		IActionButton.PopupDuration = config.PopupDuration
+		IActionButton.DebuffThreshold = config.DebuffThreshold
+		IActionButton.RecordThreshold = config.RecordThreshold
 
 		_HiddenMainMenuBar = config.BagSlotBar and true or false
 		_BagSlotBarConfig = config.BagSlotBar
@@ -1019,6 +1021,10 @@ function _Menu:OnShow()
 	-- Popup Duration
 	_MenuPopupDuration.Text = L"Popup Duration" .. " : " .. tostring(IActionButton.PopupDuration)
 
+	-- Debuff alert
+	_MenuDebuffThreshold.Text = L"Debuff Alert Threshold" .. " : " .. tostring(IActionButton.DebuffThreshold)
+	_MenuDebuffRecord.Text = L"Debuff Record Min Threshold" .. " : " .. tostring(IActionButton.RecordThreshold)
+
 	-- Save Set
 	_ListSaveSet.SelectedIndex = nil
 
@@ -1345,6 +1351,28 @@ function _MenuPopupDuration:OnClick()
 	if value then
 		if value < 0.1 or value > 5 then return end
 		IActionButton.PopupDuration = value
+	end
+end
+
+function _MenuDebuffThreshold:OnClick()
+	_Menu.Visible = false
+
+	local value = tonumber(IGAS:MsgBox(L"Please input the debuff alert threshold(0 - 10)", "ic") or nil)
+
+	if value then
+		if value < 0 or value > 10 then return end
+		IActionButton.DebuffThreshold = value
+	end
+end
+
+function _MenuDebuffRecord:OnClick()
+	_Menu.Visible = false
+
+	local value = tonumber(IGAS:MsgBox(L"Please input the debuff record min threshold(0 - 10)", "ic") or nil)
+
+	if value then
+		if value < 0 or value > 10 then return end
+		IActionButton.RecordThreshold = value
 	end
 end
 
@@ -1730,3 +1758,157 @@ function _MenuModifyAnchorPoints:OnClick()
 	_Menu:Hide()
 	IGAS:ManageAnchorPoint(btn, nil, true)
 end
+
+----------------------------------------------------
+-- Debuff Spell Activator
+----------------------------------------------------
+_RecycleAlert = Recycle(SpellActivationAlert, "IGASUI_SpellActivationAlert%d", IGASUI_IActionButton_Manager)
+
+function SpellAlert_OnFinished(self)
+	if self._ActionButton then
+		self._ActionButton._IGASUI_OverLay = nil
+		self._ActionButton = nil
+		self.Parent = IGASUI_IActionButton_Manager
+		self:StopAnimation()
+		self:ClearAllPoints()
+		self:Hide()
+
+		return _RecycleAlert(self)
+	end
+end
+
+function _RecycleAlert:OnInit(alert)
+	alert.OnFinished = SpellAlert_OnFinished
+end
+
+local _TargetAura = {}
+local _DebuffMap = {}
+local _ActiveSpell = {}
+
+_Button2Spell = {}
+
+function UpdateOverlayGlow(self)
+	local spellID = _Button2Spell[self]
+
+	if spellID and _ActiveSpell[spellID] then
+		ShowOverlayGlow(self)
+	else
+		HideOverlayGlow(self)
+	end
+end
+
+function ShowOverlayGlow(self)
+	if not self._IGASUI_OverLay then
+		local alert = _RecycleAlert()
+		local width, height = self:GetSize()
+
+		alert.Parent = self
+
+		alert:ClearAllPoints()
+		alert:SetSize(width*1.4, height*1.4)
+		alert:SetPoint("CENTER", self, "CENTER")
+
+		alert._ActionButton = self
+		self._IGASUI_OverLay = alert
+		self._IGASUI_OverLay.AnimInPlaying = true
+	end
+end
+
+function HideOverlayGlow(self)
+	if self._IGASUI_OverLay then
+		if self.Visible then
+			self._IGASUI_OverLay.AnimOutPlaying = true
+		else
+			SpellAlert_OnFinished(self._IGASUI_OverLay)
+		end
+	end
+end
+
+function ActiveOverLayGlow(spellID)
+	if not _ActiveSpell[spellID] and GetSpellCooldown(spellID) == 0 then
+		_ActiveSpell[spellID] = true
+
+		for button, id in pairs(_Button2Spell) do
+			if id == spellID then
+				ShowOverlayGlow(button)
+			end
+		end
+	end
+end
+
+function DeactiveOverLayGlow(spellID)
+	if _ActiveSpell[spellID] then
+		_ActiveSpell[spellID] = nil
+
+		for button, id in pairs(_Button2Spell) do
+			if id == spellID then
+				HideOverlayGlow(button)
+			end
+		end
+	end
+end
+
+function UpdateTargetDebuffs()
+	local index = 1
+	local name, _, duration, expires
+	local unit = "target"
+	local filter = "HARMFUL|PLAYER"
+	local now = GetTime()
+	local threshold = IActionButton.DebuffThreshold
+	local record = IActionButton.RecordThreshold
+
+	if UnitExists("target") and UnitCanAttack("player", "target") and not UnitIsDead("target") then
+		name, _, _, _, _, duration, expires = UnitAura(unit, index, filter)
+
+		wipe(_TargetAura)
+
+		while name do
+			if expires and expires > 0 and duration and duration > 0 and duration >= record then
+				_TargetAura[name] = expires - now
+				if not _DebuffMap[name] then
+					_DebuffMap[name] = select(7, GetSpellInfo(name))
+				end
+			end
+			index = index + 1
+			name, _, _, _, _, duration, expires = UnitAura(unit, index, filter)
+		end
+
+		for name, spell in pairs(_DebuffMap) do
+			if not _TargetAura[name] or _TargetAura[name] < threshold then
+				ActiveOverLayGlow(spell)
+			else
+				DeactiveOverLayGlow(spell)
+			end
+		end
+	else
+		wipe(_TargetAura)
+		for spell in pairs(_ActiveSpell) do
+			DeactiveOverLayGlow(spell)
+		end
+	end
+end
+
+local frame = CreateFrame("Frame")
+frame:Hide()
+--frame:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", "player")
+frame:RegisterUnitEvent("UNIT_AURA", "target")
+frame:RegisterEvent("PLAYER_TARGET_CHANGED")
+frame:RegisterEvent("PLAYER_REGEN_DISABLED")
+frame:RegisterEvent("PLAYER_REGEN_ENABLED")
+frame:SetScript("OnEvent", function(self, event)
+	if event == "PLAYER_REGEN_ENABLED" then
+		frame:Hide()
+	elseif event == "PLAYER_REGEN_DISABLED" then
+		frame:Show()
+	else
+		return UpdateTargetDebuffs()
+	end
+end)
+local _Elapsed = 0
+frame:SetScript("OnUpdate", function(self, elapsed)
+	_Elapsed = _Elapsed + elapsed
+	if _Elapsed > 0.5 then
+		_Elapsed = 0
+		UpdateTargetDebuffs()
+	end
+end)

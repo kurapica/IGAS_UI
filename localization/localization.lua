@@ -4,6 +4,13 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2018/02/02 v217 : </lime>
+</p><br/>
+<p>
+    1. The action bar will now notify you that some debuff should be recast on the target.
+</p>
+<br/><br/>
+<p>
 <lime>2018/01/10 v216 : </lime>
 </p><br/>
 <p>
