@@ -59,7 +59,7 @@ _ToggleButton:SetAttribute("_toggle", [[if ContainerHeader:IsShown() then Contai
 _ToggleButton.OpenBag = function() PlaySound(SOUNDKIT.IG_BACKPACK_OPEN) end
 _ToggleButton.CloseBag = function() PlaySound(SOUNDKIT.IG_BACKPACK_CLOSE) end
 
-SetOverrideBindingClick(_ToggleButton, true, GetBindingKey("OPENALLBAGS") or "B", "IGAS_UI_ContainerToggle", "LeftButton")
+--SetOverrideBindingClick(_ToggleButton, true, GetBindingKey("OPENALLBAGS") or "B", "IGAS_UI_ContainerToggle", "LeftButton")
 --SetOverrideBindingClick(_ToggleButton, true, "SHIFT-" .. (GetBindingKey("OPENALLBAGS") or "B"), "IGAS_UI_ContainerToggle", "LeftButton")
 
 _ContainerHeader:SetFrameRef("ToggleButton", _ToggleButton)

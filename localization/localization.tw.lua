@@ -188,6 +188,7 @@ L["Power bar"] = "能力資源條"
 L["Name indicator"] = "姓名指示"
 L["Range indicator"] = "距離指示"
 L["Heal Absorb"] = "治療吸收"
+L["Health Percent"] = "血量百分比"
 
 L["Raid panel"] = "團對面板"
 L["Pet panel"] = "寵物面板"

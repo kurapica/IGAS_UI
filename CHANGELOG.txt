@@ -1,3 +1,7 @@
+2018/03/21 v218
+	1. Fix the key-binding for the container.
+	2. The container is top level now.
+
 2018/02/02 v217
 	1. The action bar will now notify you that some debuff should be recast on the target.
 

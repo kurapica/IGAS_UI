@@ -174,6 +174,8 @@ function OnLoad(self)
 end
 
 function OnEnable(self)
+	SetOverrideBindingClick(_ToggleButton, true, GetBindingKey("OPENALLBAGS") or "B", "IGAS_UI_ContainerToggle", "LeftButton")
+
 	local configs = System.Reflector.Clone(_ContainerDB.ViewConfigs)
 	tinsert(configs, 1, _DefaultContainerConfig)
 

@@ -1302,6 +1302,7 @@ class "ContainerHeader"
 		self.VSpacing = 2
 		self.AutoSize = true
 		self.KeepColumnSize = true
+		self.Toplevel = true
 
 		self.MarginTop = 2
 		self.MarginBottom = 30
