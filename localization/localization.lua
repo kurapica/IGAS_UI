@@ -4,6 +4,16 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
+<lime>2018/06/02 v219 : </lime>
+</p><br/>
+<p>
+    1. You can bind keys to the popup action buttons, those buttons will only bind the keys when they are shown, and release the key when they are hidden, so you can bind normal keys like 1, 2, 3 to them.
+</p>
+<p>
+    2. If a root button has no action on it, click or use its key to click it will show its popup buttons.
+</p>
+<br/><br/>
+<p>
 <lime>2018/02/02 v217 : </lime>
 </p><br/>
 <p>

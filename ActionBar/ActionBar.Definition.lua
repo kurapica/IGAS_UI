@@ -36,6 +36,9 @@ class "IActionButton"
 	_ManagerFrame = SecureFrame("IGASUI_IActionButton_Manager", IGAS.UIParent, "SecureHandlerStateTemplate")
 	_ManagerFrame.Visible = false
 
+	-- Trick
+	ToShortKey = IGAS:GetAddon("IGAS.Widget.Action.IFKeyBinding").ToShortKey
+
 	-- Init manger frame's enviroment
 	Task.NoCombatCall(function ()
 		_ManagerFrame:Execute[[
@@ -86,6 +89,7 @@ class "IActionButton"
 			]==]
 
 			ShowBranch = [==[
+				local force  = ...
 				local branch = BranchMap[self] or self
 				local needHide = not RootExpansion[branch]
 				local regBtn
@@ -93,7 +97,11 @@ class "IActionButton"
 				for btn, root in pairs(BranchMap) do
 					if root == branch then
 						btn:Show()
-						if needHide then
+
+						local key = btn:GetAttribute("PopupHotKey")
+						if key then btn:SetBindingClick(true, key, btn:GetName(), "LeftButton") end
+
+						if needHide and not force then
 							if not regBtn then
 								regBtn = branch
 								regBtn:RegisterAutoHide(Manager:GetAttribute("PopupDuration") or 0.25)
@@ -114,6 +122,9 @@ class "IActionButton"
 				for btn, root in pairs(BranchMap) do
 					if root == branch then
 						btn:Hide()
+
+						local key = btn:GetAttribute("PopupHotKey")
+						if key then btn:ClearBinding(key) end
 					end
 				end
 			]==]
@@ -178,6 +189,21 @@ class "IActionButton"
 					end
 				end
 			end
+		elseif BranchHeader[self] and not RootExpansion[self] then
+			local atype = self:GetAttribute("actiontype")
+			if not atype or atype == "" or atype == "empty" then
+				for btn, root in pairs(BranchMap) do
+					if root == self then
+						if btn:IsShown() then
+							Manager:RunFor(self, HideBranch)
+						else
+							Manager:RunFor(self, ShowBranch, true)
+						end
+						break
+					end
+				end
+			end
+			return button
 		end
 		return button, BranchMap[self] and "togglebranch" or BranchHeader[self] and "togglebranch" or nil
 	]]
@@ -442,6 +468,11 @@ class "IActionButton"
 								not self.RaidTargetBar
 		end
 	end
+
+	local setBindingKey = ActionButton.SetBindingKey
+	local updateBindingKey = ActionButton.UpdateBindingKey
+	local clearBindingKey = ActionButton.ClearBindingKey
+	local getBindingKey = ActionButton.GetBindingKey
 
 	------------------------------------------------------
 	-- Method
@@ -724,6 +755,40 @@ class "IActionButton"
 	function HideButtonGrid(self)
 		self:SetAlpha(0)
 		self.ForceShowGrid = false
+	end
+
+	function SetBindingKey(self, key)
+		if self.Root ~= self then
+			self.PopupHotKey = key
+			self.HotKey = ToShortKey(key)
+		else
+			return setBindingKey(self, key)
+		end
+	end
+
+	function GetBindingKey(self)
+		if self.Root ~= self then
+			return self.PopupHotKey
+		else
+			return getBindingKey(self)
+		end
+	end
+
+	function UpdateBindingKey(self)
+		if self.Root ~= self then
+			self.HotKey = ToShortKey(self.PopupHotKey)
+		else
+			return updateBindingKey(self, key)
+		end
+	end
+
+	function ClearBindingKey(self)
+		if self.Root ~= self then
+			self.PopupHotKey = nil
+			self.HotKey = nil
+		else
+			return clearBindingKey(self)
+		end
 	end
 
 	------------------------------------------------------
@@ -1016,6 +1081,14 @@ class "IActionButton"
 			end
 		end,
 		Type = Boolean,
+	}
+
+	property "PopupHotKey" {
+		Handler = function(self, key)
+			Task.NoCombatCall(function()
+				self:SetAttribute("PopupHotKey", key)
+			end)
+		end,
 	}
 
 	local function HandlerAutoHide(self)
@@ -2462,6 +2535,7 @@ end
 
 function _Recycle_IButtons:OnPush(btn)
 	btn:ClearAllPoints()
+	btn:ClearBindingKey()
 	btn:SetAutoGenAction(nil)
 	btn.Brother = nil
 	btn.Branch = nil
@@ -2480,7 +2554,6 @@ function _Recycle_IButtons:OnPush(btn)
 	btn.AsGlobal = false
 	btn:Hide()
 	btn:SetSize(36, 36)
-	btn:ClearBindingKey()
 end
 
 function _Recycle_IHeaders:OnInit(btn)
