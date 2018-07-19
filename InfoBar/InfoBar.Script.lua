@@ -326,6 +326,7 @@ local MapRects = {};
 local TempVec2D = CreateVector2D(0,0);
 function GetPlayerMapPos()
 	local mapid = C_Map.GetBestMapForUnit("player")
+	if not mapid then return end
     local R,P,_ = MapRects[mapid],TempVec2D;
     if not R then
         R = {};
