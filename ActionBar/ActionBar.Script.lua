@@ -330,7 +330,6 @@ end
 
 function PLAYER_SPECIALIZATION_CHANGED(self)
 	local now = GetSpecialization() or 1
-print("SPEC_CHANGED", now)
 	if now ~= _LoadingConfig then
 		_DBChar[_LoadingConfig] = GenerateConfig(true)
 		_LoadingConfig = now
