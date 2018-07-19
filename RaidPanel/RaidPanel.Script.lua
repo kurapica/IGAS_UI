@@ -64,6 +64,14 @@ function OnLoad(self)
 	_Addon._DB.RaidPanel = _DB
 	_Addon._DBChar.RaidPanel = _DBChar
 
+	-- System Events
+	self:RegisterEvent("PLAYER_REGEN_DISABLED")
+	self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
+	self:RegisterEvent("PLAYER_LOGOUT")
+	self:RegisterEvent("LEARNED_SPELL_IN_TAB")
+end
+
+function OnEnable(self)
 	_LoadingConfig = GetSpecialization() or 1
 
 	-- Update from old save
@@ -98,11 +106,8 @@ function OnLoad(self)
 
 	LoadConfig(_DBChar[_LoadingConfig])
 
-	-- System Events
-	self:RegisterEvent("PLAYER_REGEN_DISABLED")
-	self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
-	self:RegisterEvent("PLAYER_LOGOUT")
-	self:RegisterEvent("LEARNED_SPELL_IN_TAB")
+	self:SecureHook("SpellButton_UpdateButton")
+	LEARNED_SPELL_IN_TAB(self)
 end
 
 function LoadConfig(_DBChar)
@@ -485,11 +490,6 @@ function BuilderBuffOrderCache()
 	for i, v in ipairs(_BuffOrderList) do
 		_BuffOrderCache[v] = i
 	end
-end
-
-function OnEnable(self)
-	self:SecureHook("SpellButton_UpdateButton")
-	LEARNED_SPELL_IN_TAB(self)
 end
 
 function PLAYER_REGEN_DISABLED(self)

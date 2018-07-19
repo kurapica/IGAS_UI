@@ -3,7 +3,7 @@ IGAS:NewAddon "IGAS_UI"
 BORDER_SIZE = 2
 
 SPELL_POWER_RUNE_POWER = 5
-SPELL_POWER_HOLY_POWER = _G.SPELL_POWER_HOLY_POWER
+SPELL_POWER_HOLY_POWER = 9
 
 --==========================
 -- Share Features
@@ -452,19 +452,13 @@ class "iRuneBar"
 	inherit "iClassPower"
 	extend "IFRune"
 
-	function SetRuneByIndex(self, index, start, duration, ready, isEnergize)
-		index = - index
-		if ready then
-			if not self[index] then
-				self[index] = true
-				self.Value = self.Value + 1
-			end
-		else
-			if self[index] then
-				self[index] = false
-				self.Value = self.Value - 1
-			end
+	function RefreshRunes(self, max)
+		local val = 0
+		for i = 1, max do
+			local start, duration, ready = GetRuneCooldown(i)
+			if ready then val = val + 1 end
 		end
+		self.Value = val
 	end
 
 	function SetMaxRune(self, max)

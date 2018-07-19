@@ -204,13 +204,13 @@ function OnLoad(self)
 
 	LoadGlobalActionBar()
 
-	_LoadingConfig = GetSpecialization() or 1
-	LoadConfig(_DBChar[_LoadingConfig])
-
 	self:ActiveThread("OnEnable")
 end
 
 function OnEnable(self)
+	_LoadingConfig = GetSpecialization() or 1
+	LoadConfig(_DBChar[_LoadingConfig])
+
 	UPDATE_SHAPESHIFT_FORMS(self)
 
 	-- Load toy informations
@@ -330,6 +330,7 @@ end
 
 function PLAYER_SPECIALIZATION_CHANGED(self)
 	local now = GetSpecialization() or 1
+print("SPEC_CHANGED", now)
 	if now ~= _LoadingConfig then
 		_DBChar[_LoadingConfig] = GenerateConfig(true)
 		_LoadingConfig = now
@@ -746,14 +747,20 @@ function UpdateBlzMainMenuBar()
 			iHeader.ActionButton = _BagSlotBar
 			iHeader.Visible = not _DBChar.LockBar
 
+			MainMenuBar:SetMovable(true)
+			MainMenuBar:SetUserPlaced(true)
+			MainMenuBar:ClearAllPoints()
+			MainMenuBar:SetPoint("BOTTOM", UIParent, "TOP", 0, 200)
+
 			MicroButtonAndBagsBar:SetParent(_HiddenFrame)
 
+			--[[
 			-- Hidden blizzard frame
 			MultiBarBottomLeft:SetParent(_HiddenFrame)
 			MultiBarBottomRight:SetParent(_HiddenFrame)
 			MultiBarRight:SetParent(_HiddenFrame)
 
-			MainMenuBar:EnableMouse(false)
+			--MainMenuBar:EnableMouse(false)
 
 			local animations = {IGAS:GetUI(MainMenuBar).slideOut:GetAnimations()}
 			animations[1]:SetOffset(0, 0)
@@ -767,6 +774,7 @@ function UpdateBlzMainMenuBar()
 			PossessBarFrame:SetParent(_HiddenFrame)
 
 			PetActionBarFrame:SetParent(_HiddenFrame)
+			--]]
 
 			if _MainBar then
 				_MainBar.ReplaceBlzMainAction = false
@@ -818,14 +826,20 @@ function UpdateBlzMainMenuBar()
 			_Recycle_IButtons(_BagSlotBar)
 			_BagSlotBar = nil
 
+			MainMenuBar:ClearAllPoints()
+			MainMenuBar:SetPoint("BOTTOM")
+			MainMenuBar:SetUserPlaced(false)
+			MainMenuBar:SetMovable(false)
+
 			MicroButtonAndBagsBar:SetParent(MainMenuBar)
 
+			--[[
 			-- Show blizzard frame
 			MultiBarBottomLeft:SetParent(MainMenuBar)
 			MultiBarBottomRight:SetParent(MainMenuBar)
 			MultiBarRight:SetParent(UIParent)
 
-			MainMenuBar:EnableMouse(true)
+			--MainMenuBar:EnableMouse(true)
 
 			local animations = {IGAS:GetUI(MainMenuBar).slideOut:GetAnimations()}
 			animations[1]:SetOffset(0, -180)
@@ -839,6 +853,7 @@ function UpdateBlzMainMenuBar()
 			PossessBarFrame:SetParent(MainMenuBar)
 
 			PetActionBarFrame:SetParent(MainMenuBar)
+			--]]
 		end
 	end
 end
