@@ -162,6 +162,8 @@ endinterface "IFStyle"
 interface "IFSoulFragment"
 	local min = math.min
 
+	local FindAuraByName = _G.AuraUtil.FindAuraByName
+
 	SPEC_DEMONHUNTER_VENGENCE = 2
 	SOULFRAGMENT = 203981
 	SOULFRAGMENTNAME = GetSpellInfo(SOULFRAGMENT)
@@ -173,7 +175,7 @@ interface "IFSoulFragment"
 			self:RegisterUnitEvent("UNIT_AURA", "player")
 			self:SetClassPowerVisible(true)
 			self:SetClassPowerType(SOULFRAGMENT)
-			self:SetUnitClassPower(min((select(4, UnitAura("player", SOULFRAGMENTNAME))) or 0, 5), 5)
+			self:SetUnitClassPower(min((select(3, FindAuraByName(SOULFRAGMENTNAME, "player"))) or 0, 5), 5)
 		else
 			self:SetClassPowerVisible(false)
 			self:UnregisterEvent("UNIT_AURA")
@@ -181,7 +183,7 @@ interface "IFSoulFragment"
 	end
 
 	local function UNIT_AURA(self)
-		self:SetUnitClassPower(min((select(4, UnitAura("player", SOULFRAGMENTNAME))) or 0, 5), 5)
+		self:SetUnitClassPower(min((select(3, FindAuraByName(SOULFRAGMENTNAME, "player"))) or 0, 5), 5)
 	end
 
 	function IFSoulFragment(self)
@@ -607,7 +609,7 @@ class "iAuraIcon"
 	end
 
 	function Refresh(self, unit, index, filter)
-		local name, rank, texture, count, dtype, duration, expires, caster, isStealable, shouldConsolidate, spellID, canApplyAura, isBossDebuff = UnitAura(unit, index, filter)
+		local name, texture, count, dtype, duration, expires, caster, isStealable, shouldConsolidate, spellID, canApplyAura, isBossDebuff = UnitAura(unit, index, filter)
 
 		if name then
 			self.Index = index
@@ -789,8 +791,8 @@ class "iCastBar"
 		status.OnHide = status.OnHide + Status_OnHide
 	end
 
-	function Start(self, spell, rank, lineID, spellID)
-		local name, _, text, texture, startTime, endTime, _, _, notInterruptible = UnitCastingInfo(self.Unit)
+	function Start(self, lineID, spellID)
+		local name, text, texture, startTime, endTime, _, _, notInterruptible = UnitCastingInfo(self.Unit)
 
 		if not name then
 			self.Alpha = 0
@@ -845,7 +847,7 @@ class "iCastBar"
 		self.Alpha = 1
 	end
 
-	function Fail(self, spell, rank, lineID, spellID)
+	function Fail(self, lineID, spellID)
 		if not lineID or lineID == self.LineID then
 			self:OnCooldownUpdate()
 			self.Alpha = 0
@@ -854,7 +856,7 @@ class "iCastBar"
 		end
 	end
 
-	function Stop(self, spell, rank, lineID, spellID)
+	function Stop(self, lineID, spellID)
 		if not lineID or lineID == self.LineID then
 			self:OnCooldownUpdate()
 			self.Alpha = 0
@@ -863,7 +865,7 @@ class "iCastBar"
 		end
 	end
 
-	function Interrupt(self, spell, rank, lineID, spellID)
+	function Interrupt(self, lineID, spellID)
 		if not lineID or lineID == self.LineID then
 			self:OnCooldownUpdate()
 			self.Alpha = 0
@@ -880,8 +882,8 @@ class "iCastBar"
 		self.Icon.BackdropBorderColor = Media.CASTBAR_BORDER_NONINTERRUPTIBLE_COLOR
 	end
 
-	function Delay(self, spell, rank, lineID, spellID)
-		local name, _, text, texture, startTime, endTime = UnitCastingInfo(self.Unit)
+	function Delay(self, lineID, spellID)
+		local name, text, texture, startTime, endTime = UnitCastingInfo(self.Unit)
 
 		if not startTime or not endTime then return end
 
@@ -900,8 +902,8 @@ class "iCastBar"
 		self:OnCooldownUpdate(startTime, self.Duration)
 	end
 
-	function ChannelStart(self, spell, rank, lineID, spellID)
-		local name, _, text, texture, startTime, endTime, _, notInterruptible = UnitChannelInfo(self.Unit)
+	function ChannelStart(self, lineID, spellID)
+		local name, text, texture, startTime, endTime, _, notInterruptible = UnitChannelInfo(self.Unit)
 
 		if not name then
 			self.Alpha = 0
@@ -956,8 +958,8 @@ class "iCastBar"
 		self.Alpha = 1
 	end
 
-	function ChannelUpdate(self, spell, rank, lineID, spellID)
-		local name, _, text, texture, startTime, endTime = UnitChannelInfo(self.Unit)
+	function ChannelUpdate(self, lineID, spellID)
+		local name, text, texture, startTime, endTime = UnitChannelInfo(self.Unit)
 
 		if not name or not startTime or not endTime then
 			self:OnCooldownUpdate()
@@ -981,7 +983,7 @@ class "iCastBar"
 		self:OnCooldownUpdate(startTime, self.Duration)
 	end
 
-	function ChannelStop(self, spell, rank, lineID, spellID)
+	function ChannelStop(self, lineID, spellID)
 		self:OnCooldownUpdate()
 		self.Alpha = 0
 		self.Duration = 0

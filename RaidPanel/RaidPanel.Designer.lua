@@ -908,6 +908,10 @@ iBuffOrder = Form("IGAS_UI_BuffOrderList") {
 
 		iBuffOrderList:ResumeLayout()
 	end,
+
+	OnHide = function(self)
+		BuilderBuffOrderCache()
+	end,
 }
 
 iBuffOrderList = List("OrderList", iBuffOrder) {

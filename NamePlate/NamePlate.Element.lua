@@ -130,7 +130,7 @@ class "iAuraPanel"
 		if not self.HasFilter then return false end
 
 		if UnitIsUnit("player", unit) then
-			local name, _, _, _, _, duration, _, caster, _, _, spellID = UnitAura(unit, index, filter)
+			local name, _, _, _, duration, _, caster, _, _, spellID = UnitAura(unit, index, filter)
 			if name and duration > 0 and duration <= 60 then return true end
 		else
 			return true

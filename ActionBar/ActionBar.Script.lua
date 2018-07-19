@@ -49,6 +49,7 @@ ITEM_QUEST = 10
 
 _HiddenFrame = CreateFrame("Frame")	-- No need use IGAS frame
 _HiddenFrame:Hide()
+_HiddenFrame.OnStatusBarsUpdated = function() end
 
 GameTooltip = _G.GameTooltip
 UIParent = _G.UIParent
@@ -251,7 +252,7 @@ function UpdateStanceBar()
 	local btn = _StanceBar
 	_StanceBar.Visible = false
 	for i = 1, GetNumShapeshiftForms() do
-	    local id = select(5, GetShapeshiftFormInfo(i))
+	    local id = select(4, GetShapeshiftFormInfo(i))
 	    if id then
 	    	btn:SetAction("spell", id)
 	    	btn = btn.Brother
@@ -745,11 +746,7 @@ function UpdateBlzMainMenuBar()
 			iHeader.ActionButton = _BagSlotBar
 			iHeader.Visible = not _DBChar.LockBar
 
-			MainMenuBarBackpackButton:SetParent(_HiddenFrame)
-			CharacterBag0Slot:SetParent(_HiddenFrame)
-			CharacterBag1Slot:SetParent(_HiddenFrame)
-			CharacterBag2Slot:SetParent(_HiddenFrame)
-			CharacterBag3Slot:SetParent(_HiddenFrame)
+			MicroButtonAndBagsBar:SetParent(_HiddenFrame)
 
 			-- Hidden blizzard frame
 			MultiBarBottomLeft:SetParent(_HiddenFrame)
@@ -763,19 +760,13 @@ function UpdateBlzMainMenuBar()
 
 			MainMenuBarArtFrame:SetParent(_HiddenFrame)
 
-			MainMenuExpBar:SetParent(_HiddenFrame)
-
-			MainMenuBarMaxLevelBar:SetParent(_HiddenFrame)
-
-			ReputationWatchBar:SetParent(_HiddenFrame)
+			StatusTrackingBarManager:SetParent(_HiddenFrame)
 
 			StanceBarFrame:SetParent(_HiddenFrame)
 
 			PossessBarFrame:SetParent(_HiddenFrame)
 
 			PetActionBarFrame:SetParent(_HiddenFrame)
-
-			ArtifactWatchBar:SetParent(_HiddenFrame)
 
 			if _MainBar then
 				_MainBar.ReplaceBlzMainAction = false
@@ -827,14 +818,7 @@ function UpdateBlzMainMenuBar()
 			_Recycle_IButtons(_BagSlotBar)
 			_BagSlotBar = nil
 
-			MainMenuBarBackpackButton:SetParent(MainMenuBarArtFrame)
-			CharacterBag0Slot:SetParent(MainMenuBarArtFrame)
-			CharacterBag1Slot:SetParent(MainMenuBarArtFrame)
-			CharacterBag2Slot:SetParent(MainMenuBarArtFrame)
-			CharacterBag3Slot:SetParent(MainMenuBarArtFrame)
-
-			MainMenuBarBackpackButton:ClearAllPoints()
-			MainMenuBarBackpackButton:SetPoint("BOTTOMRIGHT", -4, 6)
+			MicroButtonAndBagsBar:SetParent(MainMenuBar)
 
 			-- Show blizzard frame
 			MultiBarBottomLeft:SetParent(MainMenuBar)
@@ -848,19 +832,13 @@ function UpdateBlzMainMenuBar()
 
 			MainMenuBarArtFrame:SetParent(MainMenuBar)
 
-			MainMenuExpBar:SetParent(MainMenuBar)
-
-			MainMenuBarMaxLevelBar:SetParent(MainMenuBar)
-
-			ReputationWatchBar:SetParent(MainMenuBar)
+			StatusTrackingBarManager:SetParent(MainMenuBar)
 
 			StanceBarFrame:SetParent(MainMenuBar)
 
 			PossessBarFrame:SetParent(MainMenuBar)
 
 			PetActionBarFrame:SetParent(MainMenuBar)
-
-			ArtifactWatchBar:SetParent(MainMenuBar)
 		end
 	end
 end
@@ -1858,7 +1836,7 @@ function UpdateTargetDebuffs()
 	local record = IActionButton.RecordThreshold
 
 	if UnitExists("target") and UnitCanAttack("player", "target") and not UnitIsDead("target") then
-		name, _, _, _, _, duration, expires = UnitAura(unit, index, filter)
+		name, _, _, _, duration, expires = UnitAura(unit, index, filter)
 
 		wipe(_TargetAura)
 
@@ -1870,7 +1848,7 @@ function UpdateTargetDebuffs()
 				end
 			end
 			index = index + 1
-			name, _, _, _, _, duration, expires = UnitAura(unit, index, filter)
+			name, _, _, _, duration, expires = UnitAura(unit, index, filter)
 		end
 
 		for name, spell in pairs(_DebuffMap) do

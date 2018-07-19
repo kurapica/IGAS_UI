@@ -710,7 +710,7 @@ class "IActionButton"
 			if type == "spell" then
 				_Button2Spell[self] = id
 			elseif type == "macro" then
-				_Button2Spell[self] = (select(3, GetMacroSpell(id)))
+				_Button2Spell[self] = GetMacroSpell(id)
 			else
 				_Button2Spell[self] = nil
 			end

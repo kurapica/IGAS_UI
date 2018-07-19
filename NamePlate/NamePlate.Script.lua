@@ -62,7 +62,7 @@ end
 function OnEnable(self)
 	UpdateNamePlateOptions()
 
-	for _, task in pairs(C_TaskQuest.GetQuestsForPlayerByMapID((GetCurrentMapAreaID()))) do
+	for _, task in pairs(C_TaskQuest.GetQuestsForPlayerByMapID(MapUtil.GetDisplayableMapForPlayer())) do
 		if task.inProgress then
 			local name = C_TaskQuest.GetQuestInfoByQuestID(task.questId)
 			if name then

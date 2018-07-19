@@ -341,7 +341,7 @@ function UNIT_AURA(self, unitID)
     end
 
     while true do
-        _, _, _, _, _, duration, expires, caster, _, _, spellID = UnitBuff("player", index)
+        _, _, _, _, duration, expires, caster, _, _, spellID = UnitBuff("player", index)
 
         if not spellID then
             break

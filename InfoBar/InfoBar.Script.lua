@@ -322,6 +322,23 @@ function _Status:OnLeave()
 	GameTooltip:Hide()
 end
 
+local MapRects = {};
+local TempVec2D = CreateVector2D(0,0);
+function GetPlayerMapPos()
+	local mapid = C_Map.GetBestMapForUnit("player")
+    local R,P,_ = MapRects[mapid],TempVec2D;
+    if not R then
+        R = {};
+        _, R[1] = C_Map.GetWorldPosFromMapPos(mapid,CreateVector2D(0,0));
+        _, R[2] = C_Map.GetWorldPosFromMapPos(mapid,CreateVector2D(1,1));
+        R[2]:Subtract(R[1]);
+        MapRects[mapid] = R;
+    end
+    P.x, P.y = UnitPosition('Player');
+    P:Subtract(R[1]);
+    return (1/R[2].y)*P.y, (1/R[2].x)*P.x;
+end
+
 function _Timer:OnTimer()
 	-- mail stuff
 	if HasNewMail() then
@@ -360,7 +377,7 @@ function _Timer:OnTimer()
 	end
 
     -- get player x,y
-    local x, y = GetPlayerMapPosition("player")
+    local x, y = GetPlayerMapPos()
    	x = x or 0
    	y = y or 0
     -- if x and y 0 then boo
@@ -370,7 +387,7 @@ function _Timer:OnTimer()
         coords = "(".."|c00786857"..format("%.2d,%.2d".."|r)  ",x*100,y*100)
     end
 
-    -- Artifact xp
+    --[[ Artifact xp
     local artifactXP = ""
     if HasArtifactEquipped() then
     	local itemID, altItemID, name, icon, totalXP, pointsSpent, quality, artifactAppearanceID, appearanceModID, itemAppearanceID, altItemAppearanceID, altOnTop, artifactTier = C_ArtifactUI.GetEquippedArtifactInfo();
@@ -378,10 +395,10 @@ function _Timer:OnTimer()
 		local numPointsAvailableToSpend, xp, xpForNextPoint = MainMenuBar_GetNumArtifactTraitsPurchasableFromXP(pointsSpent, totalXP, artifactTier);
 
 		artifactXP = AbbreviateLargeNumbers(xp) .. "/" .. AbbreviateLargeNumbers(xpForNextPoint).."  "
-	end
+	end]]
 
 	-- Refresh
-	_Text:SetText(fps..latency..ep..artifactXP..mail..coords..ticktack)
+	_Text:SetText(fps..latency..ep..mail..coords..ticktack)
 
 	if _Status.Hover then
 		UpdateGameTooltip()

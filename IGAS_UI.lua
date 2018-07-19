@@ -181,7 +181,7 @@ function SetUnitAura(self, unit, index, filter)
 	if GetTime() == _prev then return end
 	_prev = GetTime()
 
-	local name, rank, texture, count, dtype, duration, expires, caster, isStealable, shouldConsolidate, spellID, canApplyAura, isBossDebuff = UnitAura(unit, index, filter)
+	local name, texture, count, dtype, duration, expires, caster, isStealable, shouldConsolidate, spellID, canApplyAura, isBossDebuff = UnitAura(unit, index, filter)
 
 	if name then
 		self:AddLine("    ")

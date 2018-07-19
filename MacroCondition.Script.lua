@@ -82,22 +82,22 @@ condtionData = {
 	},
 	{
 		Condition = "form:1",
-		Text = L"The player is in form 1." .. (GetShapeshiftFormInfo(1) and GetSpellLink(select(5, GetShapeshiftFormInfo(1))) or ""),
+		Text = L"The player is in form 1." .. (GetShapeshiftFormInfo(1) and GetSpellLink(select(4, GetShapeshiftFormInfo(1))) or ""),
 		ForPlayer = true,
 	},
 	{
 		Condition = "form:2",
-		Text = L"The player is in form 2." .. (GetShapeshiftFormInfo(2) and GetSpellLink(select(5, GetShapeshiftFormInfo(2))) or ""),
+		Text = L"The player is in form 2." .. (GetShapeshiftFormInfo(2) and GetSpellLink(select(4, GetShapeshiftFormInfo(2))) or ""),
 		ForPlayer = true,
 	},
 	{
 		Condition = "form:3",
-		Text = L"The player is in form 3." .. (GetShapeshiftFormInfo(3) and GetSpellLink(select(5, GetShapeshiftFormInfo(3))) or ""),
+		Text = L"The player is in form 3." .. (GetShapeshiftFormInfo(3) and GetSpellLink(select(4, GetShapeshiftFormInfo(3))) or ""),
 		ForPlayer = true,
 	},
 	{
 		Condition = "form:4",
-		Text = L"The player is in form 4." .. (GetShapeshiftFormInfo(4) and GetSpellLink(select(5, GetShapeshiftFormInfo(4))) or ""),
+		Text = L"The player is in form 4." .. (GetShapeshiftFormInfo(4) and GetSpellLink(select(4, GetShapeshiftFormInfo(4))) or ""),
 		ForPlayer = true,
 	},
 	{

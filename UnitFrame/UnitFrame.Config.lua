@@ -158,7 +158,7 @@ Config = {
 				TopToBottom = false,
 
 				CustomFilter = function (self, unit, index, filter)
-					local name, _, _, _, _, duration, _, caster = UnitAura(unit, index, filter)
+					local name, _, _, _, duration, _, caster = UnitAura(unit, index, filter)
 					return name and caster == "player"
 				end,
 			},
@@ -180,7 +180,7 @@ Config = {
 				TopToBottom = false,
 
 				CustomFilter = function (self, unit, index, filter)
-					local name, _, _, _, _, duration, _, caster = UnitAura(unit, index, filter)
+					local name, _, _, _, duration, _, caster = UnitAura(unit, index, filter)
 					return name and caster ~= "player"
 				end,
 			},
@@ -201,7 +201,7 @@ Config = {
 
 				CustomFilter = function (self, unit, index, filter)
 					local isFriend = not UnitCanAttack("player", unit)
-					local name, _, _, _, _, duration, _, caster, _, _, spellID = UnitAura(unit, index, filter)
+					local name, _, _, _, duration, _, caster, _, _, spellID = UnitAura(unit, index, filter)
 
 					if name and duration > 0 and (_Debuff_List[spellID] or isFriend or caster == "player") then
 						return true
@@ -224,7 +224,7 @@ Config = {
 				TopToBottom = false,
 
 				CustomFilter = function (self, unit, index, filter)
-					local name, _, _, _, _, duration, _, caster = UnitAura(unit, index, filter)
+					local name, _, _, _, duration, _, caster = UnitAura(unit, index, filter)
 					return name and caster ~= "player"
 				end,
 			},
@@ -259,7 +259,7 @@ Config = {
 
 				CustomFilter = function (self, unit, index, filter)
 					local isFriend = not UnitCanAttack("player", unit)
-					local name, _, _, _, _, duration, _, caster, _, _, spellID = UnitAura(unit, index, filter)
+					local name, _, _, _, duration, _, caster, _, _, spellID = UnitAura(unit, index, filter)
 
 					if name and duration > 0 and (_Debuff_List[spellID] or isFriend or caster == "player") then
 						return true

@@ -433,6 +433,8 @@ function LoadConfig(_DBChar)
 	_DBChar.BuffOrderList = _DBChar.BuffOrderList or {}
 	_BuffOrderList = _DBChar.BuffOrderList
 
+	BuilderBuffOrderCache()
+
 	-- Default true
 	_DBChar.DebuffRightMouseRemove = nil
 	_DBChar.ShowDebuffTooltip = nil
@@ -475,6 +477,14 @@ function LoadConfig(_DBChar)
 	mnuRaidUnitwatchOnlyEnemy.Checked = _RaidUnitWatchSet.AutoLayout and _RaidUnitWatchSet.OnlyEnemy
 
 	InstallUnitList()
+end
+
+function BuilderBuffOrderCache()
+	_BuffOrderCache = { MAX = #_BuffOrderList }
+
+	for i, v in ipairs(_BuffOrderList) do
+		_BuffOrderCache[v] = i
+	end
 end
 
 function OnEnable(self)

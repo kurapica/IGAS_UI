@@ -133,6 +133,8 @@ endclass "iNameLabel"
 class "iBuffPanel"
 	inherit "AuraPanel"
 
+	local min = math.min
+
 	------------------------------------------------------
 	-- Method
 	------------------------------------------------------
@@ -148,51 +150,65 @@ class "iBuffPanel"
 			end
 		end
 
+		local orderCache = _M._BuffOrderCache
 		local orderBuffs = self.OrderBuffs
 		wipe(orderBuffs)
 
 		local index = 1
-		local i = 1
+		local i = 0
 		local name
 		local filter = self.Filter
 
 		if unit then
-			for _, spellID in ipairs(_M._BuffOrderList) do
-				local name, _, _, count, dtype, duration, expires, caster = UnitAura(unit, (GetSpellInfo(spellID)))
-
-				if name and caster == "player" then
-					if i <= self.MaxCount then
-						orderBuffs[spellID] = i
+			if orderCache.MAX > 0 then
+				local name, _, _, _, _, _, caster, _, _, spellID = UnitAura(unit, index, filter)
+				while name do
+					if caster == "player" and orderCache[spellID] then
+						local priority = orderCache[spellID]
+						for j = i, 0, -1 do
+							if j == 0 or orderCache[orderBuffs[j]] < priority then
+								orderBuffs[j + 1] = spellID
+								priority = false
+								break
+							else
+								orderBuffs[j + 1] = orderBuffs[j]
+							end
+						end
 						i = i + 1
-					else
-						break
 					end
+
+					index = index + 1
+					name, _, _, _, _, _, caster, _, _, spellID = UnitAura(unit, index, filter)
 				end
+
+				for j = 1, min(i, self.MaxCount) do orderBuffs[orderBuffs[j]] = j end
+
+				index = 1
 			end
 
-			if i > 1 then
-				local name, _, _, count, dtype, duration, expires, caster, isStealable, _, spellID = UnitAura(unit, index, filter)
+			if i > 0 then
+				local name, _, _, _, _, _, caster, _, _, spellID = UnitAura(unit, index, filter)
 				while name do
 					if caster == "player" then
 						if orderBuffs[spellID] then
 							self.Element[orderBuffs[spellID]]:Refresh(unit, index, filter)
-						elseif not _BuffBlackList[spellID] and i <= self.MaxCount then
-							self.Element[i]:Refresh(unit, index, filter)
+						elseif not _BuffBlackList[spellID] and i < self.MaxCount then
 							i = i + 1
+							self.Element[i]:Refresh(unit, index, filter)
 						end
 					end
 
 					index = index + 1
-					name, _, _, count, dtype, duration, expires, caster, isStealable, _, spellID = UnitAura(unit, index, filter)
+					name, _, _, _, _, _, caster, _, _, spellID = UnitAura(unit, index, filter)
 				end
 			else
-				while i <= self.MaxCount do
-					local name, _, _, count, dtype, duration, expires, caster, isStealable, _, spellID = UnitAura(unit, index, filter)
+				while i < self.MaxCount do
+					local name, _, _, _, _, _, caster, _, _, spellID = UnitAura(unit, index, filter)
 
 					if name then
 						if caster == "player" and not _BuffBlackList[spellID] then
-							self.Element[i]:Refresh(unit, index, filter)
 							i = i + 1
+							self.Element[i]:Refresh(unit, index, filter)
 						end
 					else
 						break
@@ -203,9 +219,9 @@ class "iBuffPanel"
 			end
 		end
 
-		while i <= self.Count do
-			self.Element[i].Visible = false
+		while i < self.Count do
 			i = i + 1
+			self.Element[i].Visible = false
 		end
 
 		return self:UpdatePanelSize()
@@ -216,7 +232,7 @@ class "iBuffPanel"
 	------------------------------------------------------
 	local function OnMouseUp(self, button)
 		if IsAltKeyDown() and button == "RightButton" and _DBChar[GetSpecialization() or 1].BuffPanelSet.RightRemove and not UnitCanAttack("player", self.Parent.Unit) then
-			local name, _, _, _, _, _, _, _, _, _, spellID = UnitAura(self.Parent.Unit, self.Index, self.Parent.Filter)
+			local name, _, _, _, _, _, _, _, _, spellID = UnitAura(self.Parent.Unit, self.Index, self.Parent.Filter)
 
 			if name then
 				_BuffBlackList[spellID] = true
@@ -273,7 +289,7 @@ class "iDebuffPanel"
 	end
 
 	function CustomFilter(self, unit, index, filter)
-		local name, rank, texture, count, dtype, duration, expires, caster, isStealable, shouldConsolidate, spellID = UnitAura(unit, index, filter)
+		local name, texture, count, dtype, duration, expires, caster, isStealable, shouldConsolidate, spellID = UnitAura(unit, index, filter)
 
 		if filter ~= "HARMFUL" then return caster == "player" end
 
@@ -287,7 +303,7 @@ class "iDebuffPanel"
 	------------------------------------------------------
 	local function OnMouseUp(self, button)
 		if IsAltKeyDown() and button == "RightButton" and _DBChar[GetSpecialization() or 1].DebuffPanelSet.RightRemove and not UnitCanAttack("player", self.Parent.Unit) then
-			local name, _, _, _, _, _, _, _, _, _, spellID = UnitAura(self.Parent.Unit, self.Index, self.Parent.Filter)
+			local name, _, _, _, _, _, _, _, _, spellID = UnitAura(self.Parent.Unit, self.Index, self.Parent.Filter)
 
 			if name then
 				_DebuffBlackList[spellID] = true
@@ -411,7 +427,7 @@ class "iClassBuffPanel"
 			local priorityIndex = self.PriorityIndex
 			local priorityMap = self.PriorityMap
 
-			local name, _, _, _, _, _, _, caster, isStealable, _, spellID, _, isBossDebuff = UnitAura(unit, index, filter)
+			local name, _, _, _, _, _, caster, isStealable, _, spellID, _, isBossDebuff = UnitAura(unit, index, filter)
 
 			while name and spellID do
 				if _ClassBuffMap[name] or _ClassBuffMap[spellID] then
@@ -444,7 +460,7 @@ class "iClassBuffPanel"
 				end
 
 				index = index + 1
-				name, _, _, _, _, _, _, caster, isStealable, _, spellID, _, isBossDebuff = UnitAura(unit, index, filter)
+				name, _, _, _, _, _, caster, isStealable, _, spellID, _, isBossDebuff = UnitAura(unit, index, filter)
 			end
 
 			for j = 1, i do
