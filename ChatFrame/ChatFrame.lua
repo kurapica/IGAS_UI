@@ -87,6 +87,10 @@ function ApplyStyle(tabName)
 	_G[tabName .. "Tab"].leftTexture:SetTexture(nil)
 	_G[tabName .. "Tab"].middleTexture:SetTexture(nil)
 	_G[tabName .. "Tab"].rightTexture:SetTexture(nil)
+
+	_G[tabName].ScrollBar:SetThumbTexture("")
+	_G[tabName].ScrollToBottomButton:SetNormalTexture("")
+	_G[tabName].ScrollToBottomButton.Flash = nil
 end
 
 function SetAlpha(self, alpha)
