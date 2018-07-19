@@ -335,6 +335,7 @@ function GetPlayerMapPos()
         MapRects[mapid] = R;
     end
     P.x, P.y = UnitPosition('Player');
+    if not P.x then return nil end
     P:Subtract(R[1]);
     return (1/R[2].y)*P.y, (1/R[2].x)*P.x;
 end

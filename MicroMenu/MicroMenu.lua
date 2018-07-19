@@ -161,10 +161,11 @@ end
 
 function MoveMicroButtons(point, name)
 	if name == _MicroMenuPanel then return end
-
-	if name:GetName() == "MainMenuBarArtFrame" then
-		ResetPos()
-	else
-		IGAS:GetWrapper(name).OnHide = ResetPos
-	end
+	Task.NoCombatCall(function()
+		if name:GetName() == "MicroButtonAndBagsBar" then
+			ResetPos()
+		else
+			IGAS:GetWrapper(name).OnHide = ResetPos
+		end
+	end)
 end

@@ -749,7 +749,7 @@ function UpdateBlzMainMenuBar()
 			MainMenuBar:SetMovable(true)
 			MainMenuBar:SetUserPlaced(true)
 			MainMenuBar:ClearAllPoints()
-			MainMenuBar:SetPoint("BOTTOM", UIParent, "TOP", 0, 200)
+			MainMenuBar:SetPoint("RIGHT", UIParent, "LEFT", -1000, 0)
 
 			MicroButtonAndBagsBar:SetParent(_HiddenFrame)
 
