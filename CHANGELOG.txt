@@ -1,3 +1,6 @@
+2018/07/20 v226
+	1. Fix the blz's main action bar still shown with DX11.
+
 2018/06/02 v219
 	1. You can bind keys to the popup action buttons, those buttons will only bind the keys when they are shown, and release the key when they are hidden, so you can bind normal keys like 1, 2, 3 to them.
 	2. If a root button has no action on it, click or use its key to click it will show its popup buttons.

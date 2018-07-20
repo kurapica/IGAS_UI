@@ -746,6 +746,7 @@ function UpdateBlzMainMenuBar()
 			iHeader.ActionButton = _BagSlotBar
 			iHeader.Visible = not _DBChar.LockBar
 
+			MainMenuBar:SetAlpha(0)
 			MainMenuBar:SetMovable(true)
 			MainMenuBar:SetUserPlaced(true)
 			MainMenuBar:ClearAllPoints()
@@ -825,6 +826,7 @@ function UpdateBlzMainMenuBar()
 			_Recycle_IButtons(_BagSlotBar)
 			_BagSlotBar = nil
 
+			MainMenuBar:SetAlpha(1)
 			MainMenuBar:ClearAllPoints()
 			MainMenuBar:SetPoint("BOTTOM")
 			MainMenuBar:SetUserPlaced(false)
