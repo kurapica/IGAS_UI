@@ -189,7 +189,9 @@ interface "IFSoulFragment"
 	function IFSoulFragment(self)
 		if select(2, UnitClass("player")) == "DEMONHUNTER" then
 			self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
+			self:RegisterEvent("PLAYER_ENTERING_WORLD")
 			self.PLAYER_SPECIALIZATION_CHANGED = PLAYER_SPECIALIZATION_CHANGED
+			self.PLAYER_ENTERING_WORLD = PLAYER_SPECIALIZATION_CHANGED
 			self.UNIT_AURA = UNIT_AURA
 
 			PLAYER_SPECIALIZATION_CHANGED(self)

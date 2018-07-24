@@ -196,6 +196,7 @@ function OnLoad(self)
 	_Addon._DB.GlobalActionBar = _GlobalActionBar
 
 	-- Register system events
+	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
 	self:RegisterEvent("PLAYER_LOGOUT")
 	self:RegisterEvent("ACTIONBAR_HIDEGRID")
@@ -342,6 +343,8 @@ function PLAYER_SPECIALIZATION_CHANGED(self)
 		end
 	end
 end
+
+PLAYER_ENTERING_WORLD = PLAYER_SPECIALIZATION_CHANGED
 
 function PLAYER_LOGOUT(self)
 	local spec = GetSpecialization() or 1

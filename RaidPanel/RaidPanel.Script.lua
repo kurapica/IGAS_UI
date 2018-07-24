@@ -66,6 +66,7 @@ function OnLoad(self)
 
 	-- System Events
 	self:RegisterEvent("PLAYER_REGEN_DISABLED")
+	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
 	self:RegisterEvent("PLAYER_LOGOUT")
 	self:RegisterEvent("LEARNED_SPELL_IN_TAB")
@@ -537,6 +538,8 @@ function PLAYER_SPECIALIZATION_CHANGED(self)
 	end
 	LEARNED_SPELL_IN_TAB(self)
 end
+
+PLAYER_ENTERING_WORLD = PLAYER_SPECIALIZATION_CHANGED
 
 function LEARNED_SPELL_IN_TAB(self)
 	wipe(_IGASUI_HELPFUL_SPELL)
