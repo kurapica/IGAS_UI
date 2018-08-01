@@ -206,6 +206,8 @@ function OnLoad(self)
 	LoadGlobalActionBar()
 
 	self:ActiveThread("OnEnable")
+
+	self:SecureHook(_G.MainMenuBar, "SetPositionForStatusBars")
 end
 
 function OnEnable(self)
@@ -860,6 +862,19 @@ function UpdateBlzMainMenuBar()
 			--]]
 		end
 	end
+end
+
+function ResetMainMenuLocation()
+	if _BagSlotBar then
+		if MainMenuBar:GetNumPoints() == 0 then
+			MainMenuBar:ClearAllPoints()
+			MainMenuBar:SetPoint("RIGHT", UIParent, "LEFT", -1000, 0)
+		end
+	end
+end
+
+function SetPositionForStatusBars(self)
+	Task.NoCombatCall(ResetMainMenuLocation)
 end
 
 function UpdateUsableColor(self)

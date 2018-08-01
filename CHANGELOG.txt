@@ -1,3 +1,6 @@
+2018/08/01 v228
+	1. Fix the main menu bar lose its location.
+
 2018/07/25 v227
 	1. Fix for force spec change when join the battlefield.
 
