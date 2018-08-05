@@ -207,6 +207,7 @@ function OnLoad(self)
 
 	self:ActiveThread("OnEnable")
 
+	_G.ExtraActionBarFrame:SetParent(_G.UIParent)
 	self:SecureHook(_G.MainMenuBar, "SetPositionForStatusBars")
 end
 

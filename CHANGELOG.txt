@@ -1,3 +1,6 @@
+2018/08/06 v229
+	1. Fix the ExtraActionBarFrame won't show.
+
 2018/08/01 v228
 	1. Fix the main menu bar lose its location.
 

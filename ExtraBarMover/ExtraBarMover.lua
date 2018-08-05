@@ -53,6 +53,7 @@ function OnLoad(self)
 	_DB = _Addon._DB.ExtraBarMover or {}
 	_Addon._DB.ExtraBarMover = _DB
 
+	ExtraActionBarFrame:SetParent(UIParent)
 	ExtraActionBarFrame:SetMovable(true)
 	ExtraActionBarFrame:SetUserPlaced(true)
 end
