@@ -41,8 +41,11 @@ function OnLoad(self)
 		_G.DeathKnightResourceOverlayFrame:UnregisterAllEvents()
 
 		_G.ClassNameplateManaBarFrame:UnregisterAllEvents()
-		_G.NamePlateTargetResourceFrame:UnregisterAllEvents()
-		_G.NamePlatePlayerResourceFrame:UnregisterAllEvents()
+		_G.ClassNameplateManaBarFrame:Hide()
+		_G.NamePlateDriverFrame:SetClassNameplateManaBar(nil)
+		_G.NamePlateDriverFrame:SetClassNameplateBar(nil)
+		--_G.NamePlateTargetResourceFrame:UnregisterAllEvents()
+		--_G.NamePlatePlayerResourceFrame:UnregisterAllEvents()
 
 		self:SecureHook(_G.NamePlateDriverFrame, "UpdateNamePlateOptions", UpdateNamePlateOptions)
 	end

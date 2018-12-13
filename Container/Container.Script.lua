@@ -100,7 +100,7 @@ function OnLoad(self)
 	self:SecureHook("BuybackItem")
 	self:SecureHook("BuyMerchantItem")
 
-	self:SecureHook("OpenStackSplitFrame")
+	self:SecureHook(_G.StackSplitFrame, "OpenStackSplitFrame")
 
 	-- DB
 	if _DB.ContainerDB and (not _DB.ContainerDB.SaveFormatVer or _DB.ContainerDB.SaveFormatVer < 1) then
@@ -968,8 +968,8 @@ end
 -- Auto Split
 -------------------------------
 StackSplitFrame = _G.StackSplitFrame
-StackSplitOkayButton = _G.StackSplitOkayButton
-StackSplitCancelButton = _G.StackSplitCancelButton
+StackSplitOkayButton = _G.StackSplitFrame.OkayButton
+StackSplitCancelButton = _G.StackSplitFrame.CancelButton
 
 StackSplitAllButton = CreateFrame("Button", "StackSplitAllButton", StackSplitFrame, "UIPanelButtonTemplate")
 StackSplitAllButton:SetWidth(42)
@@ -990,7 +990,8 @@ StackSplitAllButton:SetScript("OnClick", function()
 	end
 end)
 
-function OpenStackSplitFrame(maxStack, parent, anchor, anchorTo)
+function OpenStackSplitFrame(self, maxStack, parent, anchor, anchorTo)
+	print("OpenStackSplitFrame")
 	if _ToolSet.AutoSplit and StackSplitFrame:IsShown() and not InCombatLockdown() then
 		local bag = parent:GetParent() and parent:GetParent():GetID()
 		if bag and bag >=0 and bag <= NUM_BAG_FRAMES then
