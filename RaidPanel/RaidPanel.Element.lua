@@ -24,7 +24,7 @@ AuraCountFont_ClassBuff:CopyFontObject("NumberFontNormal")
 class "iHealthBar"
 	inherit "HealthBarFrequent"
 	extend "iStatusBarStyle""iBorder"
-	extend "IFTarget"
+	extend "IFTarget" "IFConnect"
 
 	------------------------------------------------------
 	-- Method
@@ -34,6 +34,14 @@ class "iHealthBar"
 			self.Back.BackdropBorderColor = Media.ACTIVED_BORDER_COLOR
 		else
 			self.Back.BackdropBorderColor = Media.DEFAULT_BORDER_COLOR
+		end
+	end
+
+	function SetConnectState(self, connected)
+		if connected then
+			self.Alpha = 1
+		else
+			self.Alpha = 0.3
 		end
 	end
 

@@ -990,8 +990,9 @@ StackSplitAllButton:SetScript("OnClick", function()
 	end
 end)
 
+__Thread__()
 function OpenStackSplitFrame(self, maxStack, parent, anchor, anchorTo)
-	print("OpenStackSplitFrame")
+	Task.Next()
 	if _ToolSet.AutoSplit and StackSplitFrame:IsShown() and not InCombatLockdown() then
 		local bag = parent:GetParent() and parent:GetParent():GetID()
 		if bag and bag >=0 and bag <= NUM_BAG_FRAMES then
