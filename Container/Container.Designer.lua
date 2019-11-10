@@ -41,8 +41,10 @@ mnuAutoRepairChkRep.DropDownList = _ListReputation
 mnuAutoSell = headerMenu:AddMenuButton(L"Auto Sell")
 mnuAutoSell.IsCheckButton = true
 
+--[[
 mnuAutoSplit = headerMenu:AddMenuButton(L"Auto Split")
 mnuAutoSplit.IsCheckButton = true
+--]]
 
 --------------------------
 -- Container

@@ -309,7 +309,25 @@ class "iQuestMark"
 							end
 						end
 					else
-						isOtherQuest = true
+						local x, y = progress:match("(%d+)/(%d+)")
+						if x and y then
+							if tonumber(y) > tonumber(x) then
+								isOtherQuest = true
+							end
+						else
+							isOtherQuest = true
+						end
+					end
+				else
+					local x, y = text:match("(%d+)/(%d+)")
+					if x and y then
+						if tonumber(y) > tonumber(x) then
+							self:SetDesaturated(false)
+							self.Visible = true
+							return _GameTooltip:Hide()
+						else
+							isFullfiled = true
+						end
 					end
 				end
 			end

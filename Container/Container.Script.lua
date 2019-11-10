@@ -100,7 +100,7 @@ function OnLoad(self)
 	self:SecureHook("BuybackItem")
 	self:SecureHook("BuyMerchantItem")
 
-	self:SecureHook(_G.StackSplitFrame, "OpenStackSplitFrame")
+	--self:SecureHook(_G.StackSplitFrame, "OpenStackSplitFrame")
 
 	-- DB
 	if _DB.ContainerDB and (not _DB.ContainerDB.SaveFormatVer or _DB.ContainerDB.SaveFormatVer < 1) then
@@ -321,7 +321,7 @@ function headerMenu:OnShow()
 
 	mnuAutoSell.Checked = _ToolSet.AutoSell
 
-	mnuAutoSplit.Checked = _ToolSet.AutoSplit
+	--mnuAutoSplit.Checked = _ToolSet.AutoSplit
 
 	mnuSetScale.Text = L"Scale" .. ":" .. (_ToolSet.Scale or 1)
 end
@@ -348,9 +348,9 @@ function mnuAutoSell:OnCheckChanged()
 	_ToolSet.AutoSell = self.Checked
 end
 
-function mnuAutoSplit:OnCheckChanged()
+--[[function mnuAutoSplit:OnCheckChanged()
 	_ToolSet.AutoSplit = self.Checked
-end
+end--]]
 
 function _ContainerHeader.Mask:OnShow()
 	Toggle.Update()
@@ -967,6 +967,7 @@ end
 -------------------------------
 -- Auto Split
 -------------------------------
+--[[
 StackSplitFrame = _G.StackSplitFrame
 StackSplitOkayButton = _G.StackSplitFrame.OkayButton
 StackSplitCancelButton = _G.StackSplitFrame.CancelButton
@@ -995,6 +996,7 @@ function OpenStackSplitFrame(self, maxStack, parent, anchor, anchorTo)
 	Task.Next()
 	if _ToolSet.AutoSplit and StackSplitFrame:IsShown() and not InCombatLockdown() then
 		local bag = parent:GetParent() and parent:GetParent():GetID()
+		print("OPEN", bag)
 		if bag and bag >=0 and bag <= NUM_BAG_FRAMES then
 			StackSplitOkayButton:SetWidth(40)
 			StackSplitOkayButton:SetPoint("RIGHT", StackSplitFrame, "BOTTOM", -23, 32)
@@ -1025,6 +1027,7 @@ StackSplitFrame:HookScript("OnHide", function(self)
 		end
 	end)
 end)
+--]]
 
 ----------------------------------------
 -- Stack
