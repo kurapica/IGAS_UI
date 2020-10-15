@@ -175,7 +175,7 @@ function RefreshMiniButtonPos()
 		local header = _G["ObjectiveTrackerFrame"].HeaderMenu
 		local btn = header.MinimizeButton
 		local title = header.Title
-		if _G["ObjectiveTrackerFrame"]:GetRight() <= GetScreenWidth()/2 then
+		if _G["ObjectiveTrackerFrame"]:GetRight() and _G["ObjectiveTrackerFrame"]:GetRight() <= GetScreenWidth()/2 then
 			header:ClearAllPoints()
 			header:SetPoint("TOPRIGHT", _G["ObjectiveTrackerFrame"], "TOPLEFT", -10, 0)
 			title:ClearAllPoints()
@@ -221,11 +221,11 @@ function GOSSIP_SHOW(self)
 	if not _AutoQuest.ToggleOn then return end
 
 	if C_GossipInfo.GetNumActiveQuests() > 0 then
-		if SelectActiveQuest(1, C_GossipInfo.GetGossipActiveQuests()) then return end
+		if SelectActiveQuest(1, C_GossipInfo.GetActiveQuests()) then return end
 	end
 
-	if C_GossipInfo.GetNumGossipAvailableQuests() > 0 then
-		if SelectAvailableQuest(1, C_GossipInfo.GetGossipAvailableQuests()) then return end
+	if C_GossipInfo.GetNumAvailableQuests() > 0 then
+		if SelectAvailableQuest(1, C_GossipInfo.GetAvailableQuests()) then return end
 	end
 end
 
@@ -239,7 +239,7 @@ function SelectActiveQuest(index, info)
 	if not (info and info[index]) then return false end
 
 	if info[index].isComplete then
-		C_GossipInfo.SelectGossipActiveQuest(index)
+		C_GossipInfo.SelectActiveQuest(index)
 		return true
 	end
 
@@ -250,7 +250,7 @@ function SelectAvailableQuest(index, info)
 	if not (info and info[index]) then return false end
 
 	if not _AutoQuest.AbandonQuest[info[index].title] then
-		C_GossipInfo.SelectGossipAvailableQuest(index)
+		C_GossipInfo.SelectAvailableQuest(index)
 	end
 
 	if #info <= index then
