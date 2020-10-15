@@ -245,75 +245,82 @@ function MinimapZoneTextButton:OnClick(button)
 	end
 end
 
-MinimapZoneTextButton:SetParent(Minimap)
-MinimapZoneTextButton:ClearAllPoints()
-MinimapZoneTextButton:SetPoint("BOTTOMLEFT", Minimap, "TOPLEFT", 0, 4)
-MinimapZoneTextButton:SetPoint("BOTTOMRIGHT", Minimap, "TOPRIGHT", 0, 4)
+function OnEnable()
+	MinimapZoneTextButton:SetParent(Minimap)
+	MinimapZoneTextButton:ClearAllPoints()
+	MinimapZoneTextButton:SetPoint("BOTTOMLEFT", Minimap, "TOPLEFT", 0, 4)
+	MinimapZoneTextButton:SetPoint("BOTTOMRIGHT", Minimap, "TOPRIGHT", 0, 4)
 
-MiniMapTracking:Show()
-MiniMapTrackingBackground:Hide()
-MiniMapTrackingIconOverlay:Hide()
-MiniMapTrackingButtonBorder:Hide()
+	MiniMapTracking:Show()
+	MiniMapTrackingBackground:Hide()
+	MiniMapTrackingIconOverlay:Hide()
+	MiniMapTrackingButtonBorder:Hide()
 
-MiniMapTracking:ClearAllPoints()
-MiniMapTracking:SetParent(Minimap)
-MiniMapTracking:SetPoint("TOPLEFT", Minimap, "TOPLEFT")
-MiniMapTracking:SetFrameStrata("LOW")
+	MiniMapTracking:ClearAllPoints()
+	MiniMapTracking:SetParent(Minimap)
+	MiniMapTracking:SetPoint("TOPLEFT", Minimap, "TOPLEFT")
+	MiniMapTracking:SetFrameStrata("LOW")
 
-MinimapZoneText:ClearAllPoints()
-MinimapZoneText:SetAllPoints()
-MinimapZoneText.JustifyH = "CENTER"
+	MinimapZoneText:ClearAllPoints()
+	MinimapZoneText:SetAllPoints()
+	MinimapZoneText.JustifyH = "CENTER"
 
-MinimapBorderTop.TexturePath = nil
-MiniMapWorldMapButton:Hide()
-MinimapZoomIn:Hide()
-MinimapZoomOut:Hide()
-MinimapBorder.TexturePath = nil
-Minimap:SetMaskTexture("Interface\\Buttons\\WHITE8x8")
+	MinimapBorderTop.TexturePath = nil
+	MiniMapWorldMapButton:Hide()
+	MinimapZoomIn:Hide()
+	MinimapZoomOut:Hide()
+	MinimapBorder.TexturePath = nil
+	Minimap:SetMaskTexture("Interface\\Buttons\\WHITE8x8")
 
-innerBorder = Frame("InnerBorder", Minimap)
-innerBorder.FrameStrata = "LOW"
-innerBorder:SetAllPoints()
-BuildBorder(innerBorder)
+	innerBorder = Frame("InnerBorder", Minimap)
+	innerBorder.FrameStrata = "LOW"
+	innerBorder:SetAllPoints()
+	BuildBorder(innerBorder)
 
-outBorder = Frame("OutBorder", Minimap)
-outBorder.FrameStrata = "BACKGROUND"
-outBorder:SetPoint("TOP", MinimapZoneTextButton, "TOP", 0, 4)
-outBorder:SetPoint("BOTTOMLEFT", -4, -4)
-outBorder:SetPoint("BOTTOMRIGHT", 4, -4)
-BuildBorder(outBorder)
+	outBorder = Frame("OutBorder", Minimap)
+	outBorder.FrameStrata = "BACKGROUND"
+	outBorder:SetPoint("TOP", MinimapZoneTextButton, "TOP", 0, 4)
+	outBorder:SetPoint("BOTTOMLEFT", -4, -4)
+	outBorder:SetPoint("BOTTOMRIGHT", 4, -4)
+	BuildBorder(outBorder)
 
--- GameTimeFrame
-GameTimeFrame.NormalTexture.TexturePath = nil
-GameTimeFrame.PushedTexture.TexturePath = nil
-GameTimeFrame.HighlightTexture.TexturePath = nil
-GameTimeFrame.NormalFontObject = TextStatusBarTextLarge
+	-- GameTimeFrame
+	GameTimeFrame.NormalTexture.TexturePath = nil
+	GameTimeFrame.PushedTexture.TexturePath = nil
+	GameTimeFrame.HighlightTexture.TexturePath = nil
+	GameTimeFrame.NormalFontObject = TextStatusBarTextLarge
 
-GameTimeFrame:ClearAllPoints()
-GameTimeFrame:SetPoint("TOPRIGHT")
-GameTimeFrame:SetSize(30, 30)
+	GameTimeFrame:ClearAllPoints()
+	GameTimeFrame:SetPoint("TOPRIGHT")
+	GameTimeFrame:SetSize(30, 30)
 
--- GarrisonLandingPageMinimapButton
-GarrisonLandingPageMinimapButton:ClearAllPoints()
-GarrisonLandingPageMinimapButton:SetPoint("CENTER", Minimap, "BOTTOMLEFT")
+	-- GarrisonLandingPageMinimapButton
+	GarrisonLandingPageMinimapButton:ClearAllPoints()
+	GarrisonLandingPageMinimapButton:SetPoint("CENTER", Minimap, "BOTTOMLEFT")
 
--- MiniMapInstanceDifficulty
-MiniMapInstanceDifficulty:SetParent(Minimap)
-MiniMapInstanceDifficulty:ClearAllPoints()
-MiniMapInstanceDifficulty:SetPoint("TOPLEFT", Minimap, "TOPLEFT", -6, 4)
-MiniMapInstanceDifficulty:SetFrameStrata("MEDIUM")
+	GarrisonLandingPageMinimapButton.OnShow = function(self)
+		GarrisonLandingPageMinimapButton:ClearAllPoints()
+		GarrisonLandingPageMinimapButton:SetPoint("CENTER", Minimap, "BOTTOMLEFT")
+	end
 
--- GuildInstanceDifficulty
-GuildInstanceDifficulty:SetParent(Minimap)
-GuildInstanceDifficulty:ClearAllPoints()
-GuildInstanceDifficulty:SetPoint("TOPLEFT", Minimap, "TOPLEFT", -6, 4)
-GuildInstanceDifficulty:SetFrameStrata("MEDIUM")
+	-- MiniMapInstanceDifficulty
+	MiniMapInstanceDifficulty:SetParent(Minimap)
+	MiniMapInstanceDifficulty:ClearAllPoints()
+	MiniMapInstanceDifficulty:SetPoint("TOPLEFT", Minimap, "TOPLEFT", -6, 4)
+	MiniMapInstanceDifficulty:SetFrameStrata("MEDIUM")
 
--- MiniMapChallengeMode
-MiniMapChallengeMode:ClearAllPoints()
-MiniMapChallengeMode:SetPoint("TOPLEFT", Minimap, "TOPLEFT", 0, 0)
-MiniMapChallengeMode:SetFrameStrata("MEDIUM")
+	-- GuildInstanceDifficulty
+	GuildInstanceDifficulty:SetParent(Minimap)
+	GuildInstanceDifficulty:ClearAllPoints()
+	GuildInstanceDifficulty:SetPoint("TOPLEFT", Minimap, "TOPLEFT", -6, 4)
+	GuildInstanceDifficulty:SetFrameStrata("MEDIUM")
 
--- QueueStatusMinimapButton
-QueueStatusMinimapButton:ClearAllPoints()
-QueueStatusMinimapButton:SetPoint("CENTER", Minimap, "BOTTOMLEFT", 0, 30)
+	-- MiniMapChallengeMode
+	MiniMapChallengeMode:ClearAllPoints()
+	MiniMapChallengeMode:SetPoint("TOPLEFT", Minimap, "TOPLEFT", 0, 0)
+	MiniMapChallengeMode:SetFrameStrata("MEDIUM")
+
+	-- QueueStatusMinimapButton
+	QueueStatusMinimapButton:ClearAllPoints()
+	QueueStatusMinimapButton:SetPoint("CENTER", Minimap, "BOTTOMLEFT", 0, 30)
+end
