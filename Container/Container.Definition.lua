@@ -1085,13 +1085,13 @@ class "TokenInfo"
 	function SetCurrencyID(self, val)
 		if val then
 			self.ID = val
-			local name, isHeader, isExpanded, isUnused, isWatched, count, icon = GetCurrencyListInfo(val)
-			if count and count <= 99999 then
-				self.Count.Text = tostring(count)
+			local info = C_CurrencyInfo.GetCurrencyListInfo(val)
+			if info.quantity and info.quantity <= 99999 then
+				self.Count.Text = tostring(info.quantity)
 			else
 				self.Count.Text = "*"
 			end
-			self.Icon.TexturePath = icon
+			self.Icon.TexturePath = info.iconFileID
 			self.Icon:SetTexCoord(0.06, 0.94, 0.06, 0.94)
 		end
 	end
@@ -1138,11 +1138,11 @@ class "TokenPanel"
 			local idx = 1
 
 			if watchList then
-				for i = 1, GetCurrencyListSize() do
+				for i = 1, C_CurrencyInfo.GetCurrencyListSize() do
 					if idx > self.MaxCount then break end
 
-					local name, isHeader, isExpanded, isUnused, isWatched, count, icon = GetCurrencyListInfo(i)
-					if watchList[name] then
+					local info = C_CurrencyInfo.GetCurrencyListInfo(i)
+					if watchList[info.name] then
 						self.Element[idx]:SetCurrencyID(i)
 						self.Element[idx].Visible = true
 						idx = idx + 1

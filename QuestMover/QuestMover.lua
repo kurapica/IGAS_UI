@@ -109,7 +109,7 @@ function OnLoad(self)
 	self:RegisterEvent("QUEST_DETAIL")
 	self:RegisterEvent("QUEST_ACCEPTED")
 
-	self:SecureHook("AbandonQuest")
+	self:SecureHook(C_QuestLog, "AbandonQuest")
 end
 
 function OnEnable(self)
@@ -213,19 +213,19 @@ function BAG_NEW_ITEMS_UPDATED(self)
 end
 
 function QUEST_ACCEPTED(self, questIndex)
-	questIndex = GetQuestLogTitle(questIndex)
+	questIndex = C_QuestLog.GetTitleForLogIndex(questIndex)
 	if questIndex then _AutoQuest.AbandonQuest[questIndex] = nil end
 end
 
 function GOSSIP_SHOW(self)
 	if not _AutoQuest.ToggleOn then return end
 
-	if GetNumGossipActiveQuests() > 0 then
-		if SelectActiveQuest(1, GetGossipActiveQuests()) then return end
+	if C_GossipInfo.GetNumActiveQuests() > 0 then
+		if SelectActiveQuest(1, C_GossipInfo.GetGossipActiveQuests()) then return end
 	end
 
-	if GetNumGossipAvailableQuests() > 0 then
-		if SelectAvailableQuest(1, GetGossipAvailableQuests()) then return end
+	if C_GossipInfo.GetNumGossipAvailableQuests() > 0 then
+		if SelectAvailableQuest(1, C_GossipInfo.GetGossipAvailableQuests()) then return end
 	end
 end
 
@@ -235,28 +235,28 @@ function QUEST_DETAIL(self)
 	end
 end
 
-function SelectActiveQuest(index, name, level, isTrivial, isFinished, ...)
-	if not name then return false end
+function SelectActiveQuest(index, info)
+	if not (info and info[index]) then return false end
 
-	if isFinished then
-		SelectGossipActiveQuest(index)
+	if info[index].isComplete then
+		C_GossipInfo.SelectGossipActiveQuest(index)
 		return true
 	end
 
-	return SelectActiveQuest(index + 1, ...)
+	return SelectActiveQuest(index + 1, info)
 end
 
-function SelectAvailableQuest(index, name, level, isTrivial, isDaily, isRepeatable, ...)
-	if not name then return false end
+function SelectAvailableQuest(index, info)
+	if not (info and info[index]) then return false end
 
-	if not _AutoQuest.AbandonQuest[name] then
-		SelectGossipAvailableQuest(index)
+	if not _AutoQuest.AbandonQuest[info[index].title] then
+		C_GossipInfo.SelectGossipAvailableQuest(index)
 	end
 
-	if select('#', ...) == 0 then
+	if #info <= index then
 		return true
 	else
-		return SelectAvailableQuest(index + 1, ...)
+		return SelectAvailableQuest(index + 1, info)
 	end
 end
 
@@ -296,7 +296,7 @@ function QuestFrameCompleteButton:OnShow()
 end
 
 function AbandonQuest()
-	local questName = GetAbandonQuestName()
+	local questName = C_QuestLog.GetAbandonQuest()
 	if questName then _AutoQuest.AbandonQuest[questName] = true end
 end
 

@@ -229,11 +229,12 @@ function OnEnable(self)
 	-- Token List
 	if not _ContainerDB.TokenWatchList then
 		local tbl = {}
-		for i = 1, GetCurrencyListSize() do
-			local name, isHeader, isExpanded, isUnused, isWatched, count, icon = GetCurrencyListInfo(i)
-			if isHeader and i > 1 then break end
-			if not isHeader then
-				tbl[name] = true
+		for i = 1, C_CurrencyInfo.GetCurrencyListSize() do
+			local info = C_CurrencyInfo.GetCurrencyListInfo(i)
+
+			if info.isHeader and i > 1 then break end
+			if not info.isHeader then
+				tbl[info.name] = true
 			end
 		end
 		_ContainerDB.TokenWatchList = tbl
@@ -699,14 +700,14 @@ end
 function tokenWatchManager:OnShow()
 	local tree = {}
 	local header
-	for i = 1, GetCurrencyListSize() do
-		local name, isHeader, isExpanded, isUnused, isWatched, count, icon = GetCurrencyListInfo(i)
+	for i = 1, C_CurrencyInfo.GetCurrencyListSize() do
+		local info = C_CurrencyInfo.GetCurrencyListInfo(i)
 
-		if isHeader then
-			header = { Text = name, Childs = {} }
+		if info.isHeader then
+			header = { Text = info.name, Childs = {} }
 			tinsert(tree, header)
 		elseif header then
-			tinsert(header.Childs, { Text = name })
+			tinsert(header.Childs, { Text = info.name })
 		end
 	end
 

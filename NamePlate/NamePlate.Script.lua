@@ -75,9 +75,16 @@ function OnEnable(self)
 	end
 end
 
+local _Hooked = {}
 function NAME_PLATE_CREATED(self, base)
-	base.UnitFrame:Hide()
-	base.UnitFrame:HookScript("OnShow", base.UnitFrame.Hide)
+	Task.NextCall(function()
+		local frame = base.UnitFrame
+		if frame and not _Hooked[frame] then
+			_Hooked[frame] = true
+			frame:Hide()
+			frame:HookScript("OnShow", base.UnitFrame.Hide)
+		end
+	end)
 
 	base.NamePlateMask = iNamePlateUnitFrame("iNamePlateMask", base)
 	base.NamePlateMask:ApplyFrameOptions(_VerticalScale, _HorizontalScale)
@@ -107,7 +114,7 @@ function NAME_PLATE_UNIT_REMOVED(self, unit)
 	end
 end
 
-function QUEST_ACCEPTED(self, logid, questId)
+function QUEST_ACCEPTED(self, questId)
 	if QuestUtils_IsQuestWorldQuest(questId) then
 		local name = C_TaskQuest.GetQuestInfoByQuestID(questId)
 		if name then
@@ -259,8 +266,8 @@ end
 function UpdateQuestLog(forceRefresh)
 	wipe(_QuestLog)
 
-	for i = 1, GetNumQuestLogEntries() do
-		local title, _, _, isHeader = GetQuestLogTitle(i)
+	for i = 1, C_QuestLog.GetNumQuestLogEntries() do
+		local title, _, _, isHeader = C_QuestLog.GetTitleForLogIndex(i)
 		if not isHeader then
 			_QuestLog[title] = i
 		end
