@@ -19,14 +19,14 @@ Toggle = {
 			end
 		else
 			if not mask then
-				mask = Mask("IGAS_UI_ExtraBarMover_Mask", ExtraActionBarFrame)
+				mask = Mask("IGAS_UI_ExtraBarMover_Mask", ZoneAbilityFrame)
 				mask.AsMove = true
 				mask.OnMoveFinished = function()
-					_DB.Location = ExtraActionBarFrame.Location
+					_DB.Location = ZoneAbilityFrame.Location
 				end
 				mask.FrameLevel = mask.FrameLevel + 2
 
-				menu = DropDownList("IGAS_UI_ExtraBarMover_Menu", ExtraActionBarFrame)
+				menu = DropDownList("IGAS_UI_ExtraBarMover_Menu", ZoneAbilityFrame)
 				menu.ShowOnCursor = false
 				menu.AutoHide = false
 				menu.Visible = false
@@ -35,8 +35,8 @@ Toggle = {
 				_MenuModifyAnchorPoints = menu:AddMenuButton(L"Modify AnchorPoints")
 				_MenuModifyAnchorPoints:ActiveThread("OnClick")
 				_MenuModifyAnchorPoints.OnClick = function(self)
-					IGAS:ManageAnchorPoint(ExtraActionBarFrame, nil, true)
-					_DB.Location = ExtraActionBarFrame.Location
+					IGAS:ManageAnchorPoint(ZoneAbilityFrame, nil, true)
+					_DB.Location = ZoneAbilityFrame.Location
 				end
 			end
 
@@ -53,13 +53,13 @@ function OnLoad(self)
 	_DB = _Addon._DB.ExtraBarMover or {}
 	_Addon._DB.ExtraBarMover = _DB
 
-	ExtraActionBarFrame:SetParent(UIParent)
-	ExtraActionBarFrame:SetMovable(true)
-	ExtraActionBarFrame:SetUserPlaced(true)
+	ZoneAbilityFrame:SetParent(UIParent)
+	ZoneAbilityFrame:SetMovable(true)
+	ZoneAbilityFrame:SetUserPlaced(true)
 end
 
 function OnEnable(self)
 	if _DB.Location then
-		ExtraActionBarFrame.Location = _DB.Location
+		ZoneAbilityFrame.Location = _DB.Location
 	end
 end
