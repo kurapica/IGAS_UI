@@ -20,7 +20,7 @@
 	<Include file = "Container\Container.xml"/>
 	<Script file = "Minimap\Minimap.lua"/>
 	<Script file = "ChatFrame\ChatFrame.lua"/>
-	<Script file = "QuestMover\QuestMover.lua"/>
+	<!--Script file = "QuestMover\QuestMover.lua"/-->
 	<Script file = "BuffFrameStyle\BuffFrameStyle.lua"/>
 	<Script file = "MicroMenu\MicroMenu.lua"/>
 	<Script file = "ExtraBarMover\ExtraBarMover.lua"/>
