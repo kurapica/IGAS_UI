@@ -330,9 +330,9 @@ function autoGenerateForm:OnHide()
 end
 
 function cboItemClass:OnValueChanged(key)
-	cboItemSubClass:Clear()
 	cboItemSubClass:AddItem(100, L"All")
 	cboItemSubClass.Value = 100
+	cboItemSubClass:Clear()
 
 	local subCls = _AuctionItemClasses[key].SubClass
 

@@ -2,7 +2,6 @@
 	<!-- Localization -->
 	<Script file = "localization\localization.lua"/>
 	<Script file = "localization\localization.cn.lua"/>
-	<Script file = "localization\localization.tw.lua"/>
 
 	<!-- Init -->
 	<Script file = "IGAS_UI.lua"/>

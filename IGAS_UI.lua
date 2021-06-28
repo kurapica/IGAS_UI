@@ -123,6 +123,7 @@ function OnEnable(self)
 			frm.Caption = "IGAS_UI - " .. L"Change Log"
 			frm.Resizable = false
 			frm.Visible = false
+			frm:SetSize(600, 400)
 
 			local html = HTMLViewer("HTMLViewer", frm)
 			html:SetPoint("TOPLEFT", 4, -26)

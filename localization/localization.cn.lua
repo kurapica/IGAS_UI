@@ -7,79 +7,29 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
-<lime>2018/06/02 v219 : </lime>
-</p><br/>
-<p>
-    1. 你可以为弹出按钮指定按键，这些按钮仅当自身显示时绑定这些按键，当自身隐藏时会释放它们，所以，可以绑定例如1，2，3之类常用按钮给它们。
+<lime>首先感谢您对IGAS系列长期的支持，但本次更新是正式停止对IGAS和IGAS_UI的支持，它们的可替代品已经全部完成，功能更强，运行更平滑。</lime>
 </p>
+<br/>
 <p>
-    2. 如果一个根按钮没有内容，那么点击或者使用按键定义它，会显示它的弹出按钮，以便选择使用。
+<lightgreen>动作条</lightgreen> https://www.curseforge.com/wow/addons/ShadowDancer
 </p>
-<br/><br/>
+<br/>
 <p>
-<lime>2018/02/02 v217 : </lime>
-</p><br/>
-<p>
-    1. 当需要给目标补减益时，动作条会高亮提示。
+<lightgreen>团队面板</lightgreen> https://www.curseforge.com/wow/addons/AshToAsh
 </p>
-<br/><br/>
+<br/>
 <p>
-<lime>2018/01/10 v216 : </lime>
-</p><br/>
-<p>
-    1. "全账号通用"菜单项加入，被指定的动作条将被所有角色和专精使用，比如宠物坐骑动作条之类，无需再自行同步内容。
+<lightgreen>姓名版</lightgreen> https://www.curseforge.com/wow/addons/Aim
 </p>
-<br/><br/>
+<br/>
 <p>
-<lime>2017/11/29 v205 : </lime>
-</p><br/>
-<p>
-    1. 动作条现在开始支持Masque皮肤插件。
+<lightgreen>背包</lightgreen> https://www.curseforge.com/wow/addons/BagView
 </p>
+<br/>
 <p>
-    2. 如果一个动作条只含有一个按钮(该按钮有弹出动作条)，那么可以使用"方形布局"或者"圆形布局"来快速进行布局。
+<lightgreen>头像</lightgreen> https://github.com/kurapica/AshUnitFrame
 </p>
-<p>
-    3. 新的动作条映射: 世界标记，团队标记。
-</p>
-<br/><br/>
-<p>
-<lime>2017/10/31 v204 : </lime>
-</p><br/>
-<p>
-    1. 现在你可以保存和加载特定动作条的布局和内容。
-</p>
-<br/><br/>
-<p>
-<lime>2017/08/14 v190 : </lime>
-</p><br/>
-<p>
-    1. 动作条系统添加了最大和最小不透明度选项。可用来调整透明度。
-</p>
-<br/><br/>
-<p>
-<lime>2017/05/05 v184 : </lime>
-</p><br/>
-<p>
-    1. 团队面板新增宏绑定工具，用户可以直接绑定按键到指定的宏(文本)。
-</p>
-<p>
-    2. 用户可以为部分增益指定顺序，这些特殊增益将被按顺序优先显示。
-</p>
-<br/><br/>
-<p>
-<lime>2017/04/29 v182 : </lime>
-</p><br/>
-<p>
-    1. 团队面板提供"平滑血条更新"选项，同时也可以修改平滑更新的延迟。
-</p>
-<br/><br/>
-<p>
-<lime>2017/03/27 v172 : </lime>
-</p><br/>
-<p>
-    1. 团队面板加入了“按下即触发”菜单项，勾选时，动作按下时就会触发施法。
-</p>
+<br/>
 </body>
 </html>
 ]]

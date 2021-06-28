@@ -1,7 +1,7 @@
-## Interface: 90002
+## Interface: 90005
 ## Title: IGAS_UI
 ## Author: kurapica.igas@gmail.com
-## Version: v240
+## Version: v241
 ## Notes: UI demo for IGAS
 ## eMail: kurapica.igas@gmail.com
 ## URL: http://github.com/kurapica

@@ -4,79 +4,29 @@ L["ChangeLog"] = [[
 <html>
 <body>
 <p>
-<lime>2018/06/02 v219 : </lime>
-</p><br/>
-<p>
-    1. You can bind keys to the popup action buttons, those buttons will only bind the keys when they are shown, and release the key when they are hidden, so you can bind normal keys like 1, 2, 3 to them.
+<lime>Thanks for keeping use the IGAS_UI, but I'm sorry IGAS and IGAS_UI are officially abandoned. All replacements are done by now, they are more powerful and smoothing.</lime>
 </p>
+<br/>
 <p>
-    2. If a root button has no action on it, click or use its key to click it will show its popup buttons.
+<lightgreen>Action Bar</lightgreen> https://www.curseforge.com/wow/addons/ShadowDancer
 </p>
-<br/><br/>
+<br/>
 <p>
-<lime>2018/02/02 v217 : </lime>
-</p><br/>
-<p>
-    1. The action bar will now notify you that some debuff should be recast on the target.
+<lightgreen>Raid Panel</lightgreen> https://www.curseforge.com/wow/addons/AshToAsh
 </p>
-<br/><br/>
+<br/>
 <p>
-<lime>2018/01/10 v216 : </lime>
-</p><br/>
-<p>
-    1. "As Global" menu added for the action bar, so the action bar should be used by all characters and all specialization.
+<lightgreen>Nameplate</lightgreen> https://www.curseforge.com/wow/addons/Aim
 </p>
-<br/><br/>
+<br/>
 <p>
-<lime>2017/11/29 v205 : </lime>
-</p><br/>
-<p>
-    1. The action bar support Masque now.
+<lightgreen>Bag Container</lightgreen> https://www.curseforge.com/wow/addons/BagView
 </p>
+<br/>
 <p>
-    2. If an action bar has only one button with its branches, you can use "Square Layout" or "Circle Layout" to change their locations with more easy ways.
+<lightgreen>Unit Frame</lightgreen> https://github.com/kurapica/AshUnitFrame
 </p>
-<p>
-    3. Two new action map : World Markder, Raid target.
-</p>
-<br/><br/>
-<p>
-<lime>2017/10/31 v204 : </lime>
-</p><br/>
-<p>
-    1. You can save or load the action bar's layout with the contents.
-</p>
-<br/><br/>
-<p>
-<lime>2017/08/14 v190 : </lime>
-</p><br/>
-<p>
-    1. Max opacity and min opacity settings are added for the action bar system.
-</p>
-<br/><br/>
-<p>
-<lime>2017/05/05 v184 : </lime>
-</p><br/>
-<p>
-    1. A macro binding editor is added for raid panel, so now you can bind keys for macros.
-</p>
-<p>
-    2. You can give order to buffs now, so important buffs would be shown in the first place.
-</p>
-<br/><br/>
-<p>
-<lime>2017/04/29 v182 : </lime>
-</p><br/>
-<p>
-    1. "Smoothing updating" added for raid panel, it'll smooth the updating of the healthbar, you also can modify the smoothing delay.
-</p>
-<br/><br/>
-<p>
-<lime>2017/03/27 v172 : </lime>
-</p><br/>
-<p>
-    1. A menu "Press down trigger" added for raid panel, so you can cast spell by press down the button directly.
-</p>
+<br/>
 </body>
 </html>
 ]]
